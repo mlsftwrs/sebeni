@@ -52,12 +52,14 @@ safety:
 τ is taken from `distillation.tau` (default 0.5). KL β is `trainer.beta`
 (or the active DPO/APO `beta`).
 
-U is computed per policy batch as
-\(I(stage_{pred}\ne-1)+\beta\log((\pi_\theta+\epsilon)/
-(\pi_{ref}+\epsilon))\). Morphological and LM tokens are averaged separately.
-The update scale is \(1/(1+\operatorname{relu}(U))\), so negative U never
-amplifies a step. `u_indicator`, `u_kl`, and `uncertainty` are release
+Training distrust U down-weights a noisy reward. It is **not** the held-out
+UWEC cost. The update scale is \(1/(1+\operatorname{relu}(U))\), so negative U
+never amplifies a step. `u_indicator`, `u_kl`, and `uncertainty` are release
 indicators in `safety_snapshot.json`; they never gate G/D promotion.
+
+Held-out eval writes MER, MCS, and UWEC onto `{working_dir}/exp/eval.json`
+and into the snapshot extra. UWEC uses the absolute log-ratio and is not a
+training gradient coefficient.
 
 ## Python
 

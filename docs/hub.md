@@ -6,7 +6,7 @@ upload (`beni.core.hub.model_card`). `push_to_hub` refuses to run if the card or
 
 The card includes HF YAML frontmatter, intended use (ELRL morphological
 generation — not a chatbot), training recipe (algorithm, rewards, gates that
-fired), eval table (Phi, MER, MCS, format, R_lang), languages/groups (MKU not MLQ),
+fired), eval table (Phi, MER, MCS, UWEC, format, R_lang), languages/groups (MKU not MLQ),
 baseline **grammar/dictionary** checkpoint id, hyperparameter snapshot, and links to
 [seben.robotsmali.org](https://seben.robotsmali.org) and
 [seben.robotsmali.org/docs](https://seben.robotsmali.org/docs).

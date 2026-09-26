@@ -1,8 +1,7 @@
 """Unified SAMPG driver wrapping policy-update plugins.
 
-``SRLTrainer`` is the SAMPG driver: YAML → HITL/initial distill →
-SelfAwareCallback (Φ, τ, Distiller) → policy plugin (GRPO/DPO/APO) → save θ, G, D
-→ model card → optional Hub push.
+``SRLTrainer`` trains one policy arm against frozen grammar and dictionary.
+Resource distillation runs once, upstream, via :mod:`beni.core.pipeline`.
 
 Plugins only replace the policy-update step. Register a new method
 with :func:`register_algorithm`.
@@ -13,7 +12,6 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Protocol
 
 from beni.core.safety.governor import SafetyGovernor
-from beni.core.srl.algorithm1 import confirm_hitl
 from beni.core.srl.config import MasterConfig
 from beni.utils import config as cfg
 
@@ -82,6 +80,10 @@ def _load_builtins() -> None:
         from beni.core.srl.apo.apo import SebeniApo
 
         register_algorithm("apo", SebeniApo)
+    if "sft" not in _ALGORITHM_REGISTRY:
+        from beni.core.srl.sft.sft import SebeniSft
+
+        register_algorithm("sft", SebeniSft)
 
 
 class SRLTrainer:
@@ -102,7 +104,12 @@ class SRLTrainer:
             kl_beta=self.config.trainer.beta,
         )
         self.governor = SafetyGovernor(spec)
-        if str(getattr(self.config.trainer, "framework", "torch")).lower() == "jax":
+        framework = str(getattr(self.config.trainer, "framework", "torch")).lower()
+        if framework == "jax" and str(self.config.algorithm).lower() == "sft":
+            raise ValueError(
+                "SFT is torch-only. Set trainer.framework: torch for algorithm: sft."
+            )
+        if framework == "jax":
             from beni.core.srl.jax import JaxPolicyPlugin
 
             plugin_cls = JaxPolicyPlugin
@@ -124,56 +131,15 @@ class SRLTrainer:
         except TypeError:
             return []
 
-    def _initial_distill(self, records: List[Dict[str, Any]]) -> None:
-        if not self.config.distillation.enabled or not records:
-            return
-        from beni.core.morphotactic.distil.distillation import Distiller
-        from beni.core.srl.algorithm1 import group_texts_by_language, records_text_langs
-
-        default_lang = self.config.data.default_lang or "bam"
-        lang_groups = group_texts_by_language(
-            records_text_langs(records, default_lang),
-            default_lang=default_lang,
-        )
-        allowed = set(self.config.languages()) if self.config.data.languages else None
-        for group, texts in lang_groups.items():
-            if allowed is not None and group not in allowed:
-                continue
-            distiller = Distiller(
-                lang_code=group,
-                backend=self.config.distillation.selected_backend,
-                model=self.config.distillation.model,
-                working_dir=self.config.distillation.working_dir or self.config.working_dir,
-                vertex=self.config.distillation.vertex,
-                base_url=self.config.distillation.base_url,
-                gguf_path=self.config.distillation.gguf_path,
-                n_ctx=self.config.distillation.n_ctx,
-                max_input_chars=self.config.distillation.max_input_chars,
-            )
-            distiller.handle_baselines()
-            proposal = distiller.propose(texts)
-            if proposal is None:
-                continue
-            if not confirm_hitl(
-                proposal.gram_text, proposal.dict_text, self.config.distillation.hitl
-            ):
-                continue
-            decision = self.governor.allow_promote(
-                proposal.phi,
-                proposal.phi_prime,
-                parseable=proposal.parseable,
-                first_create=proposal.first_create,
-                language_ok=proposal.language_ok,
-            )
-            if decision.allowed:
-                distiller.write_checkpoint(proposal.gram_text, proposal.dict_text)
-
     def train(self, data=None, project_name: Optional[str] = None, **kwargs):
-        """HITL/initial distill → SelfAwareCallback → GC plugin → card / Hub."""
+        """Train the selected arm. Distill first only when resources are not frozen."""
         if self.config.working_dir:
             cfg.set_working_dir(self.config.working_dir)
         records = self._records(data)
-        self._initial_distill(records)
+        from beni.core.pipeline import resources_frozen, run_distill
+
+        if records and not resources_frozen(self.config):
+            run_distill(self.config, records)
         return self.plugin.train(
             data,
             project_name=project_name,

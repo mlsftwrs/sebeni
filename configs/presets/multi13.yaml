@@ -1,6 +1,4 @@
-# Alias of configs/presets/multi13.yaml.
-# `sebeni exp` trains on dataset_300_samples.jsonl and evaluates on test.json.
-
+# MULTI13 preset. Override the arm with `sebeni exp --preset multi13 --algorithm sft`.
 preset: multi13
 project_name: sebeni-multi13
 algorithm: grpo          # sft | grpo | dpo | apo

@@ -1,29 +1,24 @@
 # Distillation and DabaX
 
-Distiller in SAMPG proposes candidate grammar and dictionary files when Φ on a
-batch of **texts** falls below τ. Sebeni promotes them only if Φ′ > Φ (and
-SafetyGovernor agrees). There is no separate `refgen` package.
+Distiller proposes candidate grammar and dictionary files when Φ on a
+language's **train split** falls below τ. Sebeni promotes a packaged baseline
+only if Φ′ > Φ (and SafetyGovernor agrees). A scratch stub may be written when
+it parses. The checkpoint is then frozen. Policy arms do not promote again.
 
 ```mermaid
 flowchart LR
-  subgraph standalone["sebeni distill"]
-    D1["Load texts"] --> D2["Distiller"] --> D3["Write baseline_vN"]
-  end
-  subgraph loop["In-loop (train / exp)"]
-    B["Batch B_ℓ"] --> Phi{"Φ < τ?"}
-    Phi -->|yes| Dist["Distiller"]
-    Dist --> Prom{"Φ′ > Φ?"}
-    Prom -->|yes| GD["Promote G, D"]
-    Prom -->|no| Keep["Keep G, D"]
-    Phi -->|no| Keep
-    GD --> Policy["Policy-update plugin"]
-    Keep --> Policy
-  end
+  Texts["Train split for language l"] --> Phi{"Φ < τ?"}
+  Phi -->|no| Freeze["Freeze current G, D"]
+  Phi -->|yes| Dist["Distiller"]
+  Dist --> Prom{"Φ′ > Φ?"}
+  Prom -->|yes| Write["Write baseline_vN"]
+  Prom -->|no| Freeze
+  Write --> Freeze
 ```
 
-`sebeni distill` writes G, D **without** a policy step. `sebeni train` /
-`sebeni exp` run the same Distiller path automatically (per language in the
-batch) via `SelfAwareCallback`. `distillation_hook` is KL scaling, not Distiller.
+`sebeni distill` is this stage. `sebeni train` runs it only when resources are
+not already frozen, then trains one arm. `distillation_hook` is KL scaling,
+not Distiller.
 
 ## What Distiller writes
 
@@ -47,7 +42,8 @@ Promoted files are versioned `baseline_vN` under
 
 ```bash
 sebeni distill -c config.yaml
-sebeni distill -c config.yaml --lang bam --lang mku --hitl
+sebeni distill -c config.yaml --lang multi13 --hitl
+sebeni distill -c config.yaml --lang bam,mku --hitl
 ```
 
 The default `algorithmic` backend needs no API key. Use `distill` when you want

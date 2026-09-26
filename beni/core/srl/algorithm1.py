@@ -143,6 +143,23 @@ def confirm_hitl(gram_text: str, dict_text: str, enabled: bool) -> bool:
     return answer in {"y", "yes"}
 
 
+def distill_language(
+    texts: Sequence[str],
+    distiller: Any,
+    governor: SafetyGovernor,
+    tau: float,
+    *,
+    hitl: bool = False,
+) -> PromoteDecision:
+    """Run SAMPG once on a language's full train split, then stop.
+
+    Φ ← DabaX(texts, G, D). If Φ < τ, Distiller proposes candidates. A scratch
+    bootstrap may be written when it parses. Every later checkpoint, including
+    the first update of a packaged baseline, is written only when Φ′ > Φ.
+    """
+    return _promote_if_below_tau(texts, distiller, governor, tau, hitl=hitl)
+
+
 def maybe_distill_batch(
     texts: Sequence[str],
     distiller: Any,
@@ -170,6 +187,17 @@ def maybe_distill_batch(
     PromoteDecision
         ``reason="phi_above_tau"`` means Distiller was skipped.
     """
+    return _promote_if_below_tau(texts, distiller, governor, tau, hitl=False)
+
+
+def _promote_if_below_tau(
+    texts: Sequence[str],
+    distiller: Any,
+    governor: SafetyGovernor,
+    tau: float,
+    *,
+    hitl: bool = False,
+) -> PromoteDecision:
     texts = [t for t in texts if t]
     if not texts:
         return PromoteDecision(False, "empty_batch", 0.0, 0.0)
@@ -181,7 +209,13 @@ def maybe_distill_batch(
 
     proposal = distiller.propose(texts, current_phi=phi)
     if proposal is None:
-        return PromoteDecision(False, "no_proposal", phi, phi, False, distiller.is_first_create())
+        scratch = bool(getattr(distiller, "is_scratch", lambda: False)())
+        return PromoteDecision(False, "no_proposal", phi, phi, False, scratch)
+
+    if hitl and not confirm_hitl(proposal.gram_text, proposal.dict_text, True):
+        return PromoteDecision(
+            False, "hitl_rejected", proposal.phi, proposal.phi_prime, proposal.parseable, proposal.first_create
+        )
 
     decision = governor.allow_promote(
         proposal.phi,

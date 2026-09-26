@@ -10,7 +10,7 @@ import pytest
 from beni.core import Analysis, Morpheme, Sentence, Token, sentence_to_completion_json
 from beni.core.compute.metrics import MorphologyScorer
 from beni.core.compute.rewards import RewardManager
-from beni.core.language import Language
+from beni.core.language import MULTI13, Language, experiment_group_code, resolve_scope
 from beni.core.safety.governor import SafetyGovernor, SafetySnapshot
 from beni.core.safety.spec import SafetySpec
 from beni.core.srl.algorithm1 import (
@@ -41,6 +41,61 @@ class TestLanguage:
         assert path.name in {"mku", "mlq"}
         aliased = cfg.resolve_packaged_baseline_dir("mlq")
         assert aliased is not None
+
+    def test_multi13_and_outlier_scopes(self):
+        multi = resolve_scope("multi13")
+        assert multi.label == "MULTI13"
+        assert multi.languages == MULTI13
+        assert resolve_scope("all").languages == MULTI13
+        assert resolve_scope("bam,mku").languages == ["bam", "mku"]
+        assert resolve_scope("bam").label == "SINGLE_LANG"
+        assert resolve_scope("bbo").label == "OUTLIER"
+        mixed = resolve_scope(["bam", "bbo"])
+        assert mixed.languages == ["bam"]
+        assert mixed.dropped == ["bbo"]
+        assert mixed.label == "SINGLE_LANG"
+
+    def test_experiment_remap_does_not_change_global_mlq(self):
+        assert Language.from_code("mlq").group_code == "mku"
+        assert experiment_group_code("mlq") == "kao"
+        assert experiment_group_code("hsy") == "mey"
+        assert experiment_group_code("seq") == "spp"
+        assert experiment_group_code("bbo") == "bbo"
+
+
+class TestExperimentSplit:
+    def test_bbo_dropped_from_multi13_and_test_json_refused(self, tmp_path):
+        import json
+
+        from beni.data.datasets import assert_train_source, load_experiment_records
+
+        path = tmp_path / "samples.jsonl"
+        rows = [
+            {"text": "kao row", "lang": "mlq"},
+            {"text": "mey row", "lang": "hsy"},
+            {"text": "spp row", "lang": "seq"},
+            {"text": "bam row", "lang": "bam"},
+            {"text": "outlier", "lang": "bbo"},
+        ]
+        path.write_text("\n".join(json.dumps(row) for row in rows), encoding="utf-8")
+        loaded = load_experiment_records(["multi13"], path)
+        assert {row["lang"] for row in loaded["records"]} == {"kao", "mey", "spp", "bam"}
+        assert loaded["dropped_bbo"] == 1
+        heldout = tmp_path / "test.json"
+        heldout.write_text("{}", encoding="utf-8")
+        with pytest.raises(ValueError, match="evaluation-only"):
+            assert_train_source(heldout)
+
+    def test_sft_is_registered_and_jax_is_rejected(self):
+        from beni.core.srl.config import MasterConfig
+        from beni.core.srl.sft.sft import SebeniSft
+        from beni.core.srl.unified import SRLTrainer, get_algorithm
+
+        assert get_algorithm("sft") is SebeniSft
+        config = MasterConfig(algorithm="sft")
+        config.trainer.framework = "jax"
+        with pytest.raises(ValueError, match="torch-only"):
+            SRLTrainer(config)
 
 
 class TestSafetyGovernor:
@@ -167,6 +222,68 @@ class TestMER:
         hyp = Sentence(text="x", tokens=[Token(surface="ab", stage=1)])
         ref.tokens[0].analyses = []
         assert scorer.mer_sentence(ref, hyp) == 0.0
+
+
+class TestEvalCosts:
+    def test_uwec_absolute_log_ratio_is_a_cost(self):
+        from beni.core.compute.uwec import uwec
+
+        stages = [1, 1]
+        _, high = uwec(stages, [0.9, 0.9], [0.1, 0.1], beta=0.1, eps=1e-8)
+        _, low = uwec(stages, [0.1, 0.1], [0.9, 0.9], beta=0.1, eps=1e-8)
+        assert float(high) == pytest.approx(float(low))
+        assert float(high) > 1.0
+
+    def test_uwec_stage_minus_one_is_zero_indicator(self):
+        from beni.core.compute.uwec import uwec
+
+        _, unknown = uwec([-1], [0.5], [0.5], beta=0.1, eps=1e-8)
+        _, known = uwec([1], [0.5], [0.5], beta=0.1, eps=1e-8)
+        assert float(unknown) == pytest.approx(0.0)
+        assert float(known) == pytest.approx(1.0)
+
+    def test_mer_pools_by_morpheme_count(self):
+        from beni.core.compute.helpers import mer_edit_counts, mer_micro
+
+        ops_a, n_a = mer_edit_counts(["a"], ["b"])
+        ops_b, n_b = mer_edit_counts(["x", "y", "z"], ["x", "y", "z"])
+        pooled = (int(ops_a) + int(ops_b)) / (int(n_a) + int(n_b))
+        mean_of_rates = (float(mer_micro(["a"], ["b"])) + float(mer_micro(["x", "y", "z"], ["x", "y", "z"]))) / 2
+        assert pooled == pytest.approx(0.25)
+        assert mean_of_rates == pytest.approx(0.5)
+
+    def test_reported_mcs_is_mismatch_reward_mcs_is_match(self):
+        from beni.core.compute.helpers import mcs_mismatch
+
+        scorer = MorphologyScorer()
+        pred = Sentence(text="x", tokens=[Token(surface="a", stage=1), Token(surface="b", stage=-1)])
+        ref = Sentence(text="x", tokens=[Token(surface="a", stage=1), Token(surface="b", stage=1)])
+        assert scorer.mcs(pred, ref) == pytest.approx(0.5)
+        assert float(mcs_mismatch([1, -1], [1, 1])) == pytest.approx(0.5)
+        extra = float(mcs_mismatch([1], [1, 2]))
+        assert extra == pytest.approx(0.5)
+
+    def test_numpy_and_jax_match_when_jax_is_installed(self):
+        numpy = pytest.importorskip("numpy")
+        from beni.core.compute.helpers import mer_micro, mcs_mismatch
+        from beni.core.compute.uwec import uwec
+
+        stages = [1, -1, 2]
+        theta = [0.2, 0.4, 0.8]
+        ref = [0.5, 0.5, 0.1]
+        _, np_uwec = uwec(stages, theta, ref, xp=numpy)
+        np_mer = mer_micro(["a", "b"], ["a", "c"], xp=numpy)
+        np_mcs = mcs_mismatch([1, 2], [1, 3], xp=numpy)
+        try:
+            import jax.numpy as jnp
+        except Exception:
+            pytest.skip("jax is not installed")
+        _, jax_uwec = uwec(stages, theta, ref, xp=jnp)
+        jax_mer = mer_micro(["a", "b"], ["a", "c"], xp=jnp)
+        jax_mcs = mcs_mismatch([1, 2], [1, 3], xp=jnp)
+        assert float(np_uwec) == pytest.approx(float(jax_uwec), rel=1e-6)
+        assert float(np_mer) == pytest.approx(float(jax_mer))
+        assert float(np_mcs) == pytest.approx(float(jax_mcs))
 
 
 class TestAdjustedPipeline:
@@ -324,10 +441,10 @@ class TestAdjustedPipeline:
 
 class TestRLang:
     def test_matching_lang(self):
-        rm = RewardManager(reward_config=RewardConfig(lang_weight=0.2))
+        rm = RewardManager()
         completion = '{"text": "aw", "lang": "bam", "tokens": []}'
         scores = rm.reward_lang([completion], language=["bam"])
-        assert scores == [0.2]
+        assert scores == [0.1]
 
     def test_mismatch_zero(self):
         rm = RewardManager()

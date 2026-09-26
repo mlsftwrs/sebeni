@@ -449,6 +449,52 @@ class AlignmentPlugin:
             )
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
+    def token_probabilities(self, text: str):
+        """Per-token π_θ and π_ref as probabilities. Forward pass may use Torch."""
+        import numpy as np
+
+        if self.model is None or self.tokenizer is None:
+            return np.asarray([], dtype=float), np.asarray([], dtype=float)
+        encoded = self.tokenizer(text, return_tensors="pt")
+        device = getattr(self.model, "device", None)
+        if device is None:
+            try:
+                device = next(self.model.parameters()).device
+            except Exception:
+                device = None
+        if device is not None:
+            encoded = {key: value.to(device) for key, value in encoded.items()}
+        input_ids = encoded["input_ids"]
+        if int(input_ids.shape[-1]) < 2:
+            ones = np.asarray([1.0], dtype=float)
+            return ones, ones.copy()
+
+        def _token_probs(model) -> np.ndarray:
+            with torch.no_grad():
+                logits = model(**encoded).logits
+            logp = torch.log_softmax(logits[:, :-1, :], dim=-1)
+            labels = input_ids[:, 1:]
+            gathered = logp.gather(-1, labels.unsqueeze(-1)).squeeze(-1)
+            return gathered.exp().detach().cpu().float().numpy().reshape(-1)
+
+        self.model.eval()
+        pi_theta = _token_probs(self.model)
+        pi_ref = None
+        if self.ref_model is not None:
+            self.ref_model.eval()
+            pi_ref = _token_probs(self.ref_model)
+        else:
+            disable = getattr(self.model, "disable_adapter", None)
+            if callable(disable):
+                try:
+                    with disable():
+                        pi_ref = _token_probs(self.model)
+                except Exception:
+                    pi_ref = None
+        if pi_ref is None:
+            pi_ref = np.array(pi_theta, copy=True)
+        return pi_theta, pi_ref
+
     geneate = generate
 
     def train(self, data, project_name: Optional[str] = None, **kwargs):

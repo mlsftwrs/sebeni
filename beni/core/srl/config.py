@@ -149,8 +149,10 @@ class DataConfig:
         if self.default_lang is not None:
             self.default_lang = self.default_lang.strip().lower()
         if self.languages is not None:
+            from beni.core.language import resolve_scope
+
             parsed = parse_lang_codes(self.languages)
-            self.languages = parsed or None
+            self.languages = resolve_scope(parsed).languages if parsed else None
         if self.known_langs is not None:
             self.known_langs = {str(c).strip().lower() for c in self.known_langs}
         elif self.languages:
@@ -401,10 +403,10 @@ class WordfreqConfig:
 @dataclass
 class RewardConfig:
     """Configuration for reward weights and composition."""
-    format_weight: float = 0.2
+    format_weight: float = 0.1
     morph_weight: float = 0.4
     rule_weight: float = 0.4
-    lang_weight: float = 0.2
+    lang_weight: float = 0.1
     enable_format_reward: bool = True
     enable_morph_reward: bool = True
     enable_rule_reward: bool = True
@@ -413,11 +415,70 @@ class RewardConfig:
 
 
 @dataclass
+class SFTTrainerConfig:
+    """Hyperparameters for the SFT arm (TRL ``SFTTrainer``)."""
+
+    learning_rate: float = 5e-6
+    per_device_train_batch_size: int = 2
+    gradient_accumulation_steps: int = 8
+    max_length: int = 2048
+    max_steps: int = 10
+    num_train_epochs: float = 1.0
+    logging_steps: int = 1
+    save_steps: int = 50
+    output_dir: str = field(default_factory=lambda: str(cfg.get_workdir().models))
+    max_grad_norm: float = 0.1
+    report_to: str = "trackio"
+    warmup_ratio: float = 0.0
+    weight_decay: float = 0.0
+    lr_scheduler_type: str = "cosine"
+    seed: int = 42
+    bf16: bool = False
+    fp16: bool = False
+    use_cpu: bool = False
+    push_to_hub: bool = False
+    hub_model_id: Optional[str] = None
+    hub_token: Optional[str] = None
+    hub_private_repo: bool = True
+
+    def to_dict(self) -> dict:
+        return {
+            "learning_rate": self.learning_rate,
+            "per_device_train_batch_size": self.per_device_train_batch_size,
+            "gradient_accumulation_steps": self.gradient_accumulation_steps,
+            "max_length": self.max_length,
+            "max_steps": self.max_steps,
+            "num_train_epochs": self.num_train_epochs,
+            "logging_steps": self.logging_steps,
+            "save_steps": self.save_steps,
+            "output_dir": self.output_dir,
+            "max_grad_norm": self.max_grad_norm,
+            "report_to": self.report_to,
+            "warmup_ratio": self.warmup_ratio,
+            "weight_decay": self.weight_decay,
+            "lr_scheduler_type": self.lr_scheduler_type,
+            "seed": self.seed,
+            "bf16": self.bf16,
+            "fp16": self.fp16,
+            "use_cpu": self.use_cpu,
+            "push_to_hub": self.push_to_hub,
+            "hub_model_id": self.hub_model_id,
+            "hub_token": self.hub_token,
+        }
+
+
+@dataclass
 class ExperimentConfig:
-    """Optional knobs for ``sebeni exp`` (K-Veritas metrics / seal)."""
+    """Canonical experiment contract: frozen resources, one arm, held-out eval."""
 
     kveritas: bool = False
     kveritas_seal: bool = False
+    freeze_resources: bool = True
+    # ``packaged`` reads dataset_300_samples.jsonl. ``raw`` keeps raw/*.txt for non-experiment train.
+    dataset: str = "raw"
+    scope: Optional[str] = None
+    preset: Optional[str] = None
+    max_eval_rows: int = 1
 
 
 @dataclass
@@ -465,6 +526,7 @@ class MasterConfig:
     trainer: GRPOTrainerConfig = field(default_factory=GRPOTrainerConfig)
     dpo: DPOTrainerConfig = field(default_factory=DPOTrainerConfig)
     apo: APOTrainerConfig = field(default_factory=APOTrainerConfig)
+    sft: SFTTrainerConfig = field(default_factory=SFTTrainerConfig)
     distillation: DistillationConfig = field(default_factory=DistillationConfig)
     reward: RewardConfig = field(default_factory=RewardConfig)
     safety: SafetyConfig = field(default_factory=SafetyConfig)
@@ -487,7 +549,7 @@ class MasterConfig:
             self.trainer.output_dir = str(wd.models)
         if self.processor.runtime_dir in ("", str(cfg.DEFAULT_WORKING_DIR / "runtime")):
             self.processor.runtime_dir = str(wd.runtime)
-        for sibling in (self.dpo, self.apo):
+        for sibling in (self.dpo, self.apo, self.sft):
             if sibling.output_dir in ("", default_models, str(cfg.DEFAULT_WORKING_DIR / "models")):
                 sibling.output_dir = str(wd.models)
         return wd.root
@@ -535,20 +597,23 @@ class MasterConfig:
         hitl: Optional[bool] = None,
     ) -> "MasterConfig":
         """Apply non-None CLI hyperparameter overrides onto trainer / model / data."""
-        from beni.core.language import parse_lang_codes
-
         if languages:
-            parsed = parse_lang_codes(languages)
-            if parsed:
-                self.data.languages = parsed
-                self.data.known_langs = set(parsed)
-                if self.data.default_lang not in parsed:
-                    self.data.default_lang = parsed[0]
+            from beni.core.language import resolve_scope
+
+            resolved = resolve_scope(languages)
+            if resolved.languages:
+                self.data.languages = list(resolved.languages)
+                self.data.known_langs = set(resolved.languages)
+                self.experiment.scope = resolved.label
+                if self.data.default_lang not in resolved.languages:
+                    self.data.default_lang = resolved.languages[0]
         trainer = self.trainer
         if self.algorithm == "dpo":
             trainer = self.dpo
         elif self.algorithm == "apo":
             trainer = self.apo
+        elif self.algorithm == "sft":
+            trainer = self.sft
         mapping = {
             "learning_rate": learning_rate,
             "per_device_train_batch_size": batch_size,

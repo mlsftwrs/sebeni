@@ -7,7 +7,7 @@ from beni.core.srl.config import MasterConfig
 from beni.core.srl.unified import SRLTrainer, register_algorithm
 
 cfg = MasterConfig.from_yaml("config.yaml")
-trainer = SRLTrainer(cfg)          # plugin = GRPO / DPO / APO
+trainer = SRLTrainer(cfg)          # plugin = SFT / GRPO / DPO / APO
 trainer.train([{"text": "Aw ka kɛnɛ wa?", "lang": "bam"}])
 # trainer.load_models / save_model / generate / push_to_hub → plugin
 ```

@@ -8,12 +8,12 @@ from datasets import Dataset
 
 from beni.core.srl.config import trl_config_kwargs
 from beni.core.srl.plugin import AlignmentPlugin
-from beni.core.srl.grpo.callbacks import SelfAwareCallback, TrackioMetricsCallback
+from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
 from beni.data.datasets import rank_group_to_preference
 
 
 class SebeniDpo(AlignmentPlugin):
-    """TRL DPOTrainer as the SAMPG policy-update plugin. Same SelfAwareCallback + rewards."""
+    """TRL DPOTrainer. Preference pairs are built from frozen grammar and dictionary."""
 
     name = "dpo"
 
@@ -29,14 +29,6 @@ class SebeniDpo(AlignmentPlugin):
         return rank_group_to_preference(
             records, scheme_prompt=True, languages=self.config.languages()
         )
-
-    def _refresh_pairs_after_promote(self, _decisions=None) -> None:
-        """Rebuild y*/corrupted pairs against the newly promoted checkpoint."""
-        if not getattr(self, "_preference_records", None):
-            return
-        refreshed = self._preference_dataset(self._preference_records)
-        if self.trainer is not None:
-            self.trainer.train_dataset = refreshed
 
     def train(
         self,
@@ -66,16 +58,6 @@ class SebeniDpo(AlignmentPlugin):
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
         if extra_callbacks:
             callbacks.extend(extra_callbacks)
-        if self.config.distillation.enabled and not any(
-            isinstance(cb, SelfAwareCallback) for cb in callbacks
-        ):
-            callbacks.append(
-                SelfAwareCallback(
-                    self.config,
-                    governor=self.governor,
-                    on_promote=self._refresh_pairs_after_promote,
-                )
-            )
 
         self.trainer = DPOTrainer(
             model=self.model,
@@ -87,7 +69,7 @@ class SebeniDpo(AlignmentPlugin):
         )
         self._wire_pre_update_hooks(self.trainer)
         self._init_trackio(project_name)
-        print("Starting Sebeni DPO Training Loop (SAMPG)...")
+        print("Starting Sebeni DPO Training Loop...")
         result = self.trainer.train()
         self.save_model(self.config.dpo.output_dir or self.config.trainer.output_dir)
         if self.config.dpo.push_to_hub:

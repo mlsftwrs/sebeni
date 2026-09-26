@@ -7,17 +7,18 @@ Unified module for evaluating morphological decomposition quality.
 Includes MER, MCS, Uncertainty, and Phi scores.
 
 Metrics:
-    - MER  : Morpheme Error Rate (edit distance at morpheme level)
-    - MCS  : Morphological Composition Stage accuracy
-    - U    : Token-level Uncertainty cost error (indicator + log-ratio)
-    - Phi  : Corpus-level Morphological Integrity score
+    - MER  : micro morpheme edit rate (S_m + D_m + I_m) / N_m
+    - MCS  : match fraction in rewards; mismatch cost in held-out reports
+    - UWEC : I(stage != -1) + beta * |log((pi_theta + eps) / (pi_ref + eps))|
+    - Phi  : corpus-level morphological integrity score
 """
 
 from __future__ import annotations
 import numpy as np
 import warnings
 from typing import Union, List, Dict
-from beni.core.compute.helpers import levenshtein_matrix, _traceback_ld_ops
+from beni.core.compute.helpers import mer_micro, to_morpheme_list
+from beni.core.compute.uwec import uwec
 from beni.core import Token, Sentence
 
 
@@ -77,21 +78,9 @@ class MorphologyScorer:
             Edit-distance rate. 0 when both sequences are empty; inf when
             the reference is empty and the hypothesis is not.
         """
-        from beni.core.compute.helpers import to_morpheme_list
         ref = to_morpheme_list(ref_tokens)
         hyp = to_morpheme_list(hyp_tokens)
-
-        m, n = len(ref), len(hyp)
-
-        if m == 0 and n == 0:
-            return 0.0
-        if m == 0:
-            return float('inf')
-
-        dp = levenshtein_matrix(ref, hyp)
-        s_m, d_m, i_m = _traceback_ld_ops(dp, ref, hyp)
-
-        return (s_m + d_m + i_m) / m
+        return float(mer_micro(ref, hyp))
 
     def mer_sentence(self, ref_sentence: Sentence, hyp_sentence: Sentence, agg: str = 'mean') -> float:
         """
@@ -162,62 +151,30 @@ class MorphologyScorer:
                     token: Token, 
                     model_prob: float, 
                     ref_prob: float) -> float:
-        """
-        Compute token uncertainty weighted cost error U(w_i, o_i).
-         
-        U = I(Stage_pred ≠ -1) + β * log((π_θ + ε) / (π_θ_ref + ε))
-         
-        Parameters
-        ----------
-        token : Token
-            The token with predicted stage
-        model_prob : float
-            π_θ(w_i | o_i) — trained model probability
-        ref_prob : float
-            π_θ_ref(w_i | o_i) — reference model probability
-            
-        Returns
-        -------
-        float
-            Uncertainty weighted cost error score
-        """
-        indicator = 1.0 if token.has_valid_stage else 0.0
-        ratio = (model_prob + self.eps) / (ref_prob + self.eps)
-        log_ratio = np.log(ratio)
-        return indicator + self.beta * log_ratio
+        """Token UWEC: indicator plus absolute log-ratio. Evaluation cost."""
+        _, mean = uwec(
+            [token.stage],
+            [model_prob],
+            [ref_prob],
+            beta=self.beta,
+            eps=self.eps,
+        )
+        return float(mean)
     
     def uncertainty_weighted_cost_error_sentence(self, 
                     sentence: Sentence, 
                     model_probs: List[float], 
                     ref_probs: List[float]) -> float:
-        """
-        Compute sentence uncertainty weighted cost error U(w_i, o_i).
-         
-        U = mean I(Stage_pred != -1) + beta * mean log((pi_theta + eps) / (pi_ref + eps))
-
-        Morphological-analysis tokens and LM/BPE tokens are averaged separately;
-        they are not positionally aligned.
-         
-        Parameters
-        ----------
-        sentence : Sentence
-            The sentence with predicted stage
-        model_probs : List[float]
-            π_θ(w_i | o_i) — trained model probabilities
-        ref_probs : List[float]
-            π_θ_ref(w_i | o_i) — reference model probabilities
-            
-        Returns
-        -------
-        float
-            Sentence uncertainty weighted cost error score
-        """
-        indicators = [1.0 if token.has_valid_stage else 0.0 for token in sentence.tokens]
-        log_ratios = [(model_prob + self.eps) / (ref_prob + self.eps) for model_prob, ref_prob in zip(model_probs, ref_probs)]
-        log_ratios = [np.log(lr) for lr in log_ratios]
-        indicator_mean = float(np.mean(indicators)) if indicators else 0.0
-        ratio_mean = float(np.mean(log_ratios)) if log_ratios else 0.0
-        return indicator_mean + self.beta * ratio_mean
+        """Sentence UWEC as the token mean of U(w_i, o)."""
+        stages = [token.stage for token in (sentence.tokens or [])]
+        _, mean = uwec(
+            stages,
+            model_probs,
+            ref_probs,
+            beta=self.beta,
+            eps=self.eps,
+        )
+        return float(mean)
 
     def evaluate(self, 
                  predicted: Union[Sentence, List[Token]], 

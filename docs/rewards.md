@@ -3,13 +3,13 @@
 Shared \(\pi_{rf}\) for every algorithm:
 
 \[
-R_{\mathrm{total}} = \omega_m R_{\mathrm{morph}} + \omega_r R_{\mathrm{rule}} + \omega_f R_{\mathrm{format}}
+R_{\mathrm{total}} = \omega_m R_{\mathrm{morph}} + \omega_r R_{\mathrm{rule}} + \omega_f R_{\mathrm{format}} + \omega_l R_{\mathrm{lang}}
 \]
 
-Sebeni defaults (YAML `reward:`): format **0.2**, morph **0.4**, rule **0.4**,
-**lang 0.2**. GRPO stays **outcome-level** on the completion; token stages are
-process signal. Daba itself is the verifiable reward — no separate reward
-model.
+Sebeni defaults (YAML `reward:`): morph **0.4**, rule **0.4**, format **0.1**,
+lang **0.1** — they sum to **1.0**. GRPO stays **outcome-level** on the
+completion; token stages are process signal. Daba itself is the verifiable
+reward — no separate reward model.
 
 ## Metrics
 
@@ -17,21 +17,24 @@ model.
 borrowing EMPR / stage 6 → `empr` (default 0.5); unknown → 0. Trigger Distiller
 if corpus/batch Φ < τ (0.5).
 
-**MER** — optional scorer output: morpheme Levenshtein \((S_m+D_m+I_m)/N_m\) vs
-IGT. \(N_m\) is the reference morpheme count. Lower is better.
+**MER** — held-out morpheme edit rate \((S_m+D_m+I_m)/N_m\). \(N_m\) is the
+reference morpheme count. The reported value for a language or MULTI13 is one
+micro-average over every morpheme in that scope. Lower is better.
 
-**MCS** — optional scorer output: fraction of tokens whose predicted `stage`
-equals Daba's stage (self-awareness: no fake stage=1). Unaware hallucination is
-claiming a valid stage for a token Daba marks −1.
+**MCS (reward)** — fraction of tokens whose predicted `stage` equals Daba's
+stage. Training rewards still use this match fraction.
 
-**U** — \(I(\text{stage}_{pred}\ne-1) +
-\beta \log((\pi_\theta+\epsilon)/(\pi_{ref}+\epsilon))\). The stage indicator
-is averaged over morphological JSON tokens; the log ratio is averaged over LM
-completion tokens. They are not positionally zipped.
+**MCS (report)** — the mismatch cost \(1 -\) that fraction, so MER, MCS, and
+UWEC are all quantities to minimize. Unpaired tokens count as mismatches.
 
-U is reward distrust, not a fifth reward and not a replacement for Φ. Torch
-and JAX scale the update by \(1/(1+\operatorname{relu}(U))\). Evaluation logs
-`u_indicator`, `u_kl`, and `uncertainty`.
+**UWEC** — post-training cost
+\(I(\mathrm{Stage}_{pred}\neq-1)+\beta\left|\log\frac{\pi^\mathcal{A}_\theta+\varepsilon}{\pi_{\mathrm{ref}}+\varepsilon}\right|\),
+token-mean over the scope. It is not a training gradient coefficient. Torch or
+Flax may produce the token probabilities; the cost reduction is NumPy or JAX.
+
+The training distrust term \(U\) used to scale gradients stays separate
+(`jax_uncertainty_scale` / SafetyGovernor). Evaluation logs MER, MCS, and UWEC
+on `{working_dir}/exp/eval.json` as `model`, `algorithm`, `scope`.
 
 ## Rewards
 
@@ -39,8 +42,8 @@ and JAX scale the update by \(1/(1+\operatorname{relu}(U))\). Evaluation logs
 | --- | --- | --- |
 | \(R_{morph}\) | 0.4 | Annotation quality vs DabaX \(y^*\): MCS, clipped MER quality, and lemma overlap |
 | \(R_{rule}\) | 0.4 | Text Φ under active **G**, **D**, plus lexical/POS agreement with \(y^*\) |
-| \(R_{format}\) | 0.2 | Valid **JSON** object with a `tokens` list |
-| \(R_{lang}\) | 0.2 | JSON `lang` matches **that row**'s group |
+| \(R_{format}\) | 0.1 | Valid **JSON** object with a `tokens` list |
+| \(R_{lang}\) | 0.1 | JSON `lang` matches **that row**'s group |
 
 ### Rule-encoded extras
 
@@ -71,10 +74,10 @@ scores 0 for the corresponding term (and can block the policy update — see
 
 ```yaml
 reward:
-  format_weight: 0.2
+  format_weight: 0.1
   morph_weight: 0.4
   rule_weight: 0.4
-  lang_weight: 0.2
+  lang_weight: 0.1
   enable_format_reward: true
   enable_morph_reward: true
   enable_rule_reward: true

@@ -8,25 +8,16 @@ Public URL: [https://seben.robotsmali.org/docs](https://seben.robotsmali.org/doc
 
 ## Three product phases
 
-1. **Distill resources** — lexical references (`\va` / `\ve` variants) become
-   a SIL Toolbox **grammar G** and **dictionary D**. Frontier LLMs synthesize
-   Daba pattern files; HITL (`--hitl`) validates Select-Mark
-   `pattern select_gloss | mark_gloss` and compounding such as `:n: [ :v: :n: ]`.
-2. **Refine G/D while training** — Daba is a **dynamic checkpoint**. If Φ on a
-   training batch is below τ, Distiller proposes \(G_{cand}, D_{cand}\)
-   and Sebeni promotes only when Φ′ > Φ.
-3. **Update θ** — GRPO (default) samples a group of completions and
-   scores them with Daba. DPO / APO are drop-in **policy-update plugins**.
+1. **Distill resources** — once per language, on the train split. If Φ is below τ, Distiller proposes a candidate grammar G and dictionary D and promotes them only when Φ′ improves. The result is frozen.
+2. **Train one arm** — SFT, GRPO, DPO, or APO reads that frozen checkpoint and starts from the base model. Arms do not promote new G or D.
+3. **Evaluate** — held-out `test.json` reports MER, MCS, and UWEC for model \(m\), algorithm \(\mathcal{A}\), and scope \(l\). All three are costs to minimize. MULTI13 pools morphemes (MER) and tokens (MCS, UWEC) across languages.
 
 ```mermaid
 flowchart TD
-  T["Dataset T: rows of text, lang"] --> Split["Split by Language.group_code"]
-  Split --> GD["Per language: G_ℓ, D_ℓ"]
-  Split --> Theta["One shared policy θ"]
-  GD --> Phi["Φ ← DabaX"]
-  Phi --> Dist["Distiller if Φ < τ"]
-  Dist --> Theta
-  Theta --> R["Rewards → plugin update"]
+  T["Train rows"] --> Dist["Distill once per language"]
+  Dist --> Freeze["Frozen G_ℓ, D_ℓ"]
+  Freeze --> Arm["One arm: SFT, GRPO, DPO, or APO"]
+  Arm --> Eval["Held-out MER, MCS, UWEC"]
 ```
 
 ## One θ, many (G, D)
@@ -71,16 +62,17 @@ flowchart TD
 
 ```
 beni/
-  cli/main.py              sebeni init|train|distill|eval|exp|wordfreq|generate|push
-  core/srl/                SAMPG + GRPO/DPO/APO plugins
+  cli/main.py              sebeni init|distill|train|eval|exp|wordfreq|generate|push
+  core/pipeline.py         distill once, one arm, held-out eval
+  core/srl/                SFT, GRPO, DPO, APO arms
   core/safety/             SafetyGovernor gates
-  core/compute/            Φ, MER, MCS, U, RewardManager
+  core/compute/            Φ, MER, MCS, UWEC (NumPy/JAX kernels), RewardManager
   core/morphotactic/       Distiller, DabaX (CLI daba.mparser)
   core/language.py         ISO → group_code (mku, mey, kao, spp)
   core/hub/                model cards
   core/wordfreq/           surface / lemma / morpheme / stage counts
   data/baselines/{lang}/   packaged G, D (Maninka files may live under mlq/)
-  data/raw/                packaged train texts for sebeni exp
+  data/raw/dataset_300_samples.jsonl   experiment train split
   data/test.json           packaged eval texts for sebeni exp
   utils/                   workdir, prompts, language metadata
 ```
@@ -90,9 +82,10 @@ Relocatable workdir (later wins): `~/.sebeni` → `SEBENI_HOME` /
 
 | Path under workdir | Contents |
 | --- | --- |
+| `data/resources/{lang}/` | Frozen G, D after `sebeni distill` |
 | `data/baselines/{lang}/` | `baseline.gram` / `.dict`, then `baseline_vN` |
 | `models/` | Policy, tokenizer, Hub `README.md`, `safety_snapshot.json` |
-| `exp/` | `eval.json`, `wordfreq/` |
+| `exp/` | `eval.json`, `manifest.json`, `wordfreq/` |
 | `runtime/` | Headless mparser scratch |
 
 ## What Sebeni does *not* do

@@ -310,8 +310,10 @@ class Distiller(object):
         state = self.__get_latest_ckpt()
         self.gram_path = state["gram"] if state["gram"] else self.gram_path
         self.dict_path = state["dict"] if state["dict"] else self.dict_path
-        first_create = self.is_first_create()
-        bootstrap = self.is_scratch()
+        # Scratch stubs use the parse gate. A copied packaged baseline is not a
+        # first create: the first promoted checkpoint still requires Φ′ > Φ.
+        first_create = self.is_scratch()
+        bootstrap = first_create
 
         current_gram = Path(self.gram_path)
         current_dict = Path(self.dict_path)

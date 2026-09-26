@@ -3,8 +3,6 @@ import torch.nn.functional as F
 from typing import List, Dict, Any, Callable, Optional
 from transformers import TrainerCallback
 
-from beni.core.srl.algorithm1 import batch_text_langs, maybe_distill_languages
-
 try:
     import trackio
 except ImportError:
@@ -114,10 +112,9 @@ def distillation_hook(model, ref_model, batch_meta: Dict[str, Any]) -> None:
 
 
 class SelfAwareCallback(TrainerCallback):
-    """SAMPG Φ vs τ: Distiller proposes G, D; promote iff Φ′ > Φ.
+    """Kept so older imports resolve. Resource promotion now happens upstream.
 
-    Runs on each train batch **before** the policy-update step. Mixed-language
-    batches are split by group code; each language has its own ``{G, D}``.
+    This callback does not propose or write grammar and dictionary files.
     """
 
     def __init__(self, config, governor=None, distiller=None, on_promote=None):
@@ -161,42 +158,9 @@ class SelfAwareCallback(TrainerCallback):
         return distiller
 
     def process_inputs(self, inputs, step=None):
-        """Run the per-batch SAMPG check from TRL's compute-loss path."""
-        if not getattr(self.config.distillation, "enabled", True):
-            return
-        default_lang = self.config.data.default_lang or "bam"
-        pairs = batch_text_langs(inputs, default_lang=default_lang)
-        if not pairs:
-            return
-        key = (step, tuple(pairs))
-        if key == self._last_batch_key:
-            return
-        self._last_batch_key = key
-        from beni.core.safety.governor import SafetyGovernor
-
-        governor = self.governor or SafetyGovernor()
-        self.last_decision = maybe_distill_languages(
-            pairs,
-            self._distiller_for,
-            governor,
-            self.tau,
-            default_lang=default_lang,
-        )
-        if isinstance(inputs, dict) and any(
-            decision.allowed for decision in self.last_decision.values()
-        ):
-            from beni.core.morphotactic.dabax import clear_dabax_cache
-            from beni.data.datasets import build_dabax_reference
-
-            for group, decision in self.last_decision.items():
-                if decision.allowed:
-                    clear_dabax_cache(group)
-            inputs["reference"] = [
-                build_dabax_reference(text, lang) for text, lang in pairs
-            ]
-            if self.on_promote is not None:
-                self.on_promote(self.last_decision)
-        return self.last_decision
+        """No-op. Distillation is not part of the policy step."""
+        del inputs, step
+        return None
 
     def on_train_batch_begin(self, args, state, control, **kwargs):
         self.process_inputs(kwargs.get("inputs"), step=getattr(state, "global_step", None))

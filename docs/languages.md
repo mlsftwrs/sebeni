@@ -24,8 +24,14 @@ Aliases such as `bm` → `bam` and `mlq` → `mku` are resolved by
 `Language.from_code`. Pass ISO or group to `--lang`.
 
 ```bash
-sebeni init --lang bam --lang mku --lang dtm --lang mey -w ./runs/mali-001
+sebeni init --lang multi13 -w ./runs/mali-001
+sebeni init --lang bam -w ./runs/bam
+sebeni exp --preset single --lang bbo --algorithm grpo -w ./runs/bbo
 ```
+
+`bbo` is an outlier kept in the experiment file and excluded from MULTI13.
+Inside `dataset_300_samples.jsonl` only, `mlq` is read as Kassonke `kao`,
+`hsy` as `mey`, and `seq` as `spp`. `Language.from_code("mlq")` is still Maninka `mku`.
 
 ```yaml
 data:

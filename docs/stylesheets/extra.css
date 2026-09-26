@@ -1,5 +1,7 @@
-/* White brush-S on a dark field: invert on the light drawer so it stays visible. */
-[data-md-color-scheme="default"] .md-nav--primary .md-nav__title .md-logo img {
+/* Sebeni overlays on the CLI terminal theme. */
+
+[data-md-color-scheme="cli-light"] .md-nav--primary .md-nav__title .md-logo img,
+[data-md-color-scheme="cli-light"] .md-header .md-logo img {
   filter: invert(1);
 }
 
@@ -8,14 +10,38 @@
   border-radius: 0.2rem;
 }
 
-/* Keep autodoc signatures and tables readable (avoid the old "broken" dump). */
+[data-md-color-scheme="cli-dark"] .md-typeset figure img,
+[data-md-color-scheme="cli-dark"] .md-typeset img[alt="SEBEN!"] {
+  filter: invert(1);
+}
+
+.md-typeset .admonition.note,
+.md-typeset .admonition.tip {
+  border-left-color: var(--term-green);
+}
+
+.md-typeset .typewriter {
+  font-family: inherit;
+  color: var(--term-green);
+  white-space: pre-wrap;
+}
+
+.md-typeset .typewriter::after {
+  content: "_";
+  color: var(--term-green);
+  animation: blink 1.1s steps(1) infinite;
+}
+
+.md-typeset table {
+  font-variant-numeric: tabular-nums;
+}
+
 .md-typeset .doc-heading {
   overflow-wrap: anywhere;
 }
 
 .md-typeset .doc-contents table {
   font-size: 0.85rem;
-  font-variant-numeric: tabular-nums;
 }
 
 .md-typeset .doc.doc-object {

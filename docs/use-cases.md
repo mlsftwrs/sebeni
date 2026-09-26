@@ -14,8 +14,9 @@ raw / test splits — no jsonl to prepare.
 sebeni exp -c configs/exp.yaml -w ./runs/exp-001
 ```
 
-Expect: `{working_dir}/exp/eval.json`, G/D under `data/baselines/{lang}/`,
-policy under `models/`, Trackio (or wandb). Details: [Experiments](experiments.md).
+Expect: `{working_dir}/exp/eval.json` with MER, MCS, and UWEC, frozen G/D under
+`data/resources/{lang}/`, policy under `models/`, Trackio (or wandb). Details:
+[Experiments](experiments.md).
 
 ## 2. Bambara GRPO
 

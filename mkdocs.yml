@@ -1,50 +1,59 @@
-site_name: Sebeni
+site_name: "sebeni@docs:~$"
 site_description: Self-aware morphotactic generation toolkit for extremely low-resource languages
 site_url: https://seben.robotsmali.org/docs/
+site_author: RobotsMali
 repo_url: https://github.com/mlsftwrs/sebeni
 repo_name: mlsftwrs/sebeni
 edit_uri: ""
-copyright: Sebeni — write in Malian languages
+copyright: "sebeni — write in Malian languages"
 
 theme:
   name: material
   logo: assets/logo.png
   favicon: assets/favicon.png
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    text: "JetBrains Mono"
+    code: "JetBrains Mono"
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: indigo
-      accent: indigo
+    - scheme: cli-dark
       toggle:
-        icon: material/brightness-7
-        name: Dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: indigo
-      accent: indigo
+        icon: material/weather-night
+        name: Switch to light mode
+    - scheme: cli-light
       toggle:
-        icon: material/brightness-4
-        name: Light mode
+        icon: material/weather-sunny
+        name: Switch to dark mode
   features:
     - navigation.instant
     - navigation.tracking
+    - navigation.tabs
     - navigation.sections
     - navigation.expand
+    - navigation.top
+    - navigation.footer
     - search.suggest
     - search.highlight
     - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
     - toc.follow
-  font:
-    text: Roboto
-    code: Roboto Mono
 
 extra:
   homepage: https://seben.robotsmali.org
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/mlsftwrs/sebeni
+    - icon: simple/huggingface
+      link: https://huggingface.co/mlsftwrs
 
 extra_css:
+  - stylesheets/terminal.css
   - stylesheets/extra.css
 
 extra_javascript:
+  - javascripts/typewriter.js
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
@@ -53,14 +62,16 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - tables
-  - toc:
-      permalink: true
-  - pymdownx.arithmatex:
-      generic: true
   - pymdownx.details
+  - pymdownx.snippets
+  - pymdownx.inlinehilite
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true
-  - pymdownx.inlinehilite
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -68,6 +79,10 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: "#"
 
 plugins:
   - search
@@ -81,9 +96,9 @@ plugins:
             show_root_heading: true
 
 nav:
-  - Learn:
-      - Home: index.md
-      - Getting started: getting-started.md
+  - Home: index.md
+  - Getting started:
+      - Install and run: getting-started.md
       - Experiments: experiments.md
       - Use cases: use-cases.md
   - How it works:
@@ -99,6 +114,7 @@ nav:
       - Wordfreq: wordfreq.md
       - Hub: hub.md
       - Contributing: contributing.md
+      - Cleanup catalog: cleanup-catalog.md
       - API:
           - Overview: api/index.md
           - SRL: api/srl.md

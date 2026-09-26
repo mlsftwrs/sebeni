@@ -23,9 +23,10 @@ class TestGRPOConfigs:
         assert config.model.model_name == "HuggingFaceTB/SmolLM2-135M"
         assert config.distillation.enabled is True
         assert config.distillation.selected_backend == "algorithmic"
-        assert config.reward.format_weight == 0.2
+        assert config.reward.format_weight == 0.1
         assert config.reward.morph_weight == 0.4
         assert config.reward.rule_weight == 0.4
+        assert config.reward.lang_weight == 0.1
 
     def test_master_config_from_dict(self):
         config_dict = {
@@ -300,10 +301,15 @@ class TestSebeniGrpoPipeline:
 
     @patch("beni.core.srl.grpo.grpo.Distiller")
     def test_run_batch_distillation_enabled(self, mock_distiller_cls):
+        from beni.core.morphotactic.distil.distillation import DistillProposal
+
         mock_distiller_instance = MagicMock()
-        mock_distiller_instance.run_batch_distillation.return_value = (
-            "baseline_v2.gram", "baseline_v2.dict"
+        mock_distiller_instance.phi_on_texts.return_value = 0.2
+        mock_distiller_instance.propose.return_value = DistillProposal(
+            "g", "d", 0.2, 0.8, True, False
         )
+        mock_distiller_instance.gram_path = "baseline_v2.gram"
+        mock_distiller_instance.dict_path = "baseline_v2.dict"
         mock_distiller_cls.return_value = mock_distiller_instance
 
         pipeline = SebeniGrpo()
@@ -328,17 +334,18 @@ class TestSebeniGrpoPipeline:
             n_ctx=4096,
             max_input_chars=8000,
         )
-        mock_distiller_instance.run_batch_distillation.assert_called_once_with([
-            "aw ka ne labato.", "kàlanko jamanaw"
-        ])
+        mock_distiller_instance.propose.assert_called_once_with(
+            ["aw ka ne labato.", "kàlanko jamanaw"], current_phi=0.2
+        )
+        mock_distiller_instance.write_checkpoint.assert_called_once()
         assert "bam" in results
         assert results["bam"]["gram_path"] == "baseline_v2.gram"
-        assert results["bam"]["dict_path"] == "baseline_v2.dict"
+        assert results["bam"]["allowed"] is True
 
     @patch("beni.core.srl.grpo.grpo.Distiller")
     def test_run_batch_distillation_mixed_languages(self, mock_distiller_cls):
         mock_distiller_instance = MagicMock()
-        mock_distiller_instance.run_batch_distillation.return_value = ("g.gram", "d.dict")
+        mock_distiller_instance.phi_on_texts.return_value = 0.9
         mock_distiller_cls.return_value = mock_distiller_instance
 
         pipeline = SebeniGrpo()
@@ -454,7 +461,6 @@ class TestGRPOTrainingModel:
     @patch("beni.core.srl.grpo.grpo.Distiller")
     def test_train_pipeline_execution(self, mock_distiller_cls, mock_trainer_cls, mock_grpo_config, mock_card, tmp_path):
         mock_distiller_inst = MagicMock()
-        mock_distiller_inst.run_batch_distillation.return_value = ("v1.gram", "v1.dict")
         mock_distiller_cls.return_value = mock_distiller_inst
 
         mock_trainer_inst = MagicMock()
@@ -477,7 +483,9 @@ class TestGRPOTrainingModel:
 
         result = pipeline.train(raw_sentences, project_name="Test-Run")
 
-        mock_distiller_inst.run_batch_distillation.assert_called_once()
+        mock_distiller_cls.assert_not_called()
         mock_trainer_cls.assert_called_once()
+        callbacks = mock_trainer_cls.call_args.kwargs["callbacks"]
+        assert all(type(cb).__name__ != "SelfAwareCallback" for cb in callbacks)
         mock_trainer_inst.train.assert_called_once()
         assert result == {"train_loss": 0.123}

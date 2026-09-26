@@ -45,10 +45,10 @@ distillation:
   hitl: false
 
 reward:
-  format_weight: 0.2
+  format_weight: 0.1
   morph_weight: 0.4
   rule_weight: 0.4
-  lang_weight: 0.2
+  lang_weight: 0.1
 
 safety:
   enabled: true

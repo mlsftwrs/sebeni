@@ -141,6 +141,26 @@ class JaxPolicyPlugin(AlignmentPlugin):
         selected = jnp.take_along_axis(log_probs, labels[..., None], axis=-1)[..., 0]
         return selected * attention_mask[:, 1:]
 
+    def token_probabilities(self, text: str):
+        """Per-token π_θ and π_ref as probabilities from Flax, else the torch fallback."""
+        import numpy as np
+
+        if self._fallback is not None:
+            return self._fallback.token_probabilities(text)
+        if self.model is None or self.tokenizer is None:
+            return np.asarray([], dtype=float), np.asarray([], dtype=float)
+        import jax.numpy as jnp
+
+        encoded = self.tokenizer(text, return_tensors="np")
+        ids = jnp.asarray(encoded["input_ids"])
+        mask = jnp.asarray(encoded["attention_mask"])
+        if int(ids.shape[-1]) < 2:
+            ones = np.asarray([1.0], dtype=float)
+            return ones, ones.copy()
+        theta = np.asarray(self._token_logps(self.params, ids, mask)[0])
+        ref = np.asarray(self._token_logps(self.ref_params, ids, mask)[0])
+        return np.exp(theta), np.exp(ref)
+
     def _grpo_step(self, prompts, completions, advantages, prompt_lengths):
         import jax
         import jax.numpy as jnp

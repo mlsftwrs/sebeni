@@ -1,0 +1,266 @@
+/* ==========================================================================
+   CLI / Terminal theme for MkDocs Material
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+/* ---- Palettes -------------------------------------------------------- */
+
+[data-md-color-scheme="cli-dark"] {
+  --md-default-bg-color: #0d1117;
+  --md-default-fg-color: #c9d1d9;
+  --md-default-fg-color--light: #c9d1d9;
+  --md-default-fg-color--lighter: #8b949e;
+  --md-default-fg-color--lightest: #6e7681;
+
+  --md-primary-fg-color: #0d1117;
+  --md-primary-bg-color: #39ff14;
+  --md-primary-fg-color--dark: #0d1117;
+
+  --md-accent-fg-color: #39ff14;
+
+  --md-code-bg-color: #161b22;
+  --md-code-fg-color: #79c0ff;
+
+  --md-typeset-color: #c9d1d9;
+  --md-typeset-a-color: #58a6ff;
+  --md-typeset-table-color: #c9d1d9;
+  --md-footer-fg-color: #c9d1d9;
+  --md-footer-bg-color: #010409;
+
+  --term-green: #39ff14;
+  --term-amber: #ffb454;
+  --term-red: #ff5f56;
+  --term-yellow: #ffbd2e;
+  --term-cyan: #56d4dd;
+  --term-border: #30363d;
+  --term-window-bg: #010409;
+}
+
+[data-md-color-scheme="cli-light"] {
+  --md-default-bg-color: #f6f8fa;
+  --md-default-fg-color: #1f2328;
+  --md-default-fg-color--light: #1f2328;
+  --md-default-fg-color--lighter: #57606a;
+  --md-default-fg-color--lightest: #6e7781;
+
+  --md-primary-fg-color: #f6f8fa;
+  --md-primary-bg-color: #0969da;
+  --md-primary-fg-color--dark: #1f2328;
+
+  --md-accent-fg-color: #0969da;
+
+  --md-code-bg-color: #eaeef2;
+  --md-code-fg-color: #0550ae;
+
+  --md-typeset-color: #1f2328;
+  --md-typeset-a-color: #0969da;
+  --md-typeset-table-color: #1f2328;
+  --md-footer-fg-color: #1f2328;
+  --md-footer-bg-color: #ffffff;
+
+  --term-green: #116329;
+  --term-amber: #9a6700;
+  --term-red: #cf222e;
+  --term-yellow: #9a6700;
+  --term-cyan: #1b7c83;
+  --term-border: #d0d7de;
+  --term-window-bg: #ffffff;
+}
+
+/* ---- Global type ------------------------------------------------------ */
+
+body,
+.md-typeset {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-feature-settings: "liga" 1, "calt" 1;
+  color: var(--md-typeset-color);
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset p,
+.md-typeset li,
+.md-typeset td,
+.md-typeset th {
+  color: var(--md-typeset-color);
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.md-typeset h1::before {
+  content: "$ ";
+  color: var(--term-green);
+  font-weight: 400;
+}
+
+.md-header {
+  border-bottom: 1px solid var(--term-border);
+  box-shadow: none;
+}
+
+.md-header__topic:first-child .md-ellipsis::after {
+  content: "_";
+  color: var(--term-green);
+  animation: blink 1.1s steps(1) infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ---- Terminal window chrome for code blocks --------------------------- */
+
+.md-typeset pre {
+  border: 1px solid var(--term-border);
+  border-radius: 8px;
+  background-color: var(--term-window-bg) !important;
+  position: relative;
+  padding-top: 2.2rem !important;
+  overflow: hidden;
+}
+
+.md-typeset pre::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.8rem;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0)
+  );
+  border-bottom: 1px solid var(--term-border);
+}
+
+.md-typeset pre::after {
+  content: "";
+  position: absolute;
+  top: 0.55rem;
+  left: 0.85rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--term-red);
+  box-shadow: 16px 0 0 var(--term-yellow), 32px 0 0 var(--term-green);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.md-typeset code {
+  border-radius: 4px;
+}
+
+/* ---- Admonitions styled as terminal alerts ----------------------------- */
+
+.md-typeset .admonition,
+.md-typeset details {
+  border: 1px solid var(--term-border);
+  border-left: 3px solid var(--term-green);
+  border-radius: 6px;
+  background-color: var(--md-code-bg-color);
+}
+
+.md-typeset .admonition-title,
+.md-typeset summary {
+  font-weight: 600;
+}
+
+.md-typeset .admonition-title::before {
+  content: ">";
+  color: var(--term-green);
+  margin-right: 0.4rem;
+}
+
+/* ---- Nav / sidebar ------------------------------------------------------ */
+
+.md-nav__title {
+  font-weight: 600;
+}
+
+.md-nav__link--active {
+  color: var(--term-green) !important;
+}
+
+.md-nav__item .md-nav__link--active::before {
+  content: "$ ";
+  color: var(--term-green);
+}
+
+/* ---- Tabs ---------------------------------------------------------------- */
+
+.md-typeset .tabbed-set {
+  border: 1px solid var(--term-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.md-typeset .tabbed-labels {
+  background-color: var(--md-code-bg-color);
+}
+
+/* ---- Search -------------------------------------------------------------- */
+
+.md-search__input {
+  font-family: inherit;
+  border-radius: 4px;
+}
+
+.md-search__input::placeholder {
+  color: var(--md-default-fg-color--lighter);
+}
+
+.md-search__input::before {
+  content: "$";
+}
+
+/* ---- Buttons / links styled like a prompt -------------------------------- */
+
+.md-typeset .md-button {
+  font-family: inherit;
+  border-radius: 4px;
+  border: 1px solid var(--term-green);
+  color: var(--term-green);
+  background: transparent;
+}
+
+.md-typeset .md-button:hover {
+  background-color: var(--term-green);
+  color: var(--term-window-bg);
+}
+
+/* ---- Scrollbar ------------------------------------------------------------ */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--md-default-bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--term-border);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--term-green);
+}
+
+/* ---- Footer ---------------------------------------------------------------- */
+
+.md-footer {
+  background-color: var(--term-window-bg);
+}

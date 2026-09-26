@@ -77,6 +77,7 @@ onto `max_length` when the installed TRL no longer has the prompt field.
 | `push_to_hub` | `false` | (YAML) |
 | `hub_model_id` | `null` | (YAML) |
 
+`algorithm: sft | grpo | dpo | apo` selects the arm. SFT is torch-only.
 DPO uses the `dpo:` block (`loss_type: sigmoid`); APO uses `apo:`
 (`loss_type: apo_zero` or `apo_down`). Shared optimizer fields (`learning_rate`,
 `beta`, `max_steps`, `warmup_ratio`, `weight_decay`, `lr_scheduler_type`,

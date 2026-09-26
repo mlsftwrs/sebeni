@@ -288,7 +288,7 @@ class RewardManager:
 
         scores = []
         langs = language or [""] * len(completions)
-        weight = getattr(self.config, "lang_weight", 0.2)
+        weight = getattr(self.config, "lang_weight", 0.1)
 
         for text, lang in zip(completions, langs):
             parsed = self.extract_json(text)

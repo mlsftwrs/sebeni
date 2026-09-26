@@ -8,6 +8,28 @@ from typing import Iterable, List, Optional, Union
 from beni.utils import config as cfg
 
 
+# Mali's 13 national languages, as Sebeni group codes.
+MULTI13: List[str] = [
+    "bam",
+    "bmq",
+    "boz",
+    "dtm",
+    "ful",
+    "mey",
+    "kao",
+    "myk",
+    "mku",
+    "spp",
+    "ses",
+    "snk",
+    "taq",
+]
+OUTLIER_CODE = "bbo"
+SCOPE_PRESETS = {"multi13", "all"}
+# Applied only when reading the experiment jsonl. Global ``mlq`` stays Maninka.
+EXPERIMENT_CODE_MAP = {"mlq": "kao", "hsy": "mey", "seq": "spp"}
+
+
 def parse_lang_codes(value: Optional[Union[str, Iterable[str]]]) -> List[str]:
     """Split CLI/YAML language values (``bam,mku`` or ``["bam", "mku"]``) into codes."""
     if value is None:
@@ -19,6 +41,74 @@ def parse_lang_codes(value: Optional[Union[str, Iterable[str]]]) -> List[str]:
     for item in value:
         out.extend(parse_lang_codes(str(item)))
     return out
+
+
+@dataclass
+class ScopeResolution:
+    """Language scope for one run.
+
+    ``label`` is ``MULTI13``, ``SINGLE_LANG``, ``OUTLIER``, or ``PARTIAL``.
+    ``dropped`` lists codes removed so they are not mixed into MULTI13 (``bbo``).
+    """
+
+    label: str
+    languages: List[str]
+    dropped: List[str]
+
+
+def resolve_scope(value: Optional[Union[str, Iterable[str]]]) -> ScopeResolution:
+    """Expand ``multi13`` / ``all`` and separate the ``bbo`` outlier.
+
+    One ``--lang`` value may be ``multi13``, ``all``, a single code, or a
+    comma-separated list. Repeating the flag still works.
+    """
+    tokens = parse_lang_codes(value)
+    if not tokens:
+        return ScopeResolution("SINGLE_LANG", ["bam"], [])
+    if any(token in SCOPE_PRESETS for token in tokens):
+        dropped = ["bbo"] if "bbo" in tokens else []
+        return ScopeResolution("MULTI13", list(MULTI13), dropped)
+
+    ordered: List[str] = []
+    seen = set()
+    for token in tokens:
+        if token == OUTLIER_CODE:
+            group = OUTLIER_CODE
+        else:
+            group = Language.from_code(token).group_code
+        if group not in seen:
+            seen.add(group)
+            ordered.append(group)
+
+    dropped: List[str] = []
+    if OUTLIER_CODE in ordered and len(ordered) > 1:
+        dropped.append(OUTLIER_CODE)
+        ordered = [code for code in ordered if code != OUTLIER_CODE]
+
+    if ordered == [OUTLIER_CODE]:
+        label = "OUTLIER"
+    elif len(ordered) == 1:
+        label = "SINGLE_LANG"
+    elif ordered == list(MULTI13) or set(ordered) == set(MULTI13):
+        label = "MULTI13"
+        ordered = list(MULTI13)
+    else:
+        label = "PARTIAL"
+    return ScopeResolution(label, ordered, dropped)
+
+
+def experiment_group_code(code: str) -> str:
+    """Map an experiment-file language code onto a Sebeni group code.
+
+    ``mlq`` in ``dataset_300_samples.jsonl`` is Kassonke (``kao``). That remap
+    does not apply to ``Language.from_code``, which still treats ``mlq`` as
+    Maninka (``mku``).
+    """
+    raw = str(code or "").strip().lower()
+    mapped = EXPERIMENT_CODE_MAP.get(raw, raw)
+    if mapped == OUTLIER_CODE:
+        return OUTLIER_CODE
+    return Language.from_code(mapped).group_code
 
 
 @dataclass

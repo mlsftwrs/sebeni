@@ -10,7 +10,7 @@ Browse from [https://seben.robotsmali.org/docs/api/](https://seben.robotsmali.or
 | --- | --- |
 | [SRL](srl.md) | `MasterConfig`, `SRLTrainer`, `register_algorithm`, SAMPG helpers |
 | [Safety](safety.md) | `SafetySpec`, `SafetyGovernor`, `PromoteDecision`, `SafetySnapshot` |
-| [Compute](compute.md) | `MorphologyScorer`, `RewardManager` |
+| [Compute](compute.md) | `MorphologyScorer`, `uwec`, `mer_micro`, `mcs_mismatch`, `RewardManager` |
 | [CLI](cli.md) | `sebeni` commands + `default_config_yaml` |
 | [Language](language.md) | `Language`, `parse_lang_codes` |
 | [Distiller / DabaX](morphotactic.md) | `Distiller`, `DabaX` |

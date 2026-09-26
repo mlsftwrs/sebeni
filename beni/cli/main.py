@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional
 
 import typer
 
-from beni.core.language import Language, parse_lang_codes
 from beni.core.srl.config import MasterConfig
 from beni.utils import config as cfg
 
@@ -28,61 +27,6 @@ def _load_config(
     mc = MasterConfig()
     mc.apply_workdir(cli_path=working_dir)
     return mc
-
-
-def _records(config: MasterConfig):
-    from beni.data.datasets import SebeniDataLoader
-
-    source = config.data.source
-    loader = SebeniDataLoader(config.data)
-    if source:
-        return loader.load(source)
-    return loader.load_sebeni()
-
-
-def _records_by_language(mc: MasterConfig, records) -> Dict[str, List[str]]:
-    from beni.core.srl.algorithm1 import group_texts_by_language, records_text_langs
-
-    default_lang = mc.data.default_lang or "bam"
-    grouped = group_texts_by_language(
-        records_text_langs(records, default_lang),
-        default_lang=default_lang,
-    )
-    if mc.data.languages:
-        allowed = set(mc.languages())
-        grouped = {k: v for k, v in grouped.items() if k in allowed}
-    return grouped
-
-
-def _distiller_for(mc: MasterConfig, group: str):
-    from beni.core.morphotactic.distil.distillation import Distiller
-
-    distiller = Distiller(
-        lang_code=group,
-        backend=mc.distillation.selected_backend,
-        model=mc.distillation.model,
-        working_dir=mc.distillation.working_dir or mc.working_dir,
-        vertex=mc.distillation.vertex,
-        base_url=mc.distillation.base_url,
-        gguf_path=mc.distillation.gguf_path,
-        n_ctx=mc.distillation.n_ctx,
-        max_input_chars=mc.distillation.max_input_chars,
-    )
-    distiller.handle_baselines()
-    return distiller
-
-
-def _group_codes_from_records(records) -> List[str]:
-    seen: List[str] = []
-    for rec in records or []:
-        if isinstance(rec, dict):
-            lang = rec.get("lang") or rec.get("language") or "bam"
-        else:
-            lang = getattr(rec, "lang", None) or "bam"
-        group = Language.from_code(str(lang)).group_code
-        if group not in seen:
-            seen.append(group)
-    return seen
 
 
 def _packaged_exp_yaml() -> Path:
@@ -122,83 +66,21 @@ def maybe_kveritas_seal(output: Path) -> None:
         typer.echo(f"kveritas seal exited {result.returncode}", err=True)
 
 
-def _evaluate(mc: MasterConfig, records) -> Tuple[Dict, Path]:
-    """Score Φ per language; write ``{working_dir}/exp/eval.json`` and a safety snapshot."""
-    from beni.core.compute.metrics import MorphologyScorer
-    from beni.core.morphotactic.dabax import get_dabax
-    from beni.core.safety.governor import SafetyGovernor
-
-    grouped = _records_by_language(mc, records)
-    scorer = MorphologyScorer()
-    by_language = {}
-    total_sent = 0
-    weighted_phi = 0.0
-    for group, texts in grouped.items():
-        distiller = _distiller_for(mc, group)
-        dabax = get_dabax(
-            group,
-            gram=distiller.gram_path,
-            ldict=distiller.dict_path,
-            process=True,
-            runtime_dir=cfg.get_workdir().runtime,
-        )
-        sentences = []
-        for text in texts:
-            try:
-                sentences.extend(dabax.loader(text) or [])
-            except Exception:
-                continue
-        phi = scorer.phi_corpus(sentences)["avg"] if sentences else 0.0
-        n = len(sentences)
-        by_language[group] = {
-            "phi": phi,
-            "n_sentences": n,
-            "checkpoint_id": distiller.checkpoint_id(),
-            "language": group,
-        }
-        total_sent += n
-        weighted_phi += phi * n
-    avg_phi = (weighted_phi / total_sent) if total_sent else 0.0
-    langs = list(grouped.keys()) or mc.languages()
-    report = {
-        "phi": avg_phi,
-        "tau": mc.distillation.tau,
-        "n_sentences": total_sent,
-        "languages": langs,
-        "by_language": by_language,
-        "algorithm": mc.algorithm,
-    }
-    out = cfg.get_workdir().exp / "eval.json"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
-    gov = SafetyGovernor(mc.safety.to_spec(tau=mc.distillation.tau, kl_beta=mc.trainer.beta))
-    gov.record_snapshot(
-        phi=avg_phi,
-        tau=mc.distillation.tau,
-        checkpoint_id=",".join(v["checkpoint_id"] or "" for v in by_language.values()),
-        algorithm=mc.algorithm,
-        language=",".join(langs),
-        group_code=",".join(langs),
-        extra={"languages": langs, "by_language": by_language},
-    )
-    gov.write_snapshot(cfg.get_workdir().models)
-    return report, out
-
-
 def default_config_yaml(langs: List[str], working_dir: str) -> str:
     """Scaffold YAML for ``sebeni init``."""
-    codes = Language.group_codes(langs) or ["bam"]
+    from beni.core.language import resolve_scope
+
+    resolved = resolve_scope(langs)
+    codes = resolved.languages
     default = codes[0]
     langs_yaml = "[" + ", ".join(codes) + "]"
-    slug = "-".join(codes)
+    slug = "multi13" if resolved.label == "MULTI13" else "-".join(codes)
     return f"""# Sebeni MasterConfig — https://seben.robotsmali.org/docs
 # working_dir is relocatable: CLI -w and SEBENI_HOME / SEBENI_WORKING_DIR also apply.
-# Alignment is multilingual: each row keeps its language; Φ / Distiller / {{G, D}}
-# are per group code (MKU not MLQ). Tune trainer/model hyperparams below or via
-# `sebeni train --lr ...` (see docs/hyperparams.md).
-# algorithm: grpo | dpo | apo  (policy-update plugins; SAMPG Φ / Distiller is unchanged)
+# Distillation runs once, then one arm (sft | grpo | dpo | apo) reads frozen G/D.
+# Tune trainer/model hyperparams below or via `sebeni train --lr ...`.
 project_name: sebeni-{slug}
-algorithm: grpo          # grpo | dpo | apo
+algorithm: grpo          # sft | grpo | dpo | apo
 working_dir: {working_dir}
 
 model:
@@ -256,11 +138,17 @@ distillation:
 wordfreq:
   raw_inputs: null         # defaults to packaged beni/data/raw
 
+experiment:
+  dataset: packaged        # dataset_300_samples.jsonl; test.json stays eval-only
+  freeze_resources: true
+  scope: {resolved.label}
+  max_eval_rows: 1
+
 reward:
-  format_weight: 0.2
+  format_weight: 0.1
   morph_weight: 0.4
   rule_weight: 0.4
-  lang_weight: 0.2
+  lang_weight: 0.1
 
 safety:
   enabled: true
@@ -272,9 +160,9 @@ safety:
 @app.command()
 def init(
     lang: List[str] = typer.Option(
-        ["bam"],
+        ["multi13"],
         "--lang",
-        help="ISO or Sebeni group code. Repeat or comma-separate for multilingual (e.g. --lang bam --lang mku).",
+        help="multi13, all, one group code, or a comma-separated list (bam,mku). bbo is the outlier scope.",
     ),
     working_dir: Path = typer.Option(
         Path("./runs/sebeni-001"),
@@ -284,25 +172,33 @@ def init(
     ),
 ):
     """Write config.yaml and the workdir layout (data/, models/, runs/, exp/, runtime/)."""
-    codes = Language.group_codes(parse_lang_codes(lang)) or ["bam"]
+    from beni.core.language import resolve_scope
+
+    resolved = resolve_scope(lang)
     wd = cfg.set_working_dir(working_dir, ensure=True)
     config_path = Path(wd.root) / "config.yaml"
     rel = str(wd.root)
-    config_path.write_text(default_config_yaml(codes, rel), encoding="utf-8")
+    config_path.write_text(default_config_yaml(resolved.languages, rel), encoding="utf-8")
     typer.echo(f"Wrote {config_path}")
     typer.echo(f"Working dir {wd.root}")
-    typer.echo("Languages: " + ", ".join(codes))
-    typer.echo("Next: sebeni train -c config.yaml")
+    typer.echo(f"Scope: {resolved.label}")
+    typer.echo("Languages: " + ", ".join(resolved.languages))
+    if resolved.dropped:
+        typer.echo("Dropped from this scope: " + ", ".join(resolved.dropped))
+    typer.echo("Next: sebeni distill -c config.yaml")
 
 
 @app.command()
 def train(
     config: Path = typer.Option(..., "-c", "--config", help="YAML or JSON MasterConfig."),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
+    algorithm: Optional[str] = typer.Option(
+        None, "--algorithm", help="sft | grpo | dpo | apo. Overrides the config."
+    ),
     lang: Optional[List[str]] = typer.Option(
         None,
         "--lang",
-        help="Override data.languages (repeatable / comma-separated).",
+        help="Scope override: multi13, all, one code, or a comma-separated list.",
     ),
     hitl: Optional[bool] = typer.Option(None, "--hitl/--no-hitl", help="HITL on initial distill."),
     lr: Optional[float] = typer.Option(None, "--lr", help="Optimizer learning rate."),
@@ -338,8 +234,10 @@ def train(
     ),
     use_cpu: Optional[bool] = typer.Option(None, "--use-cpu/--no-use-cpu"),
 ):
-    """Run SAMPG (Φ / τ / Distiller) then the configured policy-update plugin."""
+    """Train one arm. Distills and freezes G/D first when that has not been done."""
     mc = _load_config(config, working_dir)
+    if algorithm:
+        mc.algorithm = algorithm.strip().lower()
     mc.apply_cli_overrides(
         languages=lang,
         learning_rate=lr,
@@ -370,11 +268,9 @@ def train(
         lr_scheduler_type=lr_scheduler,
         hitl=hitl,
     )
-    from beni.core.srl.unified import SRLTrainer
+    from beni.core.pipeline import run_arm
 
-    records = _records(mc)
-    trainer = SRLTrainer(mc)
-    trainer.train(records)
+    run_arm(mc)
 
 
 @app.command()
@@ -384,13 +280,12 @@ def distill(
     lang: Optional[List[str]] = typer.Option(None, "--lang"),
     hitl: Optional[bool] = typer.Option(None, "--hitl/--no-hitl"),
 ):
-    """Baseline-only Distiller job (train does this automatically when needed)."""
+    """Upstream SAMPG distillation. Writes frozen G/D and does not train a policy."""
     mc = _load_config(config, working_dir)
     mc.apply_cli_overrides(languages=lang, hitl=hitl)
-    from beni.core.srl.grpo.grpo import SebeniGrpo
+    from beni.core.pipeline import run_distill
 
-    records = _records(mc)
-    SebeniGrpo(mc).run_batch_distillation(records)
+    run_distill(mc)
 
 
 @app.command()
@@ -399,41 +294,71 @@ def eval(
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
     lang: Optional[List[str]] = typer.Option(None, "--lang"),
 ):
-    """Score Φ / MER / MCS **per language**; write ``{working_dir}/exp/eval.json``."""
+    """Score held-out test.json per language; write ``{working_dir}/exp/eval.json``."""
     mc = _load_config(config, working_dir)
     mc.apply_cli_overrides(languages=lang)
-    _report, out = _evaluate(mc, _records(mc))
-    typer.echo(str(out))
+    from beni.core.pipeline import run_eval
+    from beni.core.srl.unified import SRLTrainer
+
+    trainer = None
+    try:
+        trainer = SRLTrainer(mc)
+        trainer.load_models()
+    except Exception:
+        trainer = None
+    generate = None
+    policy = None
+    if trainer is not None:
+
+        def _generate(text: str, _lang: str) -> str:
+            return trainer.generate(text)
+
+        generate = _generate
+        policy = getattr(trainer, "plugin", trainer)
+    report = run_eval(mc, generate=generate, policy=policy)
+    typer.echo(str(cfg.get_workdir().exp / "eval.json"))
+    typer.echo(f"scope={report.get('scope')} phi={report.get('phi')}")
 
 
-def _run_exp(config: Optional[Path], working_dir: Optional[Path]) -> None:
-    cfg_path = config or _packaged_exp_yaml()
+def _preset_yaml(name: str) -> Path:
+    token = str(name or "multi13").strip().lower()
+    if token in {"all", "multi13"}:
+        token = "multi13"
+    root = Path(__file__).resolve().parents[2] / "configs" / "presets" / f"{token}.yaml"
+    if root.is_file():
+        return root
+    packaged = Path(__file__).resolve().parents[1] / "data" / "presets" / f"{token}.yaml"
+    return packaged if packaged.is_file() else root
+
+
+def _run_exp(
+    config: Optional[Path],
+    working_dir: Optional[Path],
+    preset: Optional[str] = None,
+    algorithm: Optional[str] = None,
+    lang: Optional[List[str]] = None,
+) -> None:
+    cfg_path = _preset_yaml(preset) if preset else (config or _preset_yaml("multi13"))
+    if not Path(cfg_path).is_file():
+        cfg_path = config or _packaged_exp_yaml()
     if not Path(cfg_path).is_file():
         typer.echo(f"experiment config not found: {cfg_path}", err=True)
         raise typer.Exit(code=2)
     mc = _load_config(Path(cfg_path), working_dir)
+    if algorithm:
+        mc.algorithm = algorithm.strip().lower()
+    if lang:
+        mc.apply_cli_overrides(languages=lang)
+    mc.experiment.dataset = "packaged"
     mc.data.source = None
-    mc.data.languages = None
-    from beni.data.datasets import SebeniDataLoader
-    from beni.core.srl.unified import SRLTrainer
+    from beni.core.pipeline import run_experiment
 
-    loader = SebeniDataLoader(mc.data)
-    train_records = loader.load_sebeni(split="train")
-    if not train_records:
-        typer.echo("Packaged train split is empty (beni/data/raw).", err=True)
-        raise typer.Exit(code=1)
-    langs = _group_codes_from_records(train_records)
-    mc.data.languages = langs
-    mc.data.known_langs = set(langs)
-    if langs:
-        mc.data.default_lang = langs[0]
-    trainer = SRLTrainer(mc)
-    trainer.train(train_records)
-
-    mc.data.languages = None
-    test_records = SebeniDataLoader(mc.data).load_sebeni(split="test")
-    report, out = _evaluate(mc, test_records)
-    typer.echo(str(out))
+    try:
+        report = run_experiment(mc)
+    except RuntimeError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(str(cfg.get_workdir().exp / "eval.json"))
     if mc.experiment.kveritas:
         emit_kveritas_metrics(report)
     if mc.experiment.kveritas_seal:
@@ -446,12 +371,25 @@ def exp(
         None,
         "-c",
         "--config",
-        help="YAML MasterConfig. Defaults to packaged exp.yaml; data.source is ignored.",
+        help="YAML MasterConfig. Defaults to the MULTI13 preset. data.source is ignored.",
+    ),
+    preset: Optional[str] = typer.Option(
+        None,
+        "--preset",
+        help="multi13 or single. Overrides -c when set.",
+    ),
+    algorithm: Optional[str] = typer.Option(
+        None, "--algorithm", help="sft | grpo | dpo | apo."
+    ),
+    lang: Optional[List[str]] = typer.Option(
+        None,
+        "--lang",
+        help="Scope override. Required in spirit for --preset single (default bam in the preset).",
     ),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
 ):
-    """Train one multilingual SAMPG policy on packaged raw data, then eval test.json."""
-    _run_exp(config, working_dir)
+    """Distill, train one arm on the packaged experiment jsonl, then evaluate test.json."""
+    _run_exp(config, working_dir, preset=preset, algorithm=algorithm, lang=lang)
 
 
 @app.command("experiment")
@@ -460,12 +398,15 @@ def experiment(
         None,
         "-c",
         "--config",
-        help="YAML MasterConfig. Defaults to packaged exp.yaml; data.source is ignored.",
+        help="YAML MasterConfig. Defaults to the MULTI13 preset. data.source is ignored.",
     ),
+    preset: Optional[str] = typer.Option(None, "--preset", help="multi13 or single."),
+    algorithm: Optional[str] = typer.Option(None, "--algorithm", help="sft | grpo | dpo | apo."),
+    lang: Optional[List[str]] = typer.Option(None, "--lang"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
 ):
     """Alias of ``sebeni exp``."""
-    _run_exp(config, working_dir)
+    _run_exp(config, working_dir, preset=preset, algorithm=algorithm, lang=lang)
 
 
 @app.command()

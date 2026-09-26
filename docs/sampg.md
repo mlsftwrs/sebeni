@@ -1,8 +1,9 @@
 # SAMPG
 
-**Self-Aware Morphotactic Pattern Generation** is the product loop. `sebeni train`
-and `sebeni exp` **are** this loop. Completions are morphological analyses
-(JSON `tokens`), not a chatbot.
+**Self-Aware Morphotactic Pattern Generation** is the upstream resource step.
+`sebeni distill` runs it once per language. `sebeni train` and `sebeni exp`
+train one arm only after that checkpoint is frozen. Completions are
+morphological analyses (JSON `tokens`), not a chatbot.
 
 ## Dataset vs G, D
 
@@ -18,35 +19,28 @@ still **one** model.
 
 ## Loop
 
-1. Distill G, D (HITL optional; scratch bootstrap if no packaged baseline)
-2. For each batch: group by language; Φ ← DabaX
-3. If Φ < τ: Distiller proposes \(G_{cand}, D_{cand}\); promote iff Φ′ > Φ
-4. Serialize the active DabaX parse as ideal JSON \(y^*\)
-5. Sample completions; score text integrity and annotations against \(y^*\)
-6. Compute U and scale the policy update (U is not a reward or Distiller metric)
-7. Update θ with GRPO (default) or DPO / APO plugin
+1. Split the train rows by language. The experiment file remaps `mlq` → `kao`, `hsy` → `mey`, and `seq` → `spp` before this split.
+2. For each language, Φ ← DabaX on that language's full train split.
+3. If Φ < τ, Distiller proposes \(G_{cand}, D_{cand}\). Promote when Φ′ > Φ. A scratch stub may be written when it parses.
+4. Freeze baseline and distilled G, D under `{working_dir}/data/resources/{lang}/`.
+5. One arm reads that checkpoint: SFT extracts labels, or GRPO / DPO / APO builds its training rows. None of them write a new G or D.
+6. Score completions against the frozen DabaX parse. U scales the policy update. U is not a reward and it is not Distiller.
 
 ```mermaid
 flowchart TD
-  T["Dataset T: rows of text, lang"] --> B["Mini-batch B"]
-  B --> G["Split by Language.group_code"]
-  G --> Phi["Φ ← DabaX texts B_ℓ, G_ℓ, D_ℓ"]
-  Phi -->|"Φ ≥ τ"| S["Sample o₁ … o_G ~ π_θ"]
-  Phi -->|"Φ < τ"| Dist["Distiller"]
-  Dist --> PhiP["Φ′ ← DabaX B_ℓ, G_cand, D_cand"]
-  PhiP -->|"Φ′ > Φ and SafetyGovernor"| Prom["Promote baseline_vN"]
-  PhiP -->|"else"| Keep["Keep current G, D"]
-  Prom --> S
-  Keep --> S
-  S --> R["R_morph + R_rule + R_format + R_lang"]
-  R --> U["Update θ via GRPO / DPO / APO plugin"]
-  U --> B
+  T["Train rows"] --> Split["Split by group code"]
+  Split --> Phi["Φ ← DabaX full split"]
+  Phi -->|"Φ ≥ τ"| Freeze["Freeze G, D"]
+  Phi -->|"Φ < τ"| Dist["Distiller once"]
+  Dist --> PhiP["Φ′ > Φ"]
+  PhiP --> Freeze
+  Freeze --> Arm["SFT or GRPO or DPO or APO"]
+  Arm --> Eval["Held-out MER / MCS / UWEC"]
 ```
 
-`SelfAwareCallback` is the Φ / Distiller step (runs **before** the policy
-update). `distillation_hook` is **KL scaling**, not Distiller.
+`distillation_hook` is **KL scaling**, not Distiller. Policy steps do not call Distiller.
 
-YAML `algorithm: grpo | dpo | apo` changes only the policy-update plugin.
+YAML `algorithm: sft | grpo | dpo | apo` selects the arm.
 Register another with `register_algorithm(name, cls)`.
 
 ## Φ (morphological integrity)
@@ -66,11 +60,12 @@ missing splitter / constraint (e.g. `{|na}`).
 ## Rewards
 
 \[
-R_{\mathrm{total}} = \omega_m R_{\mathrm{morph}} + \omega_r R_{\mathrm{rule}} + \omega_f R_{\mathrm{format}}
+R_{\mathrm{total}} = \omega_m R_{\mathrm{morph}} + \omega_r R_{\mathrm{rule}} + \omega_f R_{\mathrm{format}} + \omega_l R_{\mathrm{lang}}
 \]
 
-Default weights: \(R_{morph}=0.4\), \(R_{rule}=0.4\), \(R_{format}=0.2\).
-Sebeni adds \(R_{lang}\) (JSON `lang` must match **that row**).
+Default weights: \(R_{morph}=0.4\), \(R_{rule}=0.4\), \(R_{format}=0.1\),
+\(R_{lang}=0.1\) (sum **1.0**).
+Sebeni requires JSON `lang` to match **that row**.
 
 - \(R_{morph}\): mean Daba stage score on completion tokens; stage −1 is
   heavily penalized.
@@ -109,6 +104,7 @@ one JSON object.
 
 | YAML `algorithm` | Class | TRL |
 | --- | --- | --- |
+| `sft` | `SebeniSft` | `SFTTrainer` |
 | `grpo` | `SebeniGrpo` | `GRPOTrainer` |
 | `dpo` | `SebeniDpo` | `DPOTrainer` |
 | `apo` | `SebeniApo` | `DPOTrainer` + `apo_zero` / `apo_down` |
@@ -136,7 +132,7 @@ data:
 ```
 
 ```bash
-sebeni init --lang bam --lang mku --lang dtm -w ./runs/manding-001
+sebeni init --lang bam,mku,dtm -w ./runs/manding-001
 sebeni train -c ./runs/manding-001/config.yaml
 ```
 

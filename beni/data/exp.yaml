@@ -1,10 +1,9 @@
-# Sebeni batteries-included experiment.
-# `sebeni exp` always trains on packaged beni/data/raw/* and evaluates on
-# beni/data/test.json. data.source is ignored. Edit the knobs below.
+# Alias of configs/presets/multi13.yaml.
+# `sebeni exp` trains on dataset_300_samples.jsonl and evaluates on test.json.
 
-project_name: sebeni-exp
-algorithm: grpo          # grpo | dpo | apo
-# working_dir: ./runs/exp-001   # CLI -w wins
+preset: multi13
+project_name: sebeni-multi13
+algorithm: grpo          # sft | grpo | dpo | apo
 
 model:
   model_name: HuggingFaceTB/SmolLM2-135M
@@ -14,9 +13,9 @@ model:
   lora_alpha: 32
   lora_dropout: 0.1
 
-# data.source is ignored by `sebeni exp`. languages are discovered from raw/*.
 data:
   default_lang: bam
+  languages: [multi13]
   scheme: completion
 
 trainer:
@@ -36,8 +35,7 @@ trainer:
   bf16: false
   gradient_checkpointing: false
   use_cpu: false
-  report_to: trackio     # trackio | wandb | none
-  # pip install "sebeni[train,wandb]" before report_to: wandb
+  report_to: trackio
 
 distillation:
   enabled: true
@@ -46,18 +44,19 @@ distillation:
   tau: 0.5
   hitl: false
 
-wordfreq:
-  raw_inputs: null       # defaults to packaged raw/
+experiment:
+  dataset: packaged
+  freeze_resources: true
+  scope: MULTI13
+  max_eval_rows: 1
+  kveritas: false
+  kveritas_seal: false
 
 reward:
-  format_weight: 0.2
+  format_weight: 0.1
   morph_weight: 0.4
   rule_weight: 0.4
-  lang_weight: 0.2
+  lang_weight: 0.1
 
 safety:
   enabled: true
-
-experiment:
-  kveritas: false        # print KVERITAS_METRIC lines after eval
-  kveritas_seal: false   # if `kveritas` is on PATH, seal {working_dir}/exp/report.pdf

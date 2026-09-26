@@ -9,16 +9,14 @@ from beni.core.srl.config import (
 )
 from beni.core.srl.plugin import AlignmentPlugin
 from beni.core.morphotactic.distil.distillation import Distiller
-from beni.core.srl.grpo.callbacks import TrackioMetricsCallback, SelfAwareCallback
-from beni.core.srl.algorithm1 import confirm_hitl
+from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
 
 
 class SebeniGrpo(AlignmentPlugin):
-    """
-    GRPO policy-update plugin for SAMPG.
+    """GRPO policy-update plugin.
 
-    Distiller is invoked per batch when Φ < τ via SelfAwareCallback.
-    An optional initial distill still runs when no baseline exists.
+    Grammar and dictionary are frozen before this step. Training does not
+    promote new resource checkpoints.
     """
 
     name = "grpo"
@@ -44,12 +42,12 @@ class SebeniGrpo(AlignmentPlugin):
         )
 
     def run_batch_distillation(self, sentences: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Initial / HITL Distiller pass (not the per-batch Φ < τ path)."""
+        """One upstream SAMPG pass per language. Not called from ``train``."""
         if not self.config.distillation.enabled:
             print("Morphotactic distillation is disabled in config.")
             return {}
 
-        from beni.core.srl.algorithm1 import group_texts_by_language, records_text_langs
+        from beni.core.srl.algorithm1 import distill_language, group_texts_by_language, records_text_langs
 
         default_lang = self.config.data.default_lang or "bam"
         lang_groups = group_texts_by_language(
@@ -62,7 +60,7 @@ class SebeniGrpo(AlignmentPlugin):
         for group_code, texts in lang_groups.items():
             if allowed is not None and group_code not in allowed:
                 continue
-            print(f"Running Morphotactic Distillation on batch for language '{group_code}' ({len(texts)} texts)...")
+            print(f"Running Morphotactic Distillation for language '{group_code}' ({len(texts)} texts)...")
             try:
                 distiller = Distiller(
                     lang_code=group_code,
@@ -75,46 +73,22 @@ class SebeniGrpo(AlignmentPlugin):
                     n_ctx=self.config.distillation.n_ctx,
                     max_input_chars=self.config.distillation.max_input_chars,
                 )
-                if self.config.distillation.hitl:
-                    distiller.handle_baselines()
-                    proposal = distiller.propose(texts)
-                    if proposal is None:
-                        distillation_results[group_code] = {"error": "no proposal"}
-                        continue
-                    if not confirm_hitl(proposal.gram_text, proposal.dict_text, True):
-                        distillation_results[group_code] = {"skipped": "hitl_rejected"}
-                        continue
-                    decision = self.governor.allow_promote(
-                        proposal.phi,
-                        proposal.phi_prime,
-                        parseable=proposal.parseable,
-                        first_create=proposal.first_create,
-                        language_ok=proposal.language_ok,
-                    )
-                    if decision.allowed:
-                        distiller.write_checkpoint(proposal.gram_text, proposal.dict_text)
-                        distillation_results[group_code] = {
-                            "gram_path": str(distiller.gram_path),
-                            "dict_path": str(distiller.dict_path),
-                            "reason": decision.reason,
-                        }
-                    else:
-                        distillation_results[group_code] = {"error": decision.reason}
-                    continue
-
-                result = distiller.run_batch_distillation(texts)
-                if result and result[0] and result[1]:
-                    gram_path, dict_path = result
-                    distillation_results[group_code] = {
-                        "gram_path": gram_path,
-                        "dict_path": dict_path
-                    }
-                    print(f"Distillation complete for '{group_code}': gram={gram_path}, dict={dict_path}")
-                else:
-                    distillation_results[group_code] = {"error": "no baseline update"}
-            except Exception as e:
-                print(f"Morphotactic distillation for '{group_code}' skipped: {e}")
-                distillation_results[group_code] = {"error": str(e)}
+                decision = distill_language(
+                    texts,
+                    distiller,
+                    self.governor,
+                    self.config.distillation.tau,
+                    hitl=self.config.distillation.hitl,
+                )
+                distillation_results[group_code] = {
+                    "gram_path": str(distiller.gram_path) if decision.allowed else None,
+                    "dict_path": str(distiller.dict_path) if decision.allowed else None,
+                    "reason": decision.reason,
+                    "allowed": decision.allowed,
+                }
+            except Exception as exc:
+                print(f"Morphotactic distillation for '{group_code}' skipped: {exc}")
+                distillation_results[group_code] = {"error": str(exc)}
 
         return distillation_results
 
@@ -125,12 +99,11 @@ class SebeniGrpo(AlignmentPlugin):
         run_distillation_first: bool = True,
         extra_callbacks: Optional[List] = None,
     ):
-        """Execute GRPO with SelfAwareCallback on each batch."""
+        """Execute GRPO against the already frozen grammar and dictionary."""
+        del run_distillation_first
         raw_sentences = None
         if isinstance(data, list):
             raw_sentences = data
-            if run_distillation_first and self.config.distillation.enabled:
-                self.run_batch_distillation(raw_sentences)
             dataset = self.format_dataset(raw_sentences)
         else:
             dataset = data
@@ -151,10 +124,6 @@ class SebeniGrpo(AlignmentPlugin):
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
         if extra_callbacks:
             callbacks.extend(extra_callbacks)
-        if self.config.distillation.enabled and not any(
-            isinstance(cb, SelfAwareCallback) for cb in callbacks
-        ):
-            callbacks.append(SelfAwareCallback(self.config, governor=self.governor))
 
         trainer_kwargs = {
             "model": self.model,
@@ -176,7 +145,7 @@ class SebeniGrpo(AlignmentPlugin):
         self._wire_pre_update_hooks(self.trainer)
         self._init_trackio(project_name)
 
-        print("Starting Sebeni GRPO Training Loop (SAMPG)...")
+        print("Starting Sebeni GRPO Training Loop...")
         train_result = self.trainer.train()
         self.save_model(self.config.trainer.output_dir)
 

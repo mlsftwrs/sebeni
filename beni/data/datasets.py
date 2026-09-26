@@ -44,6 +44,68 @@ def build_dabax_reference(text: str, lang: str) -> dict:
     return sentence_to_completion_json(sentences[0])
 
 
+EXPERIMENT_JSONL_NAME = "dataset_300_samples.jsonl"
+EVAL_SPLIT_NAME = "test.json"
+
+
+def assert_train_source(path: Union[str, Path]) -> Path:
+    """Refuse the held-out eval file as a distillation or training source."""
+    source = Path(path)
+    if source.name == EVAL_SPLIT_NAME:
+        raise ValueError("test.json is evaluation-only and cannot be used for distillation or training")
+    return source
+
+
+def load_experiment_records(
+    languages: Optional[Sequence[str]] = None,
+    path: Optional[Union[str, Path]] = None,
+) -> Dict[str, Any]:
+    """Load the experiment train jsonl with the file-only language remap.
+
+    ``mlq`` → ``kao``, ``hsy`` → ``mey``, ``seq`` → ``spp`` happen here, before
+    group-code resolution. ``bbo`` rows are kept only when ``bbo`` is an
+    allowed language. This function never reads ``test.json``.
+    """
+    from beni.core.language import OUTLIER_CODE, experiment_group_code
+
+    source = assert_train_source(path or (cfg.DATA_DIR / "raw" / EXPERIMENT_JSONL_NAME))
+    allowed = None
+    if languages:
+        from beni.core.language import resolve_scope
+
+        allowed = set(resolve_scope(languages).languages)
+    records: List[Dict[str, str]] = []
+    counts: Dict[str, int] = {}
+    dropped_bbo = 0
+    raw_counts: Dict[str, int] = {}
+    with source.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            row = json.loads(line)
+            raw = str(row.get("lang") or row.get("language") or "").strip().lower()
+            raw_counts[raw] = raw_counts.get(raw, 0) + 1
+            group = experiment_group_code(raw)
+            if group == OUTLIER_CODE and (allowed is None or OUTLIER_CODE not in allowed):
+                dropped_bbo += 1
+                continue
+            if allowed is not None and group not in allowed:
+                continue
+            text = str(row.get("text") or "").strip()
+            if not text:
+                continue
+            records.append({"text": text, "lang": group})
+            counts[group] = counts.get(group, 0) + 1
+    return {
+        "records": records,
+        "counts": counts,
+        "raw_counts": raw_counts,
+        "dropped_bbo": dropped_bbo,
+        "source": str(source),
+    }
+
+
 def corrupt_completion(reference: dict) -> dict:
     """Create a legal but morphologically wrong negative completion."""
     rejected = copy.deepcopy(reference)

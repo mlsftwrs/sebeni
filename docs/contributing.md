@@ -14,15 +14,14 @@ Install for docs / tests:
 
 ```bash
 pip install -e ".[docs,dev]"
-# or from GitHub:
-# pip install "sebeni[docs,dev] @ git+https://github.com/mlsftwrs/sebeni.git"
-```
-
-Docs: [seben.robotsmali.org/docs](https://seben.robotsmali.org/docs).
-
-```bash
+# or: pip install "sebeni[docs,dev] @ git+https://github.com/mlsftwrs/sebeni.git"
 ruff format beni tests
 ruff check beni tests
 pytest
 mkdocs serve
 ```
+
+The docs site uses the terminal MkDocs theme (`docs/stylesheets/terminal.css`):
+JetBrains Mono, `cli-dark` / `cli-light` palettes, and a typewriter prompt on
+the home page. Keep MathJax (`javascripts/mathjax.js`) for the metric pages.
+Public URL: [seben.robotsmali.org/docs](https://seben.robotsmali.org/docs).

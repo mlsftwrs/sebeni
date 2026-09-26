@@ -1,38 +1,39 @@
 # Experiments
 
-`sebeni exp` is the batteries-included path: **one multilingual policy** on all
-packaged `beni/data/raw/*.txt`, then eval on packaged `beni/data/test.json`.
-You edit a pre-config YAML for the model, hyperparams, and logger — not a data
-path.
+`sebeni exp` is the batteries-included path: distill frozen grammar and
+dictionary from the packaged experiment jsonl, train **one** arm, then
+evaluate packaged `beni/data/test.json`. Pick a preset and an algorithm.
 
 ```bash
-sebeni exp -c configs/exp.yaml -w ./runs/exp-001
+sebeni exp --preset multi13 --algorithm sft -w ./runs/multi13-sft
+sebeni exp --preset single --lang bam --algorithm grpo -w ./runs/bam-grpo
+sebeni exp --preset single --lang bbo --algorithm sft -w ./runs/bbo-sft
 # alias: sebeni experiment
 ```
 
-If `-c` is omitted, Sebeni loads the packaged `exp.yaml`. `data.source` is
-**ignored**.
+If `-c` and `--preset` are omitted, Sebeni loads the MULTI13 preset.
+`data.source` is **ignored**. The train file is
+`beni/data/raw/dataset_300_samples.jsonl`. Codes in that file are remapped
+before distillation: `mlq` → `kao`, `hsy` → `mey`, `seq` → `spp`. `bbo` is
+kept only for `--lang bbo`.
 
 ```mermaid
 flowchart TD
-  yaml["Edit configs/exp.yaml"] --> expCmd["sebeni exp"]
-  expCmd --> raw["Load beni/data/raw as T"]
-  raw --> train["SAMPG train: one theta, G/D per lang"]
-  train --> ev["Eval beni/data/test.json"]
+  preset["preset multi13 or single"] --> jsonl["dataset_300_samples.jsonl"]
+  jsonl --> distill["Distill once and freeze G, D"]
+  distill --> arm["One arm: sft, grpo, dpo, or apo"]
+  arm --> ev["Eval beni/data/test.json"]
   ev --> log["trackio or wandb"]
-  ev --> kv["Optional K-Veritas metrics / seal"]
 ```
 
 ## What gets loaded
 
 | Split | Source | Language |
 | --- | --- | --- |
-| Train | `beni/data/raw/*.txt` | filename stem via `Language.from_code` (`mlq` → `mku`) |
-| Eval | `beni/data/test.json` | object `{lang: text}`; paragraphs split; same aliases |
+| Train | `beni/data/raw/dataset_300_samples.jsonl` | experiment remap, then group code |
+| Eval | `beni/data/test.json` | object `{lang: text}`; paragraphs split; evaluation only |
 
-`bbo.txt` is included when present. Languages without a packaged baseline
-use Distiller **scratch bootstrap**. The packaged raw split is about 36MB
-(mostly `bam.txt`) so `sebeni exp` works after a GitHub install.
+`bbo` rows stay in the jsonl and are excluded from MULTI13. A language with no packaged baseline uses Distiller scratch bootstrap. `raw/*.txt` remains available to `sebeni wordfreq` and to `sebeni train` when `experiment.dataset` is `raw`.
 
 Custom `data.source` applies to `sebeni train` / `eval`. Wordfreq uses
 `wordfreq.raw_inputs` (with `data.source` as a compatibility fallback).
@@ -43,7 +44,7 @@ Only `exp` pins the packaged splits.
 Edit [`configs/exp.yaml`](https://github.com/mlsftwrs/sebeni/blob/main/configs/exp.yaml):
 
 - `model.model_name` (and LoRA / 4-bit)
-- `algorithm: grpo | dpo | apo`
+- `algorithm: sft | grpo | dpo | apo`
 - `trainer.*` (`lr`, `max_steps`, `batch_size`, `num_generations`, …)
 - `trainer.report_to: trackio | wandb | none` (default `trackio`)
 - Distiller `provider` / `model` / `tau` / `enabled`
@@ -61,10 +62,17 @@ Trackio stays in `[train]`.
 
 | Path | What |
 | --- | --- |
-| `{working_dir}/exp/eval.json` | Φ overall and `by_language` |
+| `{working_dir}/exp/eval.json` | MER, MCS, UWEC, Φ per language and pooled for the scope |
+| `{working_dir}/exp/manifest.json` | model, algorithm, scope, seed, resource hashes |
+| `{working_dir}/data/resources/{lang}/` | Frozen G, D used by the arm |
 | `{working_dir}/models/` | Policy, tokenizer, model card, `safety_snapshot.json` |
 | `{working_dir}/data/baselines/{lang}/` | G, D checkpoints |
 | tracker | Trackio or Weights & Biases, per `report_to` |
+
+Held-out MER, MCS, and UWEC are the same three costs for every arm. Scope
+scores pool reference morphemes (MER) and tokens (MCS, UWEC); a language with
+more units weighs more in MULTI13. Reported MCS is the mismatch rate.
+Training still uses the match fraction. UWEC is evaluation-only.
 
 ## K-Veritas (optional)
 
@@ -97,5 +105,6 @@ Optional Google refinement accepts ADC or `GOOGLE_API_KEY`.
 ## Next
 
 - [Use cases](use-cases.md) for your own jsonl
-- [SAMPG](sampg.md) for the loop `exp` is running
+- [SAMPG](sampg.md) for distill → one arm → eval
+- [Rewards](rewards.md) for MER, MCS, and UWEC
 - [Hyperparameters](hyperparams.md) for every YAML key

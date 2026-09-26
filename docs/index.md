@@ -2,20 +2,41 @@
   ![SEBEN!](assets/seben-wordmark.png){ width="360" }
 </figure>
 
-# Sebeni
+# sebeni
+
+<div class="admonition note" markdown>
+<p class="admonition-title">session</p>
+
+```
+$ whoami
+sebeni
+$ sebeni exp --preset multi13 --algorithm sft -w ./runs/multi13-sft
+distill → train sft → eval MER / MCS / UWEC
+```
+
+</div>
+
+<p>
+  <span class="typewriter" data-text="$ sebeni exp --preset multi13 --algorithm sft"></span>
+</p>
 
 Sebeni is a **morphotactic post-training toolkit** for extremely low-resource
-languages (ELRL). It runs **Self-Aware Morphotactic Pattern Generation (SAMPG)**:
-a dataset of `(text, language)` rows is scored with a Daba **grammar G** and
-**dictionary D**; if morphological integrity Φ is below τ the Distiller proposes
-new G, D; then the shared policy θ is updated with GRPO (or DPO / APO as
-policy-update plugins).
+languages. One run is three stages:
+
+1. Distill grammar **G** and dictionary **D** once per language, then freeze them.
+2. Train **one** arm — SFT, GRPO, DPO, or APO — against that checkpoint.
+3. Score held-out **MER**, **MCS**, and **UWEC**. All three are costs to minimize.
+
+Completions are morphological JSON (`tokens`), not a chatbot.
 
 ```bash
 pip install "sebeni[train,distil] @ git+https://github.com/mlsftwrs/sebeni.git"
+pip install "daba @ git+https://github.com/maslinych/daba.git" --no-deps
 sebeni --help
-sebeni exp -c configs/exp.yaml -w ./runs/exp-001
 ```
+
+[Get started](getting-started.md){ .md-button }
+[Run an experiment](experiments.md){ .md-button }
 
 Public docs: [https://seben.robotsmali.org/docs](https://seben.robotsmali.org/docs).
 Project home: [seben.robotsmali.org](https://seben.robotsmali.org).
@@ -27,19 +48,18 @@ Hub: [huggingface.co/mlsftwrs](https://huggingface.co/mlsftwrs).
 | Symbol | Role |
 | --- | --- |
 | \(T\) | Dataset of `{text, lang}` rows — not G or D |
-| \(B\) | A mini-batch \(B \subset T\) |
-| \(G, D\) | Daba grammar and dictionary files (`.gram` / `.dict`) |
-| \(\Phi\) | Morphological integrity of the **batch texts** given \(G, D\) |
+| \(G, D\) | Daba grammar and dictionary files (`.gram` / `.dict`), frozen after distill |
+| \(\Phi\) | Morphological integrity of the train split given \(G, D\) |
 | \(\tau\) | Threshold, default **0.5** |
 | \(\theta\) | The SLM policy (**one** model, even when \(T\) is multilingual) |
 
-Completions are JSON objects with a `tokens` list. Maninka group code is
-**mku** (not `mlq`). GRPO / DPO / APO are **policy-update plugins**; Φ and
-Distiller stay the same.
+Maninka group code is **mku** (not `mlq`). In the experiment jsonl only,
+`mlq` → `kao`, `hsy` → `mey`, `seq` → `spp`. `bbo` is an outlier.
 
 ## Read next
 
 1. [Getting started](getting-started.md) — install, dataset shape, happy path
 2. [Experiments](experiments.md) — `sebeni exp` on packaged raw / test data
 3. [Use cases](use-cases.md) — ten recipes with your own jsonl
-4. [SAMPG](sampg.md) — how the training loop works
+4. [SAMPG](sampg.md) — distill once, train one arm, evaluate
+5. [Rewards](rewards.md) — MER, MCS, UWEC, and training rewards

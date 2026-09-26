@@ -10,10 +10,10 @@
 [![github](https://img.shields.io/badge/code-mlsftwrs/sebeni-black)](https://github.com/mlsftwrs/sebeni)
 
 Sebeni is a morphotactic post-training toolkit for Manding and related
-extremely low-resource languages. Training runs **SAMPG**: a dataset of
-**(text, language)** rows is scored with a **grammar G** and **dictionary D**;
-if Φ is below τ the Distiller proposes a better G and D; then the shared
-policy θ is updated (GRPO by default, DPO/APO as policy-update plugins).
+extremely low-resource languages. One run is three stages: **distill** grammar
+G and dictionary D once per language, **train one arm** (SFT, GRPO, DPO, or
+APO) against those frozen files, then **evaluate** held-out MER, MCS, and
+UWEC. Completions are morphological JSON, not a chatbot.
 
 ```bash
 pip install "sebeni[train,distil] @ git+https://github.com/mlsftwrs/sebeni.git"
@@ -59,38 +59,39 @@ or `TOGETHER_API_KEY`. Hub push uses `HF_TOKEN` or `huggingface-cli login`.
 
 ## Quick start
 
-**Packaged data** (no jsonl to write):
+**Canonical experiment** (packaged jsonl, no data to write):
 
 ```bash
-# edit configs/exp.yaml: model, hyperparams, report_to
-sebeni exp -c configs/exp.yaml -w ./runs/exp-001
+sebeni exp --preset multi13 --algorithm sft -w ./runs/multi13-sft
+sebeni exp --preset single --lang bam --algorithm grpo -w ./runs/bam-grpo
 ```
 
-`sebeni exp` always trains on packaged `beni/data/raw/*` and evaluates
-`beni/data/test.json`. Details: [Experiments](https://seben.robotsmali.org/docs/experiments/).
+If `-c` and `--preset` are omitted, Sebeni loads the MULTI13 preset.
+`sebeni exp` trains on `beni/data/raw/dataset_300_samples.jsonl` and
+evaluates `beni/data/test.json`. Details:
+[Experiments](https://seben.robotsmali.org/docs/experiments/).
 
 **Your own jsonl:**
 
 ```bash
 sebeni init --lang bam --lang mku -w ./runs/manding-001
 # point data.source at jsonl/csv with text + lang
-sebeni train -c ./runs/manding-001/config.yaml --lr 1e-5 --max-steps 50
-sebeni eval  -c ./runs/manding-001/config.yaml
+sebeni distill -c ./runs/manding-001/config.yaml
+sebeni train   -c ./runs/manding-001/config.yaml --algorithm grpo --lr 1e-5 --max-steps 50
+sebeni eval    -c ./runs/manding-001/config.yaml
 sebeni generate -c ./runs/manding-001/config.yaml --prompt "Aw ka kɛnɛ wa?" --lang bam
 sebeni wordfreq -c ./runs/manding-001/config.yaml
 ```
 
 `init` writes `config.yaml` plus `data/`, `models/`, `runs/`, `exp/`, `runtime/`.
-Repeat `--lang` (or `bam,mku`) for multilingual runs. Trainer / LoRA knobs are
-YAML keys under `model:` / `trainer:` / `dpo:` / `apo:` and CLI flags on
-`sebeni train` (`--lr`, `--batch-size`, `--lora-r`, `--beta`, …). Full tables:
+`--lang multi13` (or `all`) is the 13 canonical groups. `--lang bam` is one
+language. Trainer / LoRA knobs are YAML keys under `model:` / `trainer:` /
+`dpo:` / `apo:` and CLI flags on `sebeni train`. Full tables:
 [Hyperparameters](https://seben.robotsmali.org/docs/hyperparams/).
 
-Examples: [`configs/exp.yaml`](configs/exp.yaml),
-[`configs/grpo_bam.yaml`](configs/grpo_bam.yaml),
-[`configs/grpo_multilang.yaml`](configs/grpo_multilang.yaml),
-[`configs/dpo_bam.yaml`](configs/dpo_bam.yaml),
-[`configs/apo_bam.yaml`](configs/apo_bam.yaml).
+Presets: [`configs/presets/multi13.yaml`](configs/presets/multi13.yaml),
+[`configs/presets/single.yaml`](configs/presets/single.yaml).
+`configs/exp.yaml` is an alias of the MULTI13 preset.
 
 ## Dataset: text and language
 
@@ -113,30 +114,33 @@ A mixed-language file is normal: one language per row. Completions must not mix
 languages **inside** a single JSON object (`R_lang`). G and D are files
 (`baseline.gram` / `baseline.dict`), not columns.
 
-Maninka group code is **MKU** (not MLQ). Completions use JSON `tokens`.
+Maninka group code is **MKU** (not MLQ). In the experiment jsonl only, `mlq`
+maps to Kassonke `kao`, `hsy` to `mey`, and `seq` to `spp`. `bbo` is an outlier
+kept for `--lang bbo`. Completions use JSON `tokens`.
 
-## How training works
+## How a run works
 
-SAMPG, in short:
+1. **Distill once.** Split the train rows by language. Score Φ with DabaX. If
+   Φ < τ, Distiller proposes \(G_{cand}, D_{cand}\) and promotes only when Φ′ > Φ.
+   Freeze G and D under `{working_dir}/data/resources/{lang}/`.
+2. **Train one arm.** SFT, GRPO, DPO, or APO reads that checkpoint. Arms do not
+   write a new grammar or dictionary.
+3. **Evaluate.** Held-out `test.json` reports MER, MCS, and UWEC for model,
+   algorithm, and scope. All three are costs to minimize. MULTI13 pools
+   morphemes (MER) and tokens (MCS, UWEC). UWEC is evaluation-only.
 
-1. Distill G, D (HITL optional; scratch bootstrap if no packaged baseline).
-2. For each batch, group by language and score Φ with DabaX.
-3. If Φ < τ, Distiller proposes \(G_{cand}, D_{cand}\); promote iff Φ′ > Φ.
-4. Sample completions; score \(R_{morph}\) / \(R_{format}\) / \(R_{rule}\) / \(R_{lang}\).
-5. Update θ with GRPO, or DPO / APO as a plugin.
-
-One policy θ; `(G_ℓ, D_ℓ)` per language. Φ is computed **on a batch of texts**
-with those files. Threshold τ defaults to **0.5**. Full narrative:
-[SAMPG](https://seben.robotsmali.org/docs/sampg/).
+One policy θ; `(G_ℓ, D_ℓ)` per language. τ defaults to **0.5**. Full narrative:
+[SAMPG](https://seben.robotsmali.org/docs/sampg/). Metrics:
+[Rewards](https://seben.robotsmali.org/docs/rewards/).
 
 ## CLI
 
 ```
 sebeni init      --lang bam --lang mku -w ./runs/manding-001
-sebeni exp       -c configs/exp.yaml -w ./runs/exp-001
-sebeni train     -c config.yaml [--lr 1e-5] [--lora-r 32] [--max-steps 100]
 sebeni distill   -c config.yaml
+sebeni train     -c config.yaml --algorithm grpo [--lr 1e-5] [--lora-r 32]
 sebeni eval      -c config.yaml
+sebeni exp       --preset multi13 --algorithm sft -w ./runs/multi13-sft
 sebeni wordfreq  -c config.yaml
 sebeni generate  -c config.yaml --prompt "..." --lang bam
 sebeni push      -c config.yaml --repo-id mlsftwrs/<model>
@@ -147,6 +151,7 @@ Working directory, later wins if set: `~/.sebeni` → `SEBENI_HOME` /
 
 | Artifact | Path |
 | --- | --- |
+| Frozen G, D | `{working_dir}/data/resources/{lang}/` |
 | G, D checkpoints | `{working_dir}/data/baselines/{lang}/baseline.gram` `.dict` and `baseline_vN` |
 | Policy + tokenizer | `{working_dir}/models/` |
 | Hub card + snapshot | `{working_dir}/models/README.md`, `safety_snapshot.json` |
@@ -165,7 +170,7 @@ export:
 - Completions must be valid JSON with `tokens`; format-invalid batches cannot update θ
 - `R_lang` vs **that row**'s group code
 - Promote G, D only when Φ′ > Φ (after the scratch parse gate)
-- Uncertainty U and KL-to-ref (`beta`) down-weight noisy rewards
+- Training distrust U and KL-to-ref (`beta`) down-weight noisy rewards
 - **No Hub push** without a model card and `safety_snapshot.json` (Φ, τ, checkpoint id)
 
 Push checklist and org transfer: [Hub](https://seben.robotsmali.org/docs/hub/).
