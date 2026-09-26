@@ -114,7 +114,6 @@ nav:
       - Wordfreq: wordfreq.md
       - Hub: hub.md
       - Contributing: contributing.md
-      - Cleanup catalog: cleanup-catalog.md
       - API:
           - Overview: api/index.md
           - SRL: api/srl.md
