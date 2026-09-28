@@ -58,15 +58,16 @@ distillation:
   model: gemini-2.5-flash   # LLM backends only
   tau: 0.5
   hitl: false
-  vertex: false
+  # vertex: true            # ADC / Vertex AI; omit to auto-select when ADC is present
   gguf_path: null
   n_ctx: 4096
 ```
 
 - `algorithmic` builds a DabaX stage −1 miss list and adds conservative `\lx`
   entries. This is the train/exp default.
-- `google` accepts `GOOGLE_API_KEY`, or ADC/Vertex with `vertex: true` and
-  `GOOGLE_CLOUD_PROJECT`.
+- `google` uses Vertex/ADC when `vertex: true` or ADC is present
+  (`GOOGLE_CLOUD_PROJECT` / application-default credentials). A leftover
+  `GOOGLE_API_KEY` does not override ADC. Set `vertex: false` for AI Studio.
 - `.env` is loaded from the config directory, workdir, or `SEBENI_ENV`;
   existing process variables win.
 - OpenAI-compatible backends accept `base_url` for Ollama/vLLM.

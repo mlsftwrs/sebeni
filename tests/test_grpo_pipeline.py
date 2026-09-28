@@ -328,7 +328,7 @@ class TestSebeniGrpoPipeline:
             backend="google",
             model="gemini-2.5-flash",
             working_dir=None,
-            vertex=False,
+            vertex=None,
             base_url=None,
             gguf_path=None,
             n_ctx=4096,

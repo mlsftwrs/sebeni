@@ -67,34 +67,57 @@ class RewardManager:
         self.predicted_stages.clear()
 
     @staticmethod
-    def dict_to_morpheme(d: dict) -> Morpheme:
-        children = ([RewardManager.dict_to_morpheme(child) for child in d.get("morphemes", [])] if "morphemes" in d else None)
+    def _as_list(value: Any) -> list:
+        return value if isinstance(value, list) else []
 
+    @staticmethod
+    def dict_to_morpheme(d: dict) -> Morpheme:
+        children = None
+        if isinstance(d, dict) and "morphemes" in d:
+            children = [
+                RewardManager.dict_to_morpheme(child)
+                for child in RewardManager._as_list(d.get("morphemes"))
+                if isinstance(child, dict)
+            ]
+
+        payload = d if isinstance(d, dict) else {}
         return Morpheme(
-            form=d.get("form", ""), ps=d.get("ps", []),
-            gloss=d.get("gloss", ""), morphemes=children)
+            form=payload.get("form") or "",
+            ps=RewardManager._as_list(payload.get("ps")),
+            gloss=payload.get("gloss") or "",
+            morphemes=children,
+        )
 
     @staticmethod
     def parse_json_to_sentence(json_data: dict, text: str = "") -> Sentence:
+        payload = json_data if isinstance(json_data, dict) else {}
         tokens = []
-        for t_data in json_data.get("tokens", []):
+        for t_data in RewardManager._as_list(payload.get("tokens")):
+            if not isinstance(t_data, dict):
+                continue
             analyses = []
-            for a_data in t_data.get("analyses", []):
-                morphemes = [RewardManager.dict_to_morpheme(m) for m in a_data.get("morphemes", [])]
+            for a_data in RewardManager._as_list(t_data.get("analyses")):
+                if not isinstance(a_data, dict):
+                    continue
+                morphemes = [
+                    RewardManager.dict_to_morpheme(m)
+                    for m in RewardManager._as_list(a_data.get("morphemes"))
+                    if isinstance(m, dict)
+                ]
                 analyses.append(Analysis(
-                    form=a_data.get("form", ""),
-                    ps=a_data.get("ps", []),
-                    gloss=a_data.get("gloss", ""),
+                    form=a_data.get("form") or "",
+                    ps=RewardManager._as_list(a_data.get("ps")),
+                    gloss=a_data.get("gloss") or "",
                     morphemes=morphemes,
                 ))
             tokens.append(Token(
-                surface=t_data.get("surface", ""),
-                stage=t_data.get("stage", -1),
+                surface=t_data.get("surface") or "",
+                stage=t_data.get("stage") if t_data.get("stage") is not None else -1,
                 analyses=analyses,
             ))
         return Sentence(
-            text=text or json_data.get("text", ""),
-            lang=json_data.get("lang", "bam"),
+            text=text or payload.get("text") or "",
+            lang=payload.get("lang") or "bam",
             tokens=tokens,
         )
 
@@ -248,7 +271,7 @@ class RewardManager:
 
         if reference is not None:
             for ref in reference:
-                if isinstance(ref, dict) and ref:
+                if isinstance(ref, dict) and RewardManager._as_list(ref.get("tokens")):
                     reference_sentences.append(
                         RewardManager.parse_json_to_sentence(ref, ref.get("text", "")))
                 elif isinstance(ref, str) and ref:

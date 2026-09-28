@@ -343,6 +343,60 @@ class TestAdjustedPipeline:
         assert proposal.parseable
         assert proposal.phi_prime > phi
 
+    def test_remove_is_alias_of_delete(self):
+        gram = "keep |\nbroken |\n"
+        out = Distiller.apply_gram_deltas(gram, "[REMOVE: broken |]\n")
+        assert "broken" not in out
+        assert "keep" in out
+
+    def test_skips_unparseable_add_keeps_previous(self):
+        gram = "keep |\n"
+        delta = "[ADD]\n}\n[ADD]\nmore |\n"
+        out = Distiller.apply_gram_deltas(
+            gram,
+            delta,
+            keep_if=lambda text: "}" not in text,
+        )
+        assert "}" not in out
+        assert "more |" in out
+        assert "keep |" in out
+
+    def test_all_unparseable_deltas_leave_original(self):
+        gram = "keep |\n"
+        out = Distiller.apply_gram_deltas(
+            gram,
+            "[ADD]\n}\n",
+            keep_if=lambda text: "}" not in text,
+        )
+        assert out == gram
+
+    def test_propose_reverts_when_candidate_not_parseable(self, tmp_path):
+        with patch.object(
+            Distiller, "_valid_language", return_value={"language": "Z", "group_code": "zzz"}
+        ):
+            distiller = Distiller(
+                lang_code="zzz", backend="algorithmic", working_dir=tmp_path
+            )
+        distiller.handle_baselines()
+        gram = tmp_path / "data" / "baselines" / "zzz" / "baseline.gram"
+        original = gram.read_text(encoding="utf-8")
+        with patch.object(distiller, "collect_misses", return_value=["foo"]), patch.object(
+            distiller, "_texts_parseable", return_value=False
+        ):
+            proposal = distiller.propose(["foo"], current_phi=0.2)
+        assert proposal is None
+        assert gram.read_text(encoding="utf-8") == original
+
+    def test_propose_exception_does_not_raise(self, tmp_path):
+        with patch.object(
+            Distiller, "_valid_language", return_value={"language": "Z", "group_code": "zzz"}
+        ):
+            distiller = Distiller(
+                lang_code="zzz", backend="algorithmic", working_dir=tmp_path
+            )
+        with patch.object(distiller, "collect_misses", side_effect=RuntimeError("boom")):
+            assert distiller.propose(["foo"], current_phi=0.1) is None
+
     def test_morph_reward_compares_gold_annotation(self):
         reference = {
             "text": "aw",
@@ -370,6 +424,18 @@ class TestAdjustedPipeline:
             prompts=[{}],
         )
         assert score == pytest.approx([rm.config.morph_weight])
+
+    def test_morph_reward_null_gold_tokens_scores_zero(self):
+        from beni.core.compute.rewards import RewardManager
+
+        rm = RewardManager()
+        scores = rm.reward_morph(
+            ['{"lang": "snk", "tokens": []}'],
+            language=["snk"],
+            reference=[{"text": None, "lang": None, "tokens": None}],
+            prompts=[{}],
+        )
+        assert scores == [0.0]
 
     def test_reward_format_accepts_conversational_completions(self):
         from beni.core.compute.rewards import RewardManager
@@ -567,8 +633,124 @@ class TestProviderRegistry:
             )
         assert provider.cache is None
         client.assert_called_with(
-            vertexai=True, project="test-project", location=cfg.GOOGLE_LOCATION
+            vertexai=True, project="test-project", location=cfg.google_location()
         )
+
+    def test_use_google_vertex_prefers_adc_over_api_key(self, monkeypatch):
+        monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "adc-project")
+        monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
+        assert cfg.use_google_vertex(None, api_key="studio-key") is True
+        assert cfg.use_google_vertex(True, api_key=None) is True
+        assert cfg.use_google_vertex(False, api_key="studio-key") is False
+
+    def test_use_google_vertex_reads_adc_quota_project(self, tmp_path, monkeypatch):
+        adc = tmp_path / "adc.json"
+        adc.write_text(
+            '{"type": "authorized_user", "quota_project_id": "quota-proj"}',
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", str(adc))
+        for name in ("GOOGLE_CLOUD_PROJECT", "GOOGLE_PROJECT_ID", "GOOGLE_PROJECT"):
+            monkeypatch.delenv(name, raising=False)
+        assert cfg.google_project_id() == "quota-proj"
+        assert cfg.use_google_vertex(None) is True
+
+    def test_distiller_prefers_vertex_adc_over_api_key(self, tmp_path, monkeypatch):
+        pytest.importorskip("google.genai")
+        monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "adc-project")
+        monkeypatch.setenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+        monkeypatch.setenv("GOOGLE_API_KEY", "studio-key")
+        with patch(
+            "beni.core.morphotactic.distil.providers.google.genai.Client"
+        ) as client, patch.object(
+            Distiller,
+            "_valid_language",
+            return_value={"language": "Bamana", "group_code": "bam"},
+        ):
+            distiller = Distiller(
+                lang_code="bam",
+                backend="google",
+                model="gemini-test",
+                working_dir=tmp_path,
+            )
+        assert distiller.provider.vertex is True
+        client.assert_called_with(
+            vertexai=True, project="adc-project", location="us-central1"
+        )
+
+    def test_explicit_vertex_false_uses_studio_api_key(self, tmp_path, monkeypatch):
+        pytest.importorskip("google.genai")
+        monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "adc-project")
+        with patch(
+            "beni.core.morphotactic.distil.providers.google.genai.Client"
+        ) as client, patch.object(
+            Distiller,
+            "_valid_language",
+            return_value={"language": "Bamana", "group_code": "bam"},
+        ):
+            Distiller(
+                lang_code="bam",
+                backend="google",
+                model="gemini-test",
+                working_dir=tmp_path,
+                api_key="studio-key",
+                vertex=False,
+            )
+        client.assert_called_with(api_key="studio-key")
+
+    def test_google_cache_failure_does_not_raise(self):
+        pytest.importorskip("google.genai")
+        mock_client = MagicMock()
+        mock_client.caches.list.side_effect = RuntimeError("RESOURCE_EXHAUSTED")
+        with patch(
+            "beni.core.morphotactic.distil.providers.google.genai.Client",
+            return_value=mock_client,
+        ):
+            from beni.core.morphotactic.distil.providers.google import GoogleProvider
+
+            provider = GoogleProvider(
+                api_key=None, vertex=True, project_id="test-project", language="spp"
+            )
+            assert provider.create_cache(contents="sys") is None
+            assert provider.cache is None
+
+    def test_create_provider_google_drops_openai_gguf_kwargs(self):
+        pytest.importorskip("google.genai")
+        with patch("beni.core.morphotactic.distil.providers.google.genai.Client"):
+            from beni.core.morphotactic.distil.providers import create_provider
+
+            provider = create_provider(
+                "google",
+                api_key="test-key",
+                model="gemini-test",
+                language="bam",
+                base_url="https://example.invalid/v1",
+                gguf_path="/tmp/model.gguf",
+                n_ctx=2048,
+            )
+        assert provider.__class__.__name__ == "GoogleProvider"
+
+    def test_distiller_google_accepts_shared_backend_kwargs(self, tmp_path):
+        pytest.importorskip("google.genai")
+        with patch(
+            "beni.core.morphotactic.distil.providers.google.genai.Client"
+        ), patch.object(
+            Distiller,
+            "_valid_language",
+            return_value={"language": "Bamana", "group_code": "bam"},
+        ):
+            distiller = Distiller(
+                lang_code="bam",
+                backend="google",
+                model="gemini-test",
+                working_dir=tmp_path,
+                api_key="test-key",
+                base_url="https://example.invalid/v1",
+                gguf_path="/tmp/model.gguf",
+                n_ctx=2048,
+            )
+        assert distiller.provider is not None
+        assert distiller.provider.__class__.__name__ == "GoogleProvider"
 
     def test_gguf_selection_warns_about_context(self):
         from beni.core.morphotactic.distil.providers.gguf import GGUFProvider

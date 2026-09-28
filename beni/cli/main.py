@@ -132,6 +132,7 @@ distillation:
   enabled: true
   backend: algorithmic     # algorithmic | gguf | google | openai | groq | together
   model: gemini-2.5-flash
+  # vertex: true           # ADC / Vertex AI; omit to auto-select when ADC is present
   tau: 0.5
   hitl: false
 

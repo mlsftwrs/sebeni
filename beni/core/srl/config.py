@@ -378,7 +378,7 @@ class DistillationConfig:
     auto_update_baselines: bool = True
     tau: float = 0.5
     hitl: bool = False
-    vertex: bool = False
+    vertex: Optional[bool] = None
     base_url: Optional[str] = None
     gguf_path: Optional[str] = None
     n_ctx: int = 4096

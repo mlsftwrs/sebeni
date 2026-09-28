@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import shutil
 import subprocess
 from pathlib import Path
@@ -16,6 +17,8 @@ from typing import Any, Callable, Dict, List, Optional
 from beni.core.language import resolve_scope
 from beni.core.srl.config import MasterConfig
 from beni.utils import config as cfg
+
+logger = logging.getLogger(__name__)
 
 
 def frozen_marker(mc: MasterConfig) -> Path:
@@ -228,21 +231,33 @@ def run_distill(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None
         for group, texts in grouped.items():
             if group not in allowed:
                 continue
-            distiller = _distiller_for(mc, group)
-            decision = distill_language(
-                texts,
-                distiller,
-                governor,
-                mc.distillation.tau,
-                hitl=mc.distillation.hitl,
-            )
-            decisions[group] = {
-                "allowed": decision.allowed,
-                "reason": decision.reason,
-                "phi": decision.phi,
-                "phi_prime": decision.phi_prime,
-            }
-            resources[group] = _snapshot_language(distiller, group, root)
+            try:
+                distiller = _distiller_for(mc, group)
+                decision = distill_language(
+                    texts,
+                    distiller,
+                    governor,
+                    mc.distillation.tau,
+                    hitl=mc.distillation.hitl,
+                )
+                decisions[group] = {
+                    "allowed": decision.allowed,
+                    "reason": decision.reason,
+                    "phi": decision.phi,
+                    "phi_prime": decision.phi_prime,
+                }
+                resources[group] = _snapshot_language(distiller, group, root)
+            except Exception as exc:
+                logger.warning(
+                    "Distill %s failed; keeping previous G, D (%s)", group, exc
+                )
+                decisions[group] = {
+                    "allowed": False,
+                    "reason": "distill_error",
+                    "phi": 0.0,
+                    "phi_prime": 0.0,
+                    "error": str(exc),
+                }
     mc.experiment.freeze_resources = True
     marker = {
         "frozen": True,

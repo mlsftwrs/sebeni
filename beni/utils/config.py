@@ -292,6 +292,68 @@ def provider_api_key(provider: str) -> Optional[str]:
     return PROVIDER_API_KEYS.get(str(provider or "").lower())
 
 
+_ADC_WELL_KNOWN = (
+    Path.home() / ".config" / "gcloud" / "application_default_credentials.json"
+)
+
+
+def google_adc_path() -> Optional[Path]:
+    """ADC JSON from ``GOOGLE_APPLICATION_CREDENTIALS`` or the gcloud well-known file."""
+    explicit = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    if explicit:
+        path = Path(explicit).expanduser()
+        return path if path.is_file() else None
+    if _ADC_WELL_KNOWN.is_file():
+        return _ADC_WELL_KNOWN
+    return None
+
+
+def google_project_id() -> Optional[str]:
+    """GCP project for Vertex: env first, then ADC ``quota_project_id`` / ``project_id``."""
+    for name in ("GOOGLE_CLOUD_PROJECT", "GOOGLE_PROJECT_ID", "GOOGLE_PROJECT"):
+        value = (os.getenv(name) or "").strip()
+        if value:
+            return value
+    path = google_adc_path()
+    if not path:
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    for key in ("quota_project_id", "project_id"):
+        value = data.get(key)
+        if value:
+            return str(value)
+    return None
+
+
+def google_location() -> str:
+    for name in ("GOOGLE_CLOUD_LOCATION", "GOOGLE_LOCATION", "GOOGLE_REGION"):
+        value = (os.getenv(name) or "").strip()
+        if value:
+            return value
+    return GOOGLE_LOCATION or "us-central1"
+
+
+def use_google_vertex(vertex: Optional[bool], api_key: Optional[str] = None) -> bool:
+    """Select Vertex/ADC vs Gemini Developer API (AI Studio).
+
+    ``True`` always Vertex. ``False`` always the Studio API-key client.
+    ``None`` auto-selects Vertex when ADC project or credentials exist, even if
+    ``GOOGLE_API_KEY`` is also set. A leftover Studio key must not silently
+    bill AI Studio prepaid credits.
+    """
+    del api_key
+    if vertex is True:
+        return True
+    if vertex is False:
+        return False
+    return bool(google_project_id() or google_adc_path())
+
+
 def scratch_gram() -> str:
     """Daba-compatible empty grammar stub for languages with no packaged baseline."""
     return SCRATCH_GRAM

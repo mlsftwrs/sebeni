@@ -414,8 +414,11 @@ class SebeniDataLoader:
                 lang = getattr(item, "lang", self.config.default_lang)
                 reference = {}
 
-            if not reference and text:
+            tokens = reference.get("tokens") if isinstance(reference, dict) else None
+            if not isinstance(tokens, list) and text:
                 reference = build_dabax_reference(text, lang or self.config.default_lang or "bam")
+            if not isinstance(reference, dict) or not isinstance(reference.get("tokens"), list):
+                reference = {}
 
             messages = [
                 {"role": "system", "content": prompt},

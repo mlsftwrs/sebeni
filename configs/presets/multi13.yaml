@@ -51,10 +51,10 @@ experiment:
   kveritas_seal: false
 
 reward:
-  format_weight: 0.1
-  morph_weight: 0.4
-  rule_weight: 0.4
-  lang_weight: 0.1
+  format_weight: 0.2
+  morph_weight: 0.3
+  rule_weight: 0.3
+  lang_weight: 0.2
 
 safety:
   enabled: true

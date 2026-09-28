@@ -67,8 +67,8 @@ class DistilSysPrompt:
         1. Analyze the new text against the BASELINE checkpoints and any PREVIOUS DELTAS.
         2. Identify conflicts, errors, or changes required by the new text:
         - **New Material:** Mark with `[ADD]`
-        - **Correction/Modification:** Mark with `[REPLACE: target_identifier]` where `target_identifier` is the exact `\lx` entry or rule name being corrected.
-        - **Deprecation/Deletion:** Mark with `[DELETE: target_identifier]`
+        - **Correction/Modification:** Mark with `[REPLACE: target_identifier]` where `target_identifier` is the exact `\\lx` entry or rule name being corrected.
+        - **Deprecation/Deletion:** Mark with `[DELETE: target_identifier]` or `[REMOVE: target_identifier]`
         3. Formatting Rules for Deltas:
         - For Dictionary modifications, specify the target lexeme:
             `[REPLACE: \\lx lexeme_name]` followed by the full updated MDF entry block.

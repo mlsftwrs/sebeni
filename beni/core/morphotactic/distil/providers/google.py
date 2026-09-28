@@ -1,6 +1,6 @@
 import time
 import json
-import os
+import logging
 from rich.console import Console
 from pydantic import ValidationError
 from google import genai
@@ -8,28 +8,21 @@ from typing import Dict, Union, Any
 from beni.utils import config as cfg
 from beni.core.morphotactic.distil.providers import base
 
+logger = logging.getLogger(__name__)
+
 class GoogleProvider(base.BaseProvider):
     """Google Gemini provider."""
 
     def __init__(
-            self, api_key=cfg.GOOGLE_API, 
+            self, api_key=None, 
             model="gemma-4-26b-a4b-it", language: str= None, 
             temperature: float =cfg.TEMPERATURE, cache_contents: Union[None, Dict]=None, 
-            TTL=cfg.CACHE_TTL, vertex=False, project_id: str=cfg.GOOGLE_PROJECT_ID, region: str=cfg.GOOGLE_LOCATION):
+            TTL=cfg.CACHE_TTL, vertex=False, project_id: str=None, region: str=None):
 
-        super().__init__(api_key, model)
-        self.project_id = (
-            project_id
-            or os.getenv("GOOGLE_CLOUD_PROJECT")
-            or os.getenv("GOOGLE_PROJECT_ID")
-        )
-        self.region = (
-            region
-            or os.getenv("GOOGLE_CLOUD_LOCATION")
-            or os.getenv("GOOGLE_LOCATION")
-            or "us-central1"
-        )
-        self.vertex = vertex
+        super().__init__(api_key or cfg.GOOGLE_API, model)
+        self.project_id = project_id or cfg.google_project_id()
+        self.region = region or cfg.google_location()
+        self.vertex = bool(vertex)
         
         self.temperature = temperature
         self.language = language
@@ -49,10 +42,20 @@ class GoogleProvider(base.BaseProvider):
             )
         if self.vertex and not self.project_id:
             raise ValueError(
-                "Vertex/ADC requires GOOGLE_CLOUD_PROJECT or GOOGLE_PROJECT_ID."
+                "Vertex/ADC requires GOOGLE_CLOUD_PROJECT or GOOGLE_PROJECT_ID "
+                "(or ADC quota_project_id from "
+                "`gcloud auth application-default set-quota-project`)."
             )
-        client = self.__vertex_client() if self.vertex else self.__api_client()
-        return client
+        if self.vertex:
+            logger.info(
+                "Google Distiller: Vertex AI (ADC) project=%s location=%s model=%s",
+                self.project_id,
+                self.region,
+                self.model,
+            )
+            return self.__vertex_client()
+        logger.info("Google Distiller: Gemini Developer API (AI Studio) model=%s", self.model)
+        return self.__api_client()
 
 
     def set_vertex(self, vertex: bool):
@@ -90,25 +93,29 @@ class GoogleProvider(base.BaseProvider):
         cache_name = self.cache_name if not cache_name else cache_name
         model = model if model else self.model
 
-        for cache in self._client.caches.list():
-            if(cache.display_name == cache_name):
-                self._client.caches.update(
-                    name=cache.name,
-                    config={"ttl": "3600s"} 
-                )
-                self.cache = cache
-                print(f"Cache found for {cache_name} --> {cache}")
-                return cache
+        try:
+            for cache in self._client.caches.list():
+                if(cache.display_name == cache_name):
+                    self._client.caches.update(
+                        name=cache.name,
+                        config={"ttl": "3600s"} 
+                    )
+                    self.cache = cache
+                    print(f"Cache found for {cache_name} --> {cache}")
+                    return cache
 
-        cache = {}
-        # TOOD: Swap to normal logging module instead of plain old print
-        print(f"Cache not found for {cache_name}, creating new cache")
-
-        # lazy loading
-        cache = self._client.caches.create(
-            model=model,
-            config=genai.types.CreateCachedContentConfig(contents=[contents], ttl=self.ttl,
-                display_name=cache_name))
+            print(f"Cache not found for {cache_name}, creating new cache")
+            cache = self._client.caches.create(
+                model=model,
+                config=genai.types.CreateCachedContentConfig(contents=[contents], ttl=self.ttl,
+                    display_name=cache_name))
+        except Exception as exc:
+            logger.warning(
+                "Google context cache unavailable (%s); continuing without cache.",
+                exc,
+            )
+            self.cache = None
+            return None
 
         self.cache = cache
         return self.cache
