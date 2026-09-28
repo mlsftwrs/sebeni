@@ -12,4 +12,7 @@ try:
 except PackageNotFoundError:  # pragma: no cover
     __version__ = "0.1.0"
 
+import warnings
+warnings.filterwarnings("ignore", message=".*pkg_resources is deprecated as an API.*", category=UserWarning)
+
 __all__ = ["__version__"]

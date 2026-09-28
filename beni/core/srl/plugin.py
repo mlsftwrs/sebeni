@@ -145,6 +145,12 @@ class AlignmentPlugin:
         )
         if use_cpu or not torch.cuda.is_available():
             device_map = "cpu"
+            if getattr(self.config, "trainer", None):
+                self.config.trainer.use_cpu = True
+            if getattr(self.config, "dpo", None):
+                self.config.dpo.use_cpu = True
+            if getattr(self.config, "apo", None):
+                self.config.apo.use_cpu = True
 
         bnb_config = None
         use_4bit = self.config.model.load_in_4bit and device_map != "cpu"
