@@ -293,8 +293,10 @@ def run_arm(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None):
     if records is None:
         loaded = load_train_records(mc)
         records = loaded["records"]
+    
     if not resources_frozen(mc):
         run_distill(mc, records)
+
     if str(mc.trainer.framework).lower() == "jax" and mc.algorithm == "sft":
         raise ValueError("SFT is torch-only. Set trainer.framework: torch for algorithm: sft.")
     from beni.core.srl.unified import SRLTrainer

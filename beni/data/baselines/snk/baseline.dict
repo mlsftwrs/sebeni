@@ -10,7 +10,7 @@
 \lx A
 \ph /a/
 \va 
-\mm 
+\mm ::
 \ps prn
 \vl 
 \ve 
@@ -31,7 +31,7 @@
 \lx Abada
 \ph /abada/
 \va 
-\mm 
+\mm ::
 \ps adv
 \vl 
 \ve 
@@ -52,7 +52,7 @@
 \lx Alahadi
 \ph /alahadi/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -73,7 +73,7 @@
 \lx Alaxamisa
 \ph /alaxamisa/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -94,7 +94,7 @@
 \lx Alijuma
 \ph /alidʒuma/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -115,7 +115,7 @@
 \lx Alikaati
 \ph /alikaːti/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -136,7 +136,7 @@
 \lx Alikeebu
 \ph /alikeːbu/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -157,7 +157,7 @@
 \lx Alimaami
 \ph /alimaːmi/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -178,7 +178,7 @@
 \lx Alimeeti
 \ph /alimeːti/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -199,7 +199,7 @@
 \lx Aliyatiime
 \ph /alijatiːme/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -220,7 +220,7 @@
 \lx Ala
 \ph /ala/
 \va 
-\mm 
+\mm ::
 \ps n.prop
 \vl 
 \ve 
@@ -241,7 +241,7 @@
 \lx An
 \ph /an/
 \va 
-\mm 
+\mm ::
 \ps prn
 \vl 
 \ve 
@@ -262,7 +262,7 @@
 \lx Anmiina
 \ph /anmiːna/
 \va 
-\mm 
+\mm ::
 \ps interj
 \vl 
 \ve 
@@ -283,7 +283,7 @@
 \lx Annebi
 \ph /anːebi/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -304,7 +304,7 @@
 \lx Anniye
 \ph /anːije/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -325,7 +325,7 @@
 \lx Araba
 \ph /araba/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -346,7 +346,7 @@
 \lx Arijanna
 \ph /aridʒanːa/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -367,7 +367,7 @@
 \lx Ayiwa
 \ph /ajiwa/
 \va 
-\mm 
+\mm ::
 \ps interj
 \vl 
 \ve 
@@ -388,7 +388,7 @@
 \lx ba
 \ph /ba/
 \va 
-\mm 
+\mm ::
 \ps part
 \vl 
 \ve 
@@ -409,7 +409,7 @@
 \lx Baafe
 \ph /baːfe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -430,7 +430,7 @@
 \lx Baane
 \ph /baːne/
 \va 
-\mm 
+\mm ::
 \ps num
 \vl 
 \ve 
@@ -451,7 +451,7 @@
 \lx Baano
 \ph /baːno/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -472,7 +472,7 @@
 \lx Baasu
 \ph /baːsu/
 \va 
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -493,7 +493,7 @@
 \lx Baawo
 \ph /baːwo/
 \va bawoni
-\mm 
+\mm ::
 \ps conj
 \vl 
 \ve 
@@ -514,7 +514,7 @@
 \lx Baaye
 \ph /baːje/
 \va baayi
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -535,7 +535,7 @@
 \lx Badaane
 \ph /badaːne/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -556,7 +556,7 @@
 \lx Bagu
 \ph /bagu/
 \va 
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -577,7 +577,7 @@
 \lx Bakkaane
 \ph /bakːaːne/
 \va baaga
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -598,7 +598,7 @@
 \lx Banbu
 \ph /banbu/
 \va 
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -619,7 +619,7 @@
 \lx Banbuxu
 \ph /banbuxu/
 \va banboxo
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -641,7 +641,7 @@
 \lx Bange
 \ph /baŋe/
 \va 
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -662,7 +662,7 @@
 \lx Bangandi
 \ph /baŋandi/
 \va 
-\mm bange-ndi
+\mm bange-ndi::
 \ps v
 \vl 
 \ve 
@@ -683,7 +683,7 @@
 \lx Banna
 \ph /banːa/
 \va 
-\mm 
+\mm ::
 \ps adj
 \vl 
 \ve 
@@ -704,7 +704,7 @@
 \lx Banŋe
 \ph /baɲe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -725,7 +725,7 @@
 \lx Bantinŋe
 \ph /bantiŋe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -746,7 +746,7 @@
 \lx Bappoore
 \ph /bapːoːre/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -767,7 +767,7 @@
 \lx Bara
 \ph /bara/
 \va balla
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -788,7 +788,7 @@
 \lx Baraaje
 \ph /baraːdʒe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -809,7 +809,7 @@
 \lx Barama
 \ph /barama/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -830,7 +830,7 @@
 \lx Barisa
 \ph /barisa/
 \va 
-\mm 
+\mm ::
 \ps conj
 \vl 
 \ve 
@@ -851,7 +851,7 @@
 \lx Bataaxe
 \ph /bataːxe/
 \va battaxe
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -872,7 +872,7 @@
 \lx Batu
 \ph /batu/
 \va batta
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -893,7 +893,7 @@
 \lx Batte
 \ph /batːe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -914,7 +914,7 @@
 \lx Baxa
 \ph /baxa/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -935,7 +935,7 @@
 \lx Baxalle
 \ph /baxalːe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -956,7 +956,7 @@
 \lx Be
 \ph /be/
 \va 
-\mm 
+\mm ::
 \ps prn
 \vl 
 \ve 
@@ -977,7 +977,7 @@
 \lx Beere
 \ph /beːre/
 \va 
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -998,7 +998,7 @@
 \lx Beeta
 \ph /beːta/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1019,7 +1019,7 @@
 \lx Befe
 \ph /befe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1040,7 +1040,7 @@
 \lx Bendi
 \ph /bendi/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1061,7 +1061,7 @@
 \lx Benne
 \ph /benːe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1082,7 +1082,7 @@
 \lx Bera
 \ph /bera/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1103,7 +1103,7 @@
 \lx Bereta
 \ph /bereta/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1124,7 +1124,7 @@
 \lx Betu
 \ph /betu/
 \va betunu
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -1145,7 +1145,7 @@
 \lx Bexiile
 \ph /bexiːle/
 \va 
-\mm 
+\mm ::
 \ps adj
 \vl 
 \ve 
@@ -1166,7 +1166,7 @@
 \lx Bida
 \ph /bida/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1187,7 +1187,7 @@
 \lx Bifi
 \ph /bifi/
 \va bippi
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -1208,7 +1208,7 @@
 \lx Biida
 \ph /biːda/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1229,7 +1229,7 @@
 \lx Biifi
 \ph /biːfi/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1250,7 +1250,7 @@
 \lx Biijibaajo
 \ph /biːdʒibaːdʒo/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1272,7 +1272,7 @@
 \lx Bange
 \ph /baŋe/
 \va 
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -1293,7 +1293,7 @@
 \lx Bangandi
 \ph /baŋandi/
 \va 
-\mm bange-ndi
+\mm bange-ndi::
 \ps v
 \vl 
 \ve 
@@ -1314,7 +1314,7 @@
 \lx Banna
 \ph /banːa/
 \va 
-\mm 
+\mm ::
 \ps adj
 \vl 
 \ve 
@@ -1335,7 +1335,7 @@
 \lx Banŋe
 \ph /baɲe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1356,7 +1356,7 @@
 \lx Bantinŋe
 \ph /bantiŋe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1377,7 +1377,7 @@
 \lx Bappoore
 \ph /bapːoːre/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1398,7 +1398,7 @@
 \lx Bara
 \ph /bara/
 \va balla
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -1419,7 +1419,7 @@
 \lx Baraaje
 \ph /baraːdʒe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1440,7 +1440,7 @@
 \lx Barama
 \ph /barama/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1461,7 +1461,7 @@
 \lx Barisa
 \ph /barisa/
 \va 
-\mm 
+\mm ::
 \ps conj
 \vl 
 \ve 
@@ -1482,7 +1482,7 @@
 \lx Bataaxe
 \ph /bataːxe/
 \va battaxe
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1503,7 +1503,7 @@
 \lx Batu
 \ph /batu/
 \va batta
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -1524,7 +1524,7 @@
 \lx Batte
 \ph /batːe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1545,7 +1545,7 @@
 \lx Baxa
 \ph /baxa/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1566,7 +1566,7 @@
 \lx Baxalle
 \ph /baxalːe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1587,7 +1587,7 @@
 \lx Be
 \ph /be/
 \va 
-\mm 
+\mm ::
 \ps prn
 \vl 
 \ve 
@@ -1608,7 +1608,7 @@
 \lx Beere
 \ph /beːre/
 \va 
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -1629,7 +1629,7 @@
 \lx Beeta
 \ph /beːta/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1650,7 +1650,7 @@
 \lx Befe
 \ph /befe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1671,7 +1671,7 @@
 \lx Bendi
 \ph /bendi/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1692,7 +1692,7 @@
 \lx Benne
 \ph /benːe/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1713,7 +1713,7 @@
 \lx Bera
 \ph /bera/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1734,7 +1734,7 @@
 \lx Bereta
 \ph /bereta/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1755,7 +1755,7 @@
 \lx Betu
 \ph /betu/
 \va betunu
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -1776,7 +1776,7 @@
 \lx Bexiile
 \ph /bexiːle/
 \va 
-\mm 
+\mm ::
 \ps adj
 \vl 
 \ve 
@@ -1797,7 +1797,7 @@
 \lx Bida
 \ph /bida/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1818,7 +1818,7 @@
 \lx Bifi
 \ph /bifi/
 \va bippi
-\mm 
+\mm ::
 \ps v
 \vl 
 \ve 
@@ -1839,7 +1839,7 @@
 \lx Biida
 \ph /biːda/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1860,7 +1860,7 @@
 \lx Biifi
 \ph /biːfi/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 
@@ -1881,7 +1881,7 @@
 \lx Biijibaajo
 \ph /biːdʒibaːdʒo/
 \va 
-\mm 
+\mm ::
 \ps n
 \vl 
 \ve 

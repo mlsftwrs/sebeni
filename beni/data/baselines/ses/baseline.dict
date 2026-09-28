@@ -10,7 +10,7 @@
 \lx boobo
 \ph boːbo
 \va bɔbɔ
-\mm boobo
+\mm boobo::
 \ps adj
 \vl 
 \ve 
@@ -32,7 +32,7 @@
 \lx cee
 \ph t͡ʃeː
 \va ce
-\mm cee
+\mm cee::
 \ps n
 \vl 
 \ve 
@@ -54,7 +54,7 @@
 \lx day
 \ph daj
 \va 
-\mm day
+\mm day::
 \ps n
 \vl 
 \ve 
@@ -76,7 +76,7 @@
 \lx fafa
 \ph fafa
 \va fofe
-\mm fafa
+\mm fafa::
 \ps n
 \vl 
 \ve 
@@ -98,7 +98,7 @@
 \lx gobu
 \ph ɡobu
 \va 
-\mm gobu
+\mm gobu::
 \ps n
 \vl 
 \ve 
@@ -120,7 +120,7 @@
 \lx heray
 \ph heraj
 \va 
-\mm heray
+\mm heray::
 \ps n
 \vl 
 \ve 
@@ -142,7 +142,7 @@
 \lx jii
 \ph d͡ʒiː
 \va 
-\mm jii
+\mm jii::
 \ps n
 \vl 
 \ve 
@@ -164,7 +164,7 @@
 \lx kaa
 \ph kaː
 \va 
-\mm kaa
+\mm kaa::
 \ps v
 \vl i
 \ve 
@@ -186,7 +186,7 @@
 \lx loti
 \ph loti
 \va 
-\mm loti
+\mm loti::
 \ps n
 \vl 
 \ve 
@@ -208,7 +208,7 @@
 \lx maa
 \ph maː
 \va mayo
-\mm maa
+\mm maa::
 \ps n
 \vl 
 \ve 
@@ -230,7 +230,7 @@
 \lx nuune
 \ph nuːne
 \va nuna
-\mm nuune
+\mm nuune::
 \ps n
 \vl 
 \ve 
@@ -252,7 +252,7 @@
 \lx ɲifi
 \ph ɲifi
 \va 
-\mm ɲifi
+\mm ɲifi::
 \ps n
 \vl 
 \ve 
@@ -274,7 +274,7 @@
 \lx ŋaari
 \ph ŋaːri
 \va 
-\mm ŋaa-ri
+\mm ŋaa-ri::
 \ps n
 \vl 
 \ve 
@@ -296,7 +296,7 @@
 \lx poti
 \ph poti
 \va 
-\mm poti
+\mm poti::
 \ps n
 \vl 
 \ve 
@@ -318,7 +318,7 @@
 \lx ra
 \ph ra
 \va 
-\mm ra
+\mm ra::
 \ps postp
 \vl 
 \ve 
@@ -340,7 +340,7 @@
 \lx say
 \ph saj
 \va 
-\mm say
+\mm say::
 \ps v
 \vl t
 \ve 
@@ -362,7 +362,7 @@
 \lx šeegay
 \ph ʃeːɡaj
 \va 
-\mm šeegay
+\mm šeegay::
 \ps n
 \vl 
 \ve 
@@ -384,7 +384,7 @@
 \lx taari
 \ph taːri
 \va 
-\mm taari
+\mm taari::
 \ps n
 \vl 
 \ve 
@@ -406,7 +406,7 @@
 \lx woy
 \ph woj
 \va wey
-\mm woy
+\mm woy::
 \ps n
 \vl 
 \ve 
@@ -428,7 +428,7 @@
 \lx yay
 \ph jaj
 \va 
-\mm yay
+\mm yay::
 \ps adj
 \vl 
 \ve 
@@ -450,7 +450,7 @@
 \lx zen
 \ph zen
 \va zeen
-\mm zen
+\mm zen::
 \ps adj
 \vl 
 \ve 
@@ -472,7 +472,7 @@
 \lx žamay
 \ph ʒamaj
 \va 
-\mm žamay
+\mm žamay::
 \ps n
 \vl 
 \ve 
@@ -494,7 +494,7 @@
 \lx bebbeeri
 \ph bebbeːri
 \va 
-\mm be-beeri
+\mm be-beeri::
 \ps adj
 \vl 
 \ve 
@@ -516,7 +516,7 @@
 \lx subbaahi
 \ph subbaːhi
 \va 
-\mm subbaahi
+\mm subbaahi::
 \ps n
 \vl 
 \ve 
@@ -538,7 +538,7 @@
 \lx kacca
 \ph katt͡ʃa
 \va 
-\mm kacca
+\mm kacca::
 \ps adj
 \vl 
 \ve 
@@ -560,7 +560,7 @@
 \lx sacce
 \ph satt͡ʃe
 \va 
-\mm sacce
+\mm sacce::
 \ps n
 \vl 
 \ve 
@@ -582,7 +582,7 @@
 \lx fadda
 \ph fadda
 \va 
-\mm fadda
+\mm fadda::
 \ps n
 \vl 
 \ve 
@@ -604,7 +604,7 @@
 \lx fidda
 \ph fidda
 \va 
-\mm fidda
+\mm fidda::
 \ps n
 \vl 
 \ve 
@@ -626,7 +626,7 @@
 \lx guffa
 \ph ɡuffa
 \va 
-\mm guffa
+\mm guffa::
 \ps n
 \vl 
 \ve 
@@ -648,7 +648,7 @@
 \lx yagga
 \ph jaɡɡa
 \va 
-\mm yagga
+\mm yagga::
 \ps num
 \vl 
 \ve 
@@ -670,7 +670,7 @@
 \lx fujje
 \ph fudd͡ʒe
 \va 
-\mm fujje
+\mm fujje::
 \ps n
 \vl 
 \ve 
@@ -692,7 +692,7 @@
 \lx hijji
 \ph hidd͡ʒi
 \va hijja
-\mm hijji
+\mm hijji::
 \ps v
 \vl i
 \ve 
@@ -714,7 +714,7 @@
 \lx lakkal
 \ph lakkal
 \va 
-\mm lakkal
+\mm lakkal::
 \ps n
 \vl 
 \ve 
@@ -736,7 +736,7 @@
 \lx baaballa
 \ph baːballa
 \va 
-\mm baaballa
+\mm baaballa::
 \ps adj
 \vl 
 \ve 
@@ -758,7 +758,7 @@
 \lx hollay
 \ph hollaj
 \va hollo
-\mm hollay
+\mm hollay::
 \ps n
 \vl 
 \ve 
@@ -780,7 +780,7 @@
 \lx tamma
 \ph tamma
 \va 
-\mm tamma
+\mm tamma::
 \ps n
 \vl 
 \ve 
@@ -802,7 +802,7 @@
 \lx manna
 \ph manna
 \va 
-\mm manna
+\mm manna::
 \ps n
 \vl 
 \ve 
@@ -824,7 +824,7 @@
 \lx menne
 \ph menne
 \va 
-\mm menne
+\mm menne::
 \ps v
 \vl i
 \ve 
@@ -846,7 +846,7 @@
 \lx baɲɲa
 \ph baɲɲa
 \va bennya
-\mm baɲɲa
+\mm baɲɲa::
 \ps n
 \vl 
 \ve 
@@ -868,7 +868,7 @@
 \lx koŋŋo
 \ph koŋŋo
 \va 
-\mm koŋŋo
+\mm koŋŋo::
 \ps n
 \vl 
 \ve 
@@ -890,7 +890,7 @@
 \lx bappa
 \ph bappa
 \va 
-\mm bappa
+\mm bappa::
 \ps v
 \vl t
 \ve 
@@ -912,7 +912,7 @@
 \lx barra
 \ph barra
 \va 
-\mm barra
+\mm barra::
 \ps n
 \vl 
 \ve 
@@ -934,7 +934,7 @@
 \lx bossay
 \ph bossaj
 \va 
-\mm bossay
+\mm bossay::
 \ps n
 \vl 
 \ve 
@@ -956,7 +956,7 @@
 \lx fatta
 \ph fatta
 \va 
-\mm fatta
+\mm fatta::
 \ps v
 \vl i
 \ve 
@@ -978,7 +978,7 @@
 \lx kuwwa
 \ph kuwwa
 \va 
-\mm kuwwa
+\mm kuwwa::
 \ps n
 \vl 
 \ve 
@@ -1000,7 +1000,7 @@
 \lx iyye
 \ph ijje
 \va 
-\mm iyye
+\mm iyye::
 \ps num
 \vl 
 \ve 
@@ -1022,7 +1022,7 @@
 \lx fizza
 \ph fizza
 \va 
-\mm fizza
+\mm fizza::
 \ps n
 \vl 
 \ve 
@@ -1044,7 +1044,7 @@
 \lx hužža
 \ph huʒʒa
 \va 
-\mm hužža
+\mm hužža::
 \ps n
 \vl 
 \ve 
@@ -1066,7 +1066,7 @@
 \lx aru
 \ph aru
 \va aaro
-\mm aru
+\mm aru::
 \ps n
 \vl 
 \ve 
@@ -1088,7 +1088,7 @@
 \lx tee
 \ph teː
 \va 
-\mm tee
+\mm tee::
 \ps v
 \vl t
 \ve 
@@ -1102,7 +1102,7 @@
 \lx biri
 \ph bi.ri
 \va 
-\mm biri
+\mm biri::
 \ps n
 \vl 
 \ve 
@@ -1124,7 +1124,7 @@
 \lx kooro
 \ph koː.ro
 \va 
-\mm kooro
+\mm kooro::
 \ps n
 \vl 
 \ve 
@@ -1146,7 +1146,7 @@
 \lx hugu
 \ph hu.ɡu
 \va huo
-\mm hugu
+\mm hugu::
 \ps n
 \vl 
 \ve 
@@ -1168,7 +1168,7 @@
 \lx bari
 \ph ba.ri
 \va berio
-\mm bari
+\mm bari::
 \ps n
 \vl 
 \ve 
@@ -1190,7 +1190,7 @@
 \lx jer
 \ph d͡ʒer
 \va 
-\mm jer
+\mm jer::
 \ps v
 \vl t
 \ve 
@@ -1212,7 +1212,7 @@
 \lx hiri
 \ph hi.ri
 \va 
-\mm hiri
+\mm hiri::
 \ps v
 \vl t
 \ve 
@@ -1234,7 +1234,7 @@
 \lx boro
 \ph bo.ro
 \va bora
-\mm boro
+\mm boro::
 \ps n
 \vl 
 \ve 
@@ -1256,7 +1256,7 @@
 \lx kuru
 \ph ku.ru
 \va 
-\mm kuru
+\mm kuru::
 \ps n
 \vl 
 \ve 
@@ -1278,7 +1278,7 @@
 \lx faari
 \ph faː.ri
 \va faro
-\mm faari
+\mm faari::
 \ps n
 \vl 
 \ve 
@@ -1300,7 +1300,7 @@
 \lx beere
 \ph beː.re
 \va 
-\mm beere
+\mm beere::
 \ps n
 \vl 
 \ve 
@@ -1322,7 +1322,7 @@
 \lx hiijay
 \ph hiː.d͡ʒaj
 \va 
-\mm hiijay
+\mm hiijay::
 \ps n
 \vl 
 \ve 
@@ -1344,7 +1344,7 @@
 \lx doonu
 \ph doː.nu
 \va 
-\mm doonu
+\mm doonu::
 \ps n
 \vl 
 \ve 
@@ -1366,7 +1366,7 @@
 \lx tuuri
 \ph tuː.ri
 \va turo
-\mm tuuri
+\mm tuuri::
 \ps n
 \vl 
 \ve 
@@ -1388,7 +1388,7 @@
 \lx hãa
 \ph hãː
 \va 
-\mm hãa
+\mm hãa::
 \ps v
 \vl t
 \ve 
@@ -1410,7 +1410,7 @@
 \lx hẽe
 \ph hẽː
 \va 
-\mm hẽe
+\mm hẽe::
 \ps v
 \vl i
 \ve 
@@ -1432,7 +1432,7 @@
 \lx dohĩ
 \ph do.hĩ
 \va 
-\mm dohĩ
+\mm dohĩ::
 \ps v
 \vl i
 \ve 
@@ -1454,7 +1454,7 @@
 \lx hõ
 \ph hõ
 \va 
-\mm hõ
+\mm hõ::
 \ps adv
 \vl 
 \ve 
@@ -1476,7 +1476,7 @@
 \lx hũ
 \ph hũ
 \va 
-\mm hũ
+\mm hũ::
 \ps intj
 \vl 
 \ve 
@@ -1498,7 +1498,7 @@
 \lx diw
 \ph diw
 \va 
-\mm diw
+\mm diw::
 \ps v
 \vl i
 \ve 
@@ -1520,7 +1520,7 @@
 \lx buy
 \ph buj
 \va 
-\mm buy
+\mm buy::
 \ps adv
 \vl 
 \ve 
@@ -1542,7 +1542,7 @@
 \lx borey
 \ph bo.rej
 \va 
-\mm boro-ey
+\mm boro-ey::
 \ps n
 \vl 
 \ve 
@@ -1564,7 +1564,7 @@
 \lx few
 \ph few
 \va 
-\mm few
+\mm few::
 \ps v
 \vl i
 \ve 
@@ -1586,7 +1586,7 @@
 \lx hoy
 \ph hoj
 \va hõŋo
-\mm hoy
+\mm hoy::
 \ps n
 \vl 
 \ve 
@@ -1608,7 +1608,7 @@
 \lx wow
 \ph wow
 \va 
-\mm wow
+\mm wow::
 \ps v
 \vl t
 \ve 
@@ -1630,7 +1630,7 @@
 \lx bay
 \ph baj
 \va 
-\mm bay
+\mm bay::
 \ps v
 \vl t
 \ve 
@@ -1652,7 +1652,7 @@
 \lx taw
 \ph taw
 \va 
-\mm taw
+\mm taw::
 \ps n
 \vl 
 \ve 
@@ -1674,7 +1674,7 @@
 \lx ŋãy
 \ph ŋãj
 \va 
-\mm ŋãy
+\mm ŋãy::
 \ps n
 \vl 
 \ve 
@@ -1696,7 +1696,7 @@
 \lx ɲãy
 \ph ɲãj
 \va 
-\mm ɲãy
+\mm ɲãy::
 \ps intj
 \vl 
 \ve 
@@ -1718,7 +1718,7 @@
 \lx sõy
 \ph sõj
 \va 
-\mm sõy
+\mm sõy::
 \ps v
 \vl i
 \ve 
@@ -1740,7 +1740,7 @@
 \lx ɲõy
 \ph ɲõj
 \va 
-\mm ɲõy
+\mm ɲõy::
 \ps adv
 \vl 
 \ve 
@@ -1762,7 +1762,7 @@
 \lx kaaray
 \ph kaː.raj
 \va 
-\mm kaaray
+\mm kaaray::
 \ps n
 \vl 
 \ve 
@@ -1784,7 +1784,7 @@
 \lx haaray
 \ph haː.raj
 \va 
-\mm haaray
+\mm haaray::
 \ps n
 \vl 
 \ve 
@@ -1806,7 +1806,7 @@
 \lx beeray
 \ph beː.raj
 \va 
-\mm beeray
+\mm beeray::
 \ps n
 \vl 
 \ve 
@@ -1828,7 +1828,7 @@
 \lx gay
 \ph ɡaj
 \va 
-\mm gay
+\mm gay::
 \ps v
 \vl i
 \ve 
@@ -1850,7 +1850,7 @@
 \lx way
 \ph waj
 \va 
-\mm way
+\mm way::
 \ps v
 \vl t
 \ve 
@@ -1872,7 +1872,7 @@
 \lx way
 \ph waj
 \va 
-\mm way
+\mm way::
 \ps v
 \vl i
 \ve 
@@ -1894,7 +1894,7 @@
 \lx ti
 \ph ti
 \va ci
-\mm ti
+\mm ti::
 \ps v
 \vl i
 \ve 
@@ -1916,7 +1916,7 @@
 \lx ŋaa
 \ph ŋaː
 \va 
-\mm ŋaa
+\mm ŋaa::
 \ps v
 \vl t
 \ve 
@@ -1938,7 +1938,7 @@
 \lx zaa
 \ph zaː
 \va 
-\mm zaa
+\mm zaa::
 \ps v
 \vl t
 \ve 
@@ -1960,7 +1960,7 @@
 \lx duu
 \ph duː
 \va 
-\mm duu
+\mm duu::
 \ps v
 \vl t
 \ve 
@@ -1982,7 +1982,7 @@
 \lx ɲaa
 \ph ɲaː
 \va nyoŋo
-\mm ɲaa
+\mm ɲaa::
 \ps n
 \vl 
 \ve 
@@ -2004,7 +2004,7 @@
 \lx yoo
 \ph joː
 \va 
-\mm yoo
+\mm yoo::
 \ps n
 \vl 
 \ve 
@@ -2026,7 +2026,7 @@
 \lx mee
 \ph meː
 \va 
-\mm mee
+\mm mee::
 \ps n
 \vl 
 \ve 
@@ -2048,7 +2048,7 @@
 \lx hii
 \ph hiː
 \va 
-\mm hii
+\mm hii::
 \ps n
 \vl 
 \ve 
@@ -2070,7 +2070,7 @@
 \lx ga
 \ph ɡa
 \va 
-\mm ga
+\mm ga::
 \ps part
 \vl 
 \ve 
@@ -2092,7 +2092,7 @@
 \lx se
 \ph se
 \va 
-\mm se
+\mm se::
 \ps postp
 \vl 
 \ve 
@@ -2114,7 +2114,7 @@
 \lx da
 \ph da
 \va 
-\mm da
+\mm da::
 \ps part
 \vl 
 \ve 
@@ -2136,7 +2136,7 @@
 \lx de
 \ph de
 \va 
-\mm de
+\mm de::
 \ps conj
 \vl 
 \ve 
@@ -2158,7 +2158,7 @@
 \lx ma
 \ph ma
 \va 
-\mm ma
+\mm ma::
 \ps part
 \vl 
 \ve 
@@ -2180,7 +2180,7 @@
 \lx go
 \ph ɡo
 \va goo
-\mm go
+\mm go::
 \ps v
 \vl i
 \ve 
@@ -2202,7 +2202,7 @@
 \lx ne
 \ph ne
 \va 
-\mm ne
+\mm ne::
 \ps adv
 \vl 
 \ve 
@@ -2224,7 +2224,7 @@
 \lx si
 \ph si
 \va sii
-\mm si
+\mm si::
 \ps part
 \vl 
 \ve 
@@ -2246,7 +2246,7 @@
 \lx ya
 \ph ja
 \va 
-\mm ya
+\mm ya::
 \ps part
 \vl 
 \ve 
@@ -2268,7 +2268,7 @@
 \lx ba
 \ph ba
 \va 
-\mm ba
+\mm ba::
 \ps conj
 \vl 
 \ve 
@@ -2290,7 +2290,7 @@
 \lx boori
 \ph boː.ri
 \va 
-\mm boori
+\mm boori::
 \ps v
 \vl i
 \ve 
@@ -2312,7 +2312,7 @@
 \lx koy
 \ph koj
 \va 
-\mm koy
+\mm koy::
 \ps v
 \vl i
 \ve 
@@ -2334,7 +2334,7 @@
 \lx marga
 \ph mar.ɡa
 \va 
-\mm marga
+\mm marga::
 \ps v
 \vl t
 \ve 
@@ -2356,7 +2356,7 @@
 \lx noo
 \ph noː
 \va 
-\mm noo
+\mm noo::
 \ps v
 \vl t
 \ve 
@@ -2378,7 +2378,7 @@
 \lx hunday
 \ph hun.daj
 \va 
-\mm hunday
+\mm hunday::
 \ps pron
 \vl 
 \ve 
@@ -2400,7 +2400,7 @@
 \lx binde
 \ph bin.de
 \va 
-\mm binde
+\mm binde::
 \ps part
 \vl 
 \ve 
@@ -2422,7 +2422,7 @@
 \lx goo
 \ph ɡoː
 \va go
-\mm goo
+\mm goo::
 \ps v
 \vl i
 \ve 
@@ -2444,7 +2444,7 @@
 \lx sii
 \ph siː
 \va si
-\mm sii
+\mm sii::
 \ps v
 \vl i
 \ve 
@@ -2466,7 +2466,7 @@
 \lx woo
 \ph woː
 \va wo
-\mm woo
+\mm woo::
 \ps pron
 \vl 
 \ve 
@@ -2488,7 +2488,7 @@
 \lx wey
 \ph wej
 \va 
-\mm wey
+\mm wey::
 \ps pron
 \vl 
 \ve 
@@ -2510,7 +2510,7 @@
 \lx faaba
 \ph faːba
 \va 
-\mm faaba
+\mm faaba::
 \ps v
 \vl t
 \ve 
@@ -2532,7 +2532,7 @@
 \lx hasaraw
 \ph hasaraw
 \va 
-\mm hasaraw
+\mm hasaraw::
 \ps n
 \vl 
 \ve 
@@ -2554,7 +2554,7 @@
 \lx goy
 \ph ɡoj
 \va 
-\mm goy
+\mm goy::
 \ps v
 \vl i
 \ve 
@@ -2576,7 +2576,7 @@
 \lx tur
 \ph tur
 \va 
-\mm tur
+\mm tur::
 \ps v
 \vl t
 \ve 
@@ -2598,7 +2598,7 @@
 \lx funsu
 \ph funsu
 \va 
-\mm funsu
+\mm funsu::
 \ps v
 \vl t
 \ve 
@@ -2620,7 +2620,7 @@
 \lx looti
 \ph loːti
 \va 
-\mm looti
+\mm looti::
 \ps v
 \vl t
 \ve 
@@ -2642,7 +2642,7 @@
 \lx daaba
 \ph daːba
 \va 
-\mm daaba
+\mm daaba::
 \ps v
 \vl t
 \ve 
@@ -2663,7 +2663,7 @@
 \lx haaba
 \ph haːba
 \va 
-\mm haaba
+\mm haaba::
 \ps v
 \vl t
 \ve 
@@ -2685,7 +2685,7 @@
 \lx kur
 \ph kur
 \va 
-\mm kur
+\mm kur::
 \ps v
 \vl t
 \ve 
@@ -2707,7 +2707,7 @@
 \lx hun
 \ph hun
 \va 
-\mm hun
+\mm hun::
 \ps v
 \vl i
 \ve 
@@ -2729,7 +2729,7 @@
 \lx biɲɲay
 \ph biɲɲaj
 \va 
-\mm biɲɲay
+\mm biɲɲay::
 \ps v
 \vl i
 \ve 
@@ -2751,7 +2751,7 @@
 \lx kasine
 \ph kasine
 \va 
-\mm kasine
+\mm kasine::
 \ps n
 \vl 
 \ve 
@@ -2772,7 +2772,7 @@
 \lx hanga
 \ph hanɡa
 \va 
-\mm hanga
+\mm hanga::
 \ps v
 \vl t
 \ve 
@@ -2793,7 +2793,7 @@
 \lx goro
 \ph ɡoro
 \va 
-\mm goro
+\mm goro::
 \ps v
 \vl i
 \ve 
@@ -2815,7 +2815,7 @@
 \lx neere
 \ph neːre
 \va 
-\mm neere
+\mm neere::
 \ps v
 \vl t
 \ve 
@@ -2837,7 +2837,7 @@
 \lx hay
 \ph haj
 \va 
-\mm hay
+\mm hay::
 \ps v
 \vl t
 \ve 
@@ -2859,7 +2859,7 @@
 \lx zay
 \ph zaj
 \va 
-\mm zay
+\mm zay::
 \ps v
 \vl i
 \ve 
@@ -2881,7 +2881,7 @@
 \lx may
 \ph maj
 \va 
-\mm may
+\mm may::
 \ps v
 \vl t
 \ve 
@@ -2902,7 +2902,7 @@
 \lx firsa
 \ph firsa
 \va 
-\mm firsa
+\mm firsa::
 \ps v
 \vl t
 \ve 
@@ -2923,7 +2923,7 @@
 \lx dana
 \ph dana
 \va 
-\mm dana
+\mm dana::
 \ps v
 \vl i
 \ve 
@@ -2945,7 +2945,7 @@
 \lx hin
 \ph hin
 \va 
-\mm hin
+\mm hin::
 \ps v
 \vl t
 \ve 
@@ -2967,7 +2967,7 @@
 \lx cim
 \ph t͡ʃim
 \va 
-\mm cim
+\mm cim::
 \ps v
 \vl i
 \ve 
@@ -2989,7 +2989,7 @@
 \lx gana
 \ph ɡana
 \va 
-\mm gana
+\mm gana::
 \ps v
 \vl t
 \ve 
@@ -3010,7 +3010,7 @@
 \lx far
 \ph far
 \va 
-\mm far
+\mm far::
 \ps v
 \vl t
 \ve 
@@ -3032,7 +3032,7 @@
 \lx caw
 \ph t͡ʃaw
 \va 
-\mm caw
+\mm caw::
 \ps v
 \vl t
 \ve 
@@ -3054,7 +3054,7 @@
 \lx nafa
 \ph nafa
 \va 
-\mm nafa
+\mm nafa::
 \ps v
 \vl i
 \ve 
@@ -3076,7 +3076,7 @@
 \lx jaŋ
 \ph d͡ʒaŋ
 \va 
-\mm jaŋ
+\mm jaŋ::
 \ps v
 \vl t
 \ve 
@@ -3098,7 +3098,7 @@
 \lx yanje
 \ph jan.d͡ʒe
 \va 
-\mm yanje
+\mm yanje::
 \ps n
 \vl 
 \ve 
@@ -3120,7 +3120,7 @@
 \lx niine
 \ph niː.ne
 \va 
-\mm niine
+\mm niine::
 \ps n
 \vl 
 \ve 
@@ -3142,7 +3142,7 @@
 \lx haŋa
 \ph ha.ŋa
 \va 
-\mm haŋa
+\mm haŋa::
 \ps n
 \vl 
 \ve 
@@ -3164,7 +3164,7 @@
 \lx moo
 \ph moː
 \va 
-\mm moo
+\mm moo::
 \ps n
 \vl 
 \ve 
@@ -3186,7 +3186,7 @@
 \lx waa
 \ph waː
 \va 
-\mm waa
+\mm waa::
 \ps n
 \vl 
 \ve 
@@ -3208,7 +3208,7 @@
 \lx boŋ
 \ph bɔŋ
 \va 
-\mm boŋ
+\mm boŋ::
 \ps n
 \vl 
 \ve 
@@ -3230,7 +3230,7 @@
 \lx wirci
 \ph wir.t͡ʃi
 \va 
-\mm wirci
+\mm wirci::
 \ps v
 \vl i
 \ve 
@@ -3252,7 +3252,7 @@
 \lx kooma
 \ph koː.ma
 \va 
-\mm kooma
+\mm kooma::
 \ps n
 \vl 
 \ve 
@@ -3274,7 +3274,7 @@
 \lx gurma
 \ph ɡur.ma
 \va 
-\mm gurma
+\mm gurma::
 \ps n
 \vl 
 \ve 
@@ -3296,7 +3296,7 @@
 \lx hawsa
 \ph haw.sa
 \va 
-\mm hawsa
+\mm hawsa::
 \ps n
 \vl 
 \ve 
@@ -3318,7 +3318,7 @@
 \lx gungu
 \ph ɡun.ɡu
 \va 
-\mm gungu
+\mm gungu::
 \ps n
 \vl 
 \ve 
@@ -3340,7 +3340,7 @@
 \lx talka
 \ph tal.ka
 \va 
-\mm talka
+\mm talka::
 \ps adj
 \vl 
 \ve 
@@ -3362,7 +3362,7 @@
 \lx boŋbi
 \ph bɔŋ.bi
 \va 
-\mm boŋ-bi
+\mm boŋ-bi::
 \ps n
 \vl 
 \ve 
@@ -3384,7 +3384,7 @@
 \lx haya
 \ph ha.ja
 \va hari
-\mm haya
+\mm haya::
 \ps n
 \vl 
 \ve 
@@ -3406,7 +3406,7 @@
 \lx laala
 \ph laː.la
 \va 
-\mm laala
+\mm laala::
 \ps adj
 \vl 
 \ve 
@@ -3428,7 +3428,7 @@
 \lx funbu
 \ph fun.bu
 \va 
-\mm funbu
+\mm funbu::
 \ps v
 \vl i
 \ve 
@@ -3450,7 +3450,7 @@
 \lx ziibi
 \ph ziː.bi
 \va 
-\mm ziibi
+\mm ziibi::
 \ps adj
 \vl 
 \ve 
@@ -3472,7 +3472,7 @@
 \lx hennay
 \ph hen.naj
 \va 
-\mm hennay
+\mm hennay::
 \ps adj
 \vl 
 \ve 
@@ -3494,7 +3494,7 @@
 \lx deŋ
 \ph deŋ
 \va 
-\mm deŋ
+\mm deŋ::
 \ps v
 \vl t
 \ve 
@@ -3516,7 +3516,7 @@
 \lx kaama
 \ph kaː.ma
 \va 
-\mm kaama
+\mm kaama::
 \ps v
 \vl t
 \ve 
@@ -3538,7 +3538,7 @@
 \lx haŋ
 \ph haŋ
 \va 
-\mm haŋ
+\mm haŋ::
 \ps v
 \vl t
 \ve 
@@ -3560,7 +3560,7 @@
 \lx fondo
 \ph fɔn.dɔ
 \va 
-\mm fondo
+\mm fondo::
 \ps n
 \vl 
 \ve 
@@ -3582,7 +3582,7 @@
 \lx teenay
 \ph teː.naj
 \va 
-\mm teenay
+\mm teenay::
 \ps n
 \vl 
 \ve 
@@ -3604,7 +3604,7 @@
 \lx kangaw
 \ph kan.ɡaw
 \va 
-\mm kangaw
+\mm kangaw::
 \ps n
 \vl 
 \ve 
@@ -3626,7 +3626,7 @@
 \lx dundu
 \ph dun.du
 \va 
-\mm dundu
+\mm dundu::
 \ps n
 \vl 
 \ve 
@@ -3648,7 +3648,7 @@
 \lx sokol
 \ph sɔ.kɔl
 \va sokola
-\mm sokol
+\mm sokol::
 \ps n
 \vl 
 \ve 
@@ -3670,7 +3670,7 @@
 \lx han
 \ph han
 \va 
-\mm han
+\mm han::
 \ps n
 \vl 
 \ve 
@@ -3692,7 +3692,7 @@
 \lx bundu
 \ph bun.du
 \va 
-\mm bundu
+\mm bundu::
 \ps n
 \vl 
 \ve 
@@ -3714,7 +3714,7 @@
 \lx daw
 \ph daw
 \va 
-\mm daw
+\mm daw::
 \ps n
 \vl 
 \ve 
@@ -3736,7 +3736,7 @@
 \lx koy
 \ph koj
 \va 
-\mm koy
+\mm koy::
 \ps n
 \vl 
 \ve 
@@ -3758,7 +3758,7 @@
 \lx hew
 \ph hew
 \va 
-\mm hew
+\mm hew::
 \ps n
 \vl 
 \ve 
@@ -3780,7 +3780,7 @@
 \lx kuy
 \ph kuj
 \va 
-\mm kuy
+\mm kuy::
 \ps n
 \vl 
 \ve 
@@ -3802,7 +3802,7 @@
 \lx yuu
 \ph juː
 \va 
-\mm yuu
+\mm yuu::
 \ps n
 \vl 
 \ve 
@@ -3824,7 +3824,7 @@
 \lx doo
 \ph doː
 \va 
-\mm doo
+\mm doo::
 \ps n
 \vl 
 \ve 
@@ -3846,7 +3846,7 @@
 \lx farka
 \ph far.ka
 \va 
-\mm farka
+\mm farka::
 \ps n
 \vl 
 \ve 
@@ -3868,7 +3868,7 @@
 \lx teli
 \ph te.li
 \va 
-\mm teli
+\mm teli::
 \ps n
 \vl 
 \ve 
@@ -3890,7 +3890,7 @@
 \lx dullu
 \ph dul.lu
 \va 
-\mm dullu
+\mm dullu::
 \ps n
 \vl 
 \ve 
@@ -3912,7 +3912,7 @@
 \lx guuru
 \ph ɡuː.ru
 \va 
-\mm guuru
+\mm guuru::
 \ps n
 \vl 
 \ve 
@@ -3934,7 +3934,7 @@
 \lx isa
 \ph i.sa
 \va 
-\mm isa
+\mm isa::
 \ps n
 \vl 
 \ve 
@@ -3956,7 +3956,7 @@
 \lx ize
 \ph i.ze
 \va 
-\mm ize
+\mm ize::
 \ps n
 \vl 
 \ve 
@@ -3978,7 +3978,7 @@
 \lx kar
 \ph kar
 \va 
-\mm kar
+\mm kar::
 \ps v
 \vl t
 \ve 
@@ -4000,7 +4000,7 @@
 \lx sar
 \ph sar
 \va 
-\mm sar
+\mm sar::
 \ps v
 \vl i
 \ve 
@@ -4022,7 +4022,7 @@
 \lx kosu
 \ph ko.su
 \va 
-\mm kosu
+\mm kosu::
 \ps v
 \vl t
 \ve 
@@ -4044,7 +4044,7 @@
 \lx feeri
 \ph feː.ri
 \va 
-\mm feeri
+\mm feeri::
 \ps v
 \vl t
 \ve 
@@ -4066,7 +4066,7 @@
 \lx foori
 \ph foː.ri
 \va 
-\mm foori
+\mm foori::
 \ps v
 \vl t
 \ve 
@@ -4088,7 +4088,7 @@
 \lx zii
 \ph ziː
 \va 
-\mm zii
+\mm zii::
 \ps v
 \vl i
 \ve 
@@ -4110,7 +4110,7 @@
 \lx jebu-hoo
 \ph d͡ʒe.bu.hoː
 \va 
-\mm jebu-hoo
+\mm jebu-hoo::
 \ps v
 \vl i
 \ve 
@@ -4132,7 +4132,7 @@
 \lx montar
 \ph mɔn.tar
 \va 
-\mm montar
+\mm montar::
 \ps n
 \vl 
 \ve 
@@ -4154,7 +4154,7 @@
 \lx araji
 \ph a.ra.d͡ʒi
 \va 
-\mm araji
+\mm araji::
 \ps n
 \vl 
 \ve 
@@ -4176,7 +4176,7 @@
 \lx soo
 \ph soː
 \va 
-\mm soo
+\mm soo::
 \ps n
 \vl 
 \ve 
@@ -4198,7 +4198,7 @@
 \lx ordinater
 \ph ɔr.di.na.tɛr
 \va 
-\mm ordinater
+\mm ordinater::
 \ps n
 \vl 
 \ve 
@@ -4220,7 +4220,7 @@
 \lx kutube
 \ph ku.tu.be
 \va 
-\mm kutube
+\mm kutube::
 \ps n
 \vl 
 \ve 
@@ -4242,7 +4242,7 @@
 \lx diliwil
 \ph di.li.wil
 \va 
-\mm diliwil
+\mm diliwil::
 \ps n
 \vl 
 \ve 
@@ -4264,7 +4264,7 @@
 \lx hanbaaji
 \ph han.baː.d͡ʒi
 \va 
-\mm hanbaaji
+\mm hanbaaji::
 \ps n
 \vl 
 \ve 
@@ -4286,7 +4286,7 @@
 \lx alwala
 \ph al.wa.la
 \va 
-\mm alwala
+\mm alwala::
 \ps n
 \vl 
 \ve 
@@ -4308,7 +4308,7 @@
 \lx nama
 \ph na.ma
 \va 
-\mm nama
+\mm nama::
 \ps v
 \vl i
 \ve 
@@ -4330,7 +4330,7 @@
 \lx sundu
 \ph sun.du
 \va 
-\mm sundu
+\mm sundu::
 \ps v
 \vl t
 \ve 
@@ -4352,7 +4352,7 @@
 \lx bisa
 \ph bi.sa
 \va 
-\mm bisa
+\mm bisa::
 \ps n
 \vl 
 \ve 
@@ -4374,7 +4374,7 @@
 \lx yerda
 \ph jɛr.da
 \va 
-\mm yerda
+\mm yerda::
 \ps v
 \vl i
 \ve 
@@ -4396,7 +4396,7 @@
 \lx yadda
 \ph jad.da
 \va 
-\mm yadda
+\mm yadda::
 \ps v
 \vl i
 \ve 
@@ -4418,7 +4418,7 @@
 \lx sorku
 \ph sɔr.ku
 \va deeji
-\mm sorku
+\mm sorku::
 \ps v
 \vl t
 \ve 
@@ -4440,7 +4440,7 @@
 \lx timme
 \ph tim.me
 \va 
-\mm timme
+\mm timme::
 \ps v
 \vl i
 \ve 
@@ -4462,7 +4462,7 @@
 \lx sarusi
 \ph sa.ru.si
 \va 
-\mm sarusi
+\mm sarusi::
 \ps n
 \vl 
 \ve 
@@ -4484,7 +4484,7 @@
 \lx kaya
 \ph ka.ja
 \va jinawey
-\mm kaya
+\mm kaya::
 \ps n
 \vl 
 \ve 
@@ -4506,7 +4506,7 @@
 \lx sawani
 \ph sa.wa.ni
 \va 
-\mm sawani
+\mm sawani::
 \ps n
 \vl 
 \ve 
@@ -4528,7 +4528,7 @@
 \lx fansa
 \ph fan.sa
 \va fensa
-\mm fansa
+\mm fansa::
 \ps v
 \vl t
 \ve 
@@ -4550,7 +4550,7 @@
 \lx pita-pita
 \ph pi.ta.pi.ta
 \va 
-\mm pita-pita
+\mm pita-pita::
 \ps n
 \vl 
 \ve 
@@ -4572,7 +4572,7 @@
 \lx buŋzam
 \ph buŋ.zam
 \va 
-\mm buŋzam
+\mm buŋzam::
 \ps v
 \vl t
 \ve 
@@ -4594,7 +4594,7 @@
 \lx meri
 \ph me.ri
 \va 
-\mm meri
+\mm meri::
 \ps adj
 \vl 
 \ve 
@@ -4616,7 +4616,7 @@
 \lx sulba
 \ph sul.ba
 \va sana
-\mm sulba
+\mm sulba::
 \ps n
 \vl 
 \ve 
@@ -4638,7 +4638,7 @@
 \lx fata
 \ph fa.ta
 \va 
-\mm fata
+\mm fata::
 \ps n
 \vl 
 \ve 
@@ -4660,7 +4660,7 @@
 \lx ba
 \ph ba
 \va baga
-\mm ba
+\mm ba::
 \ps v
 \vl t
 \ve 
@@ -4682,7 +4682,7 @@
 \lx baga
 \ph ba.ɡa
 \va ba
-\mm baga
+\mm baga::
 \ps v
 \vl t
 \ve 
@@ -4704,7 +4704,7 @@
 \lx kubey
 \ph ku.bej
 \va 
-\mm kubey
+\mm kubey::
 \ps v
 \vl t
 \ve 
@@ -4726,7 +4726,7 @@
 \lx hottu
 \ph hɔt.tu
 \va 
-\mm hottu
+\mm hottu::
 \ps adj
 \vl 
 \ve 
@@ -4749,7 +4749,7 @@
 \ph t͡ʃe.ro
 \ps n
 \va 
-\mm cero
+\mm cero::
 \ps n
 \vl 
 \ve 
@@ -4771,7 +4771,7 @@
 \lx ceretarey
 \ph t͡ʃe.re.ta.rej
 \va 
-\mm ceretarey
+\mm ceretarey::
 \ps n
 \vl 
 \ve 
@@ -4793,7 +4793,7 @@
 \lx baakasiney
 \ph baː.ka.si.nej
 \va 
-\mm baakasiney
+\mm baakasiney::
 \ps n
 \vl 
 \ve 
@@ -4815,7 +4815,7 @@
 \lx guri
 \ph ɡu.ri
 \va tira
-\mm guri
+\mm guri::
 \ps n
 \vl 
 \ve 
@@ -4837,7 +4837,7 @@
 \lx kaage
 \ph kaː.ɡe
 \va 
-\mm kaage
+\mm kaage::
 \ps n
 \vl 
 \ve 
@@ -4859,7 +4859,7 @@
 \lx kaay
 \ph kaːj
 \va 
-\mm kaay
+\mm kaay::
 \ps n
 \vl 
 \ve 
@@ -4881,7 +4881,7 @@
 \lx albeeri
 \ph al.beː.ri
 \va dottije
-\mm albeeri
+\mm albeeri::
 \ps n
 \vl 
 \ve 
@@ -4903,7 +4903,7 @@
 \lx dottije
 \ph dɔt.ti.d͡ʒe
 \va albeeri
-\mm dottije
+\mm dottije::
 \ps n
 \vl 
 \ve 
@@ -4925,7 +4925,7 @@
 \lx loku
 \ph lɔ.ku
 \va 
-\mm loku
+\mm loku::
 \ps n
 \vl 
 \ve 
@@ -4947,7 +4947,7 @@
 \lx dusu
 \ph du.su
 \va 
-\mm dusu
+\mm dusu::
 \ps v
 \vl i
 \ve 
@@ -4969,7 +4969,7 @@
 \lx honney
 \ph hɔn.nej
 \va di
-\mm honney
+\mm honney::
 \ps v
 \vl t
 \ve 
@@ -4991,7 +4991,7 @@
 \lx ce
 \ph t͡ʃe
 \va 
-\mm ce
+\mm ce::
 \ps v
 \vl t
 \ve 
@@ -5013,7 +5013,7 @@
 \lx kobi
 \ph kɔ.bi
 \va 
-\mm kobi
+\mm kobi::
 \ps v
 \vl i
 \ve 
@@ -5035,7 +5035,7 @@
 \lx man
 \ph man
 \va 
-\mm man
+\mm man::
 \ps v
 \vl i
 \ve 

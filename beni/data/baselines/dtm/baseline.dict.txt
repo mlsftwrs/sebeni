@@ -275,7 +275,7 @@
 \gvf bateau
 \ge boat
 \gve boat
-\mm di + koro
+\mm di + koro::
 \xv dikoro
 \xe bateau
 \xf boat
@@ -312,7 +312,7 @@
 \gvf lieu de culte
 \ge place of worship
 \gve place of worship
-\mm Ama + ginrun
+\mm Ama + ginrun::
 \xv amaginrun
 \xe lieu de culte
 \xf place of worship
@@ -337,7 +337,7 @@
 \gvf rumeur
 \ge rumor
 \gve rumor
-\mm suguru + ɛgɛ
+\mm suguru + ɛgɛ::
 \xv suguruɛgɛ
 \xe rumeur
 \xf rumor
@@ -374,7 +374,7 @@
 \gvf vue
 \ge sight
 \gve sight
-\mm gire + iye
+\mm gire + iye::
 \xv giriye
 \xe la vue
 \xf the sight
@@ -411,7 +411,7 @@
 \gvf outarde
 \ge bustard
 \gve bustard
-\mm gire + piru
+\mm gire + piru::
 \xv girepiru
 \xe outarde
 \xf bustard
@@ -436,7 +436,7 @@
 \gvf santé
 \ge health
 \gve health
-\mm goju + tere
+\mm goju + tere::
 \xv gojutere
 \xe santé
 \xf health
@@ -509,7 +509,7 @@
 \gvf cultivateur
 \ge farmer
 \gve farmer
-\mm waru + wara + nɛ
+\mm waru + wara + nɛ::
 \xv waruwaranɛ
 \xe cultivateur
 \xf farmer
@@ -546,7 +546,7 @@
 \gvf commerçant
 \ge merchant
 \gve merchant
-\mm ibɛ + saɲa + nɛ
+\mm ibɛ + saɲa + nɛ::
 \xv ibɛsaɲanɛ
 \xe commerçant
 \xf merchant
@@ -559,7 +559,7 @@
 \gvf coureur
 \ge runner
 \gve runner
-\mm jobu + jɔbɔ + nɛ
+\mm jobu + jɔbɔ + nɛ::
 \xv jobujɔbɔnɛ
 \xe coureur
 \xf runner
@@ -596,7 +596,7 @@
 \gvf enseignant
 \ge teacher
 \gve teacher
-\mm jaŋu + deere + nɛ
+\mm jaŋu + deere + nɛ::
 \xv jaŋudeerenɛ
 \xe enseignant
 \xf teacher
@@ -2551,7 +2551,7 @@
 
 \lx ó
 \ph /ó/
-\mm ó
+\mm ó::
 \ps v
 \gf donner
 \gvf donner
@@ -2566,7 +2566,7 @@
 
 \lx tí
 \ph /tí/
-\mm tí
+\mm tí::
 \ps v
 \gf envoyer
 \gvf envoyer
@@ -2581,7 +2581,7 @@
 
 \lx jê
 \ph /dʒɛ̂/
-\mm jê
+\mm jê::
 \ps v
 \gf emporter
 \gvf emporter
@@ -2596,7 +2596,7 @@
 
 \lx yě
 \ph /jɛ̌/
-\mm yě
+\mm yě::
 \ps v
 \gf aller
 \gvf aller
@@ -2611,7 +2611,7 @@
 
 \lx lǒ
 \ph /lǒ/
-\mm lǒ
+\mm lǒ::
 \ps n
 \gf médicament
 \gvf médicament
@@ -2626,7 +2626,7 @@
 
 \lx bɛ̌
 \ph /bɛ̌/
-\mm bɛ̌
+\mm bɛ̌::
 \ps n
 \gf barbe
 \gvf barbe
@@ -2641,7 +2641,7 @@
 
 \lx jǎ
 \ph /dʒǎ/
-\mm jǎ
+\mm jǎ::
 \ps n
 \gf fibre
 \gvf fibre
@@ -2656,7 +2656,7 @@
 
 \lx lɛ̌
 \ph /lɛ̌/
-\mm lɛ̌
+\mm lɛ̌::
 \ps n
 \gf semis
 \gvf semis
@@ -2671,7 +2671,7 @@
 
 \lx té
 \ph /té/
-\mm té
+\mm té::
 \ps n
 \gf thé
 \gvf thé
@@ -3001,7 +3001,7 @@
 
 \lx nú
 \ph /nú/
-\mm nú
+\mm nú::
 \ps v
 \gf entrer
 \gvf entrer
@@ -3016,7 +3016,7 @@
 
 \lx nǎ
 \ph /nǎ/
-\mm nǎ
+\mm nǎ::
 \ps n
 \gf personne
 \gvf personne
@@ -3031,7 +3031,7 @@
 
 \lx ɲɛ̌
 \ph /ɲɛ̌/
-\mm ɲɛ̌
+\mm ɲɛ̌::
 \ps n
 \gf femme
 \gvf femme
@@ -3046,7 +3046,7 @@
 
 \lx nɛ́
 \ph /nɛ́/
-\mm nɛ́
+\mm nɛ́::
 \ps n
 \gf sang
 \gvf sang
@@ -3061,7 +3061,7 @@
 
 \lx mɔ́
 \ph /mɔ́/
-\mm mɔ́
+\mm mɔ́::
 \ps n
 \gf rire
 \gvf rire
@@ -3076,7 +3076,7 @@
 
 \lx mɔ̌
 \ph /mɔ̌/
-\mm mɔ̌
+\mm mɔ̌::
 \ps n
 \gf gomme arabique
 \gvf gomme arabique
@@ -3091,7 +3091,7 @@
 
 \lx ɲá
 \ph /ɲá/
-\mm ɲá
+\mm ɲá::
 \ps n
 \gf terre
 \gvf terre
@@ -3106,7 +3106,7 @@
 
 \lx mɛ̌
 \ph /mɛ̌/
-\mm mɛ̌
+\mm mɛ̌::
 \ps n
 \gf coupure
 \gvf coupure
@@ -3121,7 +3121,7 @@
 
 \lx mǎ
 \ph /mǎ/
-\mm mǎ
+\mm mǎ::
 \ps adj
 \gf sec
 \gvf sec
@@ -3286,7 +3286,7 @@
 
 \lx págá
 \ph /págá/
-\mm págá
+\mm págá::
 \ps v
 \gf attacher
 \gvf attacher
@@ -3316,7 +3316,7 @@
 
 \lx tírⁿí
 \ph /tírⁿí/
-\mm tírⁿí
+\mm tírⁿí::
 \ps v
 \gf chercher du bois
 \gvf chercher du bois
@@ -3331,7 +3331,7 @@
 
 \lx ùrⁿú
 \ph /ùrⁿú/
-\mm ùrⁿú
+\mm ùrⁿú::
 \ps v
 \gf terrer
 \gvf terrer
@@ -3361,7 +3361,7 @@
 
 \lx áwⁿá
 \ph /áwⁿá/
-\mm áwⁿá
+\mm áwⁿá::
 \ps v
 \gf être en forme
 \gvf être en forme
@@ -3376,7 +3376,7 @@
 
 \lx tɔ́wⁿɔ́
 \ph /tɔ́wⁿɔ́/
-\mm tɔ́wⁿɔ́
+\mm tɔ́wⁿɔ́::
 \ps v
 \gf durer
 \gvf durer
@@ -3391,7 +3391,7 @@
 
 \lx dɔ̌yⁿ
 \ph /dɔ̌jⁿ/
-\mm dɔ̌yⁿ
+\mm dɔ̌yⁿ::
 \ps n
 \gf pilon
 \gvf pilon
@@ -3406,7 +3406,7 @@
 
 \lx tùwɛ̌-yⁿ
 \ph /tùwɛ̌jⁿ/
-\mm tùwɛ̌-yⁿ
+\mm tùwɛ̌-yⁿ::
 \ps n
 \gf silex
 \gvf silex
@@ -3421,7 +3421,7 @@
 
 \lx sɛ̂yⁿ
 \ph /sɛ̂jⁿ/
-\mm sɛ̂yⁿ
+\mm sɛ̂yⁿ::
 \ps adv
 \gf beaucoup
 \gvf beaucoup
@@ -3436,7 +3436,7 @@
 
 \lx dǎyⁿ
 \ph /dǎjⁿ/
-\mm dǎyⁿ
+\mm dǎyⁿ::
 \ps n
 \gf limite
 \gvf limite
@@ -3451,7 +3451,7 @@
 
 \lx nú
 \ph /nú/
-\mm nú
+\mm nú::
 \ps v
 \gf entrer
 \gvf entrer
@@ -3466,7 +3466,7 @@
 
 \lx nǎ
 \ph /nǎ/
-\mm nǎ
+\mm nǎ::
 \ps n
 \gf personne
 \gvf personne
@@ -3481,7 +3481,7 @@
 
 \lx ɲɛ̌
 \ph /ɲɛ̌/
-\mm ɲɛ̌
+\mm ɲɛ̌::
 \ps n
 \gf femme
 \gvf femme
@@ -3496,7 +3496,7 @@
 
 \lx nɛ́
 \ph /nɛ́/
-\mm nɛ́
+\mm nɛ́::
 \ps n
 \gf sang
 \gvf sang
@@ -3511,7 +3511,7 @@
 
 \lx mɔ́
 \ph /mɔ́/
-\mm mɔ́
+\mm mɔ́::
 \ps n
 \gf rire
 \gvf rire
@@ -3526,7 +3526,7 @@
 
 \lx mɔ̌
 \ph /mɔ̌/
-\mm mɔ̌
+\mm mɔ̌::
 \ps n
 \gf gomme arabique
 \gvf gomme arabique
@@ -3541,7 +3541,7 @@
 
 \lx ɲá
 \ph /ɲá/
-\mm ɲá
+\mm ɲá::
 \ps n
 \gf terre
 \gvf terre
@@ -3556,7 +3556,7 @@
 
 \lx mɛ̌
 \ph /mɛ̌/
-\mm mɛ̌
+\mm mɛ̌::
 \ps n
 \gf coupure
 \gvf coupure
@@ -3571,7 +3571,7 @@
 
 \lx mǎ
 \ph /mǎ/
-\mm mǎ
+\mm mǎ::
 \ps adj
 \gf sec
 \gvf sec
@@ -3736,7 +3736,7 @@
 
 \lx págá
 \ph /págá/
-\mm págá
+\mm págá::
 \ps v
 \gf attacher
 \gvf attacher
@@ -3766,7 +3766,7 @@
 
 \lx tírⁿí
 \ph /tírⁿí/
-\mm tírⁿí
+\mm tírⁿí::
 \ps v
 \gf chercher du bois
 \gvf chercher du bois
@@ -3781,7 +3781,7 @@
 
 \lx ùrⁿú
 \ph /ùrⁿú/
-\mm ùrⁿú
+\mm ùrⁿú::
 \ps v
 \gf terrer
 \gvf terrer
@@ -3793,7 +3793,7 @@
 
 \lx pírⁿí
 \ph /pírⁿí/
-\mm pírⁿí
+\mm pírⁿí::
 \ps v
 \gf traire
 \gvf traire
@@ -3808,7 +3808,7 @@
 
 \lx mìrⁿí
 \ph /mìrⁿí/
-\mm mìrⁿí
+\mm mìrⁿí::
 \ps v
 \gf avaler
 \gvf avaler
@@ -4243,7 +4243,7 @@
 
 \lx jɛ́w
 \ph /dʒɛ́w/
-\mm jɛ́w
+\mm jɛ́w::
 \ps n
 \gf malédiction
 \gvf malédiction
@@ -4258,7 +4258,7 @@
 
 \lx mɔ́m
 \ph /mɔ́m/
-\mm mɔ́m
+\mm mɔ́m::
 \ps n
 \gf sarclage
 \gvf sarclage
@@ -4273,7 +4273,7 @@
 
 \lx gɛ́ŋ
 \ph /gɛ́ŋ/
-\mm gɛ́ŋ
+\mm gɛ́ŋ::
 \ps n
 \gf supplication
 \gvf supplication
@@ -4288,7 +4288,7 @@
 
 \lx dàbú
 \ph /dàbú/
-\mm dàbú
+\mm dàbú::
 \ps n
 \gf divination
 \gvf divination
@@ -4303,7 +4303,7 @@
 
 \lx mùŋú
 \ph /mùŋú/
-\mm mùŋú
+\mm mùŋú::
 \ps n
 \gf nœud
 \gvf nœud
@@ -4318,7 +4318,7 @@
 
 \lx jàtú
 \ph /dʒàtú/
-\mm jàtú
+\mm jàtú::
 \ps n
 \gf calcul
 \gvf calcul
@@ -4333,7 +4333,7 @@
 
 \lx gɛ̀rú
 \ph /gɛ̀rú/
-\mm gɛ̀rú
+\mm gɛ̀rú::
 \ps n
 \gf récolte
 \gvf récolte
@@ -4348,7 +4348,7 @@
 
 \lx nɔ̀ŋú
 \ph /nɔ̀ŋú/
-\mm nɔ̀ŋú
+\mm nɔ̀ŋú::
 \ps n
 \gf copulation
 \gvf copulation
@@ -4363,7 +4363,7 @@
 
 \lx bàdú
 \ph /bàdú/
-\mm bàdú
+\mm bàdú::
 \ps n
 \gf réunion
 \gvf réunion
@@ -4378,7 +4378,7 @@
 
 \lx jàmú
 \ph /dʒàmú/
-\mm jàmú
+\mm jàmú::
 \ps n
 \gf trahison
 \gvf trahison
@@ -4393,7 +4393,7 @@
 
 \lx tɔ̀ŋú
 \ph /tɔ̀ŋú/
-\mm tɔ̀ŋú
+\mm tɔ̀ŋú::
 \ps n
 \gf écriture
 \gvf écriture
@@ -4408,7 +4408,7 @@
 
 \lx ìmú
 \ph /ìmú/
-\mm ìmú
+\mm ìmú::
 \ps n
 \gf coucher
 \gvf coucher
@@ -4423,7 +4423,7 @@
 
 \lx ɛ́nú
 \ph /ɛ́nú/
-\mm ɛ́nú
+\mm ɛ́nú::
 \ps n
 \gf conte
 \gvf conte
@@ -4438,7 +4438,7 @@
 
 \lx nɛ́ŋú
 \ph /nɛ́ŋú/
-\mm nɛ́ŋú
+\mm nɛ́ŋú::
 \ps n
 \gf pression
 \gvf pression
@@ -4453,7 +4453,7 @@
 
 \lx jáŋú
 \ph /dʒáŋú/
-\mm jáŋú
+\mm jáŋú::
 \ps n
 \gf études
 \gvf études
@@ -4468,7 +4468,7 @@
 
 \lx tógú
 \ph /tógú/
-\mm tógú
+\mm tógú::
 \ps n
 \gf bavardage
 \gvf bavardage
@@ -4483,7 +4483,7 @@
 
 \lx sɛ́gú
 \ph /sɛ́gú/
-\mm sɛ́gú
+\mm sɛ́gú::
 \ps n
 \gf cotisation
 \gvf cotisation
@@ -4498,7 +4498,7 @@
 
 \lx núŋú
 \ph /núŋú/
-\mm núŋú
+\mm núŋú::
 \ps n
 \gf chant
 \gvf chant
@@ -4513,7 +4513,7 @@
 
 \lx tɛ́rú
 \ph /tɛ́rú/
-\mm tɛ́rú
+\mm tɛ́rú::
 \ps n
 \gf défrichage
 \gvf défrichage
@@ -4528,7 +4528,7 @@
 
 \lx jɔ́gú
 \ph /dʒɔ́gú/
-\mm jɔ́gú
+\mm jɔ́gú::
 \ps n
 \gf picotage
 \gvf picotage
@@ -4543,7 +4543,7 @@
 
 \lx wárú
 \ph /wárú/
-\mm wárú
+\mm wárú::
 \ps n
 \gf travail agricole
 \gvf travail agricole
@@ -4558,7 +4558,7 @@
 
 \lx dúrú
 \ph /dúrú/
-\mm dúrú
+\mm dúrú::
 \ps n
 \gf gémissement
 \gvf gémissement
@@ -4573,7 +4573,7 @@
 
 \lx bógú
 \ph /bógú/
-\mm bógú
+\mm bógú::
 \ps n
 \gf aboiement
 \gvf aboiement
@@ -4588,7 +4588,7 @@
 
 \lx jɔ́ŋú
 \ph /dʒɔ́ŋú/
-\mm jɔ́ŋú
+\mm jɔ́ŋú::
 \ps n
 \gf guérison
 \gvf guérison
@@ -4603,7 +4603,7 @@
 
 \lx kìrí
 \ph /kìrí/
-\mm kìrí
+\mm kìrí::
 \ps n
 \gf saut
 \gvf saut
@@ -4618,7 +4618,7 @@
 
 \lx ìrí
 \ph /ìrí/
-\mm ìrí
+\mm ìrí::
 \ps n
 \gf bégaiement
 \gvf bégaiement
@@ -4633,7 +4633,7 @@
 
 \lx ìjí
 \ph /ìjí/
-\mm ìjí
+\mm ìjí::
 \ps n
 \gf ruade
 \gvf ruade
@@ -4648,7 +4648,7 @@
 
 \lx jíŋí
 \ph /dʒíŋí/
-\mm jíŋí
+\mm jíŋí::
 \ps n
 \gf parti pris
 \gvf parti pris
@@ -4663,7 +4663,7 @@
 
 \lx jíɲí
 \ph /dʒíɲí/
-\mm jíɲí
+\mm jíɲí::
 \ps n
 \gf odeur
 \gvf odeur
@@ -4678,7 +4678,7 @@
 
 \lx ɲíní
 \ph /ɲíní/
-\mm ɲíní
+\mm ɲíní::
 \ps n
 \gf respiration
 \gvf respiration
@@ -4693,7 +4693,7 @@
 
 \lx tìŋɛ́
 \ph /tìŋɛ́/
-\mm tìŋɛ́
+\mm tìŋɛ́::
 \ps n
 \gf parole
 \gvf parole
@@ -4708,7 +4708,7 @@
 
 \lx bírɛ́
 \ph /bírɛ́/
-\mm bírɛ́
+\mm bírɛ́::
 \ps n
 \gf travail
 \gvf travail
@@ -4723,7 +4723,7 @@
 
 \lx síɲɛ́
 \ph /síɲɛ́/
-\mm síɲɛ́
+\mm síɲɛ́::
 \ps n
 \gf bruit
 \gvf bruit
@@ -4738,7 +4738,7 @@
 
 \lx párⁿɛ́
 \ph /párⁿɛ́/
-\mm párⁿɛ́
+\mm párⁿɛ́::
 \ps n
 \gf énigme
 \gvf énigme
@@ -4753,7 +4753,7 @@
 
 \lx sìjé
 \ph /sìdʒé/
-\mm sìjé
+\mm sìjé::
 \ps n
 \gf ligne
 \gvf ligne
@@ -4768,7 +4768,7 @@
 
 \lx gúrɔ́
 \ph /gúrɔ́/
-\mm gúrɔ́
+\mm gúrɔ́::
 \ps n
 \gf vomissement
 \gvf vomissement
@@ -4783,7 +4783,7 @@
 
 \lx sùrɔ́
 \ph /sùrɔ́/
-\mm sùrɔ́
+\mm sùrɔ́::
 \ps n
 \gf tas
 \gvf tas
@@ -4798,7 +4798,7 @@
 
 \lx kɛ̀rɛ́
 \ph /kɛ̀rɛ́/
-\mm kɛ̀rɛ́
+\mm kɛ̀rɛ́::
 \ps n
 \gf amusement
 \gvf amusement
@@ -4813,7 +4813,7 @@
 
 \lx tùnɔ́
 \ph /tùnɔ́/
-\mm tùnɔ́
+\mm tùnɔ́::
 \ps n
 \gf compétition
 \gvf compétition
@@ -4828,7 +4828,7 @@
 
 \lx dúwɔ́
 \ph /dúwɔ́/
-\mm dúwɔ́
+\mm dúwɔ́::
 \ps n
 \gf fardeau
 \gvf fardeau
@@ -4843,7 +4843,7 @@
 
 \lx dùwɔ́
 \ph /dùwɔ́/
-\mm dùwɔ́
+\mm dùwɔ́::
 \ps n
 \gf forgeage
 \gvf forgeage
@@ -4858,7 +4858,7 @@
 
 \lx sùwⁿɔ́
 \ph /sùwⁿɔ́/
-\mm sùwⁿɔ́
+\mm sùwⁿɔ́::
 \ps n
 \gf ride
 \gvf ride
@@ -4873,7 +4873,7 @@
 
 \lx dúgó
 \ph /dúgó/
-\mm dúgó
+\mm dúgó::
 \ps n
 \gf sortilège
 \gvf sortilège
@@ -4888,7 +4888,7 @@
 
 \lx lùgó
 \ph /lùgó/
-\mm lùgó
+\mm lùgó::
 \ps n
 \gf compte
 \gvf compte
@@ -4903,7 +4903,7 @@
 
 \lx tàgá
 \ph /tàgá/
-\mm tàgá
+\mm tàgá::
 \ps n
 \gf chaussage
 \gvf chaussage
@@ -4918,7 +4918,7 @@
 
 \lx wìrɛ̌ⁿ
 \ph /wìɾɛ̌ⁿ/
-\mm wìrɛ̌ⁿ
+\mm wìrɛ̌ⁿ::
 \ps n
 \gf sifflement
 \gvf sifflement
@@ -4933,7 +4933,7 @@
 
 \lx sìjɛ̌ⁿ
 \ph /sìdʒɛ̌ⁿ/
-\mm sìjɛ̌ⁿ
+\mm sìjɛ̌ⁿ::
 \ps n
 \gf son de corne
 \gvf son de corne
@@ -4948,7 +4948,7 @@
 
 \lx jántɛ́
 \ph /dʒántɛ́/
-\mm jántɛ́
+\mm jántɛ́::
 \ps n
 \gf plaisanterie
 \gvf plaisanterie
@@ -5068,7 +5068,7 @@
 
 \lx dáwrú
 \ph /dáwɾú/
-\mm dáwrú
+\mm dáwrú::
 \ps n
 \gf sort
 \gvf sort
@@ -5083,7 +5083,7 @@
 
 \lx bógúrú
 \ph /bógúɾú/
-\mm bógúrú
+\mm bógúrú::
 \ps n
 \gf beuglement
 \gvf beuglement
@@ -5098,7 +5098,7 @@
 
 \lx járúgú
 \ph /dʒáɾúgú/
-\mm járúgú
+\mm járúgú::
 \ps n
 \gf critique
 \gvf critique
@@ -5113,7 +5113,7 @@
 
 \lx gɔ́ŋúrⁿú
 \ph /gɔ́ŋúɾⁿú/
-\mm gɔ́ŋúrⁿú
+\mm gɔ́ŋúrⁿú::
 \ps n
 \gf promenade
 \gvf promenade
@@ -5128,7 +5128,7 @@
 
 \lx kàgújá
 \ph /kàgúdʒá/
-\mm kàgújá
+\mm kàgújá::
 \ps n
 \gf raclement de gorge
 \gvf raclement de gorge
@@ -5143,7 +5143,7 @@
 
 \lx kéŋìrì
 \ph /kéŋìɾì/
-\mm kéŋìrì
+\mm kéŋìrì::
 \ps v
 \gf écouter
 \gvf écouter
@@ -5158,7 +5158,7 @@
 
 \lx gùrú
 \ph /gùɾú/
-\mm gùrú
+\mm gùrú::
 \ps adj
 \gf long
 \gvf long
@@ -5173,7 +5173,7 @@
 
 \lx dògú
 \ph /dògú/
-\mm dògú
+\mm dògú::
 \ps adj
 \gf lourd
 \gvf lourd
@@ -5188,7 +5188,7 @@
 
 \lx sìgɛ́
 \ph /sìgɛ́/
-\mm sìgɛ́
+\mm sìgɛ́::
 \ps adv
 \gf plus
 \gvf plus
@@ -5203,7 +5203,7 @@
 
 \lx kɛ̀ɲɛ́
 \ph /kɛ̀ɲɛ́/
-\mm kɛ̀ɲɛ́
+\mm kɛ̀ɲɛ́::
 \ps n
 \gf bière de mil
 \gvf bière de mil
@@ -5218,7 +5218,7 @@
 
 \lx lɛ̀-kɔ̌ⁿ
 \ph /lɛ̀kɔ̌ⁿ/
-\mm lɛ̀-kɔ̌ⁿ
+\mm lɛ̀-kɔ̌ⁿ::
 \ps n
 \gf pioche
 \gvf pioche
@@ -5263,7 +5263,7 @@
 
 \lx ìré
 \ph /ìɾé/
-\mm ìré
+\mm ìré::
 \ps v
 \gf être meilleur
 \gvf être meilleur
@@ -5293,7 +5293,7 @@
 
 \lx sɔ́gú
 \ph /sɔ́gú/
-\mm sɔ́gú
+\mm sɔ́gú::
 \ps adj
 \gf dense
 \gvf dense
@@ -5308,7 +5308,7 @@
 
 \lx sógò
 \ph /sógò/
-\mm sógò
+\mm sógò::
 \ps conj
 \gf parce que
 \gvf parce que
@@ -5323,7 +5323,7 @@
 
 \lx géné
 \ph /géné/
-\mm géné
+\mm géné::
 \ps n
 \gf hauteur
 \gvf hauteur
@@ -5338,7 +5338,7 @@
 
 \lx dìgɛ́
 \ph /dìgɛ́/
-\mm dìgɛ́
+\mm dìgɛ́::
 \ps v
 \gf joindre
 \gvf joindre
@@ -5368,7 +5368,7 @@
 
 \lx ɛ̀mɛ́
 \ph /ɛ̀mɛ́/
-\mm ɛ̀mɛ́
+\mm ɛ̀mɛ́::
 \ps n
 \gf sorgho
 \gvf sorgho
@@ -5383,7 +5383,7 @@
 
 \lx írí
 \ph /íɾí/
-\mm írí
+\mm írí::
 \ps n
 \gf lait
 \gvf lait
@@ -5412,7 +5412,7 @@
 
 \lx tɛ́wⁿ-ɛ́
 \ph /tɛ́wⁿɛ́/
-\mm tɛ́wⁿ-ɛ́
+\mm tɛ́wⁿ-ɛ́::
 \ps v
 \gf croquer
 \gvf croquer
@@ -5457,7 +5457,7 @@
 
 \lx lág-ɛ̀
 \ph /lágɛ̀/
-\mm lág-ɛ̀
+\mm lág-ɛ̀::
 \ps v
 \gf frapper
 \gvf frapper
@@ -5472,7 +5472,7 @@
 
 \lx dɔ́-ɲú
 \ph /dɔ́ɲú/
-\mm dɔ́-ɲú
+\mm dɔ́-ɲú::
 \ps v
 \gf vendre
 \gvf vendre
@@ -5487,7 +5487,7 @@
 
 \lx sɛ̀m-ɛ̀
 \ph /sɛ̀mɛ̀/
-\mm sɛ̀m-ɛ̀
+\mm sɛ̀m-ɛ̀::
 \ps v
 \gf balayer
 \gvf balayer
@@ -5532,7 +5532,7 @@
 
 \lx kìlɛ̀-lí
 \ph /kìlɛ̀lí/
-\mm kìlɛ̀-lí
+\mm kìlɛ̀-lí::
 \ps v
 \gf être fini
 \gvf être fini
@@ -5562,7 +5562,7 @@
 
 \lx tùwó
 \ph /tùwó/
-\mm tùwó
+\mm tùwó::
 \ps n
 \gf pierre
 \gvf pierre
@@ -5592,7 +5592,7 @@
 
 \lx ìŋé
 \ph /ìŋé/
-\mm ìŋé
+\mm ìŋé::
 \ps pron
 \gf quoi
 \gvf quoi
@@ -5622,7 +5622,7 @@
 
 \lx dógúrú
 \ph /dógúɾú/
-\mm dógúrú
+\mm dógúrú::
 \ps n
 \gf temps
 \gvf temps
@@ -5637,7 +5637,7 @@
 
 \lx ɲaŋ᷈
 \ph /ɲaŋ᷈/
-\mm ɲaŋ᷈
+\mm ɲaŋ᷈::
 \ps adv
 \gf comment
 \gvf comment
@@ -5682,7 +5682,7 @@
 
 \lx ɔ́jɔ̀®
 \ph /ɔ́dʒɔ̀/
-\mm ɔ́jɔ̀
+\mm ɔ́jɔ̀::
 \ps n
 \gf chose
 \gvf chose
@@ -5697,7 +5697,7 @@
 
 \lx yɛ̀rɛ́
 \ph /jɛ̀ɾɛ́/
-\mm yɛ̀rɛ́
+\mm yɛ̀rɛ́::
 \ps v
 \gf venir
 \gvf venir
@@ -5712,7 +5712,7 @@
 
 \lx bàgá
 \ph /bàgá/
-\mm bàgá
+\mm bàgá::
 \ps v
 \gf tomber
 \gvf tomber
@@ -5727,7 +5727,7 @@
 
 \lx kɛ́rɛ́
 \ph /kɛ́ɾɛ́/
-\mm kɛ́rɛ́
+\mm kɛ́rɛ́::
 \ps v
 \gf mordre
 \gvf mordre
@@ -5742,7 +5742,7 @@
 
 \lx págá
 \ph /págá/
-\mm págá
+\mm págá::
 \ps v
 \gf attacher
 \gvf attacher
@@ -5757,7 +5757,7 @@
 
 \lx dàgá
 \ph /dàgá/
-\mm dàgá
+\mm dàgá::
 \ps v
 \gf laisser
 \gvf laisser
@@ -5772,7 +5772,7 @@
 
 \lx gǔŋ̀
 \ph /gǔŋ/
-\mm gǔŋ̀
+\mm gǔŋ̀::
 \ps v
 \gf enlever
 \gvf enlever
@@ -5802,7 +5802,7 @@
 
 \lx súnú-gì
 \ph /súnúgì/
-\mm súnú-gì
+\mm súnú-gì::
 \ps v
 \gf descendre
 \gvf descendre
@@ -5817,7 +5817,7 @@
 
 \lx ɲùnú-gì
 \ph /ɲùnúgì/
-\mm ɲùnú-gì
+\mm ɲùnú-gì::
 \ps v
 \gf gâter
 \gvf gâter
@@ -6387,7 +6387,7 @@
 
 \lx ɔ̌-m̀
 \ph /ɔ̌m/
-\mm ɔ̌-m̀
+\mm ɔ̌-m̀::
 \ps v
 \gf être vu
 \gvf être vu
@@ -6402,7 +6402,7 @@
 
 \lx bɛ̌-m̀
 \ph /bɛ̌m/
-\mm bɛ̌-m̀
+\mm bɛ̌-m̀::
 \ps v
 \gf être disponible
 \gvf être disponible
@@ -6417,7 +6417,7 @@
 
 \lx ɛ́rú-lɛ́-m̀
 \ph /ɛ́ɾúlɛ́m/
-\mm ɛ́rú-lɛ́-m̀
+\mm ɛ́rú-lɛ́-m̀::
 \ps v
 \gf rendre heureux
 \gvf rendre heureux
@@ -6447,7 +6447,7 @@
 
 \lx dègí-nì
 \ph /dègínì/
-\mm dègí-nì
+\mm dègí-nì::
 \ps v
 \gf raccourcir
 \gvf raccourcir
@@ -6462,7 +6462,7 @@
 
 \lx dògú-nì
 \ph /dògúnì/
-\mm dògú-nì
+\mm dògú-nì::
 \ps v
 \gf s'alourdir
 \gvf s'alourdir
@@ -6477,7 +6477,7 @@
 
 \lx gɛ́-ǹ
 \ph /gɛ́ǹ/
-\mm gɛ́-ǹ
+\mm gɛ́-ǹ::
 \ps v
 \gf noircir
 \gvf noircir
@@ -6492,7 +6492,7 @@
 
 \lx újú-nì
 \ph /údʒúnì/
-\mm újú-nì
+\mm újú-nì::
 \ps v
 \gf rapetisser
 \gvf rapetisser
@@ -6508,7 +6508,7 @@
 
 \lx pírí-nì
 \ph /píɾínì/
-\mm pírí-nì
+\mm pírí-nì::
 \ps v
 \gf blanchir
 \gvf blanchir
@@ -6524,7 +6524,7 @@
 
 \lx wórú-nì
 \ph /wóɾúnì/
-\mm wórú-nì
+\mm wórú-nì::
 \ps v
 \gf s'approfondir
 \gvf s'approfondir
@@ -6539,7 +6539,7 @@
 
 \lx ɲɛ́rⁿí-nì
 \ph /ɲɛ́ɾⁿínì/
-\mm ɲɛ́rⁿí-nì
+\mm ɲɛ́rⁿí-nì::
 \ps v
 \gf s'alléger
 \gvf s'alléger
@@ -6555,7 +6555,7 @@
 
 \lx mɔ̀ɲú-nù
 \ph /mɔ̀ɲúnù/
-\mm mɔ̀ɲú-nù
+\mm mɔ̀ɲú-nù::
 \ps v
 \gf être mauvais
 \gvf être mauvais
@@ -6571,7 +6571,7 @@
 
 \lx ɛ́lí-ní
 \ph /ɛ́líní/
-\mm ɛ́lí-ní
+\mm ɛ́lí-ní::
 \ps v
 \gf être doux
 \gvf être doux
@@ -6586,7 +6586,7 @@
 
 \lx déméré-ǹ
 \ph /déméɾéǹ/
-\mm déméré-ǹ
+\mm déméré-ǹ::
 \ps v
 \gf grossir
 \gvf grossir
@@ -6602,7 +6602,7 @@
 
 \lx ɛ́ŋ-nì
 \ph /ɛ́ŋnì/
-\mm ɛ́ŋ-nì
+\mm ɛ́ŋ-nì::
 \ps v
 \gf s'approcher
 \gvf s'approcher
@@ -6618,7 +6618,7 @@
 
 \lx gàrí-nì
 \ph /gàɾínì/
-\mm gàrí-nì
+\mm gàrí-nì::
 \ps v
 \gf grossir
 \gvf grossir
@@ -6634,7 +6634,7 @@
 
 \lx márⁿì-nì
 \ph /márⁿìnì/
-\mm márⁿì-nì
+\mm márⁿì-nì::
 \ps v
 \gf devenir massif
 \gvf devenir massif
@@ -6649,7 +6649,7 @@
 
 \lx gùrú-nì
 \ph /gùɾúnì/
-\mm gùrú-nì
+\mm gùrú-nì::
 \ps v
 \gf s'allonger
 \gvf s'allonger
@@ -6665,7 +6665,7 @@
 
 \lx wàgí-nì
 \ph /wàgínì/
-\mm wàgí-nì
+\mm wàgí-nì::
 \ps v
 \gf s'éloigner
 \gvf s'éloigner
@@ -6697,7 +6697,7 @@
 
 \lx ɔ́gù-rù
 \ph /ɔ́gùɾù/
-\mm ɔ́gù-rù
+\mm ɔ́gù-rù::
 \ps v
 \gf s'accélérer
 \gvf s'accélérer
@@ -6712,7 +6712,7 @@
 
 \lx áɲì-rⁿì
 \ph /áɲìɾⁿì/
-\mm áɲì-rⁿì
+\mm áɲì-rⁿì::
 \ps v
 \gf mûrir presque
 \gvf mûrir presque
@@ -6727,7 +6727,7 @@
 
 \lx kérì-lì
 \ph /kéɾìlì/
-\mm kérì-lì
+\mm kérì-lì::
 \ps v
 \gf se refroidir
 \gvf se refroidir
@@ -6805,7 +6805,7 @@
 
 \lx nàm-gì
 \ph /nàmgì/
-\mm nàm-gì
+\mm nàm-gì::
 \ps v
 \gf s'appauvrir
 \gvf s'appauvrir
@@ -6850,7 +6850,7 @@
 
 \lx bàwⁿú rⁿù
 \ph /bàwⁿúɾⁿù/
-\mm bàwⁿú rⁿù
+\mm bàwⁿú rⁿù::
 \ps v
 \gf blesser
 \gvf blesser
@@ -6880,7 +6880,7 @@
 
 \lx téré
 \ph /téré/
-\mm téré
+\mm téré::
 \ps v
 \gf piler
 \gvf piler
@@ -6895,7 +6895,7 @@
 
 \lx áŋá
 \ph /áŋá/
-\mm áŋá
+\mm áŋá::
 \ps v
 \gf croiser les bras
 \gvf croiser les bras
@@ -6910,7 +6910,7 @@
 
 \lx pídé
 \ph /pídé/
-\mm pídé
+\mm pídé::
 \ps v
 \gf enfler
 \gvf enfler
@@ -6925,7 +6925,7 @@
 
 \lx újɔ́
 \ph /údʒɔ́/
-\mm újɔ́
+\mm újɔ́::
 \ps v
 \gf bâtir
 \gvf bâtir
@@ -6940,7 +6940,7 @@
 
 \lx kúǹ
 \ph /kúǹ/
-\mm kúǹ
+\mm kúǹ::
 \ps v
 \gf mettre
 \gvf mettre
@@ -6955,7 +6955,7 @@
 
 \lx jan
 \ph /dʒan/
-\mm jan
+\mm jan::
 \ps n
 \gf droit
 \gvf droit
@@ -6970,7 +6970,7 @@
 
 \lx kubɛi
 \ph /kubɛi/
-\mm kubɛi
+\mm kubɛi::
 \ps n
 \gf liberté
 \gvf liberté
@@ -6985,7 +6985,7 @@
 
 \lx digiyi
 \ph /digiji/
-\mm digiyi
+\mm digiyi::
 \ps n
 \gf poursuite
 \gvf poursuite
@@ -7000,7 +7000,7 @@
 
 \lx manugu
 \ph /manugu/
-\mm manugu
+\mm manugu::
 \ps n
 \gf nature
 \gvf nature
@@ -7015,7 +7015,7 @@
 
 \lx sagu
 \ph /sagu/
-\mm sagu
+\mm sagu::
 \ps n
 \gf intégrité
 \gvf intégrité
@@ -7030,7 +7030,7 @@
 
 \lx duiyi
 \ph /duiji/
-\mm duiyi
+\mm duiyi::
 \ps n
 \gf garantie
 \gvf garantie
@@ -7045,7 +7045,7 @@
 
 \lx aŋai
 \ph /aŋai/
-\mm aŋai
+\mm aŋai::
 \ps n
 \gf ouverture
 \gvf ouverture
@@ -7060,7 +7060,7 @@
 
 \lx ɔɲiyɛ
 \ph /ɔɲijɛ/
-\mm ɔɲiyɛ
+\mm ɔɲiyɛ::
 \ps n
 \gf torture
 \gvf torture
@@ -7075,7 +7075,7 @@
 
 \lx dɔɔnu
 \ph /dɔːnu/
-\mm dɔɔnu
+\mm dɔɔnu::
 \ps n
 \gf fatigue
 \gvf fatigue
@@ -7090,7 +7090,7 @@
 
 \lx pilɛmu
 \ph /pilɛmu/
-\mm pilɛmu
+\mm pilɛmu::
 \ps n
 \gf défense
 \gvf défense
@@ -7105,7 +7105,7 @@
 
 \lx amatɔŋɔ
 \ph /amatɔŋɔ/
-\mm amatɔŋɔ
+\mm amatɔŋɔ::
 \ps adj
 \gf naturel
 \gvf naturel
@@ -7120,7 +7120,7 @@
 
 \lx jaŋuginrun
 \ph /dʒaŋuginɾun/
-\mm jaŋu-ginrun
+\mm jaŋu-ginrun::
 \ps n
 \gf école
 \gvf école
@@ -7135,7 +7135,7 @@
 
 \lx gonu
 \ph /gonu/
-\mm gonu
+\mm gonu::
 \ps n
 \gf défense
 \gvf défense
@@ -7150,7 +7150,7 @@
 
 \lx debu
 \ph /debu/
-\mm debu
+\mm debu::
 \ps n
 \gf patrie
 \gvf patrie
@@ -7165,7 +7165,7 @@
 
 \lx dali
 \ph /dali/
-\mm dali
+\mm dali::
 \ps n
 \gf protection
 \gvf protection
@@ -7180,7 +7180,7 @@
 
 \lx goonu
 \ph /goːnu/
-\mm goonu
+\mm goonu::
 \ps n
 \gf clôture
 \gvf clôture
@@ -7195,7 +7195,7 @@
 
 \lx digiru
 \ph /digiɾu/
-\mm digiru
+\mm digiru::
 \ps n
 \gf secours
 \gvf secours
@@ -7210,7 +7210,7 @@
 
 \lx gaju
 \ph /gadʒu/
-\mm gaju
+\mm gaju::
 \ps n
 \gf probité
 \gvf probité
@@ -7225,7 +7225,7 @@
 
 \lx yoola
 \ph /joːla/
-\mm yoola
+\mm yoola::
 \ps n
 \gf honnêteté
 \gvf honnêteté
@@ -7240,7 +7240,7 @@
 
 \lx teitai
 \ph /teitai/
-\mm teitai
+\mm teitai::
 \ps n
 \gf honnêteté
 \gvf honnêteté
@@ -7255,7 +7255,7 @@
 
 \lx yabu
 \ph /jabu/
-\mm yabu
+\mm yabu::
 \ps n
 \gf tolérance
 \gvf tolérance
@@ -7270,7 +7270,7 @@
 
 \lx mɔrinyi
 \ph /mɔɾiɲi/
-\mm mɔrinyi
+\mm mɔrinyi::
 \ps adj
 \gf naturel
 \gvf naturel
@@ -7285,7 +7285,7 @@
 
 \lx poroba
 \ph /poɾoba/
-\mm poroba
+\mm poroba::
 \ps adj
 \gf public
 \gvf public
@@ -7293,7 +7293,7 @@
 
 \lx sɔɔ ku
 \ph /sɔː ku/
-\mm sɔɔ-ku
+\mm sɔɔ-ku::
 \ps n
 \gf titre
 \gvf titre
@@ -7308,7 +7308,7 @@
 
 \lx bɛi jan
 \ph /bɛi dʒan/
-\mm bɛi-jan
+\mm bɛi-jan::
 \ps n
 \gf droit
 \gvf droit
@@ -7323,7 +7323,7 @@
 
 \lx kanrun jan
 \ph /kanɾun dʒan/
-\mm kanrun-jan
+\mm kanrun-jan::
 \ps n
 \gf devoir
 \gvf devoir
@@ -7338,7 +7338,7 @@
 
 \lx birɛ ai
 \ph /biɾɛ ai/
-\mm birɛ-ai
+\mm birɛ-ai::
 \ps n
 \gf entreprise
 \gvf entreprise
@@ -7353,7 +7353,7 @@
 
 \lx demu biyi
 \ph /demu biji/
-\mm demu-biyi
+\mm demu-biyi::
 \ps n
 \gf loyauté
 \gvf loyauté
@@ -7368,7 +7368,7 @@
 
 \lx birɛginrun
 \ph /biɾɛginɾun/
-\mm birɛ-ginrun
+\mm birɛ-ginrun::
 \ps n
 \gf institution
 \gvf institution
@@ -7383,7 +7383,7 @@
 
 \lx porozɛ
 \ph /poɾozɛ/
-\mm porozɛ
+\mm porozɛ::
 \ps n
 \gf projet
 \gvf projet
@@ -7398,7 +7398,7 @@
 
 \lx paŋa bɛi
 \ph /paŋa bɛi/
-\mm paŋa-bɛi
+\mm paŋa-bɛi::
 \ps v
 \gf réconforter
 \gvf réconforter
@@ -7413,7 +7413,7 @@
 
 \lx diŋɛ
 \ph /diɲɛ/
-\mm diŋɛ
+\mm diŋɛ::
 \ps n
 \gf culte
 \gvf culte
@@ -7428,7 +7428,7 @@
 
 \lx yoi
 \ph /joi/
-\mm yoi
+\mm yoi::
 \ps n
 \gf intégration
 \gvf intégration
@@ -7443,7 +7443,7 @@
 
 \lx bɛrɛbe
 \ph /bɛɾɛbe/
-\mm bɛrɛbe
+\mm bɛrɛbe::
 \ps n
 \gf ressources
 \gvf ressources
@@ -7458,7 +7458,7 @@
 
 \lx jugu duru
 \ph /dʒugu duɾu/
-\mm jugu-duru
+\mm jugu-duru::
 \ps n
 \gf sanction
 \gvf sanction
@@ -7473,7 +7473,7 @@
 
 \lx depite
 \ph /depite/
-\mm depite
+\mm depite::
 \ps n
 \gf député
 \gvf député
@@ -7488,7 +7488,7 @@
 
 \lx sena
 \ph /sena/
-\mm sena
+\mm sena::
 \ps n
 \gf sénat
 \gvf sénat
@@ -7503,7 +7503,7 @@
 
 \lx denu
 \ph /denu/
-\mm denu
+\mm denu::
 \ps adj
 \gf économique
 \gvf économique
@@ -7518,7 +7518,7 @@
 
 \lx atɛmu
 \ph /atɛmu/
-\mm atɛmu
+\mm atɛmu::
 \ps adj
 \gf culturel
 \gvf culturel
@@ -7533,7 +7533,7 @@
 
 \lx sara
 \ph /saɾa/
-\mm sara
+\mm sara::
 \ps adj
 \gf territorial
 \gvf territorial
@@ -7548,7 +7548,7 @@
 
 \lx diinɛ
 \ph /diːnɛ/
-\mm diinɛ
+\mm diinɛ::
 \ps n
 \gf laïcité
 \gvf laïcité
@@ -7563,7 +7563,7 @@
 
 \lx gojo
 \ph /godʒo/
-\mm gojo
+\mm gojo::
 \ps n
 \gf chapitre
 \gvf chapitre
@@ -7578,7 +7578,7 @@
 
 \lx tɔɔru
 \ph /tɔːɾu/
-\mm tɔɔru
+\mm tɔɔru::
 \ps adj
 \gf exécutif
 \gvf exécutif
@@ -7593,7 +7593,7 @@
 
 \lx kubaŋa
 \ph /kubaŋa/
-\mm ku-baŋa
+\mm ku-baŋa::
 \ps n
 \gf président
 \gvf président
@@ -7608,7 +7608,7 @@
 
 \lx dɛnɛnɛ
 \ph /dɛnɛnɛ/
-\mm dɛnɛnɛ
+\mm dɛnɛnɛ::
 \ps n
 \gf candidat
 \gvf candidat
@@ -7623,7 +7623,7 @@
 
 \lx pui
 \ph /pui/
-\mm pui
+\mm pui::
 \ps n
 \gf serment
 \gvf serment
@@ -7638,7 +7638,7 @@
 
 \lx dimɛ
 \ph /dimɛ/
-\mm dimɛ
+\mm dimɛ::
 \ps n
 \gf fidélité
 \gvf fidélité
@@ -7653,7 +7653,7 @@
 
 \lx mɔɔnu
 \ph /mɔːnu/
-\mm mɔɔnu
+\mm mɔɔnu::
 \ps n
 \gf référendum
 \gvf référendum
@@ -7668,7 +7668,7 @@
 
 \lx kajubaun
 \ph /kadʒubaun/
-\mm kajubaun
+\mm kajubaun::
 \ps n
 \gf sécurité
 \gvf sécurité
@@ -7683,7 +7683,7 @@
 
 \lx teremu
 \ph /teɾemu/
-\mm teremu
+\mm teremu::
 \ps v
 \gf présider
 \gvf présider
@@ -7698,7 +7698,7 @@
 
 \lx sigɛ
 \ph /sigɛ/
-\mm sigɛ
+\mm sigɛ::
 \ps adj
 \gf extraordinaire
 \gvf extraordinaire
@@ -7713,7 +7713,7 @@
 
 \lx badu
 \ph /badu/
-\mm badu
+\mm badu::
 \ps n
 \gf session
 \gvf session
@@ -7728,7 +7728,7 @@
 
 \lx siyi
 \ph /siji/
-\mm siyi
+\mm siyi::
 \ps n
 \gf expérience
 \gvf expérience
@@ -7743,7 +7743,7 @@
 
 \lx tɔɔru sariyɛ diyɛ baranɛ
 \ph /tɔːɾu saɾijɛ dijɛ baɾanɛ/
-\mm tɔɔru-sariyɛ-diyɛ-baranɛ
+\mm tɔɔru-sariyɛ-diyɛ-baranɛ::
 \ps n
 \gf loi organique
 \gvf loi organique
@@ -7758,7 +7758,7 @@
 
 \lx pelemu taguru
 \ph /pelemu taguɾu/
-\mm pelemu-taguru
+\mm pelemu-taguru::
 \ps n
 \gf recours
 \gvf recours
@@ -7773,7 +7773,7 @@
 
 \lx oju
 \ph /odʒu/
-\mm oju
+\mm oju::
 \ps n
 \gf procédure
 \gvf procédure
@@ -7788,7 +7788,7 @@
 
 \lx baanran
 \ph /baːnɾan/
-\mm baanran
+\mm baanran::
 \ps n
 \gf procédure
 \gvf procédure
@@ -7803,7 +7803,7 @@
 
 \lx paŋa birɛ
 \ph /paŋa biɾɛ/
-\mm paŋa-birɛ
+\mm paŋa-birɛ::
 \ps n
 \gf administration
 \gvf administration
@@ -7818,7 +7818,7 @@
 
 \lx kubɛi sɔɔ
 \ph /kubɛi sɔː/
-\mm kubɛi-sɔɔ
+\mm kubɛi-sɔɔ::
 \ps n
 \gf souveraineté
 \gvf souveraineté
@@ -7833,7 +7833,7 @@
 
 \lx baginrun turu
 \ph /baginɾun tuɾu/
-\mm baginrun-turu
+\mm baginrun-turu::
 \ps n
 \gf unité
 \gvf unité
@@ -7848,7 +7848,7 @@
 
 \lx gɔnrɔn sigɛ
 \ph /gɔnɾɔn sigɛ/
-\mm gɔnrɔn-sigɛ
+\mm gɔnrɔn-sigɛ::
 \ps n
 \gf pouvoir exceptionnel
 \gvf pouvoir exceptionnel
@@ -7863,7 +7863,7 @@
 
 \lx depitebe iŋu
 \ph /depitebe iŋu/
-\mm depitebe-iŋu
+\mm depitebe-iŋu::
 \ps n
 \gf mesure législative
 \gvf mesure législative
@@ -7878,7 +7878,7 @@
 
 \lx kaju kunu sɛwɛ
 \ph /kadʒu kunu sɛwɛ/
-\mm kaju-kunu-sɛwɛ
+\mm kaju-kunu-sɛwɛ::
 \ps n
 \gf code pénal
 \gvf code pénal
@@ -7893,7 +7893,7 @@
 
 \lx inɛ jan
 \ph /inɛ dʒan/
-\mm inɛ-jan
+\mm inɛ-jan::
 \ps n
 \gf droit de l’homme
 \gvf droit de l’homme
@@ -7908,7 +7908,7 @@
 
 \lx poroba paŋa
 \ph /poɾoba paŋa/
-\mm poroba-paŋa
+\mm poroba-paŋa::
 \ps n
 \gf démocratie
 \gvf démocratie
@@ -7923,7 +7923,7 @@
 
 \lx poruba kajubu
 \ph /poɾuba kadʒubu/
-\mm poruba-kajubu
+\mm poruba-kajubu::
 \ps n
 \gf maintien public
 \gvf maintien public
@@ -7938,7 +7938,7 @@
 
 \lx yegiyɛlɛ
 \ph /jegijɛlɛ/
-\mm yegiyɛlɛ
+\mm yegiyɛlɛ::
 \ps adj
 \gf incompatible
 \gvf incompatible
@@ -7953,7 +7953,7 @@
 
 \lx tenɛlɛ
 \ph /tenɛlɛ/
-\mm tenɛlɛ
+\mm tenɛlɛ::
 \ps adj
 \gf incompatible
 \gvf incompatible
@@ -7968,7 +7968,7 @@
 
 \lx kejielɛ
 \ph /kedʒielɛ/
-\mm kejielɛ
+\mm kejielɛ::
 \ps adj
 \gf incompatible
 \gvf incompatible
@@ -7983,7 +7983,7 @@
 
 \lx wote bɔŋuru
 \ph /wote bɔŋuɾu/
-\mm wote-bɔŋuru
+\mm wote-bɔŋuru::
 \ps n
 \gf suffrage indirect
 \gvf suffrage indirect
@@ -7998,7 +7998,7 @@
 
 \lx bai kunu
 \ph /bai kunu/
-\mm bai-kunu
+\mm bai-kunu::
 \ps n
 \gf mandat
 \gvf mandat
@@ -8013,7 +8013,7 @@
 
 \lx pilemu jɛru
 \ph /pilemu dʒɛɾu/
-\mm pilemu-jɛru
+\mm pilemu-jɛru::
 \ps n
 \gf prorogation
 \gvf prorogation
@@ -8028,7 +8028,7 @@
 
 \lx gawuru
 \ph /gawuɾu/
-\mm gawuru
+\mm gawuru::
 \ps v
 \gf saisir
 \gvf saisir
@@ -8043,7 +8043,7 @@
 
 \lx sagu kunu
 \ph /sagu kunu/
-\mm sagu-kunu
+\mm sagu-kunu::
 \ps v
 \gf saisir
 \gvf saisir
@@ -8058,7 +8058,7 @@
 
 \lx yɔrugu yɛ wɔ
 \ph /jɔɾugu jɛ wɔ/
-\mm yɔrugu-yɛ-wɔ
+\mm yɔrugu-yɛ-wɔ::
 \ps n
 \gf emprisonnement avec sursis
 \gvf emprisonnement avec sursis
@@ -8073,7 +8073,7 @@
 
 \lx yɔrugu wɔlɔ
 \ph /jɔɾugu wɔlɔ/
-\mm yɔrugu-wɔlɔ
+\mm yɔrugu-wɔlɔ::
 \ps n
 \gf emprisonnement sans sursis
 \gvf emprisonnement sans sursis
@@ -8088,7 +8088,7 @@
 
 \lx bai kunu paŋagu
 \ph /bai kunu paŋagu/
-\mm bai-kunu-paŋagu
+\mm bai-kunu-paŋagu::
 \ps n
 \gf mandat impératif
 \gvf mandat impératif
@@ -8103,7 +8103,7 @@
 
 \lx depite sɔɔ kanaran yɛjɛ
 \ph /depite sɔː kanaɾan jɛdʒɛ/
-\mm depite-sɔɔ-kanaran-yɛjɛ
+\mm depite-sɔɔ-kanaran-yɛjɛ::
 \ps n
 \gf fonctionnement de l’assemblée nationale
 \gvf fonctionnement de l’assemblée nationale
@@ -8118,7 +8118,7 @@
 
 \lx niwɛn gonu janla
 \ph /niwɛn gonu dʒanla/
-\mm niwɛn-gonu-janla
+\mm niwɛn-gonu-janla::
 \ps n
 \gf concussion
 \gvf concussion
@@ -8133,7 +8133,7 @@
 
 \lx dawuru yaga
 \ph /dawuɾu jaga/
-\mm dawuru-yaga
+\mm dawuru-yaga::
 \ps n
 \gf autre moyen
 \gvf autre moyen
@@ -8148,7 +8148,7 @@
 
 \lx gana diguru gɛriyi
 \ph /gana diguɾu gɛɾiji/
-\mm gana-diguru-gɛriyi
+\mm gana-diguru-gɛriyi::
 \ps n
 \gf continuité de l’état
 \gvf continuité de l’état
@@ -8163,7 +8163,7 @@
 
 \lx kominube mɔɔnu
 \ph /kominube mɔːnu/
-\mm kominube-mɔɔnu
+\mm kominube-mɔɔnu::
 \ps n
 \gf collectivité territoriale
 \gvf collectivité territoriale
@@ -8178,7 +8178,7 @@
 
 \lx wote wɔtɔnɛ
 \ph /wote wɔtɔnɛ/
-\mm wote-wɔtɔnɛ
+\mm wote-wɔtɔnɛ::
 \ps n
 \gf électeur
 \gvf électeur
@@ -8193,7 +8193,7 @@
 
 \lx tɔͻru baanran iŋiru ginu
 \ph /tɔːɾu baːnɾan iɲiɾu ginu/
-\mm tɔͻru-baanran-iŋiru-ginu
+\mm tɔͻru-baanran-iŋiru-ginu::
 \ps n
 \gf condition déterminée par la loi
 \gvf condition déterminée par la loi
@@ -8208,7 +8208,7 @@
 
 \lx bɛrɛ saanu sɛwɛ
 \ph /bɛɾɛ saːnu sɛwɛ/
-\mm bɛrɛ-saanu-sɛwɛ
+\mm bɛrɛ-saanu-sɛwɛ::
 \ps n
 \gf déclaration des biens
 \gvf déclaration des biens
@@ -8223,7 +8223,7 @@
 
 \lx jigɛ ɛju
 \ph /dʒigɛ ɛdʒu/
-\mm jigɛ-ɛju
+\mm jigɛ-ɛju::
 \ps n
 \gf bonne moralité
 \gvf bonne moralité
@@ -8238,7 +8238,7 @@
 
 \lx tolo taguru
 \ph /tolo taguɾu/
-\mm tolo-taguru
+\mm tolo-taguru::
 \ps n
 \gf désistement
 \gvf désistement
@@ -8253,7 +8253,7 @@
 
 \lx babamu
 \ph /babamu/
-\mm babamu
+\mm babamu::
 \ps v
 \gf faire respecter
 \gvf faire respecter
@@ -8268,7 +8268,7 @@
 
 \lx inɛ pere mɔɔnu
 \ph /inɛ peɾe mɔːnu/
-\mm inɛ-pere-mɔɔnu
+\mm inɛ-pere-mɔɔnu::
 \ps n
 \gf société civile
 \gvf société civile
@@ -8283,7 +8283,7 @@
 
 \lx saaŋu
 \ph /saːŋu/
-\mm saaŋu
+\mm saaŋu::
 \ps n
 \gf dissolution
 \gvf dissolution
@@ -8298,7 +8298,7 @@
 
 \lx waaru
 \ph /waːɾu/
-\mm waaru
+\mm waaru::
 \ps n
 \gf délai
 \gvf délai
@@ -8313,7 +8313,7 @@
 
 \lx kale
 \ph /kale/
-\mm kale
+\mm kale::
 \ps n
 \gf délai
 \gvf délai
@@ -8328,7 +8328,7 @@
 
 \lx baginrun jamu le gɛriyi
 \ph /baginɾun dʒamu le gɛɾiji/
-\mm baginrun-jamu-le-gɛriyi
+\mm baginrun-jamu-le-gɛriyi::
 \ps n
 \gf ordre public
 \gvf ordre public
@@ -8343,7 +8343,7 @@
 
 \lx diyɛdɔn
 \ph /dijɛdɔn/
-\mm diyɛdɔn
+\mm diyɛdɔn::
 \ps n
 \gf stabilisation
 \gvf stabilisation
@@ -8358,7 +8358,7 @@
 
 \lx tɔͻru iŋeraaɲu
 \ph /tɔːɾu iɲeɾaːɲu/
-\mm tɔͻru-iŋeraaɲu
+\mm tɔͻru-iŋeraaɲu::
 \ps n
 \gf règlement intérieur
 \gvf règlement intérieur
@@ -8373,7 +8373,7 @@
 
 \lx birɛ mɔɔɲu taguru
 \ph /biɾɛ mɔːɲu taguɾu/
-\mm birɛ-mɔɔɲu-taguru
+\mm birɛ-mɔɔɲu-taguru::
 \ps n
 \gf séance plénière
 \gvf séance plénière
@@ -8388,7 +8388,7 @@
 
 \lx mali ili tɔitɔi
 \ph /mali ili tɔitɔi/
-\mm mali-ili-tɔitɔi
+\mm mali-ili-tɔitɔi::
 \ps n
 \gf origine malienne
 \gvf origine malienne
@@ -8403,7 +8403,7 @@
 
 \lx gana iŋu le biyi
 \ph /gana iɲu le biji/
-\mm gana-iŋu-le-biyi
+\mm gana-iŋu-le-biyi::
 \ps n
 \gf partisan de la république
 \gvf partisan de la république
@@ -8418,7 +8418,7 @@
 
 \lx guwɛrɛnɛma kanran dagalu taguru
 \ph /guwɛɾɛnɛma kanɾan dagalu taguɾu/
-\mm guwɛrɛnɛma-kanran-dagalu-taguru
+\mm guwɛrɛnɛma-kanran-dagalu-taguru::
 \ps n
 \gf désobéissance civile
 \gvf désobéissance civile
@@ -8433,7 +8433,7 @@
 
 \lx yalu goi
 \ph /jalu goi/
-\mm yalu-goi
+\mm yalu-goi::
 \ps n
 \gf lieu de naissance
 \gvf lieu de naissance
@@ -8448,7 +8448,7 @@
 
 \lx yalu dan
 \ph /jalu dan/
-\mm yalu-dan
+\mm yalu-dan::
 \ps n
 \gf lieu de résidence
 \gvf lieu de résidence
@@ -8463,7 +8463,7 @@
 
 \lx politiku
 \ph /politiku/
-\mm politiku
+\mm politiku::
 \ps n
 \gf politique
 \gvf politique
@@ -8478,7 +8478,7 @@
 
 \lx Adama i
 \ph /adama i/
-\mm adama-i
+\mm adama-i::
 \ps n
 \gf être humain
 \gvf être humain
@@ -8493,7 +8493,7 @@
 
 \lx babu
 \ph /babu/
-\mm babu
+\mm babu::
 \ps n
 \gf respect
 \gvf respect
@@ -8508,7 +8508,7 @@
 
 \lx yanwan tɛbu
 \ph /janwan tɛbu/
-\mm yanwan-tɛbu
+\mm yanwan-tɛbu::
 \ps n
 \gf crime
 \gvf crime
@@ -8523,7 +8523,7 @@
 
 \lx dawuru
 \ph /dawuɾu/
-\mm dawuru
+\mm dawuru::
 \ps n
 \gf moyen
 \gvf moyen
@@ -8538,7 +8538,7 @@
 
 \lx gunu kunu
 \ph /gunu kunu/
-\mm gunu-kunu
+\mm gunu-kunu::
 \ps n
 \gf esclavage
 \gvf esclavage
@@ -8553,7 +8553,7 @@
 
 \lx dɔgɔtɔrɔ
 \ph /dɔgɔtɔɾɔ/
-\mm dɔgɔtɔrɔ
+\mm dɔgɔtɔrɔ::
 \ps n
 \gf médecin
 \gvf médecin
@@ -8568,7 +8568,7 @@
 
 \lx lɛɛrɛ
 \ph /lɛːɾɛ/
-\mm lɛɛrɛ
+\mm lɛɛrɛ::
 \ps n
 \gf heure
 \gvf heure
@@ -8583,7 +8583,7 @@
 
 \lx awoka
 \ph /awoka/
-\mm awoka
+\mm awoka::
 \ps n
 \gf avocat
 \gvf avocat
@@ -8598,7 +8598,7 @@
 
 \lx ujuru
 \ph /udʒuɾu/
-\mm ujuru
+\mm ujuru::
 \ps n
 \gf question
 \gvf question
@@ -8613,7 +8613,7 @@
 
 \lx yaaji
 \ph /jaːdʒi/
-\mm yaaji
+\mm yaaji::
 \ps n
 \gf mariage
 \gvf mariage
@@ -8628,7 +8628,7 @@
 
 \lx ginrundu
 \ph /ginɾundu/
-\mm ginrundu
+\mm ginrundu::
 \ps n
 \gf foyer
 \gvf foyer
@@ -8643,7 +8643,7 @@
 
 \lx sariyɛ
 \ph /saɾijɛ/
-\mm sariyɛ
+\mm sariyɛ::
 \ps n
 \gf loi
 \gvf loi
@@ -8658,7 +8658,7 @@
 
 \lx mɔrinbiyi
 \ph /mɔɾinbiji/
-\mm mɔrinbiyi
+\mm mɔrinbiyi::
 \ps n
 \gf société
 \gvf société
@@ -8673,7 +8673,7 @@
 
 \lx guwɛrɛnɛma
 \ph /guwɛɾɛnɛma/
-\mm guwɛrɛnɛma
+\mm guwɛrɛnɛma::
 \ps n
 \gf gouvernement
 \gvf gouvernement
@@ -8688,7 +8688,7 @@
 
 \lx minisiru
 \ph /minisiɾu/
-\mm minisiru
+\mm minisiru::
 \ps n
 \gf ministre
 \gvf ministre
@@ -8703,7 +8703,7 @@
 
 \lx peresidan
 \ph /peɾesidan/
-\mm peresidan
+\mm peresidan::
 \ps n
 \gf président
 \gvf président
@@ -8718,7 +8718,7 @@
 
 \lx sɔdaju
 \ph /sɔdadʒu/
-\mm sɔdaju
+\mm sɔdaju::
 \ps n
 \gf soldat
 \gvf soldat
@@ -8733,7 +8733,7 @@
 
 \lx kajubu
 \ph /kadʒubu/
-\mm kajubu
+\mm kajubu::
 \ps n
 \gf sécurité
 \gvf sécurité
@@ -8748,7 +8748,7 @@
 
 \lx kɛɛrɛ
 \ph /kɛːɾɛ/
-\mm kɛɛrɛ
+\mm kɛɛrɛ::
 \ps n
 \gf richesse
 \gvf richesse
@@ -8763,7 +8763,7 @@
 
 \lx gɛri
 \ph /gɛɾi/
-\mm gɛri
+\mm gɛri::
 \ps n
 \gf vue
 \gvf vue
@@ -8778,7 +8778,7 @@
 
 \lx jugɔ
 \ph /dʒugɔ/
-\mm jugɔ
+\mm jugɔ::
 \ps n
 \gf connaissance
 \gvf connaissance
@@ -8793,7 +8793,7 @@
 
 \lx kɛn
 \ph /kɛn/
-\mm kɛn
+\mm kɛn::
 \ps n
 \gf héritage
 \gvf héritage
@@ -8808,7 +8808,7 @@
 
 \lx baru
 \ph /baɾu/
-\mm baru
+\mm baru::
 \ps n
 \gf ajout
 \gvf ajout
@@ -8823,7 +8823,7 @@
 
 \lx sin
 \ph /sin/
-\mm sin
+\mm sin::
 \ps n
 \gf corde
 \gvf corde
@@ -8838,7 +8838,7 @@
 
 \lx wɛi
 \ph /wɛi/
-\mm wɛi
+\mm wɛi::
 \ps v
 \gf venir
 \gvf venir
@@ -8853,7 +8853,7 @@
 
 \lx dɔnrun
 \ph /dɔnɾun/
-\mm dɔnrun
+\mm dɔnrun::
 \ps n
 \gf vente
 \gvf vente
@@ -8868,7 +8868,7 @@
 
 \lx mɔɔrinyi
 \ph /mɔːɾiɲi/
-\mm mɔɔrinyi
+\mm mɔɔrinyi::
 \ps n
 \gf rassemblement
 \gvf rassemblement
@@ -8883,7 +8883,7 @@
 
 \lx dudu
 \ph /dudu/
-\mm dudu
+\mm dudu::
 \ps n
 \gf fondation
 \gvf fondation
@@ -8898,7 +8898,7 @@
 
 \lx deeru
 \ph /deːɾu/
-\mm deeru
+\mm deeru::
 \ps n
 \gf lecture
 \gvf lecture
@@ -8913,7 +8913,7 @@
 
 \lx yɔgɔrɔ
 \ph /jɔgɔɾɔ/
-\mm yɔgɔrɔ
+\mm yɔgɔrɔ::
 \ps n
 \gf jeu
 \gvf jeu
@@ -8928,7 +8928,7 @@
 
 \lx gojutere
 \ph /godʒuteɾe/
-\mm gojutere
+\mm gojutere::
 \ps n
 \gf santé
 \gvf santé
@@ -8943,7 +8943,7 @@
 
 \lx kayɛrɛ
 \ph /kajɛɾɛ/
-\mm kayɛrɛ
+\mm kayɛrɛ::
 \ps n
 \gf nourriture
 \gvf nourriture
@@ -8958,7 +8958,7 @@
 
 \lx kɛɛrɛbaŋa
 \ph /kɛːɾɛbaŋa/
-\mm kɛɛrɛ-baŋa
+\mm kɛɛrɛ-baŋa::
 \ps n
 \gf riche
 \gvf riche
@@ -8973,7 +8973,7 @@
 
 \lx sariyɛginrun
 \ph /saɾijɛginɾun/
-\mm sariyɛ-ginrun
+\mm sariyɛ-ginrun::
 \ps n
 \gf tribunal
 \gvf tribunal
@@ -8988,7 +8988,7 @@
 
 \lx amaobu
 \ph /amaobu/
-\mm ama-obu
+\mm ama-obu::
 \ps n
 \gf don de Dieu
 \gvf don de Dieu
@@ -9003,7 +9003,7 @@
 
 \lx tɔŋutɔŋu
 \ph /tɔŋutɔŋu/
-\mm tɔŋu-tɔŋu
+\mm tɔŋu-tɔŋu::
 \ps n
 \gf écritoire
 \gvf écritoire
@@ -9018,7 +9018,7 @@
 
 \lx gɔnboi
 \ph /gɔnboi/
-\mm gɔn-boi
+\mm gɔn-boi::
 \ps n
 \gf tambourin
 \gvf tambourin
@@ -9033,7 +9033,7 @@
 
 \lx inrunsɔnhu
 \ph /inɾunsɔnhu/
-\mm inrun-sɔnhu
+\mm inrun-sɔnhu::
 \ps n
 \gf vélo
 \gvf vélo
@@ -9048,7 +9048,7 @@
 
 \lx giriiyɛ
 \ph /giɾiːjɛ/
-\mm giriiyɛ
+\mm giriiyɛ::
 \ps n
 \gf vue
 \gvf vue
@@ -9063,7 +9063,7 @@
 
 \lx suguruɛgɛ
 \ph /suguɾuɛgɛ/
-\mm suguru-ɛgɛ
+\mm suguru-ɛgɛ::
 \ps n
 \gf rumeur
 \gvf rumeur
@@ -9078,7 +9078,7 @@
 
 \lx aŋapaga
 \ph /aŋapaga/
-\mm aŋa-paga
+\mm aŋa-paga::
 \ps n
 \gf jeûne
 \gvf jeûne
@@ -9093,7 +9093,7 @@
 
 \lx kajuyo
 \ph /kadʒujo/
-\mm kajuyo
+\mm kajuyo::
 \ps n
 \gf prison
 \gvf prison
@@ -9108,7 +9108,7 @@
 
 \lx kinɛpiru
 \ph /kinɛpiɾu/
-\mm kinɛ-piru
+\mm kinɛ-piru::
 \ps n
 \gf honnêteté
 \gvf honnêteté
@@ -9124,7 +9124,7 @@
 
 \lx bɛrɛgɛnhu
 \ph /bɛɾɛgɛnhu/
-\mm bɛrɛ-gɛnhu
+\mm bɛrɛ-gɛnhu::
 \ps n
 \gf méchanceté
 \gvf méchanceté
@@ -9140,7 +9140,7 @@
 
 \lx suguruwɛi
 \ph /suguɾuwɛi/
-\mm suguru-wɛi
+\mm suguru-wɛi::
 \ps n
 \gf obéissance
 \gvf obéissance
@@ -9155,7 +9155,7 @@
 
 \lx gireyaa
 \ph /giɾejaː/
-\mm gire-yaa
+\mm gire-yaa::
 \ps v
 \gf réussir
 \gvf réussir
@@ -9170,7 +9170,7 @@
 
 \lx doɲusugo
 \ph /doɲusugo/
-\mm doɲu-sugo
+\mm doɲu-sugo::
 \ps v
 \gf descendre
 \gvf descendre
@@ -9185,7 +9185,7 @@
 
 \lx orunawan
 \ph /oɾunawan/
-\mm oru-nawan
+\mm oru-nawan::
 \ps n
 \gf gibier
 \gvf gibier
@@ -9200,7 +9200,7 @@
 
 \lx aŋapagu
 \ph /aŋapagu/
-\mm aŋa-pagu
+\mm aŋa-pagu::
 \ps n
 \gf jeûne
 \gvf jeûne
@@ -9215,7 +9215,7 @@
 
 \lx ajabalu
 \ph /adʒabalu/
-\mm ajabalu
+\mm ajabalu::
 \ps n
 \gf mort
 \gvf mort
@@ -9232,7 +9232,7 @@
 
 \lx yimu
 \ph /jimu/
-\mm yimu
+\mm yimu::
 \ps n
 \gf mort
 \gvf mort
@@ -9249,7 +9249,7 @@
 
 \lx nurɔn
 \ph /nuɾɔn/
-\mm nurɔn
+\mm nurɔn::
 \ps n
 \gf maladie
 \gvf maladie
@@ -9265,7 +9265,7 @@
 
 \lx sinla
 \ph /sinla/
-\mm sinla
+\mm sinla::
 \ps n
 \gf maladie
 \gvf maladie
@@ -9281,7 +9281,7 @@
 
 \lx jinhu
 \ph /dʒinhu/
-\mm jinhu
+\mm jinhu::
 \ps n
 \gf maladie
 \gvf maladie
@@ -9297,7 +9297,7 @@
 
 \lx pɔɔrɔ baa
 \ph /pɔːɾɔ baː/
-\mm pɔɔrɔ-baa
+\mm pɔɔrɔ-baa::
 \ps adv
 \gf autrefois
 \gvf autrefois
@@ -9314,7 +9314,7 @@
 
 \lx laa baa
 \ph /laː baː/
-\mm laa-baa
+\mm laa-baa::
 \ps adv
 \gf autrefois
 \gvf autrefois
@@ -9331,7 +9331,7 @@
 
 \lx ɔnmɔ
 \ph /ɔnmɔ/
-\mm ɔnmɔ
+\mm ɔnmɔ::
 \ps v
 \gf vivre
 \gvf vivre
@@ -9347,7 +9347,7 @@
 
 \lx hakilɛ
 \ph /hakilɛ/
-\mm hakilɛ
+\mm hakilɛ::
 \ps n
 \gf intelligence
 \gvf intelligence
@@ -9363,7 +9363,7 @@
 
 \lx bomo
 \ph /bomo/
-\mm bomo
+\mm bomo::
 \ps adj
 \gf idiot
 \gvf idiot
@@ -9379,7 +9379,7 @@
 
 \lx daiɲi
 \ph /daini/
-\mm daiɲi
+\mm daiɲi::
 \ps v
 \gf s'asseoir
 \gvf s'asseoir
@@ -9395,7 +9395,7 @@
 
 \lx iŋuru
 \ph /iɲuɾu/
-\mm iŋuru
+\mm iŋuru::
 \ps v
 \gf se lever
 \gvf se lever
@@ -9411,7 +9411,7 @@
 
 \lx ponti
 \ph /ponti/
-\mm ponti
+\mm ponti::
 \ps n
 \gf clou
 \gvf clou
@@ -9426,7 +9426,7 @@
 
 \lx taiyɛru
 \ph /taijɛɾu/
-\mm taiyɛru
+\mm taiyɛru::
 \ps n
 \gf tailleur
 \gvf tailleur
@@ -9441,7 +9441,7 @@
 
 \lx alumɛti
 \ph /alumɛti/
-\mm alumɛti
+\mm alumɛti::
 \ps n
 \gf allumette
 \gvf allumette
@@ -9456,7 +9456,7 @@
 
 \lx bogotu
 \ph /bogotu/
-\mm bogotu
+\mm bogotu::
 \ps n
 \gf cuvette
 \gvf cuvette
@@ -9471,7 +9471,7 @@
 
 \lx gazuwalu
 \ph /gazuwalu/
-\mm gazuwalu
+\mm gazuwalu::
 \ps n
 \gf gasoil
 \gvf gasoil
@@ -9486,7 +9486,7 @@
 
 \lx so
 \ph /so/
-\mm so
+\mm so::
 \ps n
 \gf seau
 \gvf seau
@@ -9501,7 +9501,7 @@
 
 \lx tasa
 \ph /tasa/
-\mm tasa
+\mm tasa::
 \ps n
 \gf tasse
 \gvf tasse
@@ -9516,7 +9516,7 @@
 
 \lx pɛjɛrɛ
 \ph /pɛdʒɛɾɛ/
-\mm pɛjɛrɛ
+\mm pɛjɛrɛ::
 \ps n
 \gf pièce
 \gvf pièce
@@ -9531,7 +9531,7 @@
 
 \lx boi lerenɛ
 \ph /boi leɾenɛ/
-\mm boi-lerenɛ
+\mm boi-lerenɛ::
 \ps n
 \gf pronom
 \gvf pronom
@@ -9546,7 +9546,7 @@
 
 \lx selumu
 \ph /selumu/
-\mm selumu
+\mm selumu::
 \ps n
 \gf interrogation
 \gvf interrogation
@@ -9561,7 +9561,7 @@
 
 \lx Da Sariyε Birεginrun
 \ph /da saɾijɛ biɾɛginɾun/
-\mm Da-Sariyε-Birεginrun
+\mm Da-Sariyε-Birεginrun::
 \ps n
 \gf cour constitutionnelle
 \gvf cour constitutionnelle
@@ -9576,7 +9576,7 @@
 
 \lx Da Sariyε Ginrun Diyε
 \ph /da saɾijɛ ginɾun dijɛ/
-\mm Da-Sariyε-Ginrun-Diyε
+\mm Da-Sariyε-Ginrun-Diyε::
 \ps n
 \gf cour suprême
 \gvf cour suprême
@@ -9591,7 +9591,7 @@
 
 \lx Bεrε sariyε ginrun
 \ph /bɛɾɛ saɾijɛ ginɾun/
-\mm Bεrε-sariyε-ginrun
+\mm Bεrε-sariyε-ginrun::
 \ps n
 \gf cour des comptes
 \gvf cour des comptes
@@ -9606,7 +9606,7 @@
 
 \lx Baginrun Sariyε Ginrun Porozε
 \ph /baginɾun saɾijɛ ginɾun poɾozɛ/
-\mm Baginrun-Sariyε-Ginrun-Porozε
+\mm Baginrun-Sariyε-Ginrun-Porozε::
 \ps n
 \gf projet de constitution
 \gvf projet de constitution
@@ -9621,7 +9621,7 @@
 
 \lx Biyi kubεi
 \ph /biji kubɛi/
-\mm Biyi-kubεi
+\mm Biyi-kubεi::
 \ps n
 \gf liberté de conscience
 \gvf liberté de conscience
@@ -9636,7 +9636,7 @@
 
 \lx Sagu duyi
 \ph /sagu duji/
-\mm Sagu-duyi
+\mm Sagu-duyi::
 \ps n
 \gf garantie
 \gvf garantie
@@ -9652,7 +9652,7 @@
 
 \lx Gagawu bεi
 \ph /gagawu bɛi/
-\mm Gagawu-bεi
+\mm Gagawu-bεi::
 \ps n
 \gf garantie
 \gvf garantie
@@ -9668,7 +9668,7 @@
 
 \lx Bεrε porobͻ
 \ph /bɛɾɛ poɾobɔ/
-\mm Bεrε-porobͻ
+\mm Bεrε-porobͻ::
 \ps n
 \gf action publique
 \gvf action publique
@@ -9683,7 +9683,7 @@
 
 \lx Depitebe lee Sena le birεginrun
 \ph /depitebe leː sena le biɾɛginɾun/
-\mm Depite-be-lee-Sena-le-birεginrun
+\mm Depite-be-lee-Sena-le-birεginrun::
 \ps n
 \gf parlement
 \gvf parlement
@@ -9698,7 +9698,7 @@
 
 \lx Denu lee Mͻnrin biyi lee Atεmu lee Sara Birεginrun
 \ph /denu leː mɔnɾin biji leː atɛmu leː saɾa biɾɛginɾun/
-\mm Denu-lee-Mͻnrin-biyi-lee-Atεmu-lee-Sara-Birεginrun
+\mm Denu-lee-Mͻnrin-biyi-lee-Atεmu-lee-Sara-Birεginrun::
 \ps n
 \gf conseil économique culturel et territorial
 \gvf conseil économique culturel et territorial
@@ -9713,7 +9713,7 @@
 
 \lx Amatͻŋͻ bεrε
 \ph /amatɔŋɔ bɛɾɛ/
-\mm Amatͻŋͻ-bεrε
+\mm Amatͻŋͻ-bεrε::
 \ps n
 \gf ressources naturelles
 \gvf ressources naturelles
@@ -9728,7 +9728,7 @@
 
 \lx Paŋa tͻͻru sͻͻ
 \ph /paɲa tɔːɾu sɔː/
-\mm Paŋa-tͻͻru-sͻͻ
+\mm Paŋa-tͻͻru-sͻͻ::
 \ps n
 \gf pouvoir exécutif
 \gvf pouvoir exécutif
@@ -9743,7 +9743,7 @@
 
 \lx Baguinrun Kajubaun Mͻͻnu
 \ph /baguinɾun kadʒubaun mɔːnu/
-\mm Baguinrun-Kajubaun-Mͻͻnu
+\mm Baguinrun-Kajubaun-Mͻͻnu::
 \ps n
 \gf conseil de sécurité national
 \gvf conseil de sécurité national
@@ -9758,7 +9758,7 @@
 
 \lx Sariyε Mͻͻnu nε Dan Kubaŋa
 \ph /saɾijɛ mɔːnu nɛ dan kubaɲa/
-\mm Sariyε-Mͻͻnu-nε-Dan-Kubaŋa
+\mm Sariyε-Mͻͻnu-nε-Dan-Kubaŋa::
 \ps n
 \gf magistrat
 \gvf magistrat
@@ -9773,7 +9773,7 @@
 
 \lx Gire Sagu Duiyͻnε
 \ph /giɾe sagu duijɔnɛ/
-\mm Gire-Sagu-Duiyͻnε
+\mm Gire-Sagu-Duiyͻnε::
 \ps n
 \gf chevalier de l’ordre
 \gvf chevalier de l’ordre
@@ -9788,7 +9788,7 @@
 
 \lx Paŋa Birεginrun Diyε Kubεunw
 \ph /paɲa biɾɛginɾun dijɛ kubɛunw/
-\mm Paŋa-Birεginrun-Diyε-Kubεunw
+\mm Paŋa-Birεginrun-Diyε-Kubεunw::
 \ps n
 \gf directeur des administrations centrales
 \gvf directeur des administrations centrales
@@ -9803,7 +9803,7 @@
 
 \lx Minisiribe Badu
 \ph /minisiɾibe badu/
-\mm Minisiri-be-Badu
+\mm Minisiri-be-Badu::
 \ps n
 \gf conseil des ministres
 \gvf conseil des ministres
@@ -9818,7 +9818,7 @@
 
 \lx Birε nε kunu
 \ph /biɾɛ nɛ kunu/
-\mm Birε-nε-kunu
+\mm Birε-nε-kunu::
 \ps n
 \gf nomination
 \gvf nomination
@@ -9833,7 +9833,7 @@
 
 \lx Sariyε Birεginrunbe lee ojube lee
 \ph /saɾijɛ biɾɛginɾunbe leː odʒube leː/
-\mm Sariyε-Birεginrunbe-lee-ojube-lee
+\mm Sariyε-Birεginrunbe-lee-ojube-lee::
 \ps n
 \gf instance
 \gvf instance
@@ -9848,7 +9848,7 @@
 
 \lx Poroba paŋa
 \ph /poɾoba paɲa/
-\mm Poroba-paŋa
+\mm Poroba-paŋa::
 \ps n
 \gf pouvoir public
 \gvf pouvoir public
@@ -9863,7 +9863,7 @@
 
 \lx joononɛbe
 \ph /dʒoːnonɛbe/
-\mm joono-nɛ-be
+\mm joono-nɛ-be::
 \ps n
 \gf voyelles
 \gvf voyelles
@@ -9879,7 +9879,7 @@
 
 \lx joonoɲube
 \ph /dʒoːnoɲube/
-\mm joono-ɲu-be
+\mm joono-ɲu-be::
 \ps n
 \gf consonnes
 \gvf consonnes
@@ -9895,7 +9895,7 @@
 
 \lx joononɛ ijebe
 \ph /dʒoːnonɛ idʒebe/
-\mm joono-nɛ-ije-be
+\mm joono-nɛ-ije-be::
 \ps n
 \gf voyelles simples
 \gvf voyelles simples
@@ -9910,7 +9910,7 @@
 
 \lx joononɛ parabe
 \ph /dʒoːnonɛ paɾabe/
-\mm joono-nɛ-para-be
+\mm joono-nɛ-para-be::
 \ps n
 \gf voyelles longues
 \gvf voyelles longues
@@ -9925,7 +9925,7 @@
 
 \lx kinrun joononɛ ijebe
 \ph /kinɾun dʒoːnonɛ idʒebe/
-\mm kinrun-joono-nɛ-ije-be
+\mm kinrun-joono-nɛ-ije-be::
 \ps n
 \gf voyelles nasales
 \gvf voyelles nasales
@@ -9940,7 +9940,7 @@
 
 \lx kinrun joononɛ parabe
 \ph /kinɾun dʒoːnonɛ paɾabe/
-\mm kinrun-joono-nɛ-para-be
+\mm kinrun-joono-nɛ-para-be::
 \ps n
 \gf voyelles longues nasales
 \gvf voyelles longues nasales
@@ -9955,7 +9955,7 @@
 
 \lx jiŋurunbe
 \ph /dʒiɲuɾunbe/
-\mm jiŋurun-be
+\mm jiŋurun-be::
 \ps n
 \gf diphtongues
 \gvf diphtongues
@@ -9970,7 +9970,7 @@
 
 \lx jiŋurun ijebe
 \ph /dʒiɲuɾun idʒebe/
-\mm jiŋurun-ije-be
+\mm jiŋurun-ije-be::
 \ps n
 \gf diphtongues orales
 \gvf diphtongues orales
@@ -9985,7 +9985,7 @@
 
 \lx kinrun jiŋurun
 \ph /kinɾun dʒiɲuɾun/
-\mm kinrun-jiŋurun
+\mm kinrun-jiŋurun::
 \ps n
 \gf diphtongues nasales
 \gvf diphtongues nasales
@@ -10000,7 +10000,7 @@
 
 \lx girebaru
 \ph /giɾebaɾu/
-\mm gire-baru
+\mm gire-baru::
 \ps n
 \gf préfixes
 \gvf préfixes
@@ -10016,7 +10016,7 @@
 
 \lx dogobaru
 \ph /dogobaɾu/
-\mm dogo-baru
+\mm dogo-baru::
 \ps n
 \gf suffixes
 \gvf suffixes
@@ -10032,7 +10032,7 @@
 
 \lx kirɛgu
 \ph /kiɾɛgu/
-\mm kirɛ-gu
+\mm kirɛ-gu::
 \ps n
 \gf état
 \gvf état
@@ -10047,7 +10047,7 @@
 
 \lx kurɔgu
 \ph /kuɾɔgu/
-\mm kurɔ-gu
+\mm kurɔ-gu::
 \ps n
 \gf état
 \gvf état
@@ -10062,7 +10062,7 @@
 
 \lx bɛrɛginɛ
 \ph /bɛɾɛginɛ/
-\mm bɛrɛ-ginɛ
+\mm bɛrɛ-ginɛ::
 \ps n
 \gf qualité
 \gvf qualité
@@ -10077,7 +10077,7 @@
 
 \lx lulɔginɛ
 \ph /lulɔginɛ/
-\mm lulɔ-ginɛ
+\mm lulɔ-ginɛ::
 \ps n
 \gf qualité
 \gvf qualité
@@ -10092,7 +10092,7 @@
 
 \lx kɛɛrɛbaŋa
 \ph /kɛːɾɛbaŋa/
-\mm kɛɛrɛ-baŋa
+\mm kɛɛrɛ-baŋa::
 \ps n
 \gf possession
 \gvf possession
@@ -10107,7 +10107,7 @@
 
 \lx arusɛgɛbaŋa
 \ph /aɾusɛgɛbaŋa/
-\mm arusɛgɛ-baŋa
+\mm arusɛgɛ-baŋa::
 \ps n
 \gf possession
 \gvf possession
@@ -10122,7 +10122,7 @@
 
 \lx taanuye
 \ph /taːnuje/
-\mm taanu-ye
+\mm taanu-ye::
 \ps adj
 \gf troisième
 \gvf troisième
@@ -10137,7 +10137,7 @@
 
 \lx naiye
 \ph /naije/
-\mm nai-ye
+\mm nai-ye::
 \ps adj
 \gf quatrième
 \gvf quatrième
@@ -10152,7 +10152,7 @@
 
 \lx maŋanɛ
 \ph /maɲanɛ/
-\mm maŋa-nɛ
+\mm maŋa-nɛ::
 \ps n
 \gf artisan
 \gvf artisan
@@ -10167,7 +10167,7 @@
 
 \lx yaanɛ
 \ph /jaːnɛ/
-\mm yaa-nɛ
+\mm yaa-nɛ::
 \ps n
 \gf voyageur
 \gvf voyageur
@@ -10182,7 +10182,7 @@
 
 \lx nanɛ
 \ph /nanɛ/
-\mm na-nɛ
+\mm na-nɛ::
 \ps n
 \gf orateur
 \gvf orateur
@@ -10197,7 +10197,7 @@
 
 \lx tirɛnɛ
 \ph /tiɾɛnɛ/
-\mm tirɛ-nɛ
+\mm tirɛ-nɛ::
 \ps n
 \gf porteur
 \gvf porteur
@@ -10212,7 +10212,7 @@
 
 \lx jobu
 \ph /dʒobu/
-\mm jobu
+\mm jobu::
 \ps n
 \gf course
 \gvf course
@@ -10227,7 +10227,7 @@
 
 \lx libu
 \ph /libu/
-\mm libu
+\mm libu::
 \ps n
 \gf nage
 \gvf nage
@@ -10242,7 +10242,7 @@
 
 \lx ɛbu
 \ph /ɛbu/
-\mm ɛbu
+\mm ɛbu::
 \ps n
 \gf achat
 \gvf achat
@@ -10257,7 +10257,7 @@
 
 \lx yai
 \ph /jai/
-\mm yai
+\mm yai::
 \ps n
 \gf marche
 \gvf marche
@@ -10272,7 +10272,7 @@
 
 \lx ɛnrɛnhi
 \ph /ɛnɾɛnhi/
-\mm ɛnrɛn-hi
+\mm ɛnrɛn-hi::
 \ps n
 \gf présentatif
 \gvf présentatif
@@ -10287,7 +10287,7 @@
 
 \lx naai
 \ph /naːi/
-\mm naa-i
+\mm naa-i::
 \ps n
 \gf présentatif
 \gvf présentatif
@@ -10302,7 +10302,7 @@
 
 \lx pejii
 \ph /pedʒiː/
-\mm peju-i
+\mm peju-i::
 \ps n
 \gf présentatif
 \gvf présentatif
@@ -10317,7 +10317,7 @@
 
 \lx taboi
 \ph /taboi/
-\mm ta-boi
+\mm ta-boi::
 \ps n
 \gf champignon
 \gvf champignon
@@ -10332,7 +10332,7 @@
 
 \lx nndɛm
 \ph /nndɛm/
-\mm nndɛ-m
+\mm nndɛ-m::
 \ps n
 \gf gens
 \gvf gens
@@ -10347,7 +10347,7 @@
 
 \lx yaana
 \ph /jaːna/
-\mm yaana
+\mm yaana::
 \ps n
 \gf femme
 \gvf femme
@@ -10364,7 +10364,7 @@
 
 \lx anna
 \ph /anna/
-\mm anna
+\mm anna::
 \ps n
 \gf homme
 \gvf homme
@@ -10381,7 +10381,7 @@
 
 \lx ulum
 \ph /ulum/
-\mm ulum
+\mm ulum::
 \ps n
 \gf enfants
 \gvf enfants
@@ -10397,7 +10397,7 @@
 
 \lx pilu
 \ph /pilu/
-\mm pilu
+\mm pilu::
 \ps adj
 \gf blanc
 \gvf blanc
@@ -10413,7 +10413,7 @@
 
 \lx ganda
 \ph /ganda/
-\mm ganda
+\mm ganda::
 \ps n
 \gf pays
 \gvf pays
@@ -10429,7 +10429,7 @@
 
 \lx ay
 \ph /aj/
-\mm ay
+\mm ay::
 \ps det
 \gf indéterminé
 \gvf indéterminé
@@ -10444,7 +10444,7 @@
 
 \lx babey
 \ph /babej/
-\mm babey
+\mm babey::
 \ps n
 \gf papa
 \gvf papa
@@ -10461,7 +10461,7 @@
 
 \lx nna
 \ph /nna/
-\mm nna
+\mm nna::
 \ps n
 \gf maman
 \gvf maman
@@ -10478,7 +10478,7 @@
 
 \lx tumɔ
 \ph /tumɔ/
-\mm tumɔ
+\mm tumɔ::
 \ps num
 \gf un
 \gvf un
@@ -10493,7 +10493,7 @@
 
 \lx ney
 \ph /nej/
-\mm ney
+\mm ney::
 \ps num
 \gf deux
 \gvf deux
@@ -10508,7 +10508,7 @@
 
 \lx taandu
 \ph /taːndu/
-\mm taandu
+\mm taandu::
 \ps num
 \gf trois
 \gvf trois
@@ -10523,7 +10523,7 @@
 
 \lx nay
 \ph /naj/
-\mm nay
+\mm nay::
 \ps num
 \gf quatre
 \gvf quatre
@@ -10538,7 +10538,7 @@
 
 \lx nnɔ
 \ph /nnɔ/
-\mm nnɔ
+\mm nnɔ::
 \ps num
 \gf cinq
 \gvf cinq
@@ -10553,7 +10553,7 @@
 
 \lx kuloy
 \ph /kuloj/
-\mm kuloy
+\mm kuloy::
 \ps num
 \gf six
 \gvf six
@@ -10568,7 +10568,7 @@
 
 \lx soy
 \ph /soj/
-\mm soy
+\mm soy::
 \ps num
 \gf sept
 \gvf sept
@@ -10583,7 +10583,7 @@
 
 \lx gagrɛ
 \ph /gagɾɛ/
-\mm gagrɛ
+\mm gagrɛ::
 \ps num
 \gf huit
 \gvf huit
@@ -10598,7 +10598,7 @@
 
 \lx tuwɔ
 \ph /tuwɔ/
-\mm tuwɔ
+\mm tuwɔ::
 \ps num
 \gf neuf
 \gvf neuf
@@ -10613,7 +10613,7 @@
 
 \lx pɛlu
 \ph /pɛlu/
-\mm pɛlu
+\mm pɛlu::
 \ps num
 \gf dix
 \gvf dix
@@ -10628,7 +10628,7 @@
 
 \lx nngulo
 \ph /ŋulo/
-\mm nngulo
+\mm nngulo::
 \ps v
 \gf se lever
 \gvf se lever
@@ -10643,7 +10643,7 @@
 
 \lx ogie
 \ph /ogje/
-\mm ogie
+\mm ogie::
 \ps v
 \gf se réchauffer
 \gvf se réchauffer
@@ -10658,7 +10658,7 @@
 
 \lx nuyo
 \ph /nujo/
-\mm nuyo
+\mm nuyo::
 \ps v
 \gf chanter
 \gvf chanter
@@ -10673,7 +10673,7 @@
 
 \lx dono
 \ph /dono/
-\mm dono
+\mm dono::
 \ps v
 \gf vendre
 \gvf vendre
@@ -10688,7 +10688,7 @@
 
 \lx nɔy
 \ph /nɔj/
-\mm nɔy
+\mm nɔy::
 \ps v
 \gf boire
 \gvf boire
@@ -10703,7 +10703,7 @@
 
 \lx ɛmɛ
 \ph /ɛmɛ/
-\mm ɛmɛ
+\mm ɛmɛ::
 \ps v
 \gf traire
 \gvf traire
@@ -10718,7 +10718,7 @@
 
 \lx emu
 \ph /emu/
-\mm emu
+\mm emu::
 \ps n
 \gf lait
 \gvf lait
@@ -10733,7 +10733,7 @@
 
 \lx banja
 \ph /bandʒa/
-\mm banja
+\mm banja::
 \ps n
 \gf plat
 \gvf plat
@@ -10748,7 +10748,7 @@
 
 \lx kulo
 \ph /kulo/
-\mm kulo
+\mm kulo::
 \ps n
 \gf poil
 \gvf poil
@@ -10763,7 +10763,7 @@
 
 \lx kinu
 \ph /kinu/
-\mm kinu
+\mm kinu::
 \ps n
 \gf nez
 \gvf nez
@@ -10778,7 +10778,7 @@
 
 \lx viɛ
 \ph /vjɛ/
-\mm viɛ
+\mm viɛ::
 \ps adj
 \gf vivant
 \gvf vivant
@@ -10793,7 +10793,7 @@
 
 \lx bɛrɛ
 \ph /bɛɾɛ/
-\mm bɛrɛ
+\mm bɛrɛ::
 \ps n
 \gf ventre
 \gvf ventre
@@ -10808,7 +10808,7 @@
 
 \lx yogo
 \ph /jogo/
-\mm yogo
+\mm yogo::
 \ps adv
 \gf demain
 \gvf demain
@@ -10823,7 +10823,7 @@
 
 \lx yaa
 \ph /jaː/
-\mm yaa
+\mm yaa::
 \ps adv
 \gf hier
 \gvf hier
@@ -10838,7 +10838,7 @@
 
 \lx gaalu
 \ph /gaːlu/
-\mm gaalu
+\mm gaalu::
 \ps adv
 \gf l'année passée
 \gvf l'année passée
@@ -10853,7 +10853,7 @@
 
 \lx yonjune
 \ph /jondʒune/
-\mm yonjune
+\mm yonjune::
 \ps n
 \gf étranger
 \gvf étranger
@@ -10882,7 +10882,7 @@
 
 \lx remɛ
 \ph /ɾemɛ/
-\mm remɛ
+\mm remɛ::
 \ps n
 \gf remède
 \gvf remède
@@ -10897,7 +10897,7 @@
 
 \lx naa
 \ph /naː/
-\mm naa
+\mm naa::
 \ps n
 \gf vache
 \gvf vache
@@ -10912,7 +10912,7 @@
 
 \lx pedu
 \ph /pedu/
-\mm pedu
+\mm pedu::
 \ps n
 \gf mouton
 \gvf mouton
@@ -10927,7 +10927,7 @@
 
 \lx Fɔŋoro
 \ph /fɔŋoɾo/
-\mm Fɔŋoro
+\mm Fɔŋoro::
 \ps n
 \gf sifflet
 \gvf sifflet
@@ -10942,7 +10942,7 @@
 
 \lx paamu
 \ph /paːmu/
-\mm paamu
+\mm paamu::
 \ps v
 \gf comprendre
 \gvf comprendre
@@ -10957,7 +10957,7 @@
 
 \lx pɛnrɛn
 \ph /pɛnɾɛn/
-\mm pɛnrɛn
+\mm pɛnrɛn::
 \ps n
 \gf fourmi
 \gvf fourmi
@@ -10973,7 +10973,7 @@
 
 \lx tolofuje
 \ph /tolofudʒe/
-\mm tolofuje
+\mm tolofuje::
 \ps n
 \gf papillon
 \gvf papillon
@@ -10988,7 +10988,7 @@
 
 \lx cɛmu
 \ph /tʃɛmu/
-\mm cɛmu
+\mm cɛmu::
 \ps n
 \gf fourmi
 \gvf fourmi
@@ -11004,7 +11004,7 @@
 
 \lx pana
 \ph /pana/
-\mm pana
+\mm pana::
 \ps n
 \gf repas
 \gvf repas
@@ -11020,7 +11020,7 @@
 
 \lx alufagalo
 \ph /alufagalo/
-\mm alufagalo
+\mm alufagalo::
 \ps n
 \gf alphabet
 \gvf alphabet
@@ -11035,7 +11035,7 @@
 
 \lx abara
 \ph /abaɾa/
-\mm abara
+\mm abara::
 \ps n
 \gf écorce
 \gvf écorce
@@ -11050,7 +11050,7 @@
 
 \lx amagana
 \ph /amagana/
-\mm amagana
+\mm amagana::
 \ps n
 \gf Dieu
 \gvf Dieu
@@ -11066,7 +11066,7 @@
 
 \lx ere
 \ph /eɾe/
-\mm ere
+\mm ere::
 \ps adj
 \gf doux
 \gvf doux
@@ -11082,7 +11082,7 @@
 
 \lx tene
 \ph /tene/
-\mm tene
+\mm tene::
 \ps adj
 \gf court
 \gvf court
@@ -11099,7 +11099,7 @@
 
 \lx ɛɲɛ
 \ph /ɛɲɛ/
-\mm ɛɲɛ
+\mm ɛɲɛ::
 \ps n
 \gf chèvre
 \gvf chèvre
@@ -11114,7 +11114,7 @@
 
 \lx ɛriyɛ
 \ph /ɛɾijɛ/
-\mm ɛriyɛ
+\mm ɛriyɛ::
 \ps n
 \gf arachide
 \gvf arachide
@@ -11130,7 +11130,7 @@
 
 \lx isa
 \ph /isa/
-\mm isa
+\mm isa::
 \ps n
 \gf rivière
 \gvf rivière
@@ -11146,7 +11146,7 @@
 
 \lx ibi
 \ph /ibi/
-\mm ibi
+\mm ibi::
 \ps n
 \gf marché
 \gvf marché
@@ -11162,7 +11162,7 @@
 
 \lx suju
 \ph /sudʒu/
-\mm suju
+\mm suju::
 \ps n
 \gf cheveu
 \gvf cheveu
@@ -11178,7 +11178,7 @@
 
 \lx tubu
 \ph /tubu/
-\mm tubu
+\mm tubu::
 \ps n
 \gf pierre
 \gvf pierre
@@ -11194,7 +11194,7 @@
 
 \lx doro
 \ph /doɾo/
-\mm doro
+\mm doro::
 \ps n
 \gf bonnet
 \gvf bonnet
@@ -11209,7 +11209,7 @@
 
 \lx goro
 \ph /goɾo/
-\mm goro
+\mm goro::
 \ps n
 \gf rivière
 \gvf rivière
@@ -11225,7 +11225,7 @@
 
 \lx aaru
 \ph /aːɾu/
-\mm aaru
+\mm aaru::
 \ps n
 \gf pluie
 \gvf pluie
@@ -11241,7 +11241,7 @@
 
 \lx daana
 \ph /daːna/
-\mm daana
+\mm daana::
 \ps v
 \gf laisser
 \gvf laisser
@@ -11257,7 +11257,7 @@
 
 \lx baara
 \ph /baːɾa/
-\mm baara
+\mm baara::
 \ps n
 \gf travail
 \gvf travail
@@ -11273,7 +11273,7 @@
 
 \lx goono
 \ph /goːno/
-\mm goono
+\mm goono::
 \ps n
 \gf clôture
 \gvf clôture
@@ -11288,7 +11288,7 @@
 
 \lx dooro
 \ph /doːɾo/
-\mm dooro
+\mm dooro::
 \ps v
 \gf charger
 \gvf charger
@@ -11303,7 +11303,7 @@
 
 \lx poonu
 \ph /poːnu/
-\mm poonu
+\mm poonu::
 \ps v
 \gf saluer
 \gvf saluer
@@ -11319,7 +11319,7 @@
 
 \lx piiriye
 \ph /piːɾije/
-\mm piiriye
+\mm piiriye::
 \ps v
 \gf montrer
 \gvf montrer
@@ -11335,7 +11335,7 @@
 
 \lx jiire
 \ph /dʒiːɾe/
-\mm jiire
+\mm jiire::
 \ps adv
 \gf avant
 \gvf avant
@@ -11351,7 +11351,7 @@
 
 \lx suuru
 \ph /suːɾu/
-\mm suuru
+\mm suuru::
 \ps n
 \gf patience
 \gvf patience
@@ -11366,7 +11366,7 @@
 
 \lx kuuru
 \ph /kuːɾu/
-\mm kuuru
+\mm kuuru::
 \ps n
 \gf os
 \gvf os
@@ -11381,7 +11381,7 @@
 
 \lx deere
 \ph /deːɾe/
-\mm deere
+\mm deere::
 \ps v
 \gf apprendre
 \gvf apprendre
@@ -11397,7 +11397,7 @@
 
 \lx teere
 \ph /teːɾe/
-\mm teere
+\mm teere::
 \ps v
 \gf apprendre
 \gvf apprendre
@@ -11413,7 +11413,7 @@
 
 \lx beeru
 \ph /beːɾu/
-\mm beeru
+\mm beeru::
 \ps n
 \gf foie
 \gvf foie
@@ -11429,7 +11429,7 @@
 
 \lx sɛɛrɛ
 \ph /sɛːɾɛ/
-\mm sɛɛrɛ
+\mm sɛɛrɛ::
 \ps n
 \gf témoin
 \gvf témoin
@@ -11444,7 +11444,7 @@
 
 \lx kɛɛrɛ
 \ph /kɛːɾɛ/
-\mm kɛɛrɛ
+\mm kɛɛrɛ::
 \ps n
 \gf richesse
 \gvf richesse
@@ -11459,7 +11459,7 @@
 
 \lx pan
 \ph /pan/
-\mm pan
+\mm pan::
 \ps n
 \gf calebasse
 \gvf calebasse
@@ -11475,7 +11475,7 @@
 
 \lx kanran
 \ph /kanɾan/
-\mm kanran
+\mm kanran::
 \ps v
 \gf lire
 \gvf lire
@@ -11491,7 +11491,7 @@
 
 \lx panran
 \ph /panɾan/
-\mm panran
+\mm panran::
 \ps v
 \gf tresser
 \gvf tresser
@@ -11506,7 +11506,7 @@
 
 \lx benw
 \ph /benw/
-\mm benw
+\mm benw::
 \ps n
 \gf oncles
 \gvf oncles
@@ -11521,7 +11521,7 @@
 
 \lx deerenw
 \ph /deːɾenw/
-\mm deerenw
+\mm deerenw::
 \ps n
 \gf élèves
 \gvf élèves
@@ -11537,7 +11537,7 @@
 
 \lx gɛnwɛnrɛn
 \ph /gɛnwɛnɾɛn/
-\mm gɛnwɛnrɛn
+\mm gɛnwɛnrɛn::
 \ps n
 \gf arc-en-ciel
 \gvf arc-en-ciel
@@ -11552,7 +11552,7 @@
 
 \lx dɛnrɛn
 \ph /dɛnɾɛn/
-\mm dɛnrɛn
+\mm dɛnrɛn::
 \ps n
 \gf place
 \gvf place
@@ -11568,7 +11568,7 @@
 
 \lx jin
 \ph /dʒin/
-\mm jin
+\mm jin::
 \ps n
 \gf maladie
 \gvf maladie
@@ -11584,7 +11584,7 @@
 
 \lx on
 \ph /on/
-\mm on
+\mm on::
 \ps n
 \gf sel
 \gvf sel
@@ -11600,7 +11600,7 @@
 
 \lx pon
 \ph /pon/
-\mm pon
+\mm pon::
 \ps n
 \gf pont
 \gvf pont
@@ -11616,7 +11616,7 @@
 
 \lx gɔnrɔn
 \ph /gɔnɾɔn/
-\mm gɔnrɔn
+\mm gɔnrɔn::
 \ps n
 \gf force
 \gvf force
@@ -11632,7 +11632,7 @@
 
 \lx mɔnhi
 \ph /mɔnhi/
-\mm mɔnhi
+\mm mɔnhi::
 \ps n
 \gf moustique
 \gvf moustique
@@ -11648,7 +11648,7 @@
 
 \lx munrɔn
 \ph /munɾɔn/
-\mm munrɔn
+\mm munrɔn::
 \ps v
 \gf sembler
 \gvf sembler
@@ -11678,7 +11678,7 @@
 
 \lx unrun
 \ph /unɾun/
-\mm unrun
+\mm unrun::
 \ps n
 \gf enfant
 \gvf enfant
@@ -11694,7 +11694,7 @@
 
 \lx nai
 \ph /nai/
-\mm nai
+\mm nai::
 \ps n
 \gf soleil
 \gvf soleil
@@ -11710,7 +11710,7 @@
 
 \lx gau
 \ph /gau/
-\mm gau
+\mm gau::
 \ps v
 \gf enlever
 \gvf enlever
@@ -11726,7 +11726,7 @@
 
 \lx bei
 \ph /bei/
-\mm bei
+\mm bei::
 \ps v
 \gf avoir
 \gvf avoir
@@ -11742,7 +11742,7 @@
 
 \lx teu
 \ph /teu/
-\mm teu
+\mm teu::
 \ps n
 \gf tétanos
 \gvf tétanos
@@ -11757,7 +11757,7 @@
 
 \lx dɛi
 \ph /dɛi/
-\mm dɛi
+\mm dɛi::
 \ps v
 \gf suivre
 \gvf suivre
@@ -11772,7 +11772,7 @@
 
 \lx bɛu
 \ph /bɛu/
-\mm bɛu
+\mm bɛu::
 \ps v
 \gf acheter
 \gvf acheter
@@ -11788,7 +11788,7 @@
 
 \lx boi
 \ph /boi/
-\mm boi
+\mm boi::
 \ps n
 \gf nom
 \gvf nom
@@ -11804,7 +11804,7 @@
 
 \lx dou
 \ph /dou/
-\mm dou
+\mm dou::
 \ps v
 \gf commander
 \gvf commander
@@ -11819,7 +11819,7 @@
 
 \lx dɔi
 \ph /dɔi/
-\mm dɔi
+\mm dɔi::
 \ps n
 \gf semence
 \gvf semence
@@ -11835,7 +11835,7 @@
 
 \lx gɔu
 \ph /gɔu/
-\mm gɔu
+\mm gɔu::
 \ps n
 \gf virgule
 \gvf virgule
@@ -11850,7 +11850,7 @@
 
 \lx pui
 \ph /pui/
-\mm pui
+\mm pui::
 \ps n
 \gf serment
 \gvf serment
@@ -11880,7 +11880,7 @@
 
 \lx dimasu
 \ph /dimasu/
-\mm dimasu
+\mm dimasu::
 \ps n
 \gf mois
 \gvf mois
@@ -11896,7 +11896,7 @@
 
 \lx tibai
 \ph /tibai/
-\mm tibai
+\mm tibai::
 \ps n
 \gf lundi
 \gvf lundi
@@ -11911,7 +11911,7 @@
 
 \lx kɔŋɛrɛ
 \ph /kɔŋɛɾɛ/
-\mm kɔŋɛrɛ
+\mm kɔŋɛrɛ::
 \ps n
 \gf congrès
 \gvf congrès
@@ -11926,7 +11926,7 @@
 
 \lx kominube
 \ph /kominube/
-\mm kominube
+\mm kominube::
 \ps n
 \gf commune
 \gvf commune
@@ -11941,7 +11941,7 @@
 
 \lx sɛndika
 \ph /sɛndika/
-\mm sɛndika
+\mm sɛndika::
 \ps n
 \gf syndicat
 \gvf syndicat
@@ -11956,7 +11956,7 @@
 
 \lx pariti
 \ph /paɾiti/
-\mm pariti
+\mm pariti::
 \ps n
 \gf parti
 \gvf parti
@@ -11971,7 +11971,7 @@
 
 \lx kɔnse
 \ph /kɔnse/
-\mm kɔnse
+\mm kɔnse::
 \ps n
 \gf conseil
 \gvf conseil
@@ -11987,7 +11987,7 @@
 
 \lx komite
 \ph /komite/
-\mm komite
+\mm komite::
 \ps n
 \gf comité
 \gvf comité
@@ -12002,7 +12002,7 @@
 
 \lx sanselie
 \ph /sanselie/
-\mm sanselie
+\mm sanselie::
 \ps n
 \gf chancelier
 \gvf chancelier
@@ -12017,7 +12017,7 @@
 
 \lx daale
 \ph /daːle/
-\mm daale
+\mm daale::
 \ps n
 \gf chef
 \gvf chef
@@ -12033,7 +12033,7 @@
 
 \lx erezion
 \ph /eɾezion/
-\mm erezion
+\mm erezion::
 \ps n
 \gf région
 \gvf région
@@ -12048,7 +12048,7 @@
 
 \lx guwɛrɛnɛrɛ
 \ph /guwɛɾɛnɛɾɛ/
-\mm guwɛrɛnɛrɛ
+\mm guwɛrɛnɛrɛ::
 \ps n
 \gf gouverneur
 \gvf gouverneur
@@ -12063,7 +12063,7 @@
 
 \lx parulema
 \ph /paɾulema/
-\mm parulema
+\mm parulema::
 \ps n
 \gf parlement
 \gvf parlement
@@ -12078,7 +12078,7 @@
 
 \lx ɔkutɔburu
 \ph /ɔkutɔbuɾu/
-\mm ɔkutɔburu
+\mm ɔkutɔburu::
 \ps n
 \gf octobre
 \gvf octobre
@@ -12093,7 +12093,7 @@
 
 \lx awirilu
 \ph /awiɾilu/
-\mm awirilu
+\mm awirilu::
 \ps n
 \gf avril
 \gvf avril
@@ -12108,7 +12108,7 @@
 
 \lx ujurati
 \ph /udʒuɾati/
-\mm ujurati
+\mm ujurati::
 \ps v
 \gf questionné
 \gvf questionné
@@ -12123,7 +12123,7 @@
 
 \lx yamugu
 \ph /jamugu/
-\mm yamugu
+\mm yamugu::
 \ps v
 \gf annulé
 \gvf annulé
@@ -12138,7 +12138,7 @@
 
 \lx amunisiti
 \ph /amunisiti/
-\mm amunisiti
+\mm amunisiti::
 \ps n
 \gf amnistie
 \gvf amnistie
@@ -12153,7 +12153,7 @@
 
 \lx báwⁿà
 \ph /báwⁿà/
-\mm báwⁿà
+\mm báwⁿà::
 \ps n.prop
 \gf Bama
 \gvf Bama
@@ -12168,7 +12168,7 @@
 
 \lx àmàdù-bádù
 \ph /àmàdùbádù/
-\mm àmàdù-bádù
+\mm àmàdù-bádù::
 \ps n.prop
 \gf Amadou-Badou
 \gvf Amadou-Badou
@@ -12183,7 +12183,7 @@
 
 \lx àmà-mùrⁿù
 \ph /àmàmùɾⁿù/
-\mm àmà-mùrⁿù
+\mm àmà-mùrⁿù::
 \ps n.prop
 \gf Ama-Mournou
 \gvf Ama-Mournou
@@ -12198,7 +12198,7 @@
 
 \lx àná bɛ́rⁿɛ́
 \ph /àná bɛ́ɾⁿɛ́/
-\mm àná bɛ́rⁿɛ́
+\mm àná bɛ́rⁿɛ́::
 \ps n.prop
 \gf Ana-Berné
 \gvf Ana-Berné
@@ -12228,7 +12228,7 @@
 
 \lx ànà-mùlà
 \ph /ànàmùlà/
-\mm ànà-mùlà
+\mm ànà-mùlà::
 \ps n.prop
 \gf Ana-Moula
 \gvf Ana-Moula
@@ -12243,7 +12243,7 @@
 
 \lx ànà-ójù
 \ph /ànàódʒù/
-\mm ànà-ójù
+\mm ànà-ójù::
 \ps n.prop
 \gf Ana-Ojou
 \gvf Ana-Ojou
@@ -12318,7 +12318,7 @@
 
 \lx bàrkàlá
 \ph /bàɾkàlá/
-\mm bàrkàlá
+\mm bàrkàlá::
 \ps n.prop
 \gf Barkala
 \gvf Barkala
@@ -12333,7 +12333,7 @@
 
 \lx báwⁿà
 \ph /báwⁿà/
-\mm báwⁿà
+\mm báwⁿà::
 \ps n.prop
 \gf Bama
 \gvf Bama
@@ -12348,7 +12348,7 @@
 
 \lx bɛ̀jɛ̀rɛ̀
 \ph /bɛ̀dʒɛ̀ɾɛ̀/
-\mm bɛ̀jɛ̀rɛ̀
+\mm bɛ̀jɛ̀rɛ̀::
 \ps n.prop
 \gf Bejere
 \gvf Bejere
@@ -12363,7 +12363,7 @@
 
 \lx bɛ́ɲɛ̀
 \ph /bɛ́ɲɛ̀/
-\mm bɛ́ɲɛ̀
+\mm bɛ́ɲɛ̀::
 \ps n.prop
 \gf Beniouma
 \gvf Beniouma
@@ -12378,7 +12378,7 @@
 
 \lx bìrɛ́kàrⁿà
 \ph /bìɾɛ́kàɾⁿà/
-\mm bìrɛ́kàrⁿà
+\mm bìrɛ́kàrⁿà::
 \ps n.prop
 \gf Birekarna
 \gvf Birekarna
@@ -12393,7 +12393,7 @@
 
 \lx bìrgɛ́
 \ph /bìɾgɛ́/
-\mm bìrgɛ́
+\mm bìrgɛ́::
 \ps n.prop
 \gf Birga
 \gvf Birga
@@ -12408,7 +12408,7 @@
 
 \lx dàmísɛ̀ⁿ
 \ph /dàmísɛ̀ⁿ/
-\mm dàmísɛ̀ⁿ
+\mm dàmísɛ̀ⁿ::
 \ps n.prop
 \gf Damisen
 \gvf Damisen
@@ -12468,7 +12468,7 @@
 
 \lx géwrú
 \ph /géwɾú/
-\mm géwrú
+\mm géwrú::
 \ps n.prop
 \gf Guéourou
 \gvf Guéourou
@@ -12483,7 +12483,7 @@
 
 \lx gírè-gárà
 \ph /gíɾè-gáɾà/
-\mm gírè-gárà
+\mm gírè-gárà::
 \ps n.prop
 \gf Guire-Gara
 \gvf Guire-Gara
@@ -12498,7 +12498,7 @@
 
 \lx górò
 \ph /góɾò/
-\mm górò
+\mm górò::
 \ps n.prop
 \gf Goro
 \gvf Goro
@@ -12513,7 +12513,7 @@
 
 \lx gɔ̌m
 \ph /gɔ̌m/
-\mm gɔ̌m
+\mm gɔ̌m::
 \ps n.prop
 \gf Gomou
 \gvf Gomou
@@ -12588,7 +12588,7 @@
 
 \lx kòyⁿ-gìrⁿí
 \ph /kòjⁿ-gìɾⁿí/
-\mm kòyⁿ-gìrⁿí
+\mm kòyⁿ-gìrⁿí::
 \ps n.prop
 \gf Koporo-Kénié-Na
 \gvf Koporo-Kénié-Na
@@ -12603,7 +12603,7 @@
 
 \lx kɔ̀ⁿ-pɛ̌ⁿ
 \ph /kɔ̀ⁿ-pɛ̌ⁿ/
-\mm kɔ̀ⁿ-pɛ̌ⁿ
+\mm kɔ̀ⁿ-pɛ̌ⁿ::
 \ps n.prop
 \gf Koporo-Kénié-Pe
 \gvf Koporo-Kénié-Pe
@@ -12618,7 +12618,7 @@
 
 \lx kɔ̀rɔ̀lí
 \ph /kɔ̀ɾɔ̀lí/
-\mm kɔ̀rɔ̀lí
+\mm kɔ̀rɔ̀lí::
 \ps n.prop
 \gf Korolou
 \gvf Korolou
@@ -12633,7 +12633,7 @@
 
 \lx kùrù-kûⁿ
 \ph /kùɾù-kûⁿ/
-\mm kùrù-kûⁿ
+\mm kùrù-kûⁿ::
 \ps n.prop
 \gf Kourou-Koun
 \gvf Kourou-Koun
@@ -12648,7 +12648,7 @@
 
 \lx kùnúŋgóró
 \ph /kùnúŋgóɾó/
-\mm kùnúŋgóró
+\mm kùnúŋgóró::
 \ps n.prop
 \gf Kontogourou
 \gvf Kontogourou
@@ -12678,7 +12678,7 @@
 
 \lx órò
 \ph /óɾò/
-\mm órò
+\mm órò::
 \ps n.prop
 \gf Oro
 \gvf Oro
@@ -12693,7 +12693,7 @@
 
 \lx ɔ̀rɔ̀-gùrú
 \ph /ɔ̀ɾɔ̀-gùɾú/
-\mm ɔ̀rɔ̀-gùrú
+\mm ɔ̀rɔ̀-gùrú::
 \ps n.prop
 \gf Orogourou
 \gvf Orogourou
@@ -12723,7 +12723,7 @@
 
 \lx ɔ̀rɔ̀-ségú
 \ph /ɔ̀ɾɔ̀-ségú/
-\mm ɔ̀rɔ̀-ségú
+\mm ɔ̀rɔ̀-ségú::
 \ps n.prop
 \gf Oroségou
 \gvf Oroségou
@@ -12753,7 +12753,7 @@
 
 \lx pélé-dùrù
 \ph /pélé-dùɾù/
-\mm pélé-dùrù
+\mm pélé-dùrù::
 \ps n.prop
 \gf Pélédourou
 \gvf Pélédourou
@@ -12783,7 +12783,7 @@
 
 \lx pɔ̀m-dójù
 \ph /pɔ̀m-dódʒù/
-\mm pɔ̀m-dójù
+\mm pɔ̀m-dójù::
 \ps n.prop
 \gf Pomboro-Dodiou
 \gvf Pomboro-Dodiou
@@ -12798,7 +12798,7 @@
 
 \lx sàⁿ-sɔ́gú
 \ph /sàⁿ-sɔ́gú/
-\mm sàⁿ-sɔ́gú
+\mm sàⁿ-sɔ́gú::
 \ps n.prop
 \gf Sansogou
 \gvf Sansogou
@@ -12813,7 +12813,7 @@
 
 \lx ságúrú
 \ph /ságúɾú/
-\mm ságúrú
+\mm ságúrú::
 \ps n.prop
 \gf Saourou
 \gvf Saourou
@@ -12843,7 +12843,7 @@
 
 \lx sèmérè
 \ph /sèmɛ́ɾɛ̀/
-\mm sèmérè
+\mm sèmérè::
 \ps n.prop
 \gf Sembéré
 \gvf Sembéré
@@ -12873,7 +12873,7 @@
 
 \lx sóró-bárà
 \ph /sóɾó-báɾà/
-\mm sóró-bárà
+\mm sóró-bárà::
 \ps n.prop
 \gf Soro-Bara
 \gvf Soro-Bara
@@ -12903,7 +12903,7 @@
 
 \lx ténè
 \ph /ténè/
-\mm ténè
+\mm ténè::
 \ps n.prop
 \gf Tenndéli
 \gvf Tenndéli
@@ -12918,7 +12918,7 @@
 
 \lx tɛ́wⁿɛ̀
 \ph /tɛ́w̃ɛ̀/
-\mm tɛ́wⁿɛ̀
+\mm tɛ́wⁿɛ̀::
 \ps n.prop
 \gf Tiémama
 \gvf Tiémama
@@ -12933,7 +12933,7 @@
 
 \lx tíⁿ-sɔ̀gùrù
 \ph /tíⁿ-sɔ̀gùɾù/
-\mm tíⁿ-sɔ̀gùrù
+\mm tíⁿ-sɔ̀gùrù::
 \ps n.prop
 \gf Timessogou
 \gvf Timessogou
@@ -12978,7 +12978,7 @@
 
 \lx tònò-àná
 \ph /tònò-àná/
-\mm tònò-àná
+\mm tònò-àná::
 \ps n.prop
 \gf Tono-Ana
 \gvf Tono-Ana
@@ -13023,7 +13023,7 @@
 
 \lx tɔ́ŋɔ́rⁿɔ́-légù
 \ph /tɔ́ŋɔ́ɾ̃ɔ́-légù/
-\mm tɔ́ŋɔ́rⁿɔ́-légù
+\mm tɔ́ŋɔ́rⁿɔ́-légù::
 \ps n.prop
 \gf Tongorno-Legu
 \gvf Tongorno-Legu
@@ -13038,7 +13038,7 @@
 
 \lx wílwàl
 \ph /wílwàl/
-\mm wílwàl
+\mm wílwàl::
 \ps n.prop
 \gf Wilwal
 \gvf Wilwal
@@ -13053,7 +13053,7 @@
 
 \lx wìlwàl-mǎ
 \ph /wìlwàl-mǎ/
-\mm wìlwàl-mǎ
+\mm wìlwàl-mǎ::
 \ps n.prop
 \gf Wilwal-Ma
 \gvf Wilwal-Ma
@@ -13068,7 +13068,7 @@
 
 \lx yɔ̀wɔ̀-kórù
 \ph /jɔ̀wɔ̀-kóɾù/
-\mm yɔ̀wɔ̀-kórù
+\mm yɔ̀wɔ̀-kórù::
 \ps n.prop
 \gf Yow-Koru
 \gvf Yow-Koru
@@ -13083,7 +13083,7 @@
 
 \lx ànjàŋá
 \ph /àndʒàɲá/
-\mm ànjàŋá
+\mm ànjàŋá::
 \ps n.prop
 \gf Azanga
 \gvf Azanga
@@ -13098,7 +13098,7 @@
 
 \lx bàrà kàná
 \ph /bàɾà kàná/
-\mm bàrà kàná
+\mm bàrà kàná::
 \ps n.prop
 \gf Bara Kana
 \gvf Bara Kana
@@ -13158,7 +13158,7 @@
 
 \lx gùrùséndé
 \ph /gùɾùséndé/
-\mm gùrùséndé
+\mm gùrùséndé::
 \ps n.prop
 \gf Gouroussindé
 \gvf Gouroussindé
@@ -13173,7 +13173,7 @@
 
 \lx kánúwá
 \ph /kánúwá/
-\mm kánúwá
+\mm kánúwá::
 \ps n.prop
 \gf Kanama
 \gvf Kanama
@@ -13188,7 +13188,7 @@
 
 \lx kòròmà-tíⁿtíⁿ
 \ph /kòɾòmà-tíⁿtíⁿ/
-\mm kòròmà-tíⁿtíⁿ
+\mm kòròmà-tíⁿtíⁿ::
 \ps n.prop
 \gf Koroma-Tintin
 \gvf Koroma-Tintin
@@ -13218,7 +13218,7 @@
 
 \lx sòrò-gàrá
 \ph /sòɾògàɾá/
-\mm sòrò-gàrá
+\mm sòrò-gàrá::
 \ps n.prop
 \gf Sodougara
 \gvf Sodougara
@@ -13233,7 +13233,7 @@
 
 \lx tɛ̀ⁿ-sɔ̀gú
 \ph /tɛ̀ⁿsɔ̀gú/
-\mm tɛ̀ⁿ-sɔ̀gú
+\mm tɛ̀ⁿ-sɔ̀gú::
 \ps n.prop
 \gf Tansogou
 \gvf Tansogou
@@ -13263,7 +13263,7 @@
 
 \lx tóról
 \ph /tóɾól/
-\mm tóról
+\mm tóról::
 \ps n.prop
 \gf Toroli
 \gvf Toroli
@@ -13308,7 +13308,7 @@
 
 \lx pógó
 \ph /pógó/
-\mm pógó
+\mm pógó::
 \ps v
 \gf écarter
 \gvf écarter
@@ -13323,7 +13323,7 @@
 
 \lx úɲɔ́rⁿɔ́
 \ph /úɲɔ́ɾⁿɔ́/
-\mm úɲɔ́rⁿɔ́
+\mm úɲɔ́rⁿɔ́::
 \ps v
 \gf demander
 \gvf demander
@@ -13338,7 +13338,7 @@
 
 \lx jìwè
 \ph /dʒìwè/
-\mm jìwè
+\mm jìwè::
 \ps n
 \gf épine
 \gvf épine
@@ -13368,7 +13368,7 @@
 
 \lx gìwɛ̀
 \ph /gìwɛ̀/
-\mm gìwɛ̀
+\mm gìwɛ̀::
 \ps n
 \gf brousse
 \gvf brousse
@@ -13414,7 +13414,7 @@
 
 \lx tɛ́rɛ́
 \ph /tɛ́ɾɛ́/
-\mm tɛ́rɛ́
+\mm tɛ́rɛ́::
 \ps v
 \gf hacher
 \gvf hacher
@@ -13444,7 +13444,7 @@
 
 \lx sàjù
 \ph /sàdʒù/
-\mm sàjù
+\mm sàjù::
 \ps n
 \gf oiseau
 \gvf oiseau
@@ -13474,7 +13474,7 @@
 
 \lx kèrú
 \ph /kèɾú/
-\mm kèrú
+\mm kèrú::
 \ps n
 \gf tige
 \gvf tige
@@ -13489,7 +13489,7 @@
 
 \lx wàgà-tùmò
 \ph /wàgàtùmò/
-\mm wàgà-tùmò
+\mm wàgà-tùmò::
 \ps n
 \gf billon
 \gvf billon
@@ -13504,7 +13504,7 @@
 
 \lx nám-ɛ̀
 \ph /námɛ̀/
-\mm nám-ɛ̀
+\mm nám-ɛ̀::
 \ps v
 \gf piétiner
 \gvf piétiner
@@ -13534,7 +13534,7 @@
 
 \lx jɔ́ŋɔ́rⁿɔ́
 \ph /dʒɔ́ŋɔ́ɾⁿɔ́/
-\mm jɔ́ŋɔ́rⁿɔ́
+\mm jɔ́ŋɔ́rⁿɔ́::
 \ps n
 \gf re-semis
 \gvf re-semis
@@ -13549,7 +13549,7 @@
 
 \lx ɛ́n-ì-ì
 \ph /ɛ́nìì/
-\mm ɛ́n-ì-ì
+\mm ɛ́n-ì-ì::
 \ps v
 \gf tremper
 \gvf tremper
@@ -13564,7 +13564,7 @@
 
 \lx lɛ̀L-ùrⁿú
 \ph /lɛ̀lùɾⁿú/
-\mm lɛ̀-ùrⁿú
+\mm lɛ̀-ùrⁿú::
 \ps n
 \gf trou de semis
 \gvf trou de semis
@@ -13579,7 +13579,7 @@
 
 \lx lígé-m̀
 \ph /lígém/
-\mm lígé-m̀
+\mm lígé-m̀::
 \ps v
 \gf compléter
 \gvf compléter
@@ -13594,7 +13594,7 @@
 
 \lx bɔ̀gɔ́rɔ́
 \ph /bɔ̀gɔ́ɾɔ́/
-\mm bɔ̀gɔ́rɔ́
+\mm bɔ̀gɔ́rɔ́::
 \ps v
 \gf retourner la terre
 \gvf retourner la terre
@@ -13609,7 +13609,7 @@
 
 \lx bònó
 \ph /bònó/
-\mm bònó
+\mm bònó::
 \ps v
 \gf butter
 \gvf butter
@@ -13624,7 +13624,7 @@
 
 \lx pù-pùró
 \ph /pùpùɾó/
-\mm pù-pùró
+\mm pù-pùró::
 \ps n
 \gf jachère
 \gvf jachère
@@ -13639,7 +13639,7 @@
 
 \lx nɛ̀wⁿɛ́
 \ph /nɛ̀w̃ɛ́/
-\mm nɛ̀wⁿɛ́
+\mm nɛ̀wⁿɛ́::
 \ps n
 \gf valeur
 \gvf valeur
@@ -13654,7 +13654,7 @@
 
 \lx dàwùrù
 \ph /dàwùɾù/
-\mm dàwùrù
+\mm dàwùrù::
 \ps n
 \gf technique
 \gvf technique
@@ -13670,7 +13670,7 @@
 
 \lx baba
 \ph /baba/
-\mm baba
+\mm baba::
 \ps n
 \gf père
 \gvf père
@@ -13685,7 +13685,7 @@
 
 \lx bere
 \ph /beɾe/
-\mm bere
+\mm bere::
 \ps n
 \gf oncle maternel
 \gvf oncle maternel
@@ -13700,7 +13700,7 @@
 
 \lx bii
 \ph /biː/
-\mm bii
+\mm bii::
 \ps v
 \gf coucher
 \gvf coucher
@@ -13715,7 +13715,7 @@
 
 \lx daga
 \ph /daga/
-\mm daga
+\mm daga::
 \ps v
 \gf laisser
 \gvf laisser
@@ -13730,7 +13730,7 @@
 
 \lx dere
 \ph /deɾe/
-\mm dere
+\mm dere::
 \ps n
 \gf frère aîné
 \gvf frère aîné
@@ -13745,7 +13745,7 @@
 
 \lx dindin
 \ph /dindin/
-\mm dindin
+\mm dindin::
 \ps n
 \gf toilettes
 \gvf toilettes
@@ -13760,7 +13760,7 @@
 
 \lx dugo
 \ph /dugo/
-\mm dugo
+\mm dugo::
 \ps adv
 \gf derrière
 \gvf derrière
@@ -13775,7 +13775,7 @@
 
 \lx dɛbɛ
 \ph /dɛbɛ/
-\mm dɛbɛ
+\mm dɛbɛ::
 \ps n
 \gf natte
 \gvf natte
@@ -13790,7 +13790,7 @@
 
 \lx funamu
 \ph /funamu/
-\mm funamu
+\mm funamu::
 \ps v
 \gf souffler
 \gvf souffler
@@ -13805,7 +13805,7 @@
 
 \lx gɔbɔ
 \ph /gɔbɔ/
-\mm gɔbɔ
+\mm gɔbɔ::
 \ps v
 \gf sortir
 \gvf sortir
@@ -13820,7 +13820,7 @@
 
 \lx gaana
 \ph /gaːna/
-\mm gaana
+\mm gaana::
 \ps n
 \gf pays
 \gvf pays
@@ -13835,7 +13835,7 @@
 
 \lx gabu
 \ph /gabu/
-\mm gabu
+\mm gabu::
 \ps adj
 \gf grand
 \gvf grand
@@ -13850,7 +13850,7 @@
 
 \lx gojo
 \ph /godʒo/
-\mm gojo
+\mm gojo::
 \ps n
 \gf corps
 \gvf corps
@@ -13865,7 +13865,7 @@
 
 \lx giriyi
 \ph /giɾiji/
-\mm giriyi
+\mm giriyi::
 \ps v
 \gf entendre
 \gvf entendre
@@ -13880,7 +13880,7 @@
 
 \lx hakɛ
 \ph /hakɛ/
-\mm hakɛ
+\mm hakɛ::
 \ps n
 \gf péché
 \gvf péché
@@ -13895,7 +13895,7 @@
 
 \lx jiji
 \ph /dʒidʒi/
-\mm jiji
+\mm jiji::
 \ps v
 \gf trembler
 \gvf trembler
@@ -13910,7 +13910,7 @@
 
 \lx jebu
 \ph /dʒebu/
-\mm jebu
+\mm jebu::
 \ps v
 \gf répondre
 \gvf répondre
@@ -13925,7 +13925,7 @@
 
 \lx jeɲe
 \ph /dʒeɲe/
-\mm jeɲe
+\mm jeɲe::
 \ps v
 \gf dire
 \gvf dire
@@ -13940,7 +13940,7 @@
 
 \lx kaŋe
 \ph /kaɲe/
-\mm kaŋe
+\mm kaŋe::
 \ps n
 \gf or
 \gvf or
@@ -13955,7 +13955,7 @@
 
 \lx kabu
 \ph /kabu/
-\mm kabu
+\mm kabu::
 \ps v
 \gf partager
 \gvf partager
@@ -13970,7 +13970,7 @@
 
 \lx kɔrɔ
 \ph /kɔɾɔ/
-\mm kɔrɔ
+\mm kɔrɔ::
 \ps adv
 \gf dedans
 \gvf dedans
@@ -13985,7 +13985,7 @@
 
 \lx kaari
 \ph /kaːɾi/
-\mm kaari
+\mm kaari::
 \ps n
 \gf froid
 \gvf froid
@@ -14000,7 +14000,7 @@
 
 \lx logoro
 \ph /logoɾo/
-\mm logoro
+\mm logoro::
 \ps n
 \gf milieu
 \gvf milieu
@@ -14015,7 +14015,7 @@
 
 \lx lege
 \ph /lege/
-\mm lege
+\mm lege::
 \ps v
 \gf descendre
 \gvf descendre
@@ -14030,7 +14030,7 @@
 
 \lx lɔgɔ
 \ph /lɔgɔ/
-\mm lɔgɔ
+\mm lɔgɔ::
 \ps n
 \gf ordure
 \gvf ordure
@@ -14045,7 +14045,7 @@
 
 \lx liliyɛ
 \ph /lilijɛ/
-\mm liliyɛ
+\mm liliyɛ::
 \ps v
 \gf craindre
 \gvf craindre
@@ -14060,7 +14060,7 @@
 
 \lx laa
 \ph /laː/
-\mm laa
+\mm laa::
 \ps adv
 \gf depuis longtemps
 \gvf depuis longtemps
@@ -14075,7 +14075,7 @@
 
 \lx lugo
 \ph /lugo/
-\mm lugo
+\mm lugo::
 \ps v
 \gf compter
 \gvf compter
@@ -14090,7 +14090,7 @@
 
 \lx mana
 \ph /mana/
-\mm mana
+\mm mana::
 \ps v
 \gf modeler
 \gvf modeler
@@ -14105,7 +14105,7 @@
 
 \lx munɔn
 \ph /munɔn/
-\mm munɔn
+\mm munɔn::
 \ps v
 \gf sembler
 \gvf sembler
@@ -14120,7 +14120,7 @@
 
 \lx mɛnɛi
 \ph /mɛnɛi/
-\mm mɛnɛi
+\mm mɛnɛi::
 \ps v
 \gf avaler
 \gvf avaler
@@ -14136,7 +14136,7 @@
 
 \lx mobili
 \ph /mobili/
-\mm mobili
+\mm mobili::
 \ps n
 \gf véhicule
 \gvf véhicule
@@ -14151,7 +14151,7 @@
 
 \lx numɔ
 \ph /numɔ/
-\mm numɔ
+\mm numɔ::
 \ps n
 \gf main
 \gvf main
@@ -14166,7 +14166,7 @@
 
 \lx ninɛ
 \ph /ninɛ/
-\mm ninɛ
+\mm ninɛ::
 \ps n
 \gf nez
 \gvf nez
@@ -14182,7 +14182,7 @@
 
 \lx numɔrɔn
 \ph /numɔɾɔn/
-\mm numɔrɔn
+\mm numɔrɔn::
 \ps n
 \gf doigt
 \gvf doigt
@@ -14197,7 +14197,7 @@
 
 \lx niɲu
 \ph /niɲu/
-\mm niɲu
+\mm niɲu::
 \ps n
 \gf dent
 \gvf dent
@@ -14212,7 +14212,7 @@
 
 \lx ɲɔgɔnrɔn
 \ph /ɲɔgɔnɾɔn/
-\mm ɲɔgɔnrɔn
+\mm ɲɔgɔnrɔn::
 \ps n
 \gf chameau
 \gvf chameau
@@ -14227,7 +14227,7 @@
 
 \lx ɲurɔn
 \ph /ɲuɾɔn/
-\mm ɲurɔn
+\mm ɲurɔn::
 \ps n
 \gf maladie
 \gvf maladie
@@ -14243,7 +14243,7 @@
 
 \lx muɲɔn
 \ph /muɲɔn/
-\mm muɲɔn
+\mm muɲɔn::
 \ps n
 \gf patience
 \gvf patience
@@ -14259,7 +14259,7 @@
 
 \lx baɲa
 \ph /baɲa/
-\mm baɲa
+\mm baɲa::
 \ps n
 \gf calebasse
 \gvf calebasse
@@ -14275,7 +14275,7 @@
 
 \lx ŋaŋa
 \ph /ŋaŋa/
-\mm ŋaŋa
+\mm ŋaŋa::
 \ps n
 \gf divers
 \gvf divers
@@ -14290,7 +14290,7 @@
 
 \lx jaŋu
 \ph /dʒaŋu/
-\mm jaŋu
+\mm jaŋu::
 \ps n
 \gf école
 \gvf école
@@ -14306,7 +14306,7 @@
 
 \lx baŋa
 \ph /baɲa/
-\mm baŋa
+\mm baŋa::
 \ps n
 \gf propriétaire
 \gvf propriétaire
@@ -14322,7 +14322,7 @@
 
 \lx yaŋan
 \ph /jaɲan/
-\mm yaŋan
+\mm yaŋan::
 \ps n
 \gf divers
 \gvf divers
@@ -14337,7 +14337,7 @@
 
 \lx poo
 \ph /poː/
-\mm poo
+\mm poo::
 \ps n
 \gf salutation
 \gvf salutation
@@ -14352,7 +14352,7 @@
 
 \lx puyo
 \ph /pujo/
-\mm puyo
+\mm puyo::
 \ps n
 \gf divers
 \gvf divers
@@ -14367,7 +14367,7 @@
 
 \lx papara
 \ph /papaɾa/
-\mm papara
+\mm papara::
 \ps n
 \gf divers
 \gvf divers
@@ -14382,7 +14382,7 @@
 
 \lx pulɔnɛ
 \ph /pulɔnɛ/
-\mm pulɔnɛ
+\mm pulɔnɛ::
 \ps n
 \gf divers
 \gvf divers
@@ -14397,7 +14397,7 @@
 
 \lx arajo
 \ph /aɾadʒo/
-\mm arajo
+\mm arajo::
 \ps n
 \gf radio
 \gvf radio
@@ -14412,7 +14412,7 @@
 
 \lx ara
 \ph /aɾa/
-\mm ara
+\mm ara::
 \ps n
 \gf divers
 \gvf divers
@@ -14427,7 +14427,7 @@
 
 \lx anran
 \ph /anɾan/
-\mm anran
+\mm anran::
 \ps n
 \gf pluie
 \gvf pluie
@@ -14443,7 +14443,7 @@
 
 \lx ɛru
 \ph /ɛɾu/
-\mm ɛru
+\mm ɛru::
 \ps n
 \gf divers
 \gvf divers
@@ -14458,7 +14458,7 @@
 
 \lx sagatara
 \ph /sagataɾa/
-\mm sagatara
+\mm sagatara::
 \ps n
 \gf jeune homme
 \gvf jeune homme
@@ -14473,7 +14473,7 @@
 
 \lx seisei
 \ph /seisei/
-\mm seisei
+\mm seisei::
 \ps n
 \gf divers
 \gvf divers
@@ -14488,7 +14488,7 @@
 
 \lx sasa
 \ph /sasa/
-\mm sasa
+\mm sasa::
 \ps n
 \gf divers
 \gvf divers
@@ -14503,7 +14503,7 @@
 
 \lx sɛsɛgɛrɛ
 \ph /sɛsɛgɛɾɛ/
-\mm sɛsɛgɛrɛ
+\mm sɛsɛgɛrɛ::
 \ps n
 \gf divers
 \gvf divers
@@ -14518,7 +14518,7 @@
 
 \lx toto
 \ph /toto/
-\mm toto
+\mm toto::
 \ps n
 \gf divers
 \gvf divers
@@ -14533,7 +14533,7 @@
 
 \lx tata
 \ph /tata/
-\mm tata
+\mm tata::
 \ps n
 \gf hyène
 \gvf hyène
@@ -14548,7 +14548,7 @@
 
 \lx teteu
 \ph /teteu/
-\mm teteu
+\mm teteu::
 \ps n
 \gf divers
 \gvf divers
@@ -14563,7 +14563,7 @@
 
 \lx taga
 \ph /taga/
-\mm taga
+\mm taga::
 \ps n
 \gf chaussure
 \gvf chaussure
@@ -14578,7 +14578,7 @@
 
 \lx Ɔgɔmɔnɔ
 \ph /ɔgɔmɔnɔ/
-\mm Ɔgɔmɔnɔ
+\mm Ɔgɔmɔnɔ::
 \ps n.prop
 \gf Ogomono
 \gvf Ogomono
@@ -14593,7 +14593,7 @@
 
 \lx Amadɔmɔ
 \ph /amadɔmɔ/
-\mm Amadɔmɔ
+\mm Amadɔmɔ::
 \ps n.prop
 \gf Amadomo
 \gvf Amadomo
@@ -14608,7 +14608,7 @@
 
 \lx Baisɛmɛ
 \ph /baisɛmɛ/
-\mm Baisɛmɛ
+\mm Baisɛmɛ::
 \ps n.prop
 \gf Baiseme
 \gvf Baiseme
@@ -14623,7 +14623,7 @@
 
 \lx Yasɛgɛ
 \ph /jasɛgɛ/
-\mm Yasɛgɛ
+\mm Yasɛgɛ::
 \ps n.prop
 \gf Yaségé
 \gvf Yaségé
@@ -14638,7 +14638,7 @@
 
 \lx tabalu
 \ph /tabalu/
-\mm tabalu
+\mm tabalu::
 \ps n
 \gf table
 \gvf table
@@ -14653,7 +14653,7 @@
 
 \lx jandulu
 \ph /dʒandulu/
-\mm jandulu
+\mm jandulu::
 \ps n
 \gf âne
 \gvf âne
@@ -14668,7 +14668,7 @@
 
 \lx Ooɲo
 \ph /oːɲo/
-\mm Ooɲo
+\mm Ooɲo::
 \ps n
 \gf vent
 \gvf vent
@@ -14683,7 +14683,7 @@
 
 \lx yiru
 \ph /jiɾu/
-\mm yiru
+\mm yiru::
 \ps n
 \gf ombre
 \gvf ombre
@@ -14699,7 +14699,7 @@
 
 \lx jugɔ
 \ph /dʒugɔ/
-\mm jugɔ
+\mm jugɔ::
 \ps n
 \gf connaissance
 \gvf connaissance
@@ -14714,7 +14714,7 @@
 
 \lx sɔnsɔnhu
 \ph /sɔnsɔnhu/
-\mm sɔnsɔnhu
+\mm sɔnsɔnhu::
 \ps n
 \gf sable
 \gvf sable
@@ -14729,7 +14729,7 @@
 
 \lx Amadu
 \ph /amadu/
-\mm Amadu
+\mm Amadu::
 \ps n.prop
 \gf Amadou
 \gvf Amadou
@@ -14744,7 +14744,7 @@
 
 \lx Yasigɛ
 \ph /jasigɛ/
-\mm Yasigɛ
+\mm Yasigɛ::
 \ps n.prop
 \gf Yasigué
 \gvf Yasigué
@@ -14759,7 +14759,7 @@
 
 \lx Baɲagara
 \ph /baɲagaɾa/
-\mm Baɲagara
+\mm Baɲagara::
 \ps n.prop
 \gf Bandiagara
 \gvf Bandiagara
@@ -14774,7 +14774,7 @@
 
 \lx Motu
 \ph /motu/
-\mm Motu
+\mm Motu::
 \ps n.prop
 \gf Mopti
 \gvf Mopti
@@ -14789,7 +14789,7 @@
 
 \lx Mali
 \ph /mali/
-\mm Mali
+\mm Mali::
 \ps n.prop
 \gf Mali
 \gvf Mali
@@ -14804,7 +14804,7 @@
 
 \lx Nijɛru
 \ph /nidʒɛɾu/
-\mm Nijɛru
+\mm Nijɛru::
 \ps n.prop
 \gf Niger
 \gvf Niger
@@ -14819,7 +14819,7 @@
 
 \lx Gona
 \ph /gona/
-\mm Gona
+\mm Gona::
 \ps n.prop
 \gf Gona
 \gvf Gona
@@ -14834,7 +14834,7 @@
 
 \lx Yamɛ
 \ph /jamɛ/
-\mm Yamɛ
+\mm Yamɛ::
 \ps n.prop
 \gf Yamé
 \gvf Yamé
@@ -14849,7 +14849,7 @@
 
 \lx Ibɛ
 \ph /ibɛ/
-\mm Ibɛ
+\mm Ibɛ::
 \ps n
 \gf marché
 \gvf marché
@@ -14865,7 +14865,7 @@
 
 \lx yulɔ
 \ph /julɔ/
-\mm yulɔ
+\mm yulɔ::
 \ps n
 \gf vêtement
 \gvf vêtement
@@ -14881,7 +14881,7 @@
 
 \lx ɛɲɛ
 \ph /ɛɲɛ/
-\mm ɛɲɛ
+\mm ɛɲɛ::
 \ps n
 \gf chèvre
 \gvf chèvre
@@ -14896,7 +14896,7 @@
 
 \lx tagaɛrɛ
 \ph /tagaɛɾɛ/
-\mm tagaɛrɛ
+\mm tagaɛrɛ::
 \ps n
 \gf divers
 \gvf divers
@@ -14911,7 +14911,7 @@
 
 \lx kii
 \ph /kiː/
-\mm kii
+\mm kii::
 \ps n
 \gf os
 \gvf os
@@ -14921,7 +14921,7 @@
 
 \lx gɛ́mu
 \ph /gɛ́mu/
-\mm gɛ́mu
+\mm gɛ́mu::
 \ps n
 \gf margouillat
 \gvf margouillat
@@ -14936,7 +14936,7 @@
 
 \lx para
 \ph /paɾa/
-\mm para
+\mm para::
 \ps v
 \gf induire
 \gvf induire
@@ -14951,7 +14951,7 @@
 
 \lx wolu
 \ph /wolu/
-\mm wolu
+\mm wolu::
 \ps n
 \gf culture
 \gvf culture
@@ -14966,7 +14966,7 @@
 
 \lx donu
 \ph /donu/
-\mm donu
+\mm donu::
 \ps n
 \gf vente
 \gvf vente
@@ -14981,7 +14981,7 @@
 
 \lx nɔy
 \ph /nɔj/
-\mm nɔy
+\mm nɔy::
 \ps n
 \gf action de boire
 \gvf action de boire
@@ -14996,7 +14996,7 @@
 
 \lx kalkalu-ginɛ
 \ph /kalkaluginɛ/
-\mm kalkalu-ginɛ
+\mm kalkalu-ginɛ::
 \ps n
 \gf menteur
 \gvf menteur
@@ -15011,7 +15011,7 @@
 
 \lx jimu-ginɛ
 \ph /dʒimuginɛ/
-\mm jimu-ginɛ
+\mm jimu-ginɛ::
 \ps n
 \gf malade
 \gvf malade
@@ -15026,7 +15026,7 @@
 
 \lx sɛmbɛ-ginɛ
 \ph /sɛmbɛginɛ/
-\mm sɛmbɛ-ginɛ
+\mm sɛmbɛ-ginɛ::
 \ps n
 \gf homme fort
 \gvf homme fort
@@ -15041,7 +15041,7 @@
 
 \lx kulo-gu
 \ph /kulogu/
-\mm kulo-gu
+\mm kulo-gu::
 \ps adj
 \gf poilu
 \gvf poilu
@@ -15056,7 +15056,7 @@
 
 \lx kinu-gu
 \ph /kinugu/
-\mm kinu-gu
+\mm kinu-gu::
 \ps adj
 \gf vivant
 \gvf vivant
@@ -15071,7 +15071,7 @@
 
 \lx bɛrɛ-gu
 \ph /bɛɾɛgu/
-\mm bɛrɛ-gu
+\mm bɛrɛ-gu::
 \ps adj
 \gf enceinte
 \gvf enceinte
@@ -15086,7 +15086,7 @@
 
 \lx kidɛ
 \ph /kidɛ/
-\mm kidɛ
+\mm kidɛ::
 \ps pron
 \gf quoi
 \gvf quoi
@@ -15102,7 +15102,7 @@
 
 \lx nnjɛ
 \ph /nndʒɛ/
-\mm nnjɛ
+\mm nnjɛ::
 \ps pron
 \gf quoi
 \gvf quoi
@@ -15118,7 +15118,7 @@
 
 \lx yaba
 \ph /jaba/
-\mm yaba
+\mm yaba::
 \ps pron
 \gf où
 \gvf où
@@ -15134,7 +15134,7 @@
 
 \lx yagu nɛ
 \ph /jagu nɛ/
-\mm yagu-nɛ
+\mm yagu-nɛ::
 \ps pron
 \gf où
 \gvf où
@@ -15150,7 +15150,7 @@
 
 \lx yana
 \ph /jana/
-\mm yana
+\mm yana::
 \ps pron
 \gf quand
 \gvf quand
@@ -15166,7 +15166,7 @@
 
 \lx yaŋgɛnu
 \ph /jaɲgɛnu/
-\mm yaŋgɛnu
+\mm yaŋgɛnu::
 \ps adv
 \gf comment
 \gvf comment
@@ -15182,7 +15182,7 @@
 
 \lx aŋgɛ
 \ph /aɲgɛ/
-\mm aŋgɛ
+\mm aŋgɛ::
 \ps pron
 \gf combien
 \gvf combien
@@ -15198,7 +15198,7 @@
 
 \lx neyyɛ
 \ph /nejjɛ/
-\mm ney-yɛ
+\mm ney-yɛ::
 \ps adj
 \gf deuxième
 \gvf deuxième
@@ -15213,7 +15213,7 @@
 
 \lx taandiɛ
 \ph /taːndjɛ/
-\mm taandu-yɛ
+\mm taandu-yɛ::
 \ps adj
 \gf troisième
 \gvf troisième
@@ -15228,7 +15228,7 @@
 
 \lx nayyɛ
 \ph /najjɛ/
-\mm nay-yɛ
+\mm nay-yɛ::
 \ps adj
 \gf quatrième
 \gvf quatrième
@@ -15243,7 +15243,7 @@
 
 \lx nnɔɛ
 \ph /nnɔɛ/
-\mm nnɔ-ɛ
+\mm nnɔ-ɛ::
 \ps adj
 \gf cinquième
 \gvf cinquième
@@ -15258,12 +15258,12 @@
 
 \lx kuloyyɛ
 \ph /kulojjɛ/
-\mm kuloy-yɛ
+\mm kuloy-yɛ::
 \ps adj
 
 \lx soyyɛ
 \ph /sojjɛ/
-\mm soy-yɛ
+\mm soy-yɛ::
 \ps adj
 \gf septième
 \gvf septième
@@ -15278,7 +15278,7 @@
 
 \lx gagriɛ
 \ph /gagɾiɛ/
-\mm gagrɛ-yɛ
+\mm gagrɛ-yɛ::
 \ps adj
 \gf huitième
 \gvf huitième
@@ -15293,7 +15293,7 @@
 
 \lx tuwɛ
 \ph /tuwɛ/
-\mm tuwɔ-yɛ
+\mm tuwɔ-yɛ::
 \ps adj
 \gf neuvième
 \gvf neuvième
@@ -15308,7 +15308,7 @@
 
 \lx pɛliɛ
 \ph /pɛljɛ/
-\mm pɛlu-yɛ
+\mm pɛlu-yɛ::
 \ps adj
 \gf dixième
 \gvf dixième
@@ -15323,7 +15323,7 @@
 
 \lx pɛney
 \ph /pɛnej/
-\mm pɛ-ney
+\mm pɛ-ney::
 \ps num
 \gf vingt
 \gvf vingt
@@ -15338,7 +15338,7 @@
 
 \lx pɛraandu
 \ph /pɛɾaːndu/
-\mm pɛ-taandu
+\mm pɛ-taandu::
 \ps num
 \gf trente
 \gvf trente
@@ -15353,7 +15353,7 @@
 
 \lx pɛnay
 \ph /pɛnaj/
-\mm pɛ-nay
+\mm pɛ-nay::
 \ps num
 \gf quarante
 \gvf quarante
@@ -15368,7 +15368,7 @@
 
 \lx pɛnnɔ
 \ph /pɛnnɔ/
-\mm pɛ-nnɔ
+\mm pɛ-nnɔ::
 \ps num
 \gf cinquante
 \gvf cinquante
@@ -15383,7 +15383,7 @@
 
 \lx pɛlukuloy
 \ph /pɛlukuloj/
-\mm pɛlu-kuloy
+\mm pɛlu-kuloy::
 \ps num
 \gf soixante
 \gvf soixante
@@ -15398,7 +15398,7 @@
 
 \lx pɛsoy
 \ph /pɛsoj/
-\mm pɛlu-soy
+\mm pɛlu-soy::
 \ps num
 \gf soixante-dix
 \gvf soixante-dix
@@ -15413,7 +15413,7 @@
 
 \lx kɛsumu
 \ph /kɛsumu/
-\mm kɛ-sumu
+\mm kɛ-sumu::
 \ps num
 \gf quatre-vingts
 \gvf quatre-vingts
@@ -15428,7 +15428,7 @@
 
 \lx munjo
 \ph /mundʒo/
-\mm munjo
+\mm munjo::
 \ps num
 \gf mille
 \gvf mille
@@ -15443,7 +15443,7 @@
 
 \lx kɛɛrɛ
 \ph /kɛːɾɛ/
-\mm kɛɛrɛ
+\mm kɛɛrɛ::
 \ps n
 \gf cauris
 \gvf cauris
@@ -15458,7 +15458,7 @@
 
 \lx sige
 \ph /sige/
-\mm sige
+\mm sige::
 \ps adv
 \gf plus
 \gvf plus
@@ -15473,7 +15473,7 @@
 
 \lx yo
 \ph /jo/
-\mm yo
+\mm yo::
 \ps conj
 \gf si
 \gvf si
@@ -15488,7 +15488,7 @@
 
 \lx wa
 \ph /wa/
-\mm wa
+\mm wa::
 \ps part
 \gf dit
 \gvf dit
@@ -15503,7 +15503,7 @@
 
 \lx le
 \ph /le/
-\mm le
+\mm le::
 \ps part
 \gf aussi
 \gvf aussi
@@ -15518,7 +15518,7 @@
 
 \lx gay
 \ph /gaj/
-\mm gay
+\mm gay::
 \ps part
 \gf quant à
 \gvf quant à
@@ -15533,7 +15533,7 @@
 
 \lx wɛɛlɛ
 \ph /wɛːlɛ/
-\mm wɛɛlɛ
+\mm wɛɛlɛ::
 \ps v
 \gf frire
 \gvf frire
@@ -15548,7 +15548,7 @@
 
 \lx wɛɛl-u
 \ph /wɛːlu/
-\mm wɛɛl-u
+\mm wɛɛl-u::
 \ps n
 \gf frit
 \gvf frit
@@ -15563,7 +15563,7 @@
 
 \lx islɛ
 \ph /islɛ/
-\mm islɛ
+\mm islɛ::
 \ps adv
 \gf de nouveau
 \gvf de nouveau
@@ -15578,7 +15578,7 @@
 
 \lx kay
 \ph /kaj/
-\mm kay
+\mm kay::
 \ps adv
 \gf mieux
 \gvf mieux
@@ -15593,7 +15593,7 @@
 
 \lx saynu
 \ph /sajnu/
-\mm saynu
+\mm saynu::
 \ps adv
 \gf très
 \gvf très
@@ -15608,7 +15608,7 @@
 
 \lx mɛɛnu
 \ph /mɛːnu/
-\mm mɛɛnu
+\mm mɛɛnu::
 \ps adv
 \gf un peu
 \gvf un peu
@@ -15623,7 +15623,7 @@
 
 \lx wuunu
 \ph /wuːnu/
-\mm wuunu
+\mm wuunu::
 \ps v
 \gf se lever brusquement
 \gvf se lever brusquement
@@ -15638,7 +15638,7 @@
 
 \lx dege-degenu
 \ph /degedegenu/
-\mm dege-degenu
+\mm dege-degenu::
 \ps adv
 \gf doucement
 \gvf doucement
@@ -15653,7 +15653,7 @@
 
 \lx juu-jaa-juunu
 \ph /dʒuːdʒaːdʒuːnu/
-\mm juu-jaa-juunu
+\mm juu-jaa-juunu::
 \ps adv
 \gf penchant en bas
 \gvf penchant en bas
@@ -15668,7 +15668,7 @@
 
 \lx ama
 \ph /ama/
-\mm ama
+\mm ama::
 \ps n
 \gf beau-parent
 \gvf beau-parent
@@ -15683,7 +15683,7 @@
 
 \lx yimu
 \ph /jimu/
-\mm yimu
+\mm yimu::
 \ps v
 \gf mourir
 \gvf mourir
@@ -15698,7 +15698,7 @@
 
 \lx ma
 \ph /ma/
-\mm ma
+\mm ma::
 \ps part
 \gf est-ce que
 \gvf est-ce que
@@ -15713,7 +15713,7 @@
 
 \lx kɔrɔ
 \ph /kɔɾɔ/
-\mm kɔrɔ
+\mm kɔrɔ::
 \ps n
 \gf calebasse
 \gvf calebasse
@@ -15729,7 +15729,7 @@
 
 \lx mɔgɔ-gu
 \ph /mɔgɔgu/
-\mm mɔgɔ-gu
+\mm mɔgɔ-gu::
 \ps n
 \gf bruit
 \gvf bruit
@@ -15744,7 +15744,7 @@
 
 \lx sɔgri-i
 \ph /sɔgɾii/
-\mm sɔgri-i
+\mm sɔgri-i::
 \ps v
 \gf faire du bruit
 \gvf faire du bruit
@@ -15759,7 +15759,7 @@
 
 \lx da-gu
 \ph /dagu/
-\mm da-gu
+\mm da-gu::
 \ps v
 \gf être assis
 \gvf être assis
@@ -15774,7 +15774,7 @@
 
 \lx go-a
 \ph /goa/
-\mm go-a
+\mm go-a::
 \ps v
 \gf sortir
 \gvf sortir
@@ -15791,7 +15791,7 @@
 
 \lx tumo-tumo
 \ph /tumotumo/
-\mm tumo-tumo
+\mm tumo-tumo::
 \ps adv
 \gf un par un
 \gvf un par un
@@ -15806,7 +15806,7 @@
 
 \lx yoo-gu
 \ph /joːgu/
-\mm yoo-gu
+\mm yoo-gu::
 \ps v
 \gf entrer
 \gvf entrer
@@ -15823,7 +15823,7 @@
 
 \lx kɛdɛ-nu
 \ph /kɛdɛnu/
-\mm kɛdɛ-nu
+\mm kɛdɛ-nu::
 \ps v
 \gf couper
 \gvf couper
@@ -15838,7 +15838,7 @@
 
 \lx tɔl-iɛŋ
 \ph /tɔljɛŋ/
-\mm tɔl-iɛŋ
+\mm tɔl-iɛŋ::
 \ps v
 \gf commencer
 \gvf commencer
@@ -15855,7 +15855,7 @@
 
 \lx bɛɛ-dɛ
 \ph /bɛːdɛ/
-\mm bɛɛ-dɛ
+\mm bɛɛ-dɛ::
 \ps v
 \gf pouvoir
 \gvf pouvoir
@@ -15870,7 +15870,7 @@
 
 \lx jug-ɛ
 \ph /dʒugɛ/
-\mm jug-ɛ
+\mm jug-ɛ::
 \ps v
 \gf comprendre
 \gvf comprendre
@@ -15886,7 +15886,7 @@
 
 \lx tara
 \ph /taɾa/
-\mm tara
+\mm tara::
 \ps n
 \gf hyène
 \gvf hyène
@@ -15902,7 +15902,7 @@
 
 \lx wagndi-i
 \ph /wagndii/
-\mm wagndi-i
+\mm wagndi-i::
 \ps v
 \gf s'éloigner
 \gvf s'éloigner
@@ -15919,7 +15919,7 @@
 
 \lx wɔlɔ
 \ph /wɔlɔ/
-\mm wɔlɔ
+\mm wɔlɔ::
 \ps n
 \gf acacia
 \gvf acacia
@@ -15934,7 +15934,7 @@
 
 \lx bɔnnɔ
 \ph /bɔnnɔ/
-\mm bɔnnɔ
+\mm bɔnnɔ::
 \ps n
 \gf épine
 \gvf épine
@@ -15950,7 +15950,7 @@
 
 \lx bɛnd-a
 \ph /bɛnda/
-\mm bɛnd-a
+\mm bɛnd-a::
 \ps v
 \gf frapper
 \gvf frapper
@@ -15966,7 +15966,7 @@
 
 \lx haa
 \ph /haː/
-\mm haa
+\mm haa::
 \ps prep
 \gf jusque
 \gvf jusque
@@ -15982,7 +15982,7 @@
 
 \lx ilie
 \ph /ilje/
-\mm ilie
+\mm ilie::
 \ps n
 \gf sang
 \gvf sang
@@ -15998,7 +15998,7 @@
 
 \lx go-nd-a
 \ph /gonda/
-\mm go-nd-a
+\mm go-nd-a::
 \ps v
 \gf faire sortir
 \gvf faire sortir
@@ -16013,7 +16013,7 @@
 
 \lx dennɛ-nu
 \ph /dennɛnu/
-\mm dennɛ-nu
+\mm dennɛ-nu::
 \ps v
 \gf chercher
 \gvf chercher
@@ -16028,7 +16028,7 @@
 
 \lx job-a
 \ph /dʒoba/
-\mm job-a
+\mm job-a::
 \ps v
 \gf courir
 \gvf courir
@@ -16043,7 +16043,7 @@
 
 \lx bìrɛ-d-iŋ
 \ph /biɾɛdiŋ/
-\mm bìrɛ-d-iŋ
+\mm bìrɛ-d-iŋ::
 \ps v
 \gf fabriquer
 \gvf fabriquer
@@ -16058,7 +16058,7 @@
 
 \lx sb-ɛ
 \ph /sbɛ/
-\mm sb-ɛ
+\mm sb-ɛ::
 \ps v
 \gf acheter
 \gvf acheter
@@ -16075,7 +16075,7 @@
 
 \lx dund-i
 \ph /dundii/
-\mm dund-i
+\mm dund-i::
 \ps v
 \gf déposer
 \gvf déposer
@@ -16091,7 +16091,7 @@
 
 \lx sbɛ-sbɛ
 \ph /sbɛsbɛ/
-\mm sbɛ-sbɛ
+\mm sbɛ-sbɛ::
 \ps v
 \gf donner
 \gvf donner
@@ -16107,7 +16107,7 @@
 
 \lx weri-i
 \ph /weɾii/
-\mm weri-i
+\mm weri-i::
 \ps v
 \gf s'habituer
 \gvf s'habituer
@@ -16122,7 +16122,7 @@
 
 \lx yeyy-ay
 \ph /jejaj/
-\mm yeyy-ay
+\mm yeyy-ay::
 \ps v
 \gf dormir
 \gvf dormir
@@ -16137,7 +16137,7 @@
 
 \lx ondi
 \ph /ondi/
-\mm ondi
+\mm ondi::
 \ps v
 \gf n'existe pas
 \gvf n'existe pas
@@ -16152,7 +16152,7 @@
 
 \lx mmbɛdi-i
 \ph /mmbɛdii/
-\mm mmbɛdi-i
+\mm mmbɛdi-i::
 \ps v
 \gf aimer
 \gvf aimer
@@ -16167,7 +16167,7 @@
 
 \lx gɛli
 \ph /gɛli/
-\mm gɛli
+\mm gɛli::
 \ps v
 \gf tenir
 \gvf tenir
@@ -16183,7 +16183,7 @@
 
 \lx dàgà-nùŋú
 \ph /dàgànùŋú/
-\mm dàgà-nùŋú
+\mm dàgà-nùŋú::
 \ps n
 \gf fin d'après-midi
 \gvf fin d'après-midi
@@ -16213,7 +16213,7 @@
 
 \lx bàrà-nɔ̀wⁿɔ́
 \ph /bàɾànɔ̀w̃ɔ́/
-\mm bàrà-nɔ̀wⁿɔ́
+\mm bàrà-nɔ̀wⁿɔ́::
 \ps n
 \gf animal sauvage
 \gvf animal sauvage
@@ -16243,7 +16243,7 @@
 
 \lx pɛ̌ⁿ
 \ph /pɛ̌ⁿ/
-\mm pɛ̌ⁿ
+\mm pɛ̌ⁿ::
 \ps adj
 \gf vieux
 \gvf vieux
@@ -16258,7 +16258,7 @@
 
 \lx pírí
 \ph /píɾí/
-\mm pírí
+\mm pírí::
 \ps adj
 \gf blanc
 \gvf blanc
@@ -16273,7 +16273,7 @@
 
 \lx gàrá
 \ph /gàɾá/
-\mm gàrá
+\mm gàrá::
 \ps adj
 \gf grand
 \gvf grand
@@ -16288,7 +16288,7 @@
 
 \lx túnɔ́
 \ph /túnɔ́/
-\mm túnɔ́
+\mm túnɔ́::
 \ps adj
 \gf un
 \gvf un
@@ -16303,7 +16303,7 @@
 
 \lx túrú
 \ph /túɾú/
-\mm túrú
+\mm túrú::
 \ps num
 \gf un
 \gvf un
@@ -16363,7 +16363,7 @@
 
 \lx tɛ́mdɛ́rɛ̀
 \ph /tɛ́mdɛ́ɾɛ̀/
-\mm tɛ́mdɛ́rɛ̀
+\mm tɛ́mdɛ́rɛ̀::
 \ps num
 \gf cent
 \gvf cent
@@ -16408,7 +16408,7 @@
 
 \lx jágà
 \ph /dʒágà/
-\mm jágà
+\mm jágà::
 \ps interj
 \gf tiens
 \gvf tiens
@@ -16423,7 +16423,7 @@
 
 \lx músɔ́rɔ́
 \ph /músɔ́ɾɔ́/
-\mm músɔ́rɔ́
+\mm músɔ́rɔ́::
 \ps n
 \gf châle
 \gvf châle
@@ -16438,7 +16438,7 @@
 
 \lx págá-jù
 \ph /págádʒù/
-\mm págá-jù
+\mm págá-jù::
 \ps v
 \gf porter
 \gvf porter
@@ -16453,7 +16453,7 @@
 
 \lx wòr-ê
 \ph /wòɾɛ̂/
-\mm wòr-ê
+\mm wòr-ê::
 \ps v
 \gf s'effondrer
 \gvf s'effondrer
@@ -16468,7 +16468,7 @@
 
 \lx yùw-ɛ̂
 \ph /jùwɛ̂/
-\mm yùw-ɛ̂
+\mm yùw-ɛ̂::
 \ps v
 \gf se renverser
 \gvf se renverser
@@ -16498,7 +16498,7 @@
 
 \lx nù-nùŋú
 \ph /nùnùŋú/
-\mm nù-nùŋú
+\mm nù-nùŋú::
 \ps n
 \gf soleil
 \gvf soleil
@@ -16513,7 +16513,7 @@
 
 \lx tɛ̀gɛ̀-jù
 \ph /tɛ̀gɛ̀dʒù/
-\mm tɛ̀gɛ̀-jù
+\mm tɛ̀gɛ̀-jù::
 \ps v
 \gf brûler
 \gvf brûler
@@ -16618,7 +16618,7 @@
 
 \lx tà-tágá
 \ph /tàtágá/
-\mm tà-tágá
+\mm tà-tágá::
 \ps n
 \gf plaisanterie
 \gvf plaisanterie
@@ -16633,7 +16633,7 @@
 
 \lx kì-kíjí
 \ph /kìkídʒí/
-\mm kì-kíjí
+\mm kì-kíjí::
 \ps n
 \gf chauve-souris
 \gvf chauve-souris
@@ -16648,7 +16648,7 @@
 
 \lx kù-kúmó
 \ph /kùkúmó/
-\mm kù-kúmó
+\mm kù-kúmó::
 \ps n
 \gf fumée
 \gvf fumée
@@ -16663,7 +16663,7 @@
 
 \lx tɔ̀-tɔ́gú
 \ph /tɔ̀tɔ́gú/
-\mm tɔ̀-tɔ́gú
+\mm tɔ̀-tɔ́gú::
 \ps n
 \gf gecko
 \gvf gecko
@@ -16678,7 +16678,7 @@
 
 \lx pì-pírí
 \ph /pìpíɾí/
-\mm pì-pírí
+\mm pì-pírí::
 \ps n
 \gf papillon
 \gvf papillon
@@ -16694,7 +16694,7 @@
 
 \lx tì-tírí
 \ph /tìtíɾí/
-\mm tì-tírí
+\mm tì-tírí::
 \ps n
 \gf mission
 \gvf mission
@@ -16709,7 +16709,7 @@
 
 \lx kɛ̀ⁿ-kɛ́wⁿɛ́
 \ph /kɛ̀ⁿkɛ́w̃ɛ́/
-\mm kɛ̀ⁿ-kɛ́wⁿɛ́
+\mm kɛ̀ⁿ-kɛ́wⁿɛ́::
 \ps n
 \gf moustique
 \gvf moustique
@@ -16725,7 +16725,7 @@
 
 \lx gɔ̀ⁿ-gɔ́rⁿɔ́
 \ph /gɔ̀ⁿgɔ́ɾ̃ɔ́/
-\mm gɔ̀ⁿ-gɔ́rⁿɔ́
+\mm gɔ̀ⁿ-gɔ́rⁿɔ́::
 \ps n
 \gf fourmi de miel
 \gvf fourmi de miel
@@ -16755,7 +16755,7 @@
 
 \lx téⁿ-tèŋè
 \ph /tɛ́ⁿtɛ̀ŋɛ̀/
-\mm téⁿ-tèŋè
+\mm téⁿ-tèŋè::
 \ps n
 \gf zorille
 \gvf zorille
@@ -16770,7 +16770,7 @@
 
 \lx bɔ̀mbóⁿ
 \ph /bɔ̀mbóⁿ/
-\mm bɔ̀mbóⁿ
+\mm bɔ̀mbóⁿ::
 \ps n
 \gf bonbon
 \gvf bonbon
@@ -16785,7 +16785,7 @@
 
 \lx sùⁿsúⁿ
 \ph /sùⁿsúⁿ/
-\mm sùⁿsúⁿ
+\mm sùⁿsúⁿ::
 \ps n
 \gf ver
 \gvf ver
@@ -16800,7 +16800,7 @@
 
 \lx kùrsà-kúrsá
 \ph /kùɾsàkúɾsá/
-\mm kùrsà-kúrsá
+\mm kùrsà-kúrsá::
 \ps n
 \gf gale
 \gvf gale
@@ -16815,7 +16815,7 @@
 
 \lx yùgù-yúgú
 \ph /jùgùjúgú/
-\mm yùgù-yúgú
+\mm yùgù-yúgú::
 \ps n
 \gf friperie
 \gvf friperie
@@ -16830,7 +16830,7 @@
 
 \lx pùsù-púsú
 \ph /pùsùpúsú/
-\mm pùsù-púsú
+\mm pùsù-púsú::
 \ps n
 \gf pousse-pousse
 \gvf pousse-pousse
@@ -16845,7 +16845,7 @@
 
 \lx wèrè-wéré
 \ph /wèɾèwéɾé/
-\mm wèrè-wéré
+\mm wèrè-wéré::
 \ps n
 \gf martinet
 \gvf martinet
@@ -16860,7 +16860,7 @@
 
 \lx gɔ̀dɔ̀-gɔ́dɔ́
 \ph /gɔ̀dɔ̀gɔ́dɔ́/
-\mm gɔ̀dɔ̀-gɔ́dɔ́
+\mm gɔ̀dɔ̀-gɔ́dɔ́::
 \ps n
 \gf huppe
 \gvf huppe
@@ -16875,7 +16875,7 @@
 
 \lx gàŋ-gǎn
 \ph /gàŋgǎn/
-\mm gàŋ-gǎn
+\mm gàŋ-gǎn::
 \ps n
 \gf fissure
 \gvf fissure
@@ -16890,7 +16890,7 @@
 
 \lx bírìgì-bárùgù
 \ph /bíɾìgìbáɾùgù/
-\mm bírìgì-bárùgù
+\mm bírìgì-bárùgù::
 \ps n
 \gf bric-à-brac
 \gvf bric-à-brac
@@ -16920,7 +16920,7 @@
 
 \lx tígí-tàgù
 \ph /tígítàgù/
-\mm tígí-tàgù
+\mm tígí-tàgù::
 \ps n
 \gf omoplate
 \gvf omoplate
@@ -16935,7 +16935,7 @@
 
 \lx kírí-kòrò
 \ph /kíɾíkòɾò/
-\mm kírí-kòrò
+\mm kírí-kòrò::
 \ps n
 \gf coquille
 \gvf coquille
@@ -16950,7 +16950,7 @@
 
 \lx tèŋè-táŋá
 \ph /tèŋètáŋá/
-\mm tèŋè-táŋá
+\mm tèŋè-táŋá::
 \ps n
 \gf danseurs sur échasses
 \gvf danseurs sur échasses
@@ -16980,7 +16980,7 @@
 
 \lx à-tégú
 \ph /àtégú/
-\mm à-tégú
+\mm à-tégú::
 \ps n
 \gf action de se tenir sur la pointe des pieds
 \gvf action de se tenir sur la pointe des pieds
@@ -16995,7 +16995,7 @@
 
 \lx àn-dáŋú
 \ph /àndáŋú/
-\mm àn-dáŋú
+\mm àn-dáŋú::
 \ps n
 \gf galettes de mil
 \gvf galettes de mil
@@ -17011,7 +17011,7 @@
 
 \lx à-mámú
 \ph /àmámú/
-\mm à-mámú
+\mm à-mámú::
 \ps n
 \gf morsure de la lèvre inférieure
 \gvf morsure de la lèvre inférieure
@@ -17026,7 +17026,7 @@
 
 \lx àŋ-gùŋùrⁿú
 \ph /àŋgùŋùɾ̃ú/
-\mm àŋ-gùŋùrⁿú
+\mm àŋ-gùŋùrⁿú::
 \ps n
 \gf tortue géante
 \gvf tortue géante
@@ -17041,7 +17041,7 @@
 
 \lx àlɛ́gú
 \ph /àlɛ́gú/
-\mm àlɛ́gú
+\mm àlɛ́gú::
 \ps n
 \gf pagne
 \gvf pagne
@@ -17056,7 +17056,7 @@
 
 \lx àtémú
 \ph /àtémú/
-\mm àtémú
+\mm àtémú::
 \ps n
 \gf rite coutumier
 \gvf rite coutumier
@@ -17086,7 +17086,7 @@
 
 \lx àjírí
 \ph /àdʒíɾí/
-\mm àjírí
+\mm àjírí::
 \ps n
 \gf lutte traditionnelle
 \gvf lutte traditionnelle
@@ -17116,7 +17116,7 @@
 
 \lx àségú
 \ph /àségú/
-\mm àségú
+\mm àségú::
 \ps n
 \gf éternuement
 \gvf éternuement
@@ -17131,7 +17131,7 @@
 
 \lx tɔ́rú-gú
 \ph /tɔ́ɾúgú/
-\mm tɔ́rú-gú
+\mm tɔ́rú-gú::
 \ps n
 \gf commencement
 \gvf commencement
@@ -17161,7 +17161,7 @@
 
 \lx yɛ́rú-gú
 \ph /jɛ́ɾúgú/
-\mm yɛ́rú-gú
+\mm yɛ́rú-gú::
 \ps n
 \gf arrivée
 \gvf arrivée
@@ -17191,7 +17191,7 @@
 
 \lx wà-wàgù-ná
 \ph /wàwàgùná/
-\mm wà-wàgù-ná
+\mm wà-wàgù-ná::
 \ps n
 \gf distance
 \gvf distance
@@ -17206,7 +17206,7 @@
 
 \lx wò-wòrù-ná
 \ph /wòwòɾùná/
-\mm wò-wòrù-ná
+\mm wò-wòrù-ná::
 \ps n
 \gf profondeur
 \gvf profondeur
@@ -17221,7 +17221,7 @@
 
 \lx gù-gùrù-ná
 \ph /gùgùɾùná/
-\mm gù-gùrù-ná
+\mm gù-gùrù-ná::
 \ps n
 \gf longueur
 \gvf longueur
@@ -17251,7 +17251,7 @@
 
 \lx tè-tèrè-ná
 \ph /tètɛ̀ɾɛ̀ná/
-\mm tè-tèrè-ná
+\mm tè-tèrè-ná::
 \ps n
 \gf vitesse
 \gvf vitesse
@@ -17281,7 +17281,7 @@
 
 \lx pàŋà-gíⁿ
 \ph /pàŋàgíⁿ/
-\mm pàŋà-gíⁿ
+\mm pàŋà-gíⁿ::
 \ps n
 \gf autorité
 \gvf autorité
@@ -17296,7 +17296,7 @@
 
 \lx nùrⁿù-gíⁿ
 \ph /nùɾⁿùgíⁿ/
-\mm nùrⁿù-gíⁿ
+\mm nùrⁿù-gíⁿ::
 \ps n
 \gf malade
 \gvf malade
@@ -17326,7 +17326,7 @@
 
 \lx jɔ̀ŋɔ̀-gíⁿ
 \ph /dʒɔ̀ŋɔ̀gíⁿ/
-\mm jɔ̀ŋɔ̀-gíⁿ
+\mm jɔ̀ŋɔ̀-gíⁿ::
 \ps n
 \gf lépreux
 \gvf lépreux
@@ -17341,7 +17341,7 @@
 
 \lx nàm-gíⁿ
 \ph /nàmgíⁿ/
-\mm nàm-gíⁿ
+\mm nàm-gíⁿ::
 \ps n
 \gf indigent
 \gvf indigent
@@ -17371,7 +17371,7 @@
 
 \lx lìwɛ̀-gíⁿ
 \ph /lìwɛ̀gíⁿ/
-\mm lìwɛ̀-gíⁿ
+\mm lìwɛ̀-gíⁿ::
 \ps n
 \gf poltron
 \gvf poltron
@@ -17386,7 +17386,7 @@
 
 \lx wàlà-gíⁿ
 \ph /wàlàgíⁿ/
-\mm wàlà-gíⁿ
+\mm wàlà-gíⁿ::
 \ps n
 \gf paresseux
 \gvf paresseux
@@ -17431,7 +17431,7 @@
 
 \lx túⁿ
 \ph /túⁿ/
-\mm túⁿ
+\mm túⁿ::
 \ps pron
 \gf réciproque
 \gvf réciproque
@@ -17613,7 +17613,7 @@
 
 \lx dɔ́ⁿ
 \ph /dɔ́ⁿ/
-\mm dɔ́ⁿ
+\mm dɔ́ⁿ::
 \ps n
 \gf prix
 \gvf prix
@@ -17628,7 +17628,7 @@
 
 \lx tɔ́ⁿ
 \ph /tɔ́ⁿ/
-\mm tɔ́ⁿ
+\mm tɔ́ⁿ::
 \ps n
 \gf bosse
 \gvf bosse
@@ -17643,7 +17643,7 @@
 
 \lx dǐⁿ
 \ph /dǐⁿ/
-\mm dǐⁿ
+\mm dǐⁿ::
 \ps n
 \gf hanche
 \gvf hanche
@@ -17658,7 +17658,7 @@
 
 \lx gɛ́ⁿ
 \ph /gɛ́ⁿ/
-\mm gɛ́ⁿ
+\mm gɛ́ⁿ::
 \ps n
 \gf vésicule biliaire
 \gvf vésicule biliaire
@@ -17673,7 +17673,7 @@
 
 \lx kúⁿ
 \ph /kúⁿ/
-\mm kúⁿ
+\mm kúⁿ::
 \ps n
 \gf tête
 \gvf tête
@@ -17688,7 +17688,7 @@
 
 \lx káⁿ
 \ph /káⁿ/
-\mm káⁿ
+\mm káⁿ::
 \ps n
 \gf bouche
 \gvf bouche
@@ -17703,7 +17703,7 @@
 
 \lx dǎⁿ
 \ph /dǎⁿ/
-\mm dǎⁿ
+\mm dǎⁿ::
 \ps n
 \gf taille
 \gvf taille
@@ -17718,7 +17718,7 @@
 
 \lx tǔⁿ
 \ph /tǔⁿ/
-\mm tǔⁿ
+\mm tǔⁿ::
 \ps n
 \gf tissu
 \gvf tissu
@@ -17733,7 +17733,7 @@
 
 \lx tǐⁿ
 \ph /tǐⁿ/
-\mm tǐⁿ
+\mm tǐⁿ::
 \ps n
 \gf bois de chauffe
 \gvf bois de chauffe
@@ -17748,7 +17748,7 @@
 
 \lx jɔ́ⁿ
 \ph /dʒɔ́ⁿ/
-\mm jɔ́ⁿ
+\mm jɔ́ⁿ::
 \ps n
 \gf champ privé
 \gvf champ privé
@@ -17763,7 +17763,7 @@
 
 \lx kɔ̌ⁿ
 \ph /kɔ̌ⁿ/
-\mm kɔ̌ⁿ
+\mm kɔ̌ⁿ::
 \ps n
 \gf daba
 \gvf daba
@@ -17778,7 +17778,7 @@
 
 \lx dɛ̌ⁿ
 \ph /dɛ̌ⁿ/
-\mm dɛ̌ⁿ
+\mm dɛ̌ⁿ::
 \ps n
 \gf jarre
 \gvf jarre
@@ -17793,7 +17793,7 @@
 
 \lx jɛ́ⁿ
 \ph /dʒɛ́ⁿ/
-\mm jɛ́ⁿ
+\mm jɛ́ⁿ::
 \ps n
 \gf manche
 \gvf manche
@@ -17808,7 +17808,7 @@
 
 \lx báⁿ
 \ph /báⁿ/
-\mm báⁿ
+\mm báⁿ::
 \ps n
 \gf banc
 \gvf banc
@@ -17823,7 +17823,7 @@
 
 \lx pǎⁿ
 \ph /pǎⁿ/
-\mm pǎⁿ
+\mm pǎⁿ::
 \ps n
 \gf pénurie d'eau
 \gvf pénurie d'eau
@@ -17838,7 +17838,7 @@
 
 \lx jɔ̌ⁿ
 \ph /dʒɔ̌ⁿ/
-\mm jɔ̌ⁿ
+\mm jɔ̌ⁿ::
 \ps n
 \gf teinturier
 \gvf teinturier
@@ -17853,12 +17853,12 @@
 
 \lx sáⁿ
 \ph /sáⁿ/
-\mm sáⁿ
+\mm sáⁿ::
 \ps n
 
 \lx bɔ̌ⁿ
 \ph /bɔ̌ⁿ/
-\mm bɔ̌ⁿ
+\mm bɔ̌ⁿ::
 \ps n
 \gf tam-tam
 \gvf tam-tam
@@ -17873,7 +17873,7 @@
 
 \lx bɔ́ⁿ
 \ph /bɔ́ⁿ/
-\mm bɔ́ⁿ
+\mm bɔ́ⁿ::
 \ps n
 \gf nom
 \gvf nom
@@ -17889,7 +17889,7 @@
 
 \lx kɛ̌ⁿ
 \ph /kɛ̌ⁿ/
-\mm kɛ̌ⁿ
+\mm kɛ̌ⁿ::
 \ps n
 \gf instrument pointu
 \gvf instrument pointu
@@ -17904,7 +17904,7 @@
 
 \lx pɔ̌ⁿ
 \ph /pɔ̌ⁿ/
-\mm pɔ̌ⁿ
+\mm pɔ̌ⁿ::
 \ps n
 \gf pont
 \gvf pont
@@ -17920,7 +17920,7 @@
 
 \lx kúⁿ
 \ph /kúⁿ/
-\mm kúⁿ
+\mm kúⁿ::
 \ps adj
 \gf célibataire
 \gvf célibataire
@@ -17935,7 +17935,7 @@
 
 \lx pɛ̌ⁿ
 \ph /pɛ̌ⁿ/
-\mm pɛ̌ⁿ
+\mm pɛ̌ⁿ::
 \ps adj
 \gf vieux
 \gvf vieux
@@ -17950,7 +17950,7 @@
 
 \lx dɛ̌ⁿ
 \ph /dɛ̌ⁿ/
-\mm dɛ̌ⁿ
+\mm dɛ̌ⁿ::
 \ps adj
 \gf mal développé
 \gvf mal développé
@@ -17965,7 +17965,7 @@
 
 \lx báⁿ
 \ph /báⁿ/
-\mm báⁿ
+\mm báⁿ::
 \ps adj
 \gf rouge
 \gvf rouge
@@ -17980,7 +17980,7 @@
 
 \lx sɛ́ⁿ
 \ph /sɛ́ⁿ/
-\mm sɛ́ⁿ
+\mm sɛ́ⁿ::
 \ps adj
 \gf bon
 \gvf bon
@@ -17995,7 +17995,7 @@
 
 \lx tɔ́ⁿ
 \ph /tɔ́ⁿ/
-\mm tɔ́ⁿ
+\mm tɔ́ⁿ::
 \ps adj
 \gf doux
 \gvf doux
@@ -18010,7 +18010,7 @@
 
 \lx sǎⁿ
 \ph /sǎⁿ/
-\mm sǎⁿ
+\mm sǎⁿ::
 \ps pron
 \gf réfléchi
 \gvf réfléchi
@@ -18025,7 +18025,7 @@
 
 \lx túⁿ
 \ph /túⁿ/
-\mm túⁿ
+\mm túⁿ::
 \ps pron
 \gf réciproque
 \gvf réciproque
@@ -18040,7 +18040,7 @@
 
 \lx -gíⁿ
 \ph /-gíⁿ/
-\mm -gíⁿ
+\mm -gíⁿ::
 \ps suff
 \gf suffixe caractéristique
 \gvf suffixe caractéristique
@@ -18305,7 +18305,7 @@
 
 \lx gàríⁿ
 \ph /gàɾíⁿ/
-\mm gàríⁿ
+\mm gàríⁿ::
 \ps n
 \gf rein
 \gvf rein
@@ -18335,7 +18335,7 @@
 
 \lx lɛ̀gíⁿ
 \ph /lɛ̀gíⁿ/
-\mm lɛ̀gíⁿ
+\mm lɛ̀gíⁿ::
 \ps n
 \gf rouleau à coton
 \gvf rouleau à coton
@@ -18350,7 +18350,7 @@
 
 \lx kò-kòríⁿ
 \ph /kòkòɾíⁿ/
-\mm kò-kòríⁿ
+\mm kò-kòríⁿ::
 \ps n
 \gf navette
 \gvf navette
@@ -18365,7 +18365,7 @@
 
 \lx dɔ̀gɔ̌ⁿ
 \ph /dɔ̀gɔ̌ⁿ/
-\mm dɔ̀gɔ̌ⁿ
+\mm dɔ̀gɔ̌ⁿ::
 \ps n
 \gf Dogon
 \gvf Dogon
@@ -18380,7 +18380,7 @@
 
 \lx ɔ̀gɔ̌ⁿ
 \ph /ɔ̀gɔ̌ⁿ/
-\mm ɔ̀gɔ̌ⁿ
+\mm ɔ̀gɔ̌ⁿ::
 \ps n
 \gf chef
 \gvf chef
@@ -18395,7 +18395,7 @@
 
 \lx tɛ́lɛ́ⁿ
 \ph /tɛ́lɛ́ⁿ/
-\mm tɛ́lɛ́ⁿ
+\mm tɛ́lɛ́ⁿ::
 \ps n
 \gf Tellem
 \gvf Tellem
@@ -18410,7 +18410,7 @@
 
 \lx dégéⁿ
 \ph /dégéⁿ/
-\mm dégéⁿ
+\mm dégéⁿ::
 \ps n
 \gf nain
 \gvf nain
@@ -18440,7 +18440,7 @@
 
 \lx yéríⁿ
 \ph /jéríⁿ/
-\mm yéríⁿ
+\mm yéríⁿ::
 \ps n
 \gf visiteur
 \gvf visiteur
@@ -18455,7 +18455,7 @@
 
 \lx wálíⁿ
 \ph /wálíⁿ/
-\mm wálíⁿ
+\mm wálíⁿ::
 \ps n
 \gf voyant
 \gvf voyant
@@ -18470,7 +18470,7 @@
 
 \lx táⁿtú
 \ph /táⁿtú/
-\mm táⁿtú
+\mm táⁿtú::
 \ps n
 \gf tente
 \gvf tente
@@ -18485,7 +18485,7 @@
 
 \lx málɛ́ⁿkɛ́
 \ph /málɛ́ⁿkɛ́/
-\mm málɛ́ⁿkɛ́
+\mm málɛ́ⁿkɛ́::
 \ps n
 \gf ange
 \gvf ange
@@ -18500,7 +18500,7 @@
 
 \lx ìⁿsìrⁿí
 \ph /ìⁿsìɾⁿí/
-\mm ìⁿsìrⁿí
+\mm ìⁿsìrⁿí::
 \ps n
 \gf urine
 \gvf urine
@@ -18530,7 +18530,7 @@
 
 \lx ɔ́ⁿsàⁿ
 \ph /ɔ́ⁿsàⁿ/
-\mm ɔ́ⁿsàⁿ
+\mm ɔ́ⁿsàⁿ::
 \ps n
 \gf cimetière
 \gvf cimetière
@@ -18545,7 +18545,7 @@
 
 \lx gùⁿsáⁿ
 \ph /gùⁿsáⁿ/
-\mm gùⁿsáⁿ
+\mm gùⁿsáⁿ::
 \ps n
 \gf brousse profonde
 \gvf brousse profonde
@@ -18575,7 +18575,7 @@
 
 \lx mɔ́
 \ph /mɔ́/
-\mm mɔ́
+\mm mɔ́::
 \ps n
 \gf rire
 \gvf rire
@@ -18635,7 +18635,7 @@
 
 \lx pàŋá
 \ph /pàŋá/
-\mm pàŋá
+\mm pàŋá::
 \ps n
 \gf pouvoir
 \gvf pouvoir
@@ -18695,7 +18695,7 @@
 
 \lx ɲùgú
 \ph /ɲùgú/
-\mm ɲùgú
+\mm ɲùgú::
 \ps n
 \gf herbe
 \gvf herbe
@@ -18710,7 +18710,7 @@
 
 \lx mèré
 \ph /mèɾé/
-\mm mèré
+\mm mèré::
 \ps n
 \gf monorchide
 \gvf monorchide
@@ -18740,7 +18740,7 @@
 
 \lx màŋá
 \ph /màɲá/
-\mm màŋá
+\mm màŋá::
 \ps v
 \gf honorer
 \gvf honorer
@@ -18755,7 +18755,7 @@
 
 \lx nàná
 \ph /nàná/
-\mm nàná
+\mm nàná::
 \ps n
 \gf gauche
 \gvf gauche
@@ -18770,7 +18770,7 @@
 
 \lx ɲù-ɲǔ
 \ph /ɲùɲǔ/
-\mm ɲù-ɲǔ
+\mm ɲù-ɲǔ::
 \ps n
 \gf temps froid
 \gvf temps froid
@@ -18815,7 +18815,7 @@
 
 \lx dòŋó
 \ph /dòŋó/
-\mm dòŋó
+\mm dòŋó::
 \ps v
 \gf piler
 \gvf piler
@@ -18830,7 +18830,7 @@
 
 \lx mɔ́m
 \ph /mɔ́m/
-\mm mɔ́m
+\mm mɔ́m::
 \ps n
 \gf sarclage
 \gvf sarclage
@@ -18845,7 +18845,7 @@
 
 \lx ɛ́wɛ́
 \ph /ɛ́wɛ́/
-\mm ɛ́wɛ́
+\mm ɛ́wɛ́::
 \ps v
 \gf vendre
 \gvf vendre
@@ -18860,7 +18860,7 @@
 
 \lx éw
 \ph /éw/
-\mm éw
+\mm éw::
 \ps n
 \gf achat
 \gvf achat
@@ -18875,7 +18875,7 @@
 
 \lx gògó
 \ph /gògó/
-\mm gògó
+\mm gògó::
 \ps v
 \gf manger
 \gvf manger
@@ -18890,7 +18890,7 @@
 
 \lx gègé
 \ph /gègé/
-\mm gègé
+\mm gègé::
 \ps v
 \gf grignoter
 \gvf grignoter
@@ -18905,7 +18905,7 @@
 
 \lx gùgɔ́
 \ph /gùgɔ́/
-\mm gùgɔ́
+\mm gùgɔ́::
 \ps v
 \gf ruminer
 \gvf ruminer
@@ -18920,7 +18920,7 @@
 
 \lx gɔ̀gɔ́
 \ph /gɔ̀gɔ́/
-\mm gɔ̀gɔ́
+\mm gɔ̀gɔ́::
 \ps v
 \gf égrener
 \gvf égrener
@@ -18935,7 +18935,7 @@
 
 \lx óŋù-rⁿù
 \ph /óŋùɾ̃ù/
-\mm óŋù-rv
+\mm óŋù-rv::
 \ps v
 \gf défroisser
 \gvf défroisser
@@ -18950,7 +18950,7 @@
 
 \lx téŋì-rì
 \ph /téŋìɾì/
-\mm téŋì-rv
+\mm téŋì-rv::
 \ps v
 \gf détraver
 \gvf détraver
@@ -18965,7 +18965,7 @@
 
 \lx déméré
 \ph /déméɾé/
-\mm déméré
+\mm déméré::
 \ps adj
 \gf gros
 \gvf gros
@@ -18980,7 +18980,7 @@
 
 \lx mùŋú-rù
 \ph /mùŋúɾù/
-\mm mùŋú-rv
+\mm mùŋú-rv::
 \ps v
 \gf dénouer
 \gvf dénouer
@@ -18995,7 +18995,7 @@
 
 \lx bòmí-rì
 \ph /bòmíɾì/
-\mm bòmí-rv
+\mm bòmí-rv::
 \ps v
 \gf mettre au dos
 \gvf mettre au dos
@@ -19010,7 +19010,7 @@
 
 \lx gǔŋɔ́-ɲú
 \ph /gǔŋɔ́ɲú/
-\mm gǔŋ-jú
+\mm gǔŋ-jú::
 \ps v
 \gf enlèvera
 \gvf enlèvera
@@ -19040,7 +19040,7 @@
 
 \lx bìné
 \ph /bìné/
-\mm bìné
+\mm bìné::
 \ps v
 \gf retourner
 \gvf retourner
@@ -19055,7 +19055,7 @@
 
 \lx dùŋó
 \ph /dùŋó/
-\mm dùŋó
+\mm dùŋó::
 \ps v
 \gf boucher
 \gvf boucher
@@ -19070,7 +19070,7 @@
 
 \lx tɛ́mɛ́
 \ph /tɛ́mɛ́/
-\mm tɛ́mɛ́
+\mm tɛ́mɛ́::
 \ps v
 \gf rencontrer
 \gvf rencontrer
@@ -19085,7 +19085,7 @@
 
 \lx ɔ́mɔ́
 \ph /ɔ́mɔ́/
-\mm ɔ́mɔ́
+\mm ɔ́mɔ́::
 \ps v
 \gf pourrir
 \gvf pourrir
@@ -19100,7 +19100,7 @@
 
 \lx tímɛ́
 \ph /tímɛ́/
-\mm tímɛ́
+\mm tímɛ́::
 \ps v
 \gf couvrir
 \gvf couvrir
@@ -19115,7 +19115,7 @@
 
 \lx bàwⁿúrⁿù
 \ph /bàwⁿúɾ̃ù/
-\mm bàwⁿú-rv
+\mm bàwⁿú-rv::
 \ps v
 \gf blesser
 \gvf blesser
@@ -19130,7 +19130,7 @@
 
 \lx kójùgù
 \ph /kódʒùgù/
-\mm kójùgù
+\mm kójùgù::
 \ps v
 \gf tousser
 \gvf tousser
@@ -19145,7 +19145,7 @@
 
 \lx págì-rì
 \ph /págìɾì/
-\mm págì-rv
+\mm págì-rv::
 \ps v
 \gf délier
 \gvf délier
@@ -19160,7 +19160,7 @@
 
 \lx áwìrì
 \ph /áwìɾì/
-\mm áwìrì
+\mm áwìrì::
 \ps v
 \gf étaler
 \gvf étaler
@@ -19175,7 +19175,7 @@
 
 \lx kɛ́gɛ́rɛ́
 \ph /kɛ́gɛ́ɾɛ́/
-\mm kɛ́gɛ́rɛ́
+\mm kɛ́gɛ́rɛ́::
 \ps n
 \gf selle
 \gvf selle
@@ -19190,7 +19190,7 @@
 
 \lx pɛ́gì-rì
 \ph /pɛ́gìɾì/
-\mm pɛ́gì-rv
+\mm pɛ́gì-rv::
 \ps v
 \gf enlever
 \gvf enlever
@@ -19205,7 +19205,7 @@
 
 \lx sáwùrù
 \ph /sáwùɾù/
-\mm sáwùrù
+\mm sáwùrù::
 \ps v
 \gf poser du mortier
 \gvf poser du mortier
@@ -19220,7 +19220,7 @@
 
 \lx pɔ́gùrù
 \ph /pɔ́gùɾù/
-\mm pɔ́gùrù
+\mm pɔ́gùrù::
 \ps v
 \gf être ébouriffé
 \gvf être ébouriffé
@@ -19235,7 +19235,7 @@
 
 \lx sɔ́gù-rù
 \ph /sɔ́gùɾù/
-\mm sɔ́gɔ́-rv
+\mm sɔ́gɔ́-rv::
 \ps v
 \gf déverrouiller
 \gvf déverrouiller
@@ -19251,7 +19251,7 @@
 
 \lx pɔ́wùrù
 \ph /pɔ́wùɾù/
-\mm pɔ́wùrù
+\mm pɔ́wùrù::
 \ps v
 \gf agiter une torche
 \gvf agiter une torche
@@ -19266,7 +19266,7 @@
 
 \lx úgùrù
 \ph /úgùɾù/
-\mm úgùrù
+\mm úgùrù::
 \ps v
 \gf cuire au four
 \gvf cuire au four
@@ -19281,7 +19281,7 @@
 
 \lx sáɲùrⁿù
 \ph /sáɲùɾⁿù/
-\mm sáɲùrⁿù
+\mm sáɲùrⁿù::
 \ps v
 \gf recrépir
 \gvf recrépir
@@ -19296,7 +19296,7 @@
 
 \lx sáŋìrⁿì
 \ph /sáŋìɾⁿì/
-\mm sáŋìrⁿì
+\mm sáŋìrⁿì::
 \ps v
 \gf éclairer
 \gvf éclairer
@@ -19311,7 +19311,7 @@
 
 \lx sáŋì-rⁿì
 \ph /sáŋìɾⁿì/
-\mm sáŋá-rv
+\mm sáŋá-rv::
 \ps v
 \gf enlever une clôture
 \gvf enlever une clôture
@@ -19327,7 +19327,7 @@
 
 \lx kúmùrⁿi
 \ph /kúmùɾⁿi/
-\mm kúmùrⁿi
+\mm kúmùrⁿi::
 \ps v
 \gf se rallumer
 \gvf se rallumer
@@ -19358,7 +19358,7 @@
 
 \lx símìrⁿì
 \ph /símìɾⁿì/
-\mm símìrⁿì
+\mm símìrⁿì::
 \ps v
 \gf redescendre
 \gvf redescendre
@@ -19373,7 +19373,7 @@
 
 \lx pínì-rⁿì
 \ph /pínìɾⁿì/
-\mm pínɛ́-rv
+\mm pínɛ́-rv::
 \ps v
 \gf ouvrir la porte
 \gvf ouvrir la porte
@@ -19389,7 +19389,7 @@
 
 \lx íwínì
 \ph /íwínì/
-\mm íwínì
+\mm íwínì::
 \ps v
 \gf aimer
 \gvf aimer
@@ -19404,7 +19404,7 @@
 
 \lx pírígì
 \ph /píɾígì/
-\mm pírígì
+\mm pírígì::
 \ps v
 \gf être à l'agonie
 \gvf être à l'agonie
@@ -19419,7 +19419,7 @@
 
 \lx tánú-gù
 \ph /tánúgù/
-\mm táŋá-gv
+\mm táŋá-gv::
 \ps v
 \gf transformer
 \gvf transformer
@@ -19434,7 +19434,7 @@
 
 \lx súnú-gù
 \ph /súnúgù/
-\mm súgó-gv
+\mm súgó-gv::
 \ps v
 \gf descendre
 \gvf descendre
@@ -19450,7 +19450,7 @@
 
 \lx ɔ́rí-gì
 \ph /ɔ́ɾígì/
-\mm ɔ̀rú-gv
+\mm ɔ̀rú-gv::
 \ps v
 \gf ramollir
 \gvf ramollir
@@ -19466,7 +19466,7 @@
 
 \lx kúrúgù
 \ph /kúɾúgù/
-\mm kúrúgù
+\mm kúrúgù::
 \ps v
 \gf être dense
 \gvf être dense
@@ -19481,7 +19481,7 @@
 
 \lx ámúgù
 \ph /ámúgù/
-\mm ámúgù
+\mm ámúgù::
 \ps v
 \gf tenir sur la poitrine
 \gvf tenir sur la poitrine
@@ -19496,7 +19496,7 @@
 
 \lx pójúgù
 \ph /pódʒúgù/
-\mm pójúgù
+\mm pójúgù::
 \ps v
 \gf écraser
 \gvf écraser
@@ -19511,7 +19511,7 @@
 
 \lx lígíjì
 \ph /lígídʒì/
-\mm lígíjì
+\mm lígíjì::
 \ps v
 \gf mélanger
 \gvf mélanger
@@ -19526,7 +19526,7 @@
 
 \lx lúgújù
 \ph /lúgúdʒù/
-\mm lúgújù
+\mm lúgújù::
 \ps v
 \gf fouiller
 \gvf fouiller
@@ -19541,7 +19541,7 @@
 
 \lx púgújù
 \ph /púdʒúdʒù/
-\mm púgújù
+\mm púgújù::
 \ps v
 \gf piler
 \gvf piler
@@ -19556,7 +19556,7 @@
 
 \lx kógújù
 \ph /kógúdʒù/
-\mm kógújù
+\mm kógújù::
 \ps v
 \gf tousser
 \gvf tousser
@@ -19571,7 +19571,7 @@
 
 \lx kúmúɲù
 \ph /kúmúɲù/
-\mm kúmúɲù
+\mm kúmúɲù::
 \ps v
 \gf cligner des yeux
 \gvf cligner des yeux
@@ -19586,7 +19586,7 @@
 
 \lx pírí-nì
 \ph /píɾínì/
-\mm pírí-nv
+\mm pírí-nv::
 \ps v
 \gf blanchir
 \gvf blanchir
@@ -19602,7 +19602,7 @@
 
 \lx ɔ́rⁿínì
 \ph /ɔ́ɾⁿínì/
-\mm ɔ́rⁿínì
+\mm ɔ́rⁿínì::
 \ps v
 \gf devenir lisse
 \gvf devenir lisse
@@ -19617,7 +19617,7 @@
 
 \lx ɲɛ́rⁿí-nì
 \ph /ɲɛ́ɾⁿínì/
-\mm ɲɛ́rⁿú-nv
+\mm ɲɛ́rⁿú-nv::
 \ps v
 \gf s'alléger
 \gvf s'alléger
@@ -19633,7 +19633,7 @@
 
 \lx kájúwù
 \ph /kádʒúwù/
-\mm kájúwù
+\mm kájúwù::
 \ps v
 \gf faire attention
 \gvf faire attention
@@ -19648,7 +19648,7 @@
 
 \lx súrúlù
 \ph /súɾúlù/
-\mm súrúlù
+\mm súrúlù::
 \ps v
 \gf transvaser
 \gvf transvaser
@@ -19664,7 +19664,7 @@
 \lx fɔŋoro
 \ph /fɔ.ŋo.ɾo/
 \va fɔŋoro
-\mm fɔŋoro
+\mm fɔŋoro::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19686,7 +19686,7 @@
 \lx yaajɛ
 \ph /jaː.dʒɛ/
 \va yaajɛ
-\mm yaajɛ
+\mm yaajɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19708,7 +19708,7 @@
 \lx ɲaŋau
 \ph /ɲa.ŋau/
 \va ɲaŋau
-\mm ɲaŋau
+\mm ɲaŋau::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19730,7 +19730,7 @@
 \lx paamu
 \ph /paː.mu/
 \va paamu
-\mm paamu
+\mm paamu::
 \ps v
 \vl trans
 \ve tommo-so
@@ -19752,7 +19752,7 @@
 \lx pɛnrɛn
 \ph /pɛn.ɾɛn/
 \va pɛnrɛn
-\mm pɛnrɛn
+\mm pɛnrɛn::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19774,7 +19774,7 @@
 \lx inɛ
 \ph /i.nɛ/
 \va inɛ
-\mm inɛ
+\mm inɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19796,7 +19796,7 @@
 \lx tolofuje
 \ph /to.lo.fu.dʒe/
 \va tolofuje
-\mm tolofuje
+\mm tolofuje::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19818,7 +19818,7 @@
 \lx cɛmu
 \ph /tʃɛ.mu/
 \va cɛmu
-\mm cɛmu
+\mm cɛmu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19840,7 +19840,7 @@
 \lx pana
 \ph /pa.na/
 \va pana
-\mm pana
+\mm pana::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19862,7 +19862,7 @@
 \lx hakilɛ
 \ph /ha.ki.lɛ/
 \va hakilɛ
-\mm hakilɛ
+\mm hakilɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19884,7 +19884,7 @@
 \lx alufagalo
 \ph /a.lu.fa.ga.lo/
 \va alufagalo
-\mm alufagalo
+\mm alufagalo::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19906,7 +19906,7 @@
 \lx paga
 \ph /pa.ga/
 \va paga
-\mm paga
+\mm paga::
 \ps v
 \vl trans
 \ve tommo-so
@@ -19928,7 +19928,7 @@
 \lx laga
 \ph /la.ga/
 \va laga
-\mm laga
+\mm laga::
 \ps v
 \vl trans
 \ve tommo-so
@@ -19950,7 +19950,7 @@
 \lx abara
 \ph /a.ba.ɾa/
 \va abara
-\mm abara
+\mm abara::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19972,7 +19972,7 @@
 \lx amagana
 \ph /a.ma.ga.na/
 \va amagana
-\mm amagana
+\mm amagana::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -19994,7 +19994,7 @@
 \lx ere
 \ph /e.ɾe/
 \va ere
-\mm ere
+\mm ere::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20016,7 +20016,7 @@
 \lx tene
 \ph /te.ne/
 \va tene
-\mm tene
+\mm tene::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20038,7 +20038,7 @@
 \lx ɛɲɛ
 \ph /ɛ.ɲɛ/
 \va ɛɲɛ
-\mm ɛɲɛ
+\mm ɛɲɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20060,7 +20060,7 @@
 \lx ɛriyɛ
 \ph /ɛ.ɾi.jɛ/
 \va ɛriyɛ
-\mm ɛriyɛ
+\mm ɛriyɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20082,7 +20082,7 @@
 \lx isa
 \ph /i.sa/
 \va isa
-\mm isa
+\mm isa::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20104,7 +20104,7 @@
 \lx ibi
 \ph /i.bi/
 \va ibi
-\mm ibi
+\mm ibi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20126,7 +20126,7 @@
 \lx suju
 \ph /su.dʒu/
 \va suju
-\mm suju
+\mm suju::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20148,7 +20148,7 @@
 \lx tubu
 \ph /tu.bu/
 \va tubu
-\mm tubu
+\mm tubu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20170,7 +20170,7 @@
 \lx doro
 \ph /do.ɾo/
 \va doro
-\mm doro
+\mm doro::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20192,7 +20192,7 @@
 \lx goro
 \ph /go.ɾo/
 \va goro
-\mm goro
+\mm goro::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20214,7 +20214,7 @@
 \lx aaru
 \ph /aː.ɾu/
 \va aaru
-\mm aaru
+\mm aaru::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20236,7 +20236,7 @@
 \lx daana
 \ph /daː.na/
 \va daana
-\mm daana
+\mm daana::
 \ps v
 \vl trans
 \ve tommo-so
@@ -20258,7 +20258,7 @@
 \lx baara
 \ph /baː.ɾa/
 \va baara
-\mm baara
+\mm baara::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20280,7 +20280,7 @@
 \lx goono
 \ph /goː.no/
 \va goono
-\mm goono
+\mm goono::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -20302,7 +20302,7 @@
 \lx dooro
 \ph /doː.ɾo/
 \va dooro
-\mm dooro
+\mm dooro::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -22035,7 +22035,7 @@
 \lx bà→
 \ph /bà/
 \va n/a
-\mm bà
+\mm bà::
 \ps post
 \vl n/a
 \ve tommo-so
@@ -22167,7 +22167,7 @@
 \lx pírⁿí
 \ph /píɾⁿí/
 \va n/a
-\mm pírⁿí
+\mm pírⁿí::
 \ps v
 \vl trans
 \ve tommo-so
@@ -23739,7 +23739,7 @@
 \lx jan
 \ph /dʒan/
 \va n/a
-\mm jan
+\mm jan::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23761,7 +23761,7 @@
 \lx kubɛi
 \ph /kubɛi/
 \va n/a
-\mm kubɛi
+\mm kubɛi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23783,7 +23783,7 @@
 \lx digiyi
 \ph /diɡiji/
 \va n/a
-\mm digiyi
+\mm digiyi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23805,7 +23805,7 @@
 \lx biyi manugu
 \ph /biji manuɡu/
 \va n/a
-\mm biyi-manugu
+\mm biyi-manugu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23827,7 +23827,7 @@
 \lx sɔɔ ku
 \ph /sɔː ku/
 \va n/a
-\mm sɔɔ-ku
+\mm sɔɔ-ku::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23849,7 +23849,7 @@
 \lx kanrun jan
 \ph /kanɾun dʒan/
 \va n/a
-\mm kanrun-jan
+\mm kanrun-jan::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23871,7 +23871,7 @@
 \lx sagu duiyi
 \ph /saɡu duiji/
 \va n/a
-\mm sagu-duiyi
+\mm sagu-duiyi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23893,7 +23893,7 @@
 \lx ɔɲiyɛ dɔɔnu
 \ph /ɔɲijɛ dɔːnu/
 \va n/a
-\mm ɔɲiyɛ-dɔɔnu
+\mm ɔɲiyɛ-dɔɔnu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23915,7 +23915,7 @@
 \lx pilɛmu
 \ph /pilɛmu/
 \va n/a
-\mm pilɛmu
+\mm pilɛmu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23937,7 +23937,7 @@
 \lx amatɔŋɔ
 \ph /amatɔŋɔ/
 \va n/a
-\mm amatɔŋɔ
+\mm amatɔŋɔ::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -23959,7 +23959,7 @@
 \lx jaŋuginrun
 \ph /dʒaŋuɡinɾun/
 \va n/a
-\mm jaŋu-ginrun
+\mm jaŋu-ginrun::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -23981,7 +23981,7 @@
 \lx birɛ ai
 \ph /biɾɛ ai/
 \va n/a
-\mm birɛ-ai
+\mm birɛ-ai::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24003,7 +24003,7 @@
 \lx ku gonu
 \ph /ku ɡonu/
 \va n/a
-\mm ku-gonu
+\mm ku-gonu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24025,7 +24025,7 @@
 \lx debu dali
 \ph /debu dali/
 \va n/a
-\mm debu-dali
+\mm debu-dali::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24047,7 +24047,7 @@
 \lx digiru sai
 \ph /diɡiɾu sai/
 \va n/a
-\mm digiru-sai
+\mm digiru-sai::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24069,7 +24069,7 @@
 \lx gaju yoola
 \ph /ɡadʒu joːla/
 \va n/a
-\mm gaju-yoola
+\mm gaju-yoola::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24091,7 +24091,7 @@
 \lx teitai
 \ph /teitai/
 \va n/a
-\mm teitai
+\mm teitai::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24113,7 +24113,7 @@
 \lx demu biyi
 \ph /demu biji/
 \va n/a
-\mm demu-biyi
+\mm demu-biyi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24135,7 +24135,7 @@
 \lx birɛginrun
 \ph /biɾɛɡinɾun/
 \va n/a
-\mm birɛ-ginrun
+\mm birɛ-ginrun::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24157,7 +24157,7 @@
 \lx sariyɛ
 \ph /saɾijɛ/
 \va n/a
-\mm sariyɛ
+\mm sariyɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24179,7 +24179,7 @@
 \lx bɛrɛ sariyɛ
 \ph /bɛɾɛ saɾijɛ/
 \va n/a
-\mm bɛrɛ-sariyɛ
+\mm bɛrɛ-sariyɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24201,7 +24201,7 @@
 \lx porozɛ
 \ph /poɾozɛ/
 \va n/a
-\mm porozɛ
+\mm porozɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24223,7 +24223,7 @@
 \lx tumɔ yabu
 \ph /tumɔ jabu/
 \va n/a
-\mm tumɔ-yabu
+\mm tumɔ-yabu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24245,7 +24245,7 @@
 \lx paŋa bɛi
 \ph /paŋa bɛi/
 \va n/a
-\mm paŋa-bɛi
+\mm paŋa-bɛi::
 \ps v
 \vl trans
 \ve tommo-so
@@ -24267,7 +24267,7 @@
 \lx amagɛn
 \ph /amaɡɛn/
 \va n/a
-\mm amagɛn
+\mm amagɛn::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24289,7 +24289,7 @@
 \lx sagu duyi
 \ph /saɡu duji/
 \va n/a
-\mm sagu-duyi
+\mm sagu-duyi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24311,7 +24311,7 @@
 \lx mɔɔnu nɛ yoi
 \ph /mɔːnu nɛ joi/
 \va n/a
-\mm mɔɔnu-nɛ-yoi
+\mm mɔɔnu-nɛ-yoi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24333,7 +24333,7 @@
 \lx mɔnrin biyi gana
 \ph /mɔnɾin biji ɡana/
 \va n/a
-\mm mɔnrin-biyi-gana
+\mm mɔnrin-biyi-gana::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24355,7 +24355,7 @@
 \lx bɛrɛbe
 \ph /bɛɾɛbe/
 \va n/a
-\mm bɛrɛbe
+\mm bɛrɛbe::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -24377,7 +24377,7 @@
 \lx porobɔ
 \ph /poɾobɔ/
 \va n/a
-\mm porobɔ
+\mm porobɔ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26193,7 +26193,7 @@
 \lx baba
 \ph /ba.ba/
 \va n/a
-\mm baba
+\mm baba::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26215,7 +26215,7 @@
 \lx buudu
 \ph /buː.du/
 \va n/a
-\mm buudu
+\mm buudu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26237,7 +26237,7 @@
 \lx bere
 \ph /be.ɾe/
 \va n/a
-\mm bere
+\mm bere::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26259,7 +26259,7 @@
 \lx bii
 \ph /biː/
 \va n/a
-\mm bii
+\mm bii::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -26281,7 +26281,7 @@
 \lx daga
 \ph /da.ɡa/
 \va n/a
-\mm daga
+\mm daga::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26303,7 +26303,7 @@
 \lx dere
 \ph /de.ɾe/
 \va n/a
-\mm dere
+\mm dere::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26325,7 +26325,7 @@
 \lx dindin
 \ph /din.din/
 \va n/a
-\mm dindin
+\mm dindin::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -26347,7 +26347,7 @@
 \lx dugo
 \ph /du.ɡo/
 \va n/a
-\mm dugo
+\mm dugo::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26369,7 +26369,7 @@
 \lx dɛbɛ
 \ph /dɛ.bɛ/
 \va n/a
-\mm dɛbɛ
+\mm dɛbɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26391,7 +26391,7 @@
 \lx funamu
 \ph /fu.na.mu/
 \va n/a
-\mm funamu
+\mm funamu::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26413,7 +26413,7 @@
 \lx gɔbɔ
 \ph /ɡɔ.bɔ/
 \va n/a
-\mm gɔbɔ
+\mm gɔbɔ::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -26435,7 +26435,7 @@
 \lx gaana
 \ph /ɡaː.na/
 \va n/a
-\mm gaana
+\mm gaana::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26457,7 +26457,7 @@
 \lx gabu
 \ph /ɡa.bu/
 \va n/a
-\mm gabu
+\mm gabu::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -26479,7 +26479,7 @@
 \lx gojo
 \ph /ɡo.dʒo/
 \va n/a
-\mm gojo
+\mm gojo::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26501,7 +26501,7 @@
 \lx giriyi
 \ph /ɡi.ɾi.ji/
 \va n/a
-\mm giriyi
+\mm giriyi::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26523,7 +26523,7 @@
 \lx hakɛ
 \ph /ha.kɛ/
 \va n/a
-\mm hakɛ
+\mm hakɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26545,7 +26545,7 @@
 \lx jiji
 \ph /dʒi.dʒi/
 \va n/a
-\mm jiji
+\mm jiji::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -26567,7 +26567,7 @@
 \lx jebu
 \ph /dʒe.bu/
 \va n/a
-\mm jebu
+\mm jebu::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26589,7 +26589,7 @@
 \lx jeɲe
 \ph /dʒe.ɲe/
 \va n/a
-\mm jeɲe
+\mm jeɲe::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26611,7 +26611,7 @@
 \lx jiire
 \ph /dʒiː.ɾe/
 \va n/a
-\mm jiire
+\mm jiire::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26633,7 +26633,7 @@
 \lx jaa
 \ph /dʒaː/
 \va n/a
-\mm jaa
+\mm jaa::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26655,7 +26655,7 @@
 \lx jɛɛrɛ
 \ph /dʒɛː.ɾɛ/
 \va n/a
-\mm jɛɛrɛ
+\mm jɛɛrɛ::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26677,7 +26677,7 @@
 \lx jaara
 \ph /dʒaː.ɾa/
 \va n/a
-\mm jaara
+\mm jaara::
 \ps v
 \vl trans
 \ve tommo-so
@@ -26699,7 +26699,7 @@
 \lx kaŋe
 \ph /ka.ŋe/
 \va n/a
-\mm kaŋe
+\mm kaŋe::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26721,7 +26721,7 @@
 \lx kabu
 \ph /ka.bu/
 \va n/a
-\mm kabu
+\mm kabu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26743,7 +26743,7 @@
 \lx kanrun
 \ph /kan.ɾun/
 \va n/a
-\mm kanrun
+\mm kanrun::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26765,7 +26765,7 @@
 \lx kɔrɔ
 \ph /kɔ.ɾɔ/
 \va n/a
-\mm kɔrɔ
+\mm kɔrɔ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26787,7 +26787,7 @@
 \lx kaari
 \ph /kaː.ɾi/
 \va n/a
-\mm kaari
+\mm kaari::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -26809,7 +26809,7 @@
 \lx logoro
 \ph /lo.ɡo.ɾo/
 \va n/a
-\mm logoro
+\mm logoro::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27331,7 +27331,7 @@
 \lx dɛnhi
 \ph /dɛn.hi/
 \va dɛnhi
-\mm dɛnhi
+\mm dɛnhi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27353,7 +27353,7 @@
 \lx jonhu
 \ph /dʒon.hu/
 \va jonhu
-\mm jonhu
+\mm jonhu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27375,7 +27375,7 @@
 \lx ɔnhikɛrɛ
 \ph /ɔn.hi.kɛ.ɾɛ/
 \va ɔnhikɛrɛ
-\mm ɔnhi-kɛrɛ
+\mm ɔnhi-kɛrɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27397,7 +27397,7 @@
 \lx sɔnhu
 \ph /sɔn.hu/
 \va sɔnhu
-\mm sɔnhu
+\mm sɔnhu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27419,7 +27419,7 @@
 \lx sinhu
 \ph /sin.hu/
 \va sinhu
-\mm sinhu
+\mm sinhu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27441,7 +27441,7 @@
 \lx jinhu
 \ph /dʒin.hu/
 \va jinhu
-\mm jinhu
+\mm jinhu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27463,7 +27463,7 @@
 \lx lɔgɔ
 \ph /lɔ.ɡɔ/
 \va lɔgɔ
-\mm lɔgɔ
+\mm lɔgɔ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27485,7 +27485,7 @@
 \lx liliyɛ
 \ph /li.li.jɛ/
 \va liliyɛ
-\mm liliyɛ
+\mm liliyɛ::
 \ps v
 \vl trans
 \ve tommo-so
@@ -27507,7 +27507,7 @@
 \lx laa
 \ph /laː/
 \va laa
-\mm laa
+\mm laa::
 \ps adv
 \vl n/a
 \ve tommo-so
@@ -27529,7 +27529,7 @@
 \lx lugo
 \ph /lu.ɡo/
 \va lugo
-\mm lugo
+\mm lugo::
 \ps v
 \vl trans
 \ve tommo-so
@@ -27551,7 +27551,7 @@
 \lx mɔɔnu
 \ph /mɔː.nu/
 \va mɔɔnu
-\mm mɔɔnu
+\mm mɔɔnu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27573,7 +27573,7 @@
 \lx mobili
 \ph /mo.bi.li/
 \va mobili
-\mm mobili
+\mm mobili::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27595,7 +27595,7 @@
 \lx ɲurɔn
 \ph /ɲu.ɾon/
 \va ɲurɔn
-\mm ɲurɔn
+\mm ɲurɔn::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27617,7 +27617,7 @@
 \lx ŋaŋa
 \ph /ŋa.ŋa/
 \va ŋaŋa
-\mm ŋaŋa
+\mm ŋaŋa::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27639,7 +27639,7 @@
 \lx jaŋu
 \ph /dʒa.ŋu/
 \va jaŋu
-\mm jaŋu
+\mm jaŋu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27661,7 +27661,7 @@
 \lx baŋa
 \ph /ba.ŋa/
 \va baŋa
-\mm baŋa
+\mm baŋa::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27683,7 +27683,7 @@
 \lx arajo
 \ph /a.ɾa.dʒo/
 \va arajo
-\mm arajo
+\mm arajo::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27705,7 +27705,7 @@
 \lx anran
 \ph /an.ɾan/
 \va anran
-\mm anran
+\mm anran::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27727,7 +27727,7 @@
 \lx sɛndika
 \ph /sɛn.di.ka/
 \va sɛndika
-\mm sɛndika
+\mm sɛndika::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27749,7 +27749,7 @@
 \lx awoka
 \ph /a.wo.ka/
 \va awoka
-\mm awoka
+\mm awoka::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27771,7 +27771,7 @@
 \lx jaŋudeerenw
 \ph /dʒa.ŋu.deː.ɾenw/
 \va jaŋudeerenw
-\mm jaŋu-deeren-w
+\mm jaŋu-deeren-w::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27793,7 +27793,7 @@
 \lx kibɛru
 \ph /ki.bɛ.ɾu/
 \va kibɛru
-\mm kibɛru
+\mm kibɛru::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27815,7 +27815,7 @@
 \lx numɔbiru
 \ph /nu.mɔ.bi.ɾu/
 \va numɔbiru
-\mm numɔ-biru
+\mm numɔ-biru::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27837,7 +27837,7 @@
 \lx peresidan
 \ph /pe.ɾe.si.dan/
 \va peresidan
-\mm peresidan
+\mm peresidan::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27859,7 +27859,7 @@
 \lx kapitalu
 \ph /ka.pi.ta.lu/
 \va kapitalu
-\mm kapitalu
+\mm kapitalu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27881,7 +27881,7 @@
 \lx minisiru
 \ph /mi.ni.si.ɾu/
 \va minisiru
-\mm minisiru
+\mm minisiru::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27903,7 +27903,7 @@
 \lx sena
 \ph /se.na/
 \va sena
-\mm sena
+\mm sena::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27925,7 +27925,7 @@
 \lx depite
 \ph /de.pi.te/
 \va depite
-\mm depite
+\mm depite::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27947,7 +27947,7 @@
 \lx anbasadɛru
 \ph /an.ba.sa.dɛ.ɾu/
 \va anbasadɛru
-\mm anbasadɛru
+\mm anbasadɛru::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -27969,7 +27969,7 @@
 \lx guwɛrɛnɛrɛ
 \ph /ɡu.wɛ.ɾɛ.nɛ.ɾɛ/
 \va guwɛrɛnɛrɛ
-\mm guwɛrɛnɛrɛ
+\mm guwɛrɛnɛrɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29199,7 +29199,7 @@
 \lx amɔnɔn
 \ph /a.mɔ.nɔn/
 \va n/a
-\mm amɔnɔn
+\mm amɔnɔn::
 \ps adv
 \vl n/a
 \ve tommo-so
@@ -29221,7 +29221,7 @@
 \lx teenu
 \ph /teː.nu/
 \va n/a
-\mm teenu
+\mm teenu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29243,7 +29243,7 @@
 \lx beru
 \ph /be.ɾu/
 \va n/a
-\mm beru
+\mm beru::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29265,7 +29265,7 @@
 \lx dara
 \ph /da.ɾa/
 \va n/a
-\mm dara
+\mm dara::
 \ps post
 \vl n/a
 \ve tommo-so
@@ -29287,7 +29287,7 @@
 \lx gaari
 \ph /ɡaː.ɾi/
 \va n/a
-\mm gaari
+\mm gaari::
 \ps adv
 \vl n/a
 \ve tommo-so
@@ -29309,7 +29309,7 @@
 \lx julɔnɛ
 \ph /dʒu.lɔ.nɛ/
 \va n/a
-\mm julɔnɛ
+\mm julɔnɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29331,7 +29331,7 @@
 \lx dogoboju
 \ph /do.ɡo.bo.dʒu/
 \va n/a
-\mm dogo-boju
+\mm dogo-boju::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29353,7 +29353,7 @@
 \lx gene
 \ph /ɡe.ne/
 \va n/a
-\mm gene
+\mm gene::
 \ps post
 \vl n/a
 \ve tommo-so
@@ -29375,7 +29375,7 @@
 \lx bɛri
 \ph /bɛ.ɾi/
 \va n/a
-\mm bɛri
+\mm bɛri::
 \ps post
 \vl n/a
 \ve tommo-so
@@ -29397,7 +29397,7 @@
 \lx koju
 \ph /ko.dʒu/
 \va n/a
-\mm koju
+\mm koju::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29419,7 +29419,7 @@
 \lx sibɛ
 \ph /si.bɛ/
 \va n/a
-\mm sibɛ
+\mm sibɛ::
 \ps post
 \vl n/a
 \ve tommo-so
@@ -29441,7 +29441,7 @@
 \lx iju
 \ph /i.dʒu/
 \va n/a
-\mm iju
+\mm iju::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29463,7 +29463,7 @@
 \lx dananɛ
 \ph /da.na.nɛ/
 \va n/a
-\mm dana-nɛ
+\mm dana-nɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29485,7 +29485,7 @@
 \lx kɔrɔ
 \ph /kɔ.ɾɔ/
 \va n/a
-\mm kɔrɔ
+\mm kɔrɔ::
 \ps post
 \vl n/a
 \ve tommo-so
@@ -29507,7 +29507,7 @@
 \lx diinjɛ
 \ph /diːn.dʒɛ/
 \va n/a
-\mm diinjɛ
+\mm diinjɛ::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -29529,7 +29529,7 @@
 \lx ku
 \ph /ku/
 \va n/a
-\mm ku
+\mm ku::
 \ps post
 \vl n/a
 \ve tommo-so
@@ -29551,7 +29551,7 @@
 \lx sasa
 \ph /sa.sa/
 \va n/a
-\mm sasa
+\mm sasa::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29573,7 +29573,7 @@
 \lx timɛ
 \ph /ti.mɛ/
 \va n/a
-\mm timɛ
+\mm timɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29595,7 +29595,7 @@
 \lx omoru
 \ph /o.mo.ɾu/
 \va n/a
-\mm omoru
+\mm omoru::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29617,7 +29617,7 @@
 \lx lɛbɛ
 \ph /lɛ.bɛ/
 \va n/a
-\mm lɛbɛ
+\mm lɛbɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29639,7 +29639,7 @@
 \lx sinlaginɛ
 \ph /sin.la.ɡi.nɛ/
 \va n/a
-\mm sinla-ginɛ
+\mm sinla-ginɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29661,7 +29661,7 @@
 \lx ajuro
 \ph /a.dʒu.ɾo/
 \va n/a
-\mm ajuro
+\mm ajuro::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29683,7 +29683,7 @@
 \lx namugire
 \ph /na.mu.ɡi.ɾe/
 \va n/a
-\mm namu-gire
+\mm namu-gire::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29705,7 +29705,7 @@
 \lx sɔrɔgɔnɛ
 \ph /sɔ.ɾɔ.ɡɔ.nɛ/
 \va n/a
-\mm sɔrɔgɔnɛ
+\mm sɔrɔgɔnɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29727,7 +29727,7 @@
 \lx maŋui
 \ph /ma.ŋui/
 \va n/a
-\mm maŋui
+\mm maŋui::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29749,7 +29749,7 @@
 \lx kangɛ
 \ph /kan.ɡɛ/
 \va n/a
-\mm kangɛ
+\mm kangɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29771,7 +29771,7 @@
 \lx duia
 \ph /dui.a/
 \va n/a
-\mm duia
+\mm duia::
 \ps v
 \vl trans
 \ve tommo-so
@@ -29793,7 +29793,7 @@
 \lx sugu
 \ph /su.ɡu/
 \va n/a
-\mm sugu
+\mm sugu::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -29815,7 +29815,7 @@
 \lx sadi
 \ph /sa.di/
 \va n/a
-\mm sadi
+\mm sadi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -29837,7 +29837,7 @@
 \lx bɔrɔliyɛ
 \ph /bɔ.ɾɔ.li.jɛ/
 \va n/a
-\mm bɔrɔliyɛ
+\mm bɔrɔliyɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -32122,7 +32122,7 @@
 \lx dàbú
 \ph /dà.bú/
 \va n/a
-\mm dàbú
+\mm dàbú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32144,7 +32144,7 @@
 \lx mùŋú
 \ph /mù.ŋú/
 \va n/a
-\mm mùŋú
+\mm mùŋú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32166,7 +32166,7 @@
 \lx jàtú
 \ph /dʒà.tú/
 \va n/a
-\mm jàtú
+\mm jàtú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32188,7 +32188,7 @@
 \lx gɛ̀rú
 \ph /ɡɛ̀.ɾú/
 \va n/a
-\mm gɛ̀rú
+\mm gɛ̀rú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32210,7 +32210,7 @@
 \lx nɔ̀ŋú
 \ph /nɔ̀.ŋú/
 \va n/a
-\mm nɔ̀ŋú
+\mm nɔ̀ŋú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32232,7 +32232,7 @@
 \lx bàdú
 \ph /bà.dú/
 \va n/a
-\mm bàdú
+\mm bàdú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32254,7 +32254,7 @@
 \lx jàmú
 \ph /dʒà.mú/
 \va n/a
-\mm jàmú
+\mm jàmú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32276,7 +32276,7 @@
 \lx tɔ̀ŋú
 \ph /tɔ̀.ŋú/
 \va n/a
-\mm tɔ̀ŋú
+\mm tɔ̀ŋú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32298,7 +32298,7 @@
 \lx ìmú
 \ph /ì.mú/
 \va n/a
-\mm ìmú
+\mm ìmú::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32320,7 +32320,7 @@
 \lx ɛ́nú
 \ph /ɛ́.nú/
 \va n/a
-\mm ɛ́nú
+\mm ɛ́nú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32342,7 +32342,7 @@
 \lx nɛ́ŋú
 \ph /nɛ́.ŋú/
 \va n/a
-\mm nɛ́ŋú
+\mm nɛ́ŋú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32364,7 +32364,7 @@
 \lx jáŋú
 \ph /dʒá.ŋú/
 \va n/a
-\mm jáŋú
+\mm jáŋú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32386,7 +32386,7 @@
 \lx tógú
 \ph /tó.ɡú/
 \va n/a
-\mm tógú
+\mm tógú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32408,7 +32408,7 @@
 \lx sɛ́gú
 \ph /sɛ́.ɡú/
 \va n/a
-\mm sɛ́gú
+\mm sɛ́gú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32430,7 +32430,7 @@
 \lx núŋú
 \ph /nú.ŋú/
 \va n/a
-\mm núŋú
+\mm núŋú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32452,7 +32452,7 @@
 \lx tɛ́rú
 \ph /tɛ́.ɾú/
 \va n/a
-\mm tɛ́rú
+\mm tɛ́rú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32474,7 +32474,7 @@
 \lx jɔ́gú
 \ph /dʒɔ́.ɡú/
 \va n/a
-\mm jɔ́gú
+\mm jɔ́gú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32496,7 +32496,7 @@
 \lx wárú
 \ph /wá.ɾú/
 \va n/a
-\mm wárú
+\mm wárú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32518,7 +32518,7 @@
 \lx dúrú
 \ph /dú.ɾú/
 \va n/a
-\mm dúrú
+\mm dúrú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32540,7 +32540,7 @@
 \lx bógú
 \ph /bó.ɡú/
 \va n/a
-\mm bógú
+\mm bógú::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32562,7 +32562,7 @@
 \lx jɔ́ŋú
 \ph /dʒɔ́.ŋú/
 \va n/a
-\mm jɔ́ŋú
+\mm jɔ́ŋú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32584,7 +32584,7 @@
 \lx kìrí
 \ph /kì.ɾí/
 \va n/a
-\mm kìrí
+\mm kìrí::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32606,7 +32606,7 @@
 \lx ìrí
 \ph /ì.ɾí/
 \va n/a
-\mm ìrí
+\mm ìrí::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32628,7 +32628,7 @@
 \lx ìjí
 \ph /ì.dʒí/
 \va n/a
-\mm ìjí
+\mm ìjí::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32650,7 +32650,7 @@
 \lx jíŋí
 \ph /dʒí.ŋí/
 \va n/a
-\mm jíŋí
+\mm jíŋí::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32672,7 +32672,7 @@
 \lx jíɲí
 \ph /dʒí.ɲí/
 \va n/a
-\mm jíɲí
+\mm jíɲí::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32694,7 +32694,7 @@
 \lx ɲíní
 \ph /ɲí.ní/
 \va n/a
-\mm ɲíní
+\mm ɲíní::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32716,7 +32716,7 @@
 \lx tìŋɛ́
 \ph /tì.ŋɛ́/
 \va n/a
-\mm tìŋɛ́
+\mm tìŋɛ́::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32738,7 +32738,7 @@
 \lx bírɛ́
 \ph /bí.ɾɛ́/
 \va n/a
-\mm bírɛ́
+\mm bírɛ́::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32760,7 +32760,7 @@
 \lx síɲɛ́
 \ph /sí.ɲɛ́/
 \va n/a
-\mm síɲɛ́
+\mm síɲɛ́::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32782,7 +32782,7 @@
 \lx párⁿɛ́
 \ph /páɾ.nɛ́/
 \va n/a
-\mm párⁿɛ́
+\mm párⁿɛ́::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32804,7 +32804,7 @@
 \lx sìjé
 \ph /sì.dʒé/
 \va n/a
-\mm sìjé
+\mm sìjé::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32826,7 +32826,7 @@
 \lx gúrɔ́
 \ph /ɡú.ɾɔ́/
 \va n/a
-\mm gúrɔ́
+\mm gúrɔ́::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32848,7 +32848,7 @@
 \lx sùrɔ́
 \ph /sù.ɾɔ́/
 \va n/a
-\mm sùrɔ́
+\mm sùrɔ́::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32870,7 +32870,7 @@
 \lx kɛ̀rɛ́
 \ph /kɛ̀.ɾɛ́/
 \va n/a
-\mm kɛ̀rɛ́
+\mm kɛ̀rɛ́::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32892,7 +32892,7 @@
 \lx tùnɔ́
 \ph /tù.nɔ́/
 \va n/a
-\mm tùnɔ́
+\mm tùnɔ́::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32914,7 +32914,7 @@
 \lx dúwɔ́
 \ph /dú.wɔ́/
 \va n/a
-\mm dúwɔ́
+\mm dúwɔ́::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32936,7 +32936,7 @@
 \lx dùwɔ́
 \ph /dù.wɔ́/
 \va n/a
-\mm dùwɔ́
+\mm dùwɔ́::
 \ps v
 \vl trans
 \ve tommo-so
@@ -32958,7 +32958,7 @@
 \lx sùwⁿɔ́
 \ph /sùw.nɔ́/
 \va n/a
-\mm sùwⁿɔ́
+\mm sùwⁿɔ́::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -32980,7 +32980,7 @@
 \lx dúgó
 \ph /dú.ɡó/
 \va n/a
-\mm dúgó
+\mm dúgó::
 \ps v
 \vl trans
 \ve tommo-so
@@ -33002,7 +33002,7 @@
 \lx lùgó
 \ph /lù.ɡó/
 \va n/a
-\mm lùgó
+\mm lùgó::
 \ps v
 \vl trans
 \ve tommo-so
@@ -33024,7 +33024,7 @@
 \lx tàgá
 \ph /tà.ɡá/
 \va n/a
-\mm tàgá
+\mm tàgá::
 \ps v
 \vl trans
 \ve tommo-so
@@ -33046,7 +33046,7 @@
 \lx wìrɛ̌ⁿ
 \ph /wì.ɾɛ̌n/
 \va n/a
-\mm wìrɛ̌ⁿ
+\mm wìrɛ̌ⁿ::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -33068,7 +33068,7 @@
 \lx sìjɛ̌ⁿ
 \ph /sì.dʒɛ̌n/
 \va n/a
-\mm sìjɛ̌ⁿ
+\mm sìjɛ̌ⁿ::
 \ps v
 \vl trans
 \ve tommo-so
@@ -33090,7 +33090,7 @@
 \lx jántɛ́
 \ph /dʒán.té/
 \va n/a
-\mm jántɛ́
+\mm jántɛ́::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -33266,7 +33266,7 @@
 \lx dáwrú
 \ph /dáw.ɾú/
 \va n/a
-\mm dáwrú
+\mm dáwrú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -33288,7 +33288,7 @@
 \lx bógúrú
 \ph /bó.ɡú.ɾú/
 \va n/a
-\mm bógúrú
+\mm bógúrú::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -33310,7 +33310,7 @@
 \lx járúgú
 \ph /dʒá.ɾú.ɡú/
 \va n/a
-\mm járúgú
+\mm járúgú::
 \ps v
 \vl trans
 \ve tommo-so
@@ -33332,7 +33332,7 @@
 \lx gɔ́ŋúrⁿú
 \ph /ɡɔ́.ŋúɾ.nú/
 \va n/a
-\mm gɔ́ŋúrⁿú
+\mm gɔ́ŋúrⁿú::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -33354,7 +33354,7 @@
 \lx kàgújá
 \ph /kà.ɡú.dʒá/
 \va n/a
-\mm kàgújá
+\mm kàgújá::
 \ps v
 \vl trans
 \ve tommo-so
@@ -33376,7 +33376,7 @@
 \lx sílígá
 \ph /sí.lí.ɡá/
 \va n/a
-\mm sílígá
+\mm sílígá::
 \ps v
 \vl trans
 \ve tommo-so
@@ -33398,7 +33398,7 @@
 \lx bílígá
 \ph /bí.lí.ɡá/
 \va n/a
-\mm bílígá
+\mm bílígá::
 \ps v
 \vl trans
 \ve tommo-so
@@ -34800,7 +34800,7 @@
 \lx kirɛgu
 \ph /ki.ɾɛ.ɡu/
 \va n/a
-\mm kirɛ-gu
+\mm kirɛ-gu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -34822,7 +34822,7 @@
 \lx kurɔgu
 \ph /ku.ɾɔ.ɡu/
 \va n/a
-\mm kurɔ-gu
+\mm kurɔ-gu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -34844,7 +34844,7 @@
 \lx bɛrɛginɛ
 \ph /bɛ.ɾɛ.ɡi.nɛ/
 \va n/a
-\mm bɛrɛ-ginɛ
+\mm bɛrɛ-ginɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -34866,7 +34866,7 @@
 \lx lulɔginɛ
 \ph /lu.lɔ.ɡi.nɛ/
 \va n/a
-\mm lulɔ-ginɛ
+\mm lulɔ-ginɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -34889,7 +34889,7 @@
 \ph /kɛː.ɾɛ.ba.ŋa/
 \ps n
 \va n/a
-\mm kɛɛrɛ-baŋa
+\mm kɛɛrɛ-baŋa::
 \vl n/a
 \ve tommo-so
 \fa n/a
@@ -34910,7 +34910,7 @@
 \lx arusɛgɛbaŋa
 \ph /a.ɾu.sɛ.ɡɛ.ba.ŋa/
 \va n/a
-\mm arusɛgɛ-baŋa
+\mm arusɛgɛ-baŋa::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -34932,7 +34932,7 @@
 \lx taanuye
 \ph /taː.nu.je/
 \va n/a
-\mm taanu-ye
+\mm taanu-ye::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -34954,7 +34954,7 @@
 \lx naiye
 \ph /nai.je/
 \va n/a
-\mm nai-ye
+\mm nai-ye::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -34976,7 +34976,7 @@
 \lx maŋanɛ
 \ph /ma.ŋa.nɛ/
 \va n/a
-\mm maŋa-nɛ
+\mm maŋa-nɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -34998,7 +34998,7 @@
 \lx tirɛnɛ
 \ph /ti.ɾɛ.nɛ/
 \va n/a
-\mm tirɛ-nɛ
+\mm tirɛ-nɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35020,7 +35020,7 @@
 \lx jobu
 \ph /dʒo.bu/
 \va n/a
-\mm job-u
+\mm job-u::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35042,7 +35042,7 @@
 \lx libu
 \ph /li.bu/
 \va n/a
-\mm lib-u
+\mm lib-u::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35064,7 +35064,7 @@
 \lx ɛbu
 \ph /ɛ.bu/
 \va n/a
-\mm ɛb-u
+\mm ɛb-u::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35086,7 +35086,7 @@
 \lx wɛi
 \ph /wɛi/
 \va n/a
-\mm wɛ-i
+\mm wɛ-i::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35108,7 +35108,7 @@
 \lx yoi
 \ph /joi/
 \va n/a
-\mm yo-i
+\mm yo-i::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35130,7 +35130,7 @@
 \lx yai
 \ph /jai/
 \va n/a
-\mm ya-i
+\mm ya-i::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35152,7 +35152,7 @@
 \lx ɛnrɛnhi
 \ph /ɛn.ɾɛn.hi/
 \va n/a
-\mm ɛnrɛn-hi
+\mm ɛnrɛn-hi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35174,7 +35174,7 @@
 \lx naai
 \ph /naːi/
 \va n/a
-\mm naa-i
+\mm naa-i::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35196,7 +35196,7 @@
 \lx pejii
 \ph /pe.dʒiː/
 \va n/a
-\mm peju-i
+\mm peju-i::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35218,7 +35218,7 @@
 \lx taboi
 \ph /ta.boi/
 \va n/a
-\mm ta-boi
+\mm ta-boi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35240,7 +35240,7 @@
 \lx sariyɛginrun
 \ph /sa.ɾi.jɛ.ɡin.ɾun/
 \va n/a
-\mm sariyɛ-ginrun
+\mm sariyɛ-ginrun::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35262,7 +35262,7 @@
 \lx Amaobu
 \ph /a.ma.o.bu/
 \va n/a
-\mm Ama-obu
+\mm Ama-obu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35284,7 +35284,7 @@
 \lx tɔŋutɔŋu
 \ph /tɔ.ŋu.tɔ.ŋu/
 \va n/a
-\mm tɔŋu-tɔŋu
+\mm tɔŋu-tɔŋu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35306,7 +35306,7 @@
 \lx gɔnboi
 \ph /ɡɔn.boi/
 \va n/a
-\mm gɔn-boi
+\mm gɔn-boi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35328,7 +35328,7 @@
 \lx inrunsɔnhu
 \ph /in.ɾun.sɔn.hu/
 \va n/a
-\mm inrun-sɔnhu
+\mm inrun-sɔnhu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35350,7 +35350,7 @@
 \lx Orunawan
 \ph /o.ɾu.na.wan/
 \va n/a
-\mm oru-nawan
+\mm oru-nawan::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35372,7 +35372,7 @@
 \lx Aŋapagu
 \ph /a.ŋa.pa.ɡu/
 \va n/a
-\mm aŋa-pagu
+\mm aŋa-pagu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35394,7 +35394,7 @@
 \lx ɔnmɔ
 \ph /ɔn.mɔ/
 \va n/a
-\mm ɔnmɔ
+\mm ɔnmɔ::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -35416,7 +35416,7 @@
 \lx bomo
 \ph /bo.mo/
 \va n/a
-\mm bomo
+\mm bomo::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -35438,7 +35438,7 @@
 \lx daiɲi
 \ph /dai.ɲi/
 \va n/a
-\mm daiɲi
+\mm daiɲi::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -35460,7 +35460,7 @@
 \lx iŋuru
 \ph /i.ŋu.ɾu/
 \va n/a
-\mm iŋuru
+\mm iŋuru::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -35482,7 +35482,7 @@
 \lx pɔɔrɔ
 \ph /pɔː.ɾɔ/
 \va n/a
-\mm pɔɔrɔ
+\mm pɔɔrɔ::
 \ps adv
 \vl n/a
 \ve tommo-so
@@ -35504,7 +35504,7 @@
 \lx loo
 \ph /loː/
 \va n/a
-\mm loo
+\mm loo::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35526,7 +35526,7 @@
 \lx naa
 \ph /naː/
 \va n/a
-\mm naa
+\mm naa::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35548,7 +35548,7 @@
 \lx Amadu
 \ph /a.ma.du/
 \va n/a
-\mm Amadu
+\mm Amadu::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35570,7 +35570,7 @@
 \lx Yasigɛ
 \ph /ja.si.ɡɛ/
 \va n/a
-\mm Yasigɛ
+\mm Yasigɛ::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35592,7 +35592,7 @@
 \lx Baɲagara
 \ph /ba.ɲa.ɡa.ɾa/
 \va n/a
-\mm Baɲagara
+\mm Baɲagara::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35614,7 +35614,7 @@
 \lx Motu
 \ph /mo.tu/
 \va n/a
-\mm Motu
+\mm Motu::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35636,7 +35636,7 @@
 \lx Mali
 \ph /ma.li/
 \va n/a
-\mm Mali
+\mm Mali::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35658,7 +35658,7 @@
 \lx Nijɛru
 \ph /ni.dʒɛ.ɾu/
 \va n/a
-\mm Nijɛru
+\mm Nijɛru::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35680,7 +35680,7 @@
 \lx Gona
 \ph /ɡo.na/
 \va n/a
-\mm Gona
+\mm Gona::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35702,7 +35702,7 @@
 \lx Yamɛ
 \ph /ja.mɛ/
 \va n/a
-\mm Yamɛ
+\mm Yamɛ::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35724,7 +35724,7 @@
 \lx yulɔ
 \ph /ju.lɔ/
 \va n/a
-\mm yulɔ
+\mm yulɔ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35746,7 +35746,7 @@
 \lx tagaɛrɛ
 \ph /ta.ɡa.ɛ.ɾɛ/
 \va n/a
-\mm tagaɛrɛ
+\mm tagaɛrɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35768,7 +35768,7 @@
 \lx baga
 \ph /ba.ɡa/
 \va n/a
-\mm baga
+\mm baga::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35790,7 +35790,7 @@
 \lx kii
 \ph /kiː/
 \va n/a
-\mm kii
+\mm kii::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35812,7 +35812,7 @@
 \lx jandulu
 \ph /dʒan.du.lu/
 \va n/a
-\mm jandulu
+\mm jandulu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35834,7 +35834,7 @@
 \lx bɛrugirɛnɛ
 \ph /bɛ.ɾu.ɡi.ɾɛ.nɛ/
 \va n/a
-\mm bɛrugirɛnɛ
+\mm bɛrugirɛnɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35856,7 +35856,7 @@
 \lx teu
 \ph /teu/
 \va n/a
-\mm teu
+\mm teu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35878,7 +35878,7 @@
 \lx Sunjata
 \ph /sun.dʒa.ta/
 \va n/a
-\mm Sunjata
+\mm Sunjata::
 \ps n.prop
 \vl n/a
 \ve tommo-so
@@ -35900,7 +35900,7 @@
 \lx giriiyɛ
 \ph /ɡi.ɾiː.jɛ/
 \va n/a
-\mm giri-iyɛ
+\mm giri-iyɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35922,7 +35922,7 @@
 \lx suguruɛgɛ
 \ph /su.ɡu.ɾu.ɛ.ɡɛ/
 \va n/a
-\mm suguru-ɛgɛ
+\mm suguru-ɛgɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35944,7 +35944,7 @@
 \lx aŋapaga
 \ph /a.ŋa.pa.ɡa/
 \va n/a
-\mm aŋa-paga
+\mm aŋa-paga::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35966,7 +35966,7 @@
 \lx kajuyo
 \ph /ka.dʒu.jo/
 \va n/a
-\mm kajuyo
+\mm kajuyo::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -35988,7 +35988,7 @@
 \lx kinɛpiru
 \ph /ki.nɛ.pi.ɾu/
 \va n/a
-\mm kinɛ-piru
+\mm kinɛ-piru::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36010,7 +36010,7 @@
 \lx bɛrɛgɛnhu
 \ph /bɛ.ɾɛ.ɡɛn.hu/
 \va n/a
-\mm bɛrɛ-gɛnhu
+\mm bɛrɛ-gɛnhu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36032,7 +36032,7 @@
 \lx gojutere
 \ph /ɡo.dʒu.te.ɾe/
 \va n/a
-\mm goju-tere
+\mm goju-tere::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36054,7 +36054,7 @@
 \lx suguruwɛi
 \ph /su.ɡu.ɾu.wɛi/
 \va n/a
-\mm suguru-wɛi
+\mm suguru-wɛi::
 \ps v
 \vl trans
 \ve tommo-so
@@ -36076,7 +36076,7 @@
 \lx gireyaa
 \ph /ɡi.ɾe.jaː/
 \va n/a
-\mm gire-yaa
+\mm gire-yaa::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -36098,7 +36098,7 @@
 \lx doɲusugo
 \ph /do.ɲu.su.ɡo/
 \va n/a
-\mm doɲu-sugo
+\mm doɲu-sugo::
 \ps v
 \vl intrans
 \ve tommo-so
@@ -36120,7 +36120,7 @@
 \lx dagalu
 \ph /da.ɡa.lu/
 \va n/a
-\mm daga-lu
+\mm daga-lu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36142,7 +36142,7 @@
 \lx atɛmu
 \ph /a.tɛ.mu/
 \va n/a
-\mm atɛmu
+\mm atɛmu::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36164,7 +36164,7 @@
 \lx denu
 \ph /de.nu/
 \va n/a
-\mm denu
+\mm denu::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36186,7 +36186,7 @@
 \lx sara
 \ph /sa.ɾa/
 \va n/a
-\mm sara
+\mm sara::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36208,7 +36208,7 @@
 \lx dɛnɛnɛ
 \ph /dɛ.nɛ.nɛ/
 \va n/a
-\mm dɛnɛ-nɛ
+\mm dɛnɛ-nɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36230,7 +36230,7 @@
 \lx dimɛ
 \ph /di.mɛ/
 \va n/a
-\mm dimɛ
+\mm dimɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36252,7 +36252,7 @@
 \lx kajubaun
 \ph /ka.dʒu.ba.un/
 \va n/a
-\mm kaju-baun
+\mm kaju-baun::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36274,7 +36274,7 @@
 \lx duiyɔnɛ
 \ph /dui.jɔ.nɛ/
 \va n/a
-\mm dui-yɔnɛ
+\mm dui-yɔnɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36296,7 +36296,7 @@
 \lx kubɛunw
 \ph /ku.bɛ.unw/
 \va n/a
-\mm kubɛ-unw
+\mm kubɛ-unw::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36318,7 +36318,7 @@
 \lx baranɛ
 \ph /ba.ɾa.nɛ/
 \va n/a
-\mm bara-nɛ
+\mm bara-nɛ::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36340,7 +36340,7 @@
 \lx ojube
 \ph /o.dʒu.be/
 \va n/a
-\mm oju-be
+\mm oju-be::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36362,7 +36362,7 @@
 \lx iŋu
 \ph /i.ŋu/
 \va n/a
-\mm iŋu
+\mm iŋu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36384,7 +36384,7 @@
 \lx tenɛlɛ
 \ph /te.nɛ.lɛ/
 \va n/a
-\mm tenɛ-lɛ
+\mm tenɛ-lɛ::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36406,7 +36406,7 @@
 \lx kejielɛ
 \ph /ke.dʒi.e.lɛ/
 \va n/a
-\mm kejie-lɛ
+\mm kejie-lɛ::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36428,7 +36428,7 @@
 \lx dagamu
 \ph /da.ɡa.mu/
 \va n/a
-\mm daga-mu
+\mm daga-mu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36450,7 +36450,7 @@
 \lx wɔtɔnɛ
 \ph /wɔ.tɔ.nɛ/
 \va n/a
-\mm wɔtɔ-nɛ
+\mm wɔtɔ-nɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36472,7 +36472,7 @@
 \lx iŋiru
 \ph /i.ŋi.ɾu/
 \va n/a
-\mm iŋiru
+\mm iŋiru::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36494,7 +36494,7 @@
 \lx saanu
 \ph /saː.nu/
 \va n/a
-\mm saanu
+\mm saanu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36516,7 +36516,7 @@
 \lx jigɛ
 \ph /dʒi.ɡɛ/
 \va n/a
-\mm jigɛ
+\mm jigɛ::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36538,7 +36538,7 @@
 \lx babamu
 \ph /ba.ba.mu/
 \va n/a
-\mm baba-mu
+\mm baba-mu::
 \ps v
 \vl trans
 \ve tommo-so
@@ -36560,7 +36560,7 @@
 \lx pere
 \ph /pe.ɾe/
 \va n/a
-\mm pere
+\mm pere::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36582,7 +36582,7 @@
 \lx saaŋu
 \ph /saː.ŋu/
 \va n/a
-\mm saaŋu
+\mm saaŋu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36604,7 +36604,7 @@
 \lx kale
 \ph /ka.le/
 \va n/a
-\mm kale
+\mm kale::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36626,7 +36626,7 @@
 \lx jamu
 \ph /dʒa.mu/
 \va n/a
-\mm jamu
+\mm jamu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36648,7 +36648,7 @@
 \lx diyɛdɔn
 \ph /di.jɛ.dɔn/
 \va n/a
-\mm diyɛ-dɔn
+\mm diyɛ-dɔn::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36670,7 +36670,7 @@
 \lx iŋeraaɲu
 \ph /i.ŋe.ɾaː.ɲu/
 \va n/a
-\mm iŋera-aɲu
+\mm iŋera-aɲu::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36692,7 +36692,7 @@
 \lx pleniyɛ
 \ph /ple.ni.jɛ/
 \va n/a
-\mm pleniyɛ
+\mm pleniyɛ::
 \ps adj
 \vl n/a
 \ve tommo-so
@@ -36714,7 +36714,7 @@
 \lx ili
 \ph /i.li/
 \va n/a
-\mm ili
+\mm ili::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36736,7 +36736,7 @@
 \lx biyi
 \ph /bi.ji/
 \va n/a
-\mm biyi
+\mm biyi::
 \ps n
 \vl n/a
 \ve tommo-so
@@ -36758,7 +36758,7 @@
 \lx tɔrɔgu
 \ph /tɔ.ɾɔ.ɡu/
 \va n/a
-\mm tɔrɔ-gu
+\mm tɔrɔ-gu::
 \ps n
 \vl n/a
 \ve tommo-so

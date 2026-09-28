@@ -7,7 +7,7 @@
 \lx ăddăwlăt
 \ph [ədːəwlət]
 \va ăddăwlet
-\mm ă-ddăwlăt
+\mm ă-ddăwlăt::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf état ; nation ; pays
@@ -26,7 +26,7 @@
 \lx tamətte
 \ph [təmətːe]
 \va taməttay
-\mm t-amətte
+\mm t-amətte::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf peuple ; nation ; communauté
@@ -45,7 +45,7 @@
 \lx ittus
 \ph [itːus]
 \va itus
-\mm ittu-s
+\mm ittu-s::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf but ; objectif ; finalité
@@ -64,7 +64,7 @@
 \lx erkăwăl
 \ph [erkəwəl]
 \va arkăwăl
-\mm e-rkăwăl
+\mm e-rkăwăl::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf principe ; fondement ; foi
@@ -83,7 +83,7 @@
 \lx ăššăreɣa
 \ph [əʃːəreɣa]
 \va aššăriɣa
-\mm ă-ššărɣ-a
+\mm ă-ššărɣ-a::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf loi ; législation ; règle
@@ -102,7 +102,7 @@
 \lx konstitisyon
 \ph [konstitisjon]
 \va konstitusyon
-\mm konstitisyon
+\mm konstitisyon::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf constitution
@@ -121,7 +121,7 @@
 \lx ălxaqq
 \ph [əlxaqː]
 \va alḥaqq
-\mm ăl-xaqq
+\mm ăl-xaqq::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf droit ; prérogative
@@ -140,7 +140,7 @@
 \lx iluzam
 \ph [iluzam]
 \va iluzamən
-\mm i-luzam
+\mm i-luzam::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf devoirs ; obligations
@@ -159,7 +159,7 @@
 \lx ălxoriyyăt
 \ph [əlxorijːət]
 \va alḥurriyat
-\mm ăl-xoriyyăt
+\mm ăl-xoriyyăt::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf liberté ; indépendance
@@ -178,7 +178,7 @@
 \lx eɣəf
 \ph [eɣəf]
 \va iɣəf
-\mm eɣəf
+\mm eɣəf::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf tête ; chef ; chapitre
@@ -197,7 +197,7 @@
 \lx ălbab
 \ph [əlbab]
 \va albab
-\mm ăl-bab
+\mm ăl-bab::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf porte ; partie ; section
@@ -216,7 +216,7 @@
 \lx inaxkim
 \ph [inaxkim]
 \va anaxkim
-\mm i-n-axkim
+\mm i-n-axkim::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf autorité ; pouvoir
@@ -235,7 +235,7 @@
 \lx ămănokal
 \ph [əmənokal]
 \va amenokal
-\mm ămăno-kal
+\mm ămăno-kal::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf roi ; chef suprême ; président
@@ -254,7 +254,7 @@
 \lx ălxəkum
 \ph [əlxəkum]
 \va alḥukum
-\mm ăl-xəkum
+\mm ăl-xəkum::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf gouvernement ; pouvoir exécutif
@@ -273,7 +273,7 @@
 \lx axăkam
 \ph [axəkam]
 \va akhăkam
-\mm a-xăkam
+\mm a-xăkam::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf administration ; gestion
@@ -292,7 +292,7 @@
 \lx kăl-ălɣəṣkər
 \ph [kəl əlɣəsˤkər]
 \va kăl-ălɣaskăr
-\mm kăl-ălɣəṣkər
+\mm kăl-ălɣəṣkər::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf armée ; forces militaires
@@ -311,7 +311,7 @@
 \lx dәbәtet
 \ph [dəbətet]
 \va debete
-\mm dәbәtet
+\mm dәbәtet::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf député ; représentant
@@ -330,7 +330,7 @@
 \lx taggayt
 \ph [tagːajt]
 \va taggayt
-\mm t-aggay-t
+\mm t-aggay-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf groupe ; commission ; conseil
@@ -349,7 +349,7 @@
 \lx ăkall
 \ph [əkall]
 \va akal
-\mm ă-kall
+\mm ă-kall::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf terre ; pays ; territoire
@@ -368,7 +368,7 @@
 \lx ăwadəm
 \ph [əwadəm]
 \va awădəm
-\mm ă-wadəm
+\mm ă-wadəm::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf personne ; être humain ; individu
@@ -386,7 +386,7 @@
 
 \lx tăhănšareḍt
 \ph [təhənʃareɖt]
-\mm tă-hănšar-ḍt
+\mm tă-hănšar-ḍt::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf servitude ; esclavage
@@ -404,7 +404,7 @@
 
 \lx tămudre
 \ph [təmudre]
-\mm t-ămudr-e
+\mm t-ămudr-e::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf vie
@@ -422,7 +422,7 @@
 
 \lx ălɣafyăt
 \ph [əlɣafjət]
-\mm ăl-ɣafyăt
+\mm ăl-ɣafyăt::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf sécurité ; salut ; bien-être
@@ -440,7 +440,7 @@
 
 \lx taɣəssa
 \ph [taɣəsːa]
-\mm t-aɣəss-a
+\mm t-aɣəss-a::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf corps ; personne physique
@@ -458,7 +458,7 @@
 
 \lx aɣrud
 \ph [aɣrud]
-\mm a-ɣrud
+\mm a-ɣrud::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf intégrité ; totalité ; entièreté
@@ -476,7 +476,7 @@
 
 \lx ăggadəm
 \ph [əgːadəm]
-\mm ăgg-adəm
+\mm ăgg-adəm::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf être humain ; personne
@@ -494,7 +494,7 @@
 
 \lx əššəɣəl
 \ph [əʃːəɣəl]
-\mm ə-ššəɣəl
+\mm ə-ššəɣəl::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf travail ; emploi ; activité
@@ -512,7 +512,7 @@
 
 \lx teɣăre
 \ph [teɣəre]
-\mm t-eɣăr-e
+\mm t-eɣăr-e::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf éducation ; instruction ; lecture
@@ -530,7 +530,7 @@
 
 \lx adubən
 \ph [adubən]
-\mm adubən
+\mm adubən::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf mariage
@@ -548,7 +548,7 @@
 
 \lx ălɣăyal
 \ph [əlɣəjal]
-\mm ăl-ɣăyal
+\mm ăl-ɣăyal::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf famille
@@ -583,7 +583,7 @@
 
 \lx tamăḍt
 \ph [taməɖt]
-\mm t-amăḍ-t
+\mm t-amăḍ-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf femme
@@ -601,7 +601,7 @@
 
 \lx terše
 \ph [terʃe]
-\mm t-erš-e
+\mm t-erš-e::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf propriété ; bien
@@ -619,7 +619,7 @@
 
 \lx ăddin
 \ph [ədːin]
-\mm ă-ddin
+\mm ă-ddin::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf religion ; foi
@@ -637,7 +637,7 @@
 
 \lx isălan
 \ph [isəlan]
-\mm i-săl-an
+\mm i-săl-an::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf information ; nouvelles
@@ -655,7 +655,7 @@
 
 \lx ăhənzazăɣ
 \ph [əhənzazəɣ]
-\mm ă-hənzazăɣ
+\mm ă-hənzazăɣ::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf environnement
@@ -673,7 +673,7 @@
 
 \lx tajbəst
 \ph [taʒbəst]
-\mm t-ajbəs-t
+\mm t-ajbəs-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf défense
@@ -691,7 +691,7 @@
 
 \lx ălmal
 \ph [əlmal]
-\mm ăl-mal
+\mm ăl-mal::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf bien ; richesse ; finance ; propriété
@@ -709,7 +709,7 @@
 
 \lx tawalt
 \ph [tawalt]
-\mm t-awal-t
+\mm t-awal-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf parole ; langue
@@ -727,7 +727,7 @@
 
 \lx isəm
 \ph [isəm]
-\mm isəm
+\mm isəm::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf nom
@@ -745,7 +745,7 @@
 
 \lx tartit
 \ph [tartit]
-\mm t-art-it
+\mm t-art-it::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf unité ; souveraineté
@@ -763,7 +763,7 @@
 
 \lx ăttarex
 \ph [ətːarex]
-\mm ă-ttarex
+\mm ă-ttarex::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf histoire
@@ -781,7 +781,7 @@
 
 \lx afḍăn
 \ph [afɖən]
-\mm afḍăn
+\mm afḍăn::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf grandeur ; valeur
@@ -799,7 +799,7 @@
 
 \lx iwətyan
 \ph [iwətjan]
-\mm i-wəty-an
+\mm i-wəty-an::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf années
@@ -817,7 +817,7 @@
 
 \lx timəttawen
 \ph [timətːawen]
-\mm ti-məttaw-en
+\mm ti-məttaw-en::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf peuples ; nations
@@ -835,7 +835,7 @@
 
 \lx anməṭṭaf
 \ph [anmətˤːaf]
-\mm an-məṭṭaf
+\mm an-məṭṭaf::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf unité ; union
@@ -853,7 +853,7 @@
 
 \lx anmərh
 \ph [anmərh]
-\mm an-mərh
+\mm an-mərh::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf paix
@@ -871,7 +871,7 @@
 
 \lx ansəmɣar
 \ph [ansəmɣar]
-\mm an-səmɣar
+\mm an-səmɣar::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf respect
@@ -889,7 +889,7 @@
 
 \lx ălɣadatăn
 \ph [əlɣadatən]
-\mm ăl-ɣadat-ăn
+\mm ăl-ɣadat-ăn::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf coutumes ; traditions
@@ -907,7 +907,7 @@
 
 \lx tunfast
 \ph [tunfast]
-\mm t-unfas-t
+\mm t-unfas-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf âme ; vie
@@ -925,7 +925,7 @@
 
 \lx imawaynən
 \ph [imawajnən]
-\mm i-maway-nən
+\mm i-maway-nən::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf martyrs
@@ -943,7 +943,7 @@
 
 \lx asəməl
 \ph [asəməl]
-\mm a-səməl
+\mm a-səməl::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf établissement ; fondation
@@ -961,7 +961,7 @@
 
 \lx aɣăšad
 \ph [aɣəʃad]
-\mm a-ɣăšad
+\mm a-ɣăšad::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf crime ; injustice ; forfaiture
@@ -979,7 +979,7 @@
 
 \lx temăkšit
 \ph [teməkʃit]
-\mm t-emăkši-t
+\mm t-emăkši-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf corruption
@@ -997,7 +997,7 @@
 
 \lx tănfo
 \ph [tənfo]
-\mm t-ănfo-t
+\mm t-ănfo-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf intérêt ; bienfait
@@ -1015,7 +1015,7 @@
 
 \lx ahăroj
 \ph [ahəroʒ]
-\mm a-hăroj
+\mm a-hăroj::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf dialogue
@@ -1033,7 +1033,7 @@
 
 \lx tanmənnakt
 \ph [tanmənːakt]
-\mm t-anmənnak-t
+\mm t-anmənnak-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf consultation ; accord ; concertation
@@ -1051,7 +1051,7 @@
 
 \lx anəzjum
 \ph [anəzʒum]
-\mm an-əzjum
+\mm an-əzjum::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf devise ; slogan
@@ -1069,7 +1069,7 @@
 
 \lx ăḍḍamin
 \ph [əɖːamin]
-\mm ă-ḍḍamin
+\mm ă-ḍḍamin::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf garant
@@ -1087,7 +1087,7 @@
 
 \lx tălawit
 \ph [təlawit]
-\mm t-ălaw-it
+\mm t-ălaw-it::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf paix ; quiétude
@@ -1105,7 +1105,7 @@
 
 \lx demokrasi
 \ph [demokrasi]
-\mm demokrasi
+\mm demokrasi::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf démocratie
@@ -1123,7 +1123,7 @@
 
 \lx tanăkra
 \ph [tanəkra]
-\mm t-anăkr-a
+\mm t-anăkr-a::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf révolution ; soulèvement
@@ -1141,7 +1141,7 @@
 
 \lx akăros
 \ph [akəros]
-\mm a-kăros
+\mm a-kăros::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf ordre ; chemin ; voie
@@ -1159,7 +1159,7 @@
 
 \lx ăddewăn
 \ph [ədːewən]
-\mm ă-ddewăn
+\mm ă-ddewăn::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf cadre ; contexte
@@ -1177,7 +1177,7 @@
 
 \lx taggaẓt
 \ph [tagːazˤt]
-\mm t-aggaẓ-t
+\mm t-aggaẓ-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf protection ; défense ; sauvegarde
@@ -1195,7 +1195,7 @@
 
 \lx әllәllu
 \ph [əlːəlːu]
-\mm ә-llәllu
+\mm ә-llәllu::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf indépendance ; souveraineté
@@ -1213,7 +1213,7 @@
 
 \lx ajăraw
 \ph [aʒəraw]
-\mm a-jăraw
+\mm a-jăraw::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf accès ; droit
@@ -1231,7 +1231,7 @@
 
 \lx timašalen
 \ph [timaʃalen]
-\mm ti-mašal-en
+\mm ti-mašal-en::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf actions ; affaires ; mesures
@@ -1249,7 +1249,7 @@
 
 \lx ukəs
 \ph [ukəs]
-\mm ukəs
+\mm ukəs::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf élimination ; suppression ; retrait
@@ -1267,7 +1267,7 @@
 
 \lx temăkrăḍt
 \ph [teməkraɖt]
-\mm t-emăkrăḍ-t
+\mm t-emăkrăḍ-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf délinquance ; criminalité
@@ -1285,7 +1285,7 @@
 
 \lx sărho
 \ph [sər̥o]
-\mm sărho
+\mm sărho::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf bonne gouvernance ; droiture ; justice
@@ -1303,7 +1303,7 @@
 
 \lx təmmənəya
 \ph [təmːənəja]
-\mm t-əmmənəy-a
+\mm t-əmmənəy-a::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf pouvoir ; autorité
@@ -1321,7 +1321,7 @@
 
 \lx nasyon
 \ph [nasjon]
-\mm nasyon
+\mm nasyon::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf nation
@@ -1339,7 +1339,7 @@
 
 \lx tiḍeḍen
 \ph [tiɖeɖen]
-\mm ti-ḍeḍ-en
+\mm ti-ḍeḍ-en::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf femmes
@@ -1357,7 +1357,7 @@
 
 \lx inaɣyabăn
 \ph [inaɣjabən]
-\mm i-n-aɣyab-ăn
+\mm i-n-aɣyab-ăn::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf enfants
@@ -1375,7 +1375,7 @@
 
 \lx tinmərḍuten
 \ph [tinmərɖuten]
-\mm ti-n-mərḍut-en
+\mm ti-n-mərḍut-en::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf traités ; accords
@@ -1393,7 +1393,7 @@
 
 \lx aləɣu
 \ph [aləɣu]
-\mm a-ləɣu
+\mm a-ləɣu::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf appel ; proclamation
@@ -1411,7 +1411,7 @@
 
 \lx asəɣsəl
 \ph [asəɣsəl]
-\mm a-səɣsəl
+\mm a-səɣsəl::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf réalisation ; accomplissement
@@ -1429,7 +1429,7 @@
 
 \lx afriyəya
 \ph [afrijəja]
-\mm afriyəya
+\mm afriyəya::
 \ps n.prop.f.
 \ve Tawallammat T-an-Mali
 \gf Afrique
@@ -1447,7 +1447,7 @@
 
 \lx asətbat
 \ph [asətbat]
-\mm a-sətbat
+\mm a-sətbat::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf renforcement ; consolidation
@@ -1465,7 +1465,7 @@
 
 \lx əlfəṣəl
 \ph [əlfəsˤəl]
-\mm əl-fəṣəl
+\mm əl-fəṣəl::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf article (de loi)
@@ -1483,7 +1483,7 @@
 
 \lx tawset
 \ph [tawset]
-\mm t-awse-t
+\mm t-awse-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf origine ; race ; espèce
@@ -1501,7 +1501,7 @@
 
 \lx ini
 \ph [ini]
-\mm ini
+\mm ini::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf couleur
@@ -1519,7 +1519,7 @@
 
 \lx ahănay
 \ph [ahənaj]
-\mm a-hănay
+\mm a-hănay::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf opinion ; avis ; pensée
@@ -1537,7 +1537,7 @@
 
 \lx folitik
 \ph [folitik]
-\mm folitik
+\mm folitik::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf politique
@@ -1555,7 +1555,7 @@
 
 \lx atwigəẓ
 \ph [atwigəzˤ]
-\mm atwi-gəẓ
+\mm atwi-gəẓ::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf protection
@@ -1573,7 +1573,7 @@
 
 \lx əkkəlu
 \ph [əkːəlu]
-\mm əkkəlu
+\mm əkkəlu::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf esclavage
@@ -1591,7 +1591,7 @@
 
 \lx talɣa
 \ph [talɣa]
-\mm t-alɣ-a
+\mm t-alɣ-a::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf forme ; manière ; traitement ; torture
@@ -1609,7 +1609,7 @@
 
 \lx azəjor
 \ph [azəʒor]
-\mm a-zəjor
+\mm a-zəjor::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf exil ; sortie
@@ -1627,7 +1627,7 @@
 
 \lx taməzzoɣt
 \ph [taməzːoɣt]
-\mm t-aməzzoɣ-t
+\mm t-aməzzoɣ-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf vie en société ; cohabitation
@@ -1645,7 +1645,7 @@
 
 \lx asəlmad
 \ph [asəlmad]
-\mm a-səlmad
+\mm a-səlmad::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf enseignement ; formation
@@ -1663,7 +1663,7 @@
 
 \lx əzazăɣ
 \ph [əzazəɣ]
-\mm ə-zazăɣ
+\mm ə-zazăɣ::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf domicile ; logement ; résidence
@@ -1681,7 +1681,7 @@
 
 \lx əssexət
 \ph [əsːexət]
-\mm ə-ssexət
+\mm ə-ssexət::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf santé
@@ -1699,7 +1699,7 @@
 
 \lx aman
 \ph [aman]
-\mm aman
+\mm aman::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf eau
@@ -1717,7 +1717,7 @@
 
 \lx ăggăddăwlăt
 \ph [əgːədːəwlət]
-\mm ăgg-ăddăwlăt
+\mm ăgg-ăddăwlăt::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf citoyen
@@ -1735,7 +1735,7 @@
 
 \lx sendika
 \ph [sendika]
-\mm sendika
+\mm sendika::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf syndicat
@@ -1753,7 +1753,7 @@
 
 \lx gəref
 \ph [gəref]
-\mm gəref
+\mm gəref::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf grève
@@ -1771,7 +1771,7 @@
 
 \lx ăššarika
 \ph [əʃːarika]
-\mm ă-ššarika
+\mm ă-ššarika::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf association ; société
@@ -1789,7 +1789,7 @@
 
 \lx tadhəlt
 \ph [tadhəlt]
-\mm t-adhəl-t
+\mm t-adhəl-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf service
@@ -1807,7 +1807,7 @@
 
 \lx timẓal
 \ph [timzˤal]
-\mm ti-mẓal
+\mm ti-mẓal::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf impôts ; taxes ; droits
@@ -1825,7 +1825,7 @@
 
 \lx takəstăn
 \ph [takəstən]
-\mm ta-kəst-ăn
+\mm ta-kəst-ăn::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf taxes ; contributions
@@ -1843,7 +1843,7 @@
 
 \lx tămonnit
 \ph [təmonːit]
-\mm t-ămonn-it
+\mm t-ămonn-it::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf unité
@@ -1861,7 +1861,7 @@
 
 \lx ălɣasim
 \ph [əlɣasim]
-\mm ăl-ɣasim
+\mm ăl-ɣasim::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf capitale
@@ -1879,7 +1879,7 @@
 
 \lx tuləft
 \ph [tuləft]
-\mm t-uləf-t
+\mm t-uləf-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf drapeau
@@ -1897,7 +1897,7 @@
 
 \lx taɣmărt
 \ph [taɣmərt]
-\mm t-aɣmăr-t
+\mm t-aɣmăr-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf hymne
@@ -1915,7 +1915,7 @@
 
 \lx tadrəmt
 \ph [tadrəmt]
-\mm t-adrəm-t
+\mm t-adrəm-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf monnaie
@@ -1933,7 +1933,7 @@
 
 \lx layisite
 \ph [lajisite]
-\mm layisite
+\mm layisite::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf laïcité
@@ -1951,7 +1951,7 @@
 
 \lx ăssas
 \ph [əsːas]
-\mm ă-ssas
+\mm ă-ssas::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf base ; fondement ; principe
@@ -1969,7 +1969,7 @@
 
 \lx iqqud
 \ph [iqːud]
-\mm i-qqud
+\mm i-qqud::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf justice ; équité
@@ -1987,7 +1987,7 @@
 
 \lx ălwăkil
 \ph [əlwəkil]
-\mm ăl-wăkil
+\mm ăl-wăkil::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf agent ; représentant ; mandataire
@@ -2005,7 +2005,7 @@
 
 \lx ălxəzəb
 \ph [əlxəzəb]
-\mm ăl-xəzəb
+\mm ăl-xəzəb::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf parti politique
@@ -2023,7 +2023,7 @@
 
 \lx wăte
 \ph [wəte]
-\mm wăte
+\mm wăte::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf vote ; suffrage
@@ -2041,7 +2041,7 @@
 
 \lx maddən
 \ph [madːən]
-\mm madd-ən
+\mm madd-ən::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf hommes
@@ -2059,7 +2059,7 @@
 
 \lx akrəmma
 \ph [akrəmːa]
-\mm a-krəmm-a
+\mm a-krəmm-a::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf partie ; portion
@@ -2077,7 +2077,7 @@
 
 \lx afănaẓ
 \ph [afənazˤ]
-\mm a-fănaẓ
+\mm a-fănaẓ::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf trahison
@@ -2095,7 +2095,7 @@
 
 \lx abăkkaḍ
 \ph [abəkːaɖ]
-\mm a-băkkăḍ
+\mm a-băkkăḍ::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf péché ; crime
@@ -2113,7 +2113,7 @@
 
 \lx tibɣar
 \ph [tibɣar]
-\mm ti-bɣar
+\mm ti-bɣar::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf ressources
@@ -2131,7 +2131,7 @@
 
 \lx emənnəɣəf
 \ph [emənːəɣəf]
-\mm e-mənnəɣəf
+\mm e-mənnəɣəf::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf chef ; président
@@ -2149,7 +2149,7 @@
 
 \lx magaẓ
 \ph [magaðˤ]
-\mm ma-gaẓ
+\mm ma-gaẓ::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf gardien ; protecteur
@@ -2167,7 +2167,7 @@
 
 \lx tanăya
 \ph [tanəja]
-\mm t-anăy-a
+\mm t-anăy-a::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf mandat
@@ -2186,7 +2186,7 @@
 \lx mănda
 \ph [mənda]
 \va mӑndat
-\mm mănda
+\mm mănda::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf mandat ; durée de fonction
@@ -2205,7 +2205,7 @@
 \lx kăndida
 \ph [kəndida]
 \va kandidat
-\mm kăndida
+\mm kăndida::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf candidat
@@ -2224,7 +2224,7 @@
 \lx alăṣăl
 \ph [aləsˤəl]
 \va alăṣal
-\mm al-ăṣăl
+\mm al-ăṣăl::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf origine ; souche
@@ -2243,7 +2243,7 @@
 \lx išilan
 \ph [iʃilan]
 \va išilăn
-\mm išil-an
+\mm išil-an::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf jours
@@ -2262,7 +2262,7 @@
 \lx kur
 \ph [kur]
 \va kor
-\mm kur
+\mm kur::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf cour (de justice)
@@ -2281,7 +2281,7 @@
 \lx tăẓune
 \ph [təðˤune]
 \va tăẓuni
-\mm t-ăẓun-e
+\mm t-ăẓun-e::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf majorité
@@ -2300,7 +2300,7 @@
 \lx tawălayt
 \ph [tawəlajt]
 \va tawălet
-\mm t-awălay-t
+\mm t-awălay-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf tour (électoral)
@@ -2319,7 +2319,7 @@
 \lx ăššăk
 \ph [əʃːək]
 \va əškəy
-\mm ă-ššăk
+\mm ă-ššăk::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf doute ; contestation ; plainte
@@ -2337,7 +2337,7 @@
 
 \lx tahuḍe
 \ph [tahuɖe]
-\mm t-ahuḍ-e
+\mm t-ahuḍ-e::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf serment
@@ -2356,7 +2356,7 @@
 \lx măssinăɣ
 \ph [məsːinəɣ]
 \va Măssinəɣ
-\mm măss-inăɣ
+\mm măss-inăɣ::
 \ps n.prop.m.
 \ve Tawallammat T-an-Mali
 \gf Dieu
@@ -2374,7 +2374,7 @@
 
 \lx tafləst
 \ph [tafləst]
-\mm t-afləs-t
+\mm t-afləs-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf parjure ; trahison du serment
@@ -2393,7 +2393,7 @@
 \lx ekətəb
 \ph [ekətəb]
 \va akătab
-\mm e-kətəb
+\mm e-kətəb::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf écrit ; déclaration
@@ -2412,7 +2412,7 @@
 \lx mizăr
 \ph [mizər]
 \va amizăr
-\mm mizăr
+\mm mizăr::
 \ps adj.
 \ve Tawallammat T-an-Mali
 \gf premier
@@ -2431,7 +2431,7 @@
 \lx mənistăr
 \ph [mənistər]
 \va mәnistәr
-\mm mənistăr
+\mm mənistăr::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf ministre
@@ -2450,7 +2450,7 @@
 \lx ordonănṣ
 \ph [ordonənsˤ]
 \va ordonănṣt
-\mm ordonănṣ
+\mm ordonănṣ::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf ordonnance
@@ -2469,7 +2469,7 @@
 \lx dekre
 \ph [dekre]
 \va dekret
-\mm dekre
+\mm dekre::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf décret
@@ -2488,7 +2488,7 @@
 \lx anbăsadert
 \ph [anbəsadert]
 \va ambasader
-\mm anbăsadert
+\mm anbăsadert::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf ambassadeur
@@ -2507,7 +2507,7 @@
 \lx šanbăr
 \ph [ʃanbər]
 \va šanbərt
-\mm šanbăr
+\mm šanbăr::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf chambre (parlementaire)
@@ -2525,7 +2525,7 @@
 
 \lx kongre
 \ph [kongre]
-\mm kongre
+\mm kongre::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf congrès
@@ -2543,7 +2543,7 @@
 
 \lx sena
 \ph [sena]
-\mm sena
+\mm sena::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf sénat
@@ -2561,7 +2561,7 @@
 
 \lx senater
 \ph [senater]
-\mm senater
+\mm senater::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf sénateur
@@ -2579,7 +2579,7 @@
 
 \lx iminite
 \ph [iminite]
-\mm iminite
+\mm iminite::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf immunité (parlementaire)
@@ -2597,7 +2597,7 @@
 
 \lx sesyon
 \ph [sesjon]
-\mm sesyon
+\mm sesyon::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf session (parlementaire)
@@ -2615,7 +2615,7 @@
 
 \lx komisyon
 \ph [komisjon]
-\mm komisyon
+\mm komisyon::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf commission (parlementaire)
@@ -2633,7 +2633,7 @@
 
 \lx farləma
 \ph [farləma]
-\mm farləma
+\mm farləma::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf parlement
@@ -2651,7 +2651,7 @@
 
 \lx brože
 \ph [broʒe]
-\mm brože
+\mm brože::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf projet (de loi)
@@ -2669,7 +2669,7 @@
 
 \lx bidže
 \ph [bidʒe]
-\mm bidže
+\mm bidže::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf budget
@@ -2687,7 +2687,7 @@
 
 \lx isəstan
 \ph [isəstan]
-\mm i-səstan
+\mm i-səstan::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf questions (au gouvernement)
@@ -2705,7 +2705,7 @@
 
 \lx tixəkkam
 \ph [tixəkːam]
-\mm ti-xəkkam
+\mm ti-xəkkam::
 \ps n.f.pl.
 \ve Tawallammat T-an-Mali
 \gf pouvoir judiciaire ; juridictions
@@ -2723,7 +2723,7 @@
 
 \lx kur sifrem
 \ph [kur sifrem]
-\mm kur sifrem
+\mm kur sifrem::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf Cour suprême
@@ -2741,7 +2741,7 @@
 
 \lx təlbinart
 \ph [təlbinart]
-\mm təlbinar-t
+\mm təlbinar-t::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf tribunal
@@ -2759,7 +2759,7 @@
 
 \lx žiž
 \ph [ʒiʒ]
-\mm žiž
+\mm žiž::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf juge
@@ -2777,7 +2777,7 @@
 
 \lx konsăy
 \ph [konsəj]
-\mm konsăy
+\mm konsăy::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf conseil
@@ -2795,7 +2795,7 @@
 
 \lx mažistra
 \ph [maʒistra]
-\mm mažistra
+\mm mažistra::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf magistrat
@@ -2813,7 +2813,7 @@
 
 \lx mažistratir
 \ph [maʒistratir]
-\mm mažistratir
+\mm mažistratir::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf magistrature
@@ -2831,7 +2831,7 @@
 
 \lx kur de kont
 \ph [kur de kont]
-\mm kur de kont
+\mm kur de kont::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf Cour des comptes
@@ -2849,7 +2849,7 @@
 
 \lx inaẓrafăn
 \ph [inazˤrafən]
-\mm i-n-aẓraf-ăn
+\mm i-n-aẓraf-ăn::
 \ps n.m.pl.
 \ve Tawallammat T-an-Mali
 \gf comptables publics
@@ -2867,7 +2867,7 @@
 
 \lx konsăyye
 \ph [konsəjːe]
-\mm konsăyye
+\mm konsăyye::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf conseiller
@@ -2885,7 +2885,7 @@
 
 \lx kolektiwite
 \ph [kolektiwite]
-\mm kolektiwite
+\mm kolektiwite::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf collectivité (territoriale)
@@ -2903,7 +2903,7 @@
 
 \lx alăway
 \ph [aləwaj]
-\mm a-lăway
+\mm a-lăway::
 \ps n.m.
 \ve Tadghaq
 \gf longueur vocalique
@@ -2921,7 +2921,7 @@
 
 \lx referăndom
 \ph [referəndom]
-\mm referăndom
+\mm referăndom::
 \ps n.m.
 \ve Tawallammat T-an-Mali
 \gf référendum
@@ -2939,7 +2939,7 @@
 
 \lx kudeta
 \ph [kudeta]
-\mm kudeta
+\mm kudeta::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf coup d'État
@@ -2957,7 +2957,7 @@
 
 \lx amnisti
 \ph [amnisti]
-\mm amnisti
+\mm amnisti::
 \ps n.f.
 \ve Tawallammat T-an-Mali
 \gf amnistie
@@ -2975,7 +2975,7 @@
 
 \lx ăšajəš
 \ph [əʃaʒəʃ]
-\mm ă-šajəš
+\mm ă-šajəš::
 \ps n.m.
 \ve Tadghaq
 \gf introduction ; commencement
@@ -2993,7 +2993,7 @@
 
 \lx teyăre
 \ph [tejəre]
-\mm t-eyăr-e
+\mm t-eyăr-e::
 \ps n.f.
 \ve Tadghaq
 \gf étude ; chapitre ; section
@@ -3011,7 +3011,7 @@
 
 \lx tanəyruft
 \ph [tanəjruft]
-\mm t-anəyruf-t
+\mm t-anəyruf-t::
 \ps n.f.
 \ve Tadghaq
 \gf structure ; syntaxe
@@ -3029,7 +3029,7 @@
 
 \lx tənna
 \ph [tənːa]
-\mm tənna
+\mm tənna::
 \ps n.f.
 \ve Tadghaq
 \gf phrase ; énoncé
@@ -3047,7 +3047,7 @@
 
 \lx ăzəmməzəkkəy
 \ph [əzəmːəzəkːəj]
-\mm ă-zəmməzəkkəy
+\mm ă-zəmməzəkkəy::
 \ps n.m.
 \ve Tadghaq
 \gf ponctuation
@@ -3065,7 +3065,7 @@
 
 \lx tanəktubt
 \ph [tanəktubt]
-\mm t-anəktub-t
+\mm t-anəktub-t::
 \ps n.f.
 \ve Tadghaq
 \gf écriture ; transcription
@@ -3084,7 +3084,7 @@
 \lx tămašăyt
 \ph [təmaʃəjt]
 \va tămašăxt, təmažăxt, tămahăxt
-\mm t-ămašăy-t
+\mm t-ămašăy-t::
 \ps n.prop.f.
 \gf tamasheq (langue)
 \gvf tamasheq
@@ -3101,7 +3101,7 @@
 
 \lx ănnăxwi
 \ph [ənːəxwi]
-\mm ă-nnăxwi
+\mm ă-nnăxwi::
 \ps n.m.
 \ve Tadghaq
 \gf grammaire
@@ -3119,7 +3119,7 @@
 
 \lx takălăwkălăwt
 \ph [takələwkələwt]
-\mm ta-kălăwkălăw-t
+\mm ta-kălăwkălăw-t::
 \ps n.f.
 \ve Tadghaq
 \gf table des matières
@@ -3137,7 +3137,7 @@
 
 \lx tiləmmad
 \ph [tiləmːad]
-\mm ti-ləmmad
+\mm ti-ləmmad::
 \ps n.f.pl.
 \ve Tadghaq
 \gf leçons ; matières ; contenus
@@ -3155,7 +3155,7 @@
 
 \lx Tawəlləmmədt
 \ph [tawəlːəmːədt]
-\mm T-awəlləmməd-t
+\mm T-awəlləmməd-t::
 \ps n.prop.f.
 \ve Tawəlləmmədt
 \gf tawəlləmmədt (dialecte)
@@ -3173,7 +3173,7 @@
 
 \lx Tamăyidt
 \ph [taməjidt]
-\mm T-amăyid-t
+\mm T-amăyid-t::
 \ps n.prop.f.
 \ve Tamăyidt
 \gf tamăyidt (dialecte)
@@ -3191,7 +3191,7 @@
 
 \lx tejămke
 \ph [teʒəmke]
-\mm t-ejămke
+\mm t-ejămke::
 \ps n.f.
 \ve Tadghaq
 \gf alphabet
@@ -3209,7 +3209,7 @@
 
 \lx emăsli
 \ph [eməsli]
-\mm e-măsl-i
+\mm e-măsl-i::
 \ps n.m.
 \ve Tadghaq
 \gf voyelle
@@ -3228,7 +3228,7 @@
 \lx eyăs
 \ph [ejəs]
 \va ixăs
-\mm eyăs
+\mm eyăs::
 \ps n.m.
 \ve Tadghaq
 \gf consonne
@@ -3246,7 +3246,7 @@
 
 \lx issus
 \ph [isːus]
-\mm issus
+\mm issus::
 \ps n.m.
 \ve Tadghaq
 \gf gémination
@@ -3264,7 +3264,7 @@
 
 \lx asəməls
 \ph [asəməls]
-\mm a-səməls
+\mm a-səməls::
 \ps n.m.
 \ve Tadghaq
 \gf assimilation
@@ -3282,7 +3282,7 @@
 
 \lx teseyt
 \ph [tesejt]
-\mm t-esey-t
+\mm t-esey-t::
 \ps n.f.
 \ve Tadghaq
 \gf syllabe
@@ -3300,7 +3300,7 @@
 
 \lx tawset
 \ph [tawset]
-\mm t-awse-t
+\mm t-awse-t::
 \ps n.f.
 \ve Tadghaq
 \gf type ; sorte ; genre
@@ -3318,7 +3318,7 @@
 
 \lx ămadin
 \ph [əmadin]
-\mm ă-madin
+\mm ă-madin::
 \ps n.m.
 \ve Tadghaq
 \gf nombre (grammatical)
@@ -3336,7 +3336,7 @@
 
 \lx awṣəf
 \ph [awsˤəf]
-\mm awṣəf
+\mm awṣəf::
 \ps n.m.
 \ve Tadghaq
 \gf genre (grammatical)
@@ -3354,7 +3354,7 @@
 
 \lx ămašal
 \ph [əmaʃal]
-\mm ă-mašal
+\mm ă-mašal::
 \ps n.m.
 \ve Tadghaq
 \gf verbe
@@ -3372,7 +3372,7 @@
 
 \lx ălxal
 \ph [əlxal]
-\mm ăl-xal
+\mm ăl-xal::
 \ps n.m.
 \ve Tadghaq
 \gf aspect (verbal)
@@ -3390,7 +3390,7 @@
 
 \lx amər
 \ph [amər]
-\mm amər
+\mm amər::
 \ps n.m.
 \ve Tadghaq
 \gf impératif
@@ -3408,7 +3408,7 @@
 
 \lx ămujăš
 \ph [əmuʒəʃ]
-\mm ă-mujăš
+\mm ă-mujăš::
 \ps n.m.
 \ve Tadghaq
 \gf pronom
@@ -3426,7 +3426,7 @@
 
 \lx ănamal
 \ph [ənamal]
-\mm ă-namal
+\mm ă-namal::
 \ps n.m.
 \ve Tadghaq
 \gf adjectif
@@ -3444,7 +3444,7 @@
 
 \lx ămadhal
 \ph [əmadhal]
-\mm ă-madhal
+\mm ă-madhal::
 \ps n.m.
 \ve Tadghaq
 \gf adverbe
@@ -3462,7 +3462,7 @@
 
 \lx tămasăyt
 \ph [təmasəjt]
-\mm t-ămasăy-t
+\mm t-ămasăy-t::
 \ps n.f.
 \ve Tadghaq
 \gf conjonction
@@ -3480,7 +3480,7 @@
 
 \lx tăsasăyt
 \ph [təsasəjt]
-\mm t-ăsasăy-t
+\mm t-ăsasăy-t::
 \ps n.f.
 \ve Tadghaq
 \gf préposition
@@ -3498,7 +3498,7 @@
 
 \lx tarăqemt
 \ph [tarəqemt]
-\mm t-arăqem-t
+\mm t-arăqem-t::
 \ps n.f.
 \ve Tadghaq
 \gf interjection
@@ -3516,7 +3516,7 @@
 
 \lx ănnămmašal
 \ph [ənːəmːaʃal]
-\mm ă-nnă-mmašal
+\mm ă-nnă-mmašal::
 \ps n.m.
 \ve Tadghaq
 \gf sujet (grammatical)
@@ -3534,7 +3534,7 @@
 
 \lx enăssămd
 \ph [enəsːəmd]
-\mm e-năssămd
+\mm e-năssămd::
 \ps n.m.
 \ve Tadghaq
 \gf complément
@@ -3552,7 +3552,7 @@
 
 \lx tăfəlleyt
 \ph [təfəlːejt]
-\mm t-ăfəlley-t
+\mm t-ăfəlley-t::
 \ps n.f.
 \ve Tadghaq
 \gf proposition (grammaticale)
@@ -3570,7 +3570,7 @@
 
 \lx tarăqqemt
 \ph [tarəqːemt]
-\mm t-arăqqem-t
+\mm t-arăqqem-t::
 \ps n.f.
 \ve Tadghaq
 \gf apostrophe
@@ -3588,7 +3588,7 @@
 
 \lx aşəmməşələd
 \ph [asˤəmːəʃələd]
-\mm a-şəmməşələd
+\mm a-şəmməşələd::
 \ps n.m.
 \ve Tadghaq
 \gf segmentation
@@ -3606,7 +3606,7 @@
 
 \lx asənnəfəs
 \ph [asənːəfəs]
-\mm a-sənnəfəs
+\mm a-sənnəfəs::
 \ps n.m.
 \ve Tadghaq
 \gf redoublement ; réduplication
@@ -3624,7 +3624,7 @@
 
 \lx ălxuruf
 \ph [əlxuruf]
-\mm ăl-xuruf
+\mm ăl-xuruf::
 \ps n.m.
 \ve Tadghaq
 \gf lettre (de l'alphabet)
@@ -3829,7 +3829,7 @@
 
 \lx imăsăknăn
 \ph [iməsəknən]
-\mm i-măsăkn-ăn
+\mm i-măsăkn-ăn::
 \ps n.m.pl.
 \ve Tadghaq
 \gf déictiques
@@ -3932,7 +3932,7 @@
 
 \lx tămadhalt
 \ph [təmadhalt]
-\mm t-ămadhal-t
+\mm t-ămadhal-t::
 \ps n.f.
 \ve Tadghaq
 \gf modal
@@ -3950,7 +3950,7 @@
 
 \lx tăsəmməjrədt
 \ph [təsəmːəʒrədt]
-\mm t-ăsəmməjrəd-t
+\mm t-ăsəmməjrəd-t::
 \ps n.f.
 \ve Tadghaq
 \gf discours
@@ -3985,7 +3985,7 @@
 
 \lx emăssăkăn
 \ph [eməsːəkən]
-\mm e-măssăk-ăn
+\mm e-măssăk-ăn::
 \ps n.m.
 \ve Tadghaq
 \gf démonstratif
@@ -4173,7 +4173,7 @@
 
 \lx ămazhar
 \ph [əmazhar]
-\mm ă-mazhar
+\mm ă-mazhar::
 \ps n.m.
 \ve Tadghaq
 \gf déterminant
@@ -4191,7 +4191,7 @@
 
 \lx tayəssa
 \ph [tajəsːa]
-\mm t-ayəss-a
+\mm t-ayəss-a::
 \ps n.f.
 \ve Tadghaq
 \gf aspect physique
@@ -4893,7 +4893,7 @@
 
 \lx tamăttant
 \ph [tamətːant]
-\mm t-amăttan-t
+\mm t-amăttan-t::
 \ps n.f.
 \ve Tadghaq
 \gf mort
@@ -5694,7 +5694,7 @@
 
 \lx tăfukt
 \ph [təfukt]
-\mm t-ăfuk-t
+\mm t-ăfuk-t::
 \ps n.f.
 \ve Tadghaq
 \gf le soleil
@@ -6365,7 +6365,7 @@
 \lx ăddăwlăt
 \ph /ɐdːɐwˈlɐt/
 \va
-\mm ăddăwlăt
+\mm ăddăwlăt::
 \ps n.f.
 \vl
 \ve
@@ -6387,7 +6387,7 @@
 \lx ălxaqq
 \ph /ɐlˈχɑqː/
 \va
-\mm ăl-xaqq
+\mm ăl-xaqq::
 \ps n.m.
 \vl
 \ve
@@ -6409,7 +6409,7 @@
 \lx ălxoriyyăt
 \ph /ɐlxoriˈjːɐt/
 \va
-\mm ăl-xoriyyă-t
+\mm ăl-xoriyyă-t::
 \ps n.f.
 \vl
 \ve
@@ -6431,7 +6431,7 @@
 \lx ămănokal
 \ph /ɐmɐnoˈkɑl/
 \va
-\mm amănokal
+\mm amănokal::
 \ps n.m.
 \vl
 \ve
@@ -6453,7 +6453,7 @@
 \lx ălxәkum
 \ph /ɐlχəˈkum/
 \va
-\mm ăl-xәkum
+\mm ăl-xәkum::
 \ps n.m.
 \vl
 \ve
@@ -6475,7 +6475,7 @@
 \lx isəm
 \ph /ˈisəm/
 \va
-\mm isəm
+\mm isəm::
 \ps n.m.
 \vl
 \ve
@@ -6497,7 +6497,7 @@
 \lx ămašal
 \ph /ɐmɑˈʃɑl/
 \va
-\mm amašal
+\mm amašal::
 \ps n.m.
 \vl
 \ve
@@ -6519,7 +6519,7 @@
 \lx ăššăreɣa
 \ph /ɐʃːɐˈɾeɣɑ/
 \va
-\mm ăššăreɣa
+\mm ăššăreɣa::
 \ps n.m.
 \vl
 \ve
@@ -6541,7 +6541,7 @@
 \lx tamәtte
 \ph /tɐˈmətːe/
 \va
-\mm t-amәtt-e
+\mm t-amәtt-e::
 \ps n.f.
 \vl
 \ve
@@ -6563,7 +6563,7 @@
 \lx ămadhal
 \ph /ɐmɑˈdʰɑl/
 \va
-\mm amadhal
+\mm amadhal::
 \ps n.m.
 \vl
 \ve

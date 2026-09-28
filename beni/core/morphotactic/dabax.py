@@ -9,6 +9,7 @@ from beni.utils import config as cfg
 from beni.core.language import Language
 
 warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning, message=".*pkg_resources.*")
 
 BASELINES = cfg.DATA_DIR / "baselines"
 _DABA_GIT = 'pip install "daba @ git+https://github.com/maslinych/daba.git" --no-deps'

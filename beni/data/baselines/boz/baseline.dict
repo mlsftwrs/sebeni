@@ -1046,7 +1046,7 @@
 
 \lx murudunpi
 \ph muɾudumpi
-\mm murudu-n-pi
+\mm murudu-n-pi::
 \ps n
 \gf serpent
 \gvf serpent
@@ -1159,7 +1159,7 @@
 
 \lx haadamajwɔn
 \ph haːdamaɟwɔ̃
-\mm haadama-jwɔn
+\mm haadama-jwɔn::
 \ps n
 \gf être humain
 \gvf être humain, personne
@@ -1306,7 +1306,7 @@
 
 \lx mɛnɛya
 \ph mɛnɛja
-\mm mɛnɛ-ya
+\mm mɛnɛ-ya::
 \ps n
 \gf pêcheur
 \gvf pêcheur
@@ -1483,7 +1483,7 @@
 
 \lx tɔɔxon
 \ph tɔːxɔ̃
-\mm tɔɔ-xon
+\mm tɔɔ-xon::
 \ps n
 \gf nom propre
 \gvf nom propre
@@ -1500,7 +1500,7 @@
 
 \lx porowatɔɔ
 \ph poɾowatɔː
-\mm porowa-tɔɔ
+\mm porowa-tɔɔ::
 \ps n
 \gf nom commun
 \gvf nom commun
@@ -1517,7 +1517,7 @@
 
 \lx weletɔɔ
 \ph weletɔː
-\mm wele-tɔɔ
+\mm wele-tɔɔ::
 \ps n
 \gf substantif verbal
 \gvf substantif verbal
@@ -1550,7 +1550,7 @@
 
 \lx palanbaasinanbari
 \ph palãbaːsinãbaɾi
-\mm palanbaasina-n-bari
+\mm palanbaasina-n-bari::
 \ps adj
 \gf indéfini
 \gvf indéfini
@@ -1905,7 +1905,7 @@
 
 \lx jyeye
 \ph ɟjeje
-\mm jye-ye
+\mm jye-ye::
 \ps n.pl
 \gf réserves (de pêche)
 \gvf réserves
@@ -1922,7 +1922,7 @@
 
 \lx mwɔye
 \ph mʷɔje
-\mm mwį-ye
+\mm mwį-ye::
 \ps n.pl
 \gf gens, personnes
 \gvf gens
@@ -1939,7 +1939,7 @@
 
 \lx xɛɛneye
 \ph xɛːnɛje
-\mm xɛɛnɛ-ye
+\mm xɛɛnɛ-ye::
 \ps n.pl
 \gf commissions
 \gvf commissions
@@ -1956,7 +1956,7 @@
 
 \lx xoloye
 \ph xoloje
-\mm xolo-ye
+\mm xolo-ye::
 \ps n.pl
 \gf villages
 \gvf villages
@@ -1973,7 +1973,7 @@
 
 \lx muåɔnye
 \ph muɔ̃ɲɛ
-\mm muåɔn-ye
+\mm muåɔn-ye::
 \ps n.pl
 \gf hameaux
 \gvf hameaux
@@ -1990,7 +1990,7 @@
 
 \lx guye
 \ph guje
-\mm gu-ye
+\mm gu-ye::
 \ps det.pl
 \gf les (déterminant défini pluriel)
 \gvf les
@@ -2039,7 +2039,7 @@
 
 \lx xaluye
 \ph xaluje
-\mm xalu-ye
+\mm xalu-ye::
 \ps n.pl
 \gf hommes
 \gvf hommes
@@ -2056,7 +2056,7 @@
 
 \lx yaloye
 \ph jaloje
-\mm yalo-ye
+\mm yalo-ye::
 \ps n.pl
 \gf femmes
 \gvf femmes
@@ -2089,7 +2089,7 @@
 
 \lx Aliye
 \ph alije
-\mm Ali-ye
+\mm Ali-ye::
 \ps n.pr.pl
 \gf Ali et ses compagnons
 \gvf Ali et les siens
@@ -2203,7 +2203,7 @@
 
 \lx xuye
 \ph xuje
-\mm xu-ye
+\mm xu-ye::
 \ps n.pl
 \gf variétés de plats de riz
 \gvf plats de riz
@@ -2220,7 +2220,7 @@
 
 \lx xaludayalo
 \ph xaludajalo
-\mm xalu-da-yalo
+\mm xalu-da-yalo::
 \ps n
 \gf genre (grammatical)
 \gvf genre
@@ -2317,7 +2317,7 @@
 
 \lx tɔɔ taantoye
 \ph tɔː taːntoje
-\mm tɔɔ taanto-ye
+\mm tɔɔ taanto-ye::
 \ps n.phr
 \gf fonctions du nom
 \gvf fonctions du nom
@@ -2448,7 +2448,7 @@
 
 \lx åwįxon
 \ph ɔ̃wįxɔ̃
-\mm åwį-xon
+\mm åwį-xon::
 \ps n
 \gf capitaine (poisson)
 \gvf capitaine
@@ -2498,7 +2498,7 @@
 
 \lx wele siiye
 \ph wele siːje
-\mm wele sii-ye
+\mm wele sii-ye::
 \ps n.phr
 \gf types de verbe
 \gvf types de verbe
@@ -2515,7 +2515,7 @@
 
 \lx wele laapaaranye
 \ph wele laːpaːɾaɲe
-\mm wele laapaaran-ye
+\mm wele laapaaran-ye::
 \ps n.phr
 \gf verbes intransitifs
 \gvf verbes intransitifs
@@ -2582,7 +2582,7 @@
 
 \lx wele laakennaye
 \ph wele laːkennaːje
-\mm wele laakennan-ye
+\mm wele laakennan-ye::
 \ps n.phr
 \gf verbes transitifs
 \gvf verbes transitifs
@@ -2649,7 +2649,7 @@
 
 \lx xaranjwįn
 \ph xaɾãɟwį̃
-\mm xaran-jwįn
+\mm xaran-jwįn::
 \ps n
 \gf élève
 \gvf élève, étudiant
@@ -2682,7 +2682,7 @@
 
 \lx wele xeentɔɔtuuye
 \ph wele xeːntɔːtuːje
-\mm wele xeentɔɔtuu-ye
+\mm wele xeentɔɔtuu-ye::
 \ps n.phr
 \gf verbes pronominaux
 \gvf verbes pronominaux
@@ -2779,7 +2779,7 @@
 
 \lx gwoni
 \ph gʷoni
-\mm gwo-ni
+\mm gwo-ni::
 \ps v
 \vl 1
 \gf faire pleurer
@@ -2813,7 +2813,7 @@
 
 \lx munani
 \ph munani
-\mm muna-ni
+\mm muna-ni::
 \ps v
 \vl 1
 \gf refroidir
@@ -3016,7 +3016,7 @@
 
 \lx weleye kirɛnbaana
 \ph weleje kiɾɛ̃baːna
-\mm wele-ye kirɛn-baana
+\mm wele-ye kirɛn-baana::
 \ps n.phr
 \gf formation des verbes
 \gvf formation des verbes
@@ -3033,7 +3033,7 @@
 
 \lx wele syɛlɛnaye
 \ph wele sjɛlɛnaje
-\mm wele syɛlɛna-ye
+\mm wele syɛlɛna-ye::
 \ps n.phr
 \gf verbes dérivés
 \gvf verbes dérivés
@@ -3082,7 +3082,7 @@
 
 \lx xiliya
 \ph xilija
-\mm xolo-ya
+\mm xolo-ya::
 \ps v
 \vl 0
 \gf grossir
@@ -3116,7 +3116,7 @@
 
 \lx sireya
 \ph siɾeja
-\mm sire-ya
+\mm sire-ya::
 \ps v
 \vl 0
 \gf vieillir
@@ -3150,7 +3150,7 @@
 
 \lx xuyaaya
 \ph xujaːja
-\mm xuyon-ya
+\mm xuyon-ya::
 \ps v
 \vl 0
 \gf grandir
@@ -3184,7 +3184,7 @@
 
 \lx paatele
 \ph paːtele
-\mm paa-tele
+\mm paa-tele::
 \ps v
 \vl 2
 \gf demander (à propos de)
@@ -3235,7 +3235,7 @@
 
 \lx maasɛwɛ
 \ph maːsɛwɛ
-\mm maa-sɛwɛ
+\mm maa-sɛwɛ::
 \ps v
 \vl 1
 \gf médire
@@ -3253,7 +3253,7 @@
 
 \lx wele kabunaye
 \ph wele kabunaje
-\mm wele kabuna-ye
+\mm wele kabuna-ye::
 \ps n.phr
 \gf verbes composés
 \gvf verbes composés
@@ -3286,7 +3286,7 @@
 
 \lx liwukun
 \ph liwukũ
-\mm liwu-kun
+\mm liwu-kun::
 \ps v
 \vl 1
 \gf commencer
@@ -3337,7 +3337,7 @@
 
 \lx naanbaa
 \ph naːmbaː
-\mm naan-baa
+\mm naan-baa::
 \ps v
 \vl 1
 \gf séparer
@@ -3388,7 +3388,7 @@
 
 \lx laalakama
 \ph laːlakama
-\mm laa-la-kama
+\mm laa-la-kama::
 \ps v
 \vl 1
 \gf répondre
@@ -3455,7 +3455,7 @@
 
 \lx suupalee
 \ph suːpaleː
-\mm suu-pa-lee
+\mm suu-pa-lee::
 \ps v
 \vl 2
 \gf aider
@@ -3506,7 +3506,7 @@
 
 \lx paluyakiri
 \ph palujakiɾi
-\mm palu-ya-kiri
+\mm palu-ya-kiri::
 \ps v
 \vl 1
 \gf frapper comme un âne
@@ -3540,7 +3540,7 @@
 
 \lx poloyalee
 \ph polojaːleː
-\mm polo-ya-lee
+\mm polo-ya-lee::
 \ps v
 \vl 1
 \gf prendre un cadavre
@@ -3626,7 +3626,7 @@
 
 \lx son yee laxaala
 \ph sɔ̃ jeː laxaːla
-\mm son yee laxaala
+\mm son yee laxaala::
 \ps n.phr
 \gf temps et aspect
 \gvf temps et aspect
@@ -3643,7 +3643,7 @@
 
 \lx welenna lįįnna
 \ph welenna lįːnna
-\mm welenna lįįnna
+\mm welenna lįįnna::
 \ps n.phr
 \gf accompli
 \gvf accompli
@@ -3660,7 +3660,7 @@
 
 \lx xɛlɛna lįįnna tulin
 \ph xɛlɛna lįːnna tulĩ
-\mm xɛlɛna lįįnna tulin
+\mm xɛlɛna lįįnna tulin::
 \ps n.phr
 \gf passé récent
 \gvf passé récent
@@ -3710,7 +3710,7 @@
 
 \lx xɛlɛna lįįnna laan
 \ph xɛlɛna lįːnna laː̃
-\mm xɛlɛna lįįnna laan
+\mm xɛlɛna lįįnna laan::
 \ps n.phr
 \gf passé lointain
 \gvf passé lointain
@@ -3744,7 +3744,7 @@
 
 \lx welenna lįįnnanbari
 \ph welenna lįːnnãbaɾi
-\mm welenna lįįnna-n-bari
+\mm welenna lįįnna-n-bari::
 \ps n.phr
 \gf inaccompli
 \gvf inaccompli
@@ -3859,7 +3859,7 @@
 
 \lx sonbilɛna laan
 \ph sɔ̃bilɛna laː̃
-\mm son-bilɛ-na laan
+\mm son-bilɛ-na laan::
 \ps n.phr
 \gf futur lointain
 \gvf futur lointain
@@ -3908,7 +3908,7 @@
 
 \lx sonbilɛna tulin
 \ph sɔ̃bilɛna tulĩ
-\mm son-bilɛ-na tulin
+\mm son-bilɛ-na tulin::
 \ps n.phr
 \gf futur proche
 \gvf futur proche
@@ -3957,7 +3957,7 @@
 
 \lx saãininjwįn sonbilɛna
 \ph saːĩnĩɟwį̃ sɔ̃bilɛna
-\mm saãinin-jwįn son-bilɛ-na
+\mm saãinin-jwįn son-bilɛ-na::
 \ps n.phr
 \gf futur immédiat
 \gvf futur immédiat
@@ -3990,7 +3990,7 @@
 
 \lx sonxɛlɛna
 \ph sɔ̃xɛlɛna
-\mm son-xɛlɛ-na
+\mm son-xɛlɛ-na::
 \ps n.phr
 \gf passé duratif
 \gvf imparfait
@@ -4039,7 +4039,7 @@
 
 \lx sonbilɛna xɛlɛna
 \ph sɔ̃bilɛna xɛlɛna
-\mm son-bilɛ-na xɛlɛ-na
+\mm son-bilɛ-na xɛlɛ-na::
 \ps n.phr
 \gf futur du passé
 \gvf futur du passé
@@ -4120,7 +4120,7 @@
 
 \lx sagiãaniya welenanbari
 \ph sagiãːnija welenãbaɾi
-\mm sagiãaniya welenanbari
+\mm sagiãaniya welenanbari::
 \ps n.phr
 \gf non réalisé-irréel du futur
 \gvf irréel du futur
@@ -4170,7 +4170,7 @@
 
 \lx ãaniya welenanbari xɛlɛna
 \ph ãːnija welenãbaɾi xɛlɛna
-\mm ãaniya welenanbari xɛlɛna
+\mm ãaniya welenanbari xɛlɛna::
 \ps n.phr
 \gf conditionnel
 \gvf conditionnel
@@ -4363,7 +4363,7 @@
 
 \lx wele lįyinanbariye
 \ph wele lįjinãbaɾije
-\mm wele lįyinanbari-ye
+\mm wele lįyinanbari-ye::
 \ps n.phr
 \gf les participes
 \gvf les participes
@@ -4380,7 +4380,7 @@
 
 \lx sagu wele lįyinanbari
 \ph sagu wele lįjinãbaɾi
-\mm sagu wele lįyinanbari
+\mm sagu wele lįyinanbari::
 \ps n.phr
 \gf participe présent
 \gvf participe présent
@@ -4413,7 +4413,7 @@
 
 \lx xeeletį
 \ph xeːletį
-\mm xeele-tį
+\mm xeele-tį::
 \ps part.pres
 \gf en courant
 \gvf en courant
@@ -4447,7 +4447,7 @@
 
 \lx jyɛtį
 \ph ɟjɛtį
-\mm jyɛ-tį
+\mm jyɛ-tį::
 \ps part.pres
 \gf en mangeant
 \gvf en mangeant
@@ -4480,7 +4480,7 @@
 
 \lx wele lįyinanbari xɛlɛna
 \ph wele lįjinãbaɾi xɛlɛna
-\mm wele lįyinanbari xɛlɛ-na
+\mm wele lįyinanbari xɛlɛ-na::
 \ps n.phr
 \gf participe passé
 \gvf participe passé
@@ -4497,7 +4497,7 @@
 
 \lx saana
 \ph saːna
-\mm saa-na
+\mm saa-na::
 \ps part.past
 \gf couché
 \gvf couché
@@ -4531,7 +4531,7 @@
 
 \lx xalina
 \ph xalina
-\mm xali-na
+\mm xali-na::
 \ps part.past
 \gf vu, ayant vu
 \gvf ayant vu
@@ -4581,7 +4581,7 @@
 
 \lx paadina
 \ph paːdina
-\mm paadi-na
+\mm paadi-na::
 \ps part.past
 \gf décédé
 \gvf décédé
@@ -4631,7 +4631,7 @@
 
 \lx payina
 \ph pajina
-\mm payi-na
+\mm payi-na::
 \ps part.past
 \gf assis
 \gvf assis
@@ -4648,7 +4648,7 @@
 
 \lx fwįyinaye
 \ph fʷįjinaje
-\mm fwįyina-ye
+\mm fwįyina-ye::
 \ps part.past.pl
 \gf pourris
 \gvf pourris
@@ -4682,7 +4682,7 @@
 
 \lx jyɛmujwɔn tinanye
 \ph ɟjɛmuɟwɔ̃ tinãɲe
-\mm jyɛmu-jwɔn tinan-ye
+\mm jyɛmu-jwɔn tinan-ye::
 \ps n.phr
 \gf autres parties du discours
 \gvf autres parties du discours
@@ -4715,7 +4715,7 @@
 
 \lx mwįxɛntįįye
 \ph mʷįxɛntįːje
-\mm mwį-xɛntįį-ye
+\mm mwį-xɛntįį-ye::
 \ps n.phr
 \gf les pronoms personnels
 \gvf les pronoms personnels
@@ -4893,7 +4893,7 @@
 
 \lx nnį
 \ph nnį
-\mm n-nį
+\mm n-nį::
 \ps pron.emph
 \gf moi
 \gvf moi (emphatique)
@@ -4910,7 +4910,7 @@
 
 \lx annį
 \ph annį
-\mm an-nį
+\mm an-nį::
 \ps pron.emph
 \gf toi
 \gvf toi (emphatique)
@@ -4927,7 +4927,7 @@
 
 \lx arį
 \ph aɾį
-\mm a-rį
+\mm a-rį::
 \ps pron.emph
 \gf lui, elle
 \gvf lui, elle (emphatique)
@@ -4944,7 +4944,7 @@
 
 \lx kirį
 \ph kiɾį
-\mm ki-rį
+\mm ki-rį::
 \ps pron.emph
 \gf nous (inclusif)
 \gvf nous (inclusif, emphatique)
@@ -4961,7 +4961,7 @@
 
 \lx innį
 \ph innį
-\mm in-nį
+\mm in-nį::
 \ps pron.emph
 \gf nous (exclusif)
 \gvf nous (exclusif, emphatique)
@@ -4978,7 +4978,7 @@
 
 \lx xarį
 \ph xaɾį
-\mm xa-rį
+\mm xa-rį::
 \ps pron.emph
 \gf vous
 \gvf vous (emphatique)
@@ -4995,7 +4995,7 @@
 
 \lx yerį
 \ph jeɾį
-\mm ye-rį
+\mm ye-rį::
 \ps pron.emph
 \gf eux, elles
 \gvf eux, elles (emphatique)
@@ -5012,7 +5012,7 @@
 
 \lx xɛntɔɔ taantoye
 \ph xɛntɔː taːntoje
-\mm xɛntɔɔ taanto-ye
+\mm xɛntɔɔ taanto-ye::
 \ps n.phr
 \gf fonctions du pronom personnel
 \gvf fonctions du pronom personnel
@@ -5079,7 +5079,7 @@
 
 \lx fwįtuuya xɛntįįye
 \ph fʷįtuːja xɛntįːje
-\mm fwįtuuya xɛntįį-ye
+\mm fwįtuuya xɛntįį-ye::
 \ps n.phr
 \gf les pronoms possessifs
 \gvf les pronoms possessifs
@@ -5176,7 +5176,7 @@
 
 \lx kuye
 \ph kuje
-\mm ku-ye
+\mm ku-ye::
 \ps pron.dem.pl
 \gf ceux-ci
 \gvf ceux-ci
@@ -5193,7 +5193,7 @@
 
 \lx lanbeye
 \ph lãbeje
-\mm lanbe-ye
+\mm lanbe-ye::
 \ps n.pl
 \gf parents
 \gvf parents
@@ -5210,7 +5210,7 @@
 
 \lx ãwinye
 \ph ɔ̃wĩɲe
-\mm ãwįn-ye
+\mm ãwįn-ye::
 \ps pron.dem.pl
 \gf ceux-ci
 \gvf ceux-ci
@@ -5227,7 +5227,7 @@
 
 \lx xɛntįį lįwuntanye
 \ph xɛntįː lįwuntãɲe
-\mm xɛntįį lįwuntan-ye
+\mm xɛntįį lįwuntan-ye::
 \ps n.phr
 \gf les pronoms indéfinis
 \gvf les pronoms indéfinis
@@ -5372,7 +5372,7 @@
 
 \lx biliye
 \ph bilije
-\mm bilį-ye
+\mm bilį-ye::
 \ps pron.indef.pl
 \gf des autres
 \gvf des autres
@@ -5389,7 +5389,7 @@
 
 \lx karen
 \ph kaɾɛ̃
-\mm ka-ren
+\mm ka-ren::
 \ps pron.indef.pl
 \gf certains
 \gvf certains
@@ -5406,7 +5406,7 @@
 
 \lx tinanye
 \ph tinãɲe
-\mm tinan-ye
+\mm tinan-ye::
 \ps pron.indef.pl
 \gf autrui (pluriel)
 \gvf autrui
@@ -5439,7 +5439,7 @@
 
 \lx telexɛntįįye
 \ph telexɛntįːje
-\mm tele-xɛntįį-ye
+\mm tele-xɛntįį-ye::
 \ps n.phr
 \gf les pronoms interrogatifs
 \gvf les pronoms interrogatifs
@@ -5522,7 +5522,7 @@
 
 \lx gwaye
 \ph gʷaje
-\mm gwa-ye
+\mm gwa-ye::
 \ps pron.inter.pl
 \gf quels, quelles, qui (pluriel)
 \gvf quels
@@ -5555,7 +5555,7 @@
 
 \lx lenixɛntįįye
 \ph lenixɛntįːje
-\mm leni-xɛntįį-ye
+\mm leni-xɛntįį-ye::
 \ps n.phr
 \gf les pronoms relatifs
 \gvf les pronoms relatifs
@@ -5572,7 +5572,7 @@
 
 \lx lenixɛntįį åyɛgɛna
 \ph lenixɛntįː ɔ̃jɛgɛna
-\mm leni-xɛntįį åyɛgɛna
+\mm leni-xɛntįį åyɛgɛna::
 \ps n.phr
 \gf le pronom relatif simple
 \gvf le pronom relatif simple
@@ -5653,7 +5653,7 @@
 
 \lx lenixɛntįį kabuna
 \ph lenixɛntįː kabuna
-\mm leni-xɛntįį kabuna
+\mm leni-xɛntįį kabuna::
 \ps n.phr
 \gf le pronom relatif composé
 \gvf le pronom relatif composé
@@ -5769,7 +5769,7 @@
 
 \lx laxaala manxuduye
 \ph laxaːla mãxuduje
-\mm laxaala manxudu-ye
+\mm laxaala manxudu-ye::
 \ps n.phr
 \gf adjectifs qualificatifs
 \gvf adjectifs qualificatifs
@@ -5915,7 +5915,7 @@
 
 \lx tɛgɛmayin
 \ph tɛgɛmajĩ
-\mm tɛgɛ-mayin
+\mm tɛgɛ-mayin::
 \ps adj
 \gf beau, belle
 \gvf beau
@@ -5964,7 +5964,7 @@
 
 \lx xįnįåiãa
 \ph xįnįɔ̃iãː
-\mm xįnį-åiãa
+\mm xįnį-åiãa::
 \ps adj
 \gf vilain, laid
 \gvf laid
@@ -6013,7 +6013,7 @@
 
 \lx suumaalema
 \ph suːmaːlema
-\mm suu-maa-lema
+\mm suu-maa-lema::
 \ps adj
 \gf adroit
 \gvf adroit
@@ -6030,7 +6030,7 @@
 
 \lx suumaasonna
 \ph suːmaːsɔnna
-\mm suu-maa-sonna
+\mm suu-maa-sonna::
 \ps adj
 \gf maladroit
 \gvf maladroit
@@ -6112,7 +6112,7 @@
 
 \lx åwįnimanxuduye
 \ph ɔ̃wįnimãxuduje
-\mm åwįni-manxudu-ye
+\mm åwįni-manxudu-ye::
 \ps n.phr
 \gf les adjectifs démonstratifs
 \gvf les adjectifs démonstratifs
@@ -6213,7 +6213,7 @@
 
 \lx fwįtuuya manxuduye
 \ph fʷįtuːja mãxuduje
-\mm fwįtuuya manxudu-ye
+\mm fwįtuuya manxudu-ye::
 \ps n.phr
 \gf les adjectifs possessifs
 \gvf les adjectifs possessifs
@@ -6230,7 +6230,7 @@
 
 \lx lɔwumanxuduye
 \ph lɔwumãxuduje
-\mm lɔwu-manxudu-ye
+\mm lɔwu-manxudu-ye::
 \ps n.phr
 \gf les adjectifs numéraux
 \gvf les adjectifs numéraux
@@ -6280,7 +6280,7 @@
 
 \lx taantolįwu manxuduye
 \ph taːntolįwu mãxuduje
-\mm taanto-lįwu manxudu-ye
+\mm taanto-lįwu manxudu-ye::
 \ps n.phr
 \gf adjectifs numéraux ordinaux
 \gvf adjectifs numéraux ordinaux
@@ -6313,7 +6313,7 @@
 
 \lx pendena
 \ph pɛndɛna
-\mm pende-na
+\mm pende-na::
 \ps adj.num.ord
 \gf deuxième
 \gvf deuxième
@@ -6330,7 +6330,7 @@
 
 \lx siyaana
 \ph sijaːna
-\mm siyaan-na
+\mm siyaan-na::
 \ps adj.num.ord
 \gf troisième
 \gvf troisième
@@ -6347,7 +6347,7 @@
 
 \lx kyɛrimana
 \ph cɛɾimana
-\mm kyɛriman-na
+\mm kyɛriman-na::
 \ps adj.num.ord
 \gf centième
 \gvf centième
@@ -6380,7 +6380,7 @@
 
 \lx naaranna
 \ph naːɾanna
-\mm naaranna-na
+\mm naaranna-na::
 \ps adj.num.ord
 \gf quatrième
 \gvf quatrième
@@ -6445,7 +6445,7 @@
 
 \lx telemanxuduye
 \ph telemãxuduje
-\mm tele-manxudu-ye
+\mm tele-manxudu-ye::
 \ps n.phr
 \gf les adjectifs interrogatifs
 \gvf les adjectifs interrogatifs
@@ -6494,7 +6494,7 @@
 
 \lx manxudu lįwuntanye
 \ph mãxudu lįwuntãɲe
-\mm manxudu lįwuntan-ye
+\mm manxudu lįwuntan-ye::
 \ps n.phr
 \gf les adjectifs indéfinis
 \gvf les adjectifs indéfinis
@@ -6640,7 +6640,7 @@
 
 \lx xaranjwɔnye
 \ph xaɾãɟwɔ̃ɲe
-\mm xaran-jwɔn-ye
+\mm xaran-jwɔn-ye::
 \ps n.pl
 \gf élèves
 \gvf élèves
@@ -6979,7 +6979,7 @@
 
 \lx naantugiye
 \ph naːntugije
-\mm naan-tugi-ye
+\mm naan-tugi-ye::
 \ps n.phr
 \gf les conjonctions de coordination
 \gvf les conjonctions de coordination
@@ -7207,7 +7207,7 @@
 \lx jadelɔwu manxuduye
 \ph ɟadelɔwu mãxuduje
 \va
-\mm jade-lɔwu manxudu-ye
+\mm jade-lɔwu manxudu-ye::
 \ps n.phr
 \vl
 \ve

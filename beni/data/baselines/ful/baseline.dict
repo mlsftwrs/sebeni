@@ -10,7 +10,7 @@
 \lx leydi
 \ph lej.di
 \va leyde
-\mm leydi
+\mm leydi::
 \ps n
 \vl 
 \ve 
@@ -32,7 +32,7 @@
 \lx Mali
 \ph ma.li
 \va 
-\mm Mali
+\mm Mali::
 \ps n.prop
 \vl 
 \ve 
@@ -54,7 +54,7 @@
 \lx anniya
 \ph an.ni.ja
 \va anniyaaji
-\mm anniya
+\mm anniya::
 \ps n
 \vl 
 \ve 
@@ -76,7 +76,7 @@
 \lx bakkilal
 \ph bak.ki.lal
 \va 
-\mm bakkil-al
+\mm bakkil-al::
 \ps n
 \vl 
 \ve 
@@ -98,7 +98,7 @@
 \lx poroje
 \ph po.ro.ʒe
 \va 
-\mm poroje
+\mm poroje::
 \ps n
 \vl 
 \ve 
@@ -120,7 +120,7 @@
 \lx nuuygal
 \ph nuːj.gal
 \va 
-\mm nuuy-gal
+\mm nuuy-gal::
 \ps n
 \vl 
 \ve 
@@ -142,7 +142,7 @@
 \lx sariya
 \ph sa.ri.ja
 \va sariyaaji
-\mm sariya
+\mm sariya::
 \ps n
 \vl 
 \ve 
@@ -164,7 +164,7 @@
 \lx haatumeere
 \ph haː.tu.meː.re
 \va 
-\mm haatumeere
+\mm haatumeere::
 \ps n
 \vl 
 \ve 
@@ -186,7 +186,7 @@
 \lx fannu
 \ph fan.nu
 \va fannuuji
-\mm fannu
+\mm fannu::
 \ps n
 \vl 
 \ve 
@@ -208,7 +208,7 @@
 \lx puɗɗirka
 \ph puɗ.ɗir.ka
 \va 
-\mm puɗɗ-ir-ka
+\mm puɗɗ-ir-ka::
 \ps n
 \vl 
 \ve 
@@ -230,7 +230,7 @@
 \lx tiitoonde
 \ph tiː.toːn.de
 \va 
-\mm tiit-oon-de
+\mm tiit-oon-de::
 \ps n
 \vl 
 \ve 
@@ -252,7 +252,7 @@
 \lx banngal
 \ph ban.ngal
 \va 
-\mm banng-al
+\mm banng-al::
 \ps n
 \vl 
 \ve 
@@ -274,7 +274,7 @@
 \lx hakke
 \ph hak.ke
 \va hakkeeji
-\mm hakke
+\mm hakke::
 \ps n
 \vl 
 \ve 
@@ -296,7 +296,7 @@
 \lx gollal
 \ph gol.lal
 \va golleeji
-\mm goll-al
+\mm goll-al::
 \ps n
 \vl 
 \ve 
@@ -318,7 +318,7 @@
 \lx tummbitere
 \ph tumm.bi.te.re
 \va 
-\mm tummb-it-ere
+\mm tummb-it-ere::
 \ps n
 \vl 
 \ve 
@@ -340,7 +340,7 @@
 \lx kaande
 \ph kaːn.de
 \va 
-\mm kaande
+\mm kaande::
 \ps n
 \vl 
 \ve 
@@ -362,7 +362,7 @@
 \lx dimaaku
 \ph di.maː.ku
 \va dimaakuuji
-\mm dima-aku
+\mm dima-aku::
 \ps n
 \vl 
 \ve 
@@ -384,7 +384,7 @@
 \lx laamu
 \ph laː.mu
 \va laamuuji
-\mm laam-u
+\mm laam-u::
 \ps n
 \vl 
 \ve 
@@ -406,7 +406,7 @@
 \lx gollirɗo
 \ph gol.lir.ɗo
 \va 
-\mm goll-ir-ɗo
+\mm goll-ir-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -428,7 +428,7 @@
 \lx persidan
 \ph per.si.dan
 \va 
-\mm persidan
+\mm persidan::
 \ps n
 \vl 
 \ve 
@@ -450,7 +450,7 @@
 \lx goforneman
 \ph go.for.ne.man
 \va 
-\mm goforneman
+\mm goforneman::
 \ps n
 \vl 
 \ve 
@@ -472,7 +472,7 @@
 \lx njuɓɓudi
 \ph nʒuɓ.ɓu.di
 \va 
-\mm njuɓɓ-u-di
+\mm njuɓɓ-u-di::
 \ps n
 \vl 
 \ve 
@@ -494,7 +494,7 @@
 \lx suudu
 \ph suː.du
 \va cuuɗi
-\mm suudu
+\mm suudu::
 \ps n
 \vl 
 \ve 
@@ -516,7 +516,7 @@
 \lx gollonooru
 \ph gol.lo.noː.ru
 \va 
-\mm goll-on-oo-ru
+\mm goll-on-oo-ru::
 \ps adj
 \vl 
 \ve 
@@ -538,7 +538,7 @@
 \lx hoore
 \ph hoː.re
 \va koo’e
-\mm hoore
+\mm hoore::
 \ps n
 \vl 
 \ve 
@@ -560,7 +560,7 @@
 \lx mum
 \ph mum
 \va 
-\mm mum
+\mm mum::
 \ps pron.refl
 \vl 
 \ve 
@@ -582,7 +582,7 @@
 \lx larme
 \ph lar.me
 \va 
-\mm larme
+\mm larme::
 \ps n
 \vl 
 \ve 
@@ -604,7 +604,7 @@
 \lx ndeenaagu
 \ph ndeː.naː.gu
 \va 
-\mm ndeen-aagu
+\mm ndeen-aagu::
 \ps n
 \vl 
 \ve 
@@ -626,7 +626,7 @@
 \lx deppite
 \ph dep.pi.te
 \va deppite’en
-\mm deppite
+\mm deppite::
 \ps n
 \vl 
 \ve 
@@ -648,7 +648,7 @@
 \lx sarɗi
 \ph sar.ɗi
 \va sarɗiiji
-\mm sarɗi
+\mm sarɗi::
 \ps n
 \vl 
 \ve 
@@ -670,7 +670,7 @@
 \lx mawnugol
 \ph maw.nu.gol
 \va mawnude
-\mm mawn-u-gol
+\mm mawn-u-gol::
 \ps v
 \vl i
 \ve 
@@ -692,7 +692,7 @@
 \lx asammbile
 \ph a.sam.bi.le
 \va 
-\mm asammbile
+\mm asammbile::
 \ps n
 \vl 
 \ve 
@@ -714,7 +714,7 @@
 \lx yaarugol
 \ph jaː.ru.gol
 \va yaarude
-\mm yaar-u-gol
+\mm yaar-u-gol::
 \ps v
 \vl i
 \ve 
@@ -736,7 +736,7 @@
 \lx taƴugol
 \ph ta.ʔju.gol
 \va taƴude
-\mm taƴ-u-gol
+\mm taƴ-u-gol::
 \ps v
 \vl t
 \ve 
@@ -758,7 +758,7 @@
 \lx kuur
 \ph kuːr
 \va 
-\mm kuur
+\mm kuur::
 \ps n
 \vl 
 \ve 
@@ -780,7 +780,7 @@
 \lx siperemu
 \ph si.pe.re.mu
 \va 
-\mm siperemu
+\mm siperemu::
 \ps adj
 \vl 
 \ve 
@@ -802,7 +802,7 @@
 \lx kontu
 \ph kon.tu
 \va kontuuji
-\mm kontu
+\mm kontu::
 \ps n
 \vl 
 \ve 
@@ -824,7 +824,7 @@
 \lx waajorde
 \ph waː.ʒor.de
 \va 
-\mm waaj-or-de
+\mm waaj-or-de::
 \ps n
 \vl 
 \ve 
@@ -846,7 +846,7 @@
 \lx keɓal
 \ph ke.ɓal
 \va 
-\mm keɓ-al
+\mm keɓ-al::
 \ps n
 \vl 
 \ve 
@@ -868,7 +868,7 @@
 \lx neɗɗaaku
 \ph neɗ.ɗaː.ku
 \va 
-\mm neɗɗ-aaku
+\mm neɗɗ-aaku::
 \ps n
 \vl 
 \ve 
@@ -890,7 +890,7 @@
 \lx hawaalu
 \ph ha.waː.lu
 \va 
-\mm hawaalu
+\mm hawaalu::
 \ps n
 \vl 
 \ve 
@@ -912,7 +912,7 @@
 \lx finaa-tawaa
 \ph fi.naː.ta.waː
 \va 
-\mm fin-aa-taw-aa
+\mm fin-aa-taw-aa::
 \ps n
 \vl 
 \ve 
@@ -934,7 +934,7 @@
 \lx lanndinal
 \ph lan.di.nal
 \va 
-\mm lanndin-al
+\mm lanndin-al::
 \ps n
 \vl 
 \ve 
@@ -956,7 +956,7 @@
 \lx laamiiɗo
 \ph laː.miː.ɗo
 \va laamiiɓe
-\mm laam-ii-ɗo
+\mm laam-ii-ɗo::
 \ps n
 \vl 
 \ve 
@@ -978,7 +978,7 @@
 \lx ameeri
 \ph a.meː.ri
 \va ameeri’en
-\mm ameeri
+\mm ameeri::
 \ps n
 \vl 
 \ve 
@@ -1000,7 +1000,7 @@
 \lx geelle
 \ph geːl.le
 \va 
-\mm geelle
+\mm geelle::
 \ps n
 \vl 
 \ve 
@@ -1022,7 +1022,7 @@
 \lx deental
 \ph deːn.tal
 \va 
-\mm deent-al
+\mm deent-al::
 \ps n
 \vl 
 \ve 
@@ -1044,7 +1044,7 @@
 \lx Afirik
 \ph a.fi.rik
 \va 
-\mm Afirik
+\mm Afirik::
 \ps n.prop
 \vl 
 \ve 
@@ -1066,7 +1066,7 @@
 \lx aadi
 \ph aː.di
 \va aadiiji
-\mm aadi
+\mm aadi::
 \ps n
 \vl 
 \ve 
@@ -1088,7 +1088,7 @@
 \lx kawral
 \ph kaw.ral
 \va kawre
-\mm kawr-al
+\mm kawr-al::
 \ps n
 \vl 
 \ve 
@@ -1110,12 +1110,12 @@
 \lx aduna
 \ph a.du.na
 \va adunaaru
-\mm ad
+\mm ad::
 
 \lx ƴeewtugol
 \ph ʔjeːw.tu.gol
 \va 
-\mm ƴeewt-u-gol
+\mm ƴeewt-u-gol::
 \ps n
 \vl 
 \ve 
@@ -1137,7 +1137,7 @@
 \lx keertaaɗo
 \ph keːr.taː.ɗo
 \va 
-\mm heer-t-aa-ɗo
+\mm heer-t-aa-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -1159,7 +1159,7 @@
 \lx ƴaɓɓotoodo
 \ph ʔjaɓ.ɓo.toː.ɗo
 \va 
-\mm ƴaɓɓ-ot-oo-ɗo
+\mm ƴaɓɓ-ot-oo-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -1181,7 +1181,7 @@
 \lx timminirɗo
 \ph tim.mi.nir.ɗo
 \va 
-\mm timm-in-ir-ɗo
+\mm timm-in-ir-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -1203,7 +1203,7 @@
 \lx yimɓe
 \ph jim.ɓe
 \va 
-\mm yimɓe
+\mm yimɓe::
 \ps n
 \vl 
 \ve 
@@ -1225,7 +1225,7 @@
 \lx fiinugol
 \ph fiː.nu.gol
 \va 
-\mm fiin-u-gol
+\mm fiin-u-gol::
 \ps v
 \vl i
 \ve 
@@ -1247,7 +1247,7 @@
 \lx keewal
 \ph keː.wal
 \va 
-\mm heew-al
+\mm heew-al::
 \ps n
 \vl 
 \ve 
@@ -1269,7 +1269,7 @@
 \lx haala
 \ph haː.la
 \va haalaaji
-\mm haala
+\mm haala::
 \ps n
 \vl 
 \ve 
@@ -1291,7 +1291,7 @@
 \lx seyoragol
 \ph se.jo.ra.gol
 \va 
-\mm sey-or-a-gol
+\mm sey-or-a-gol::
 \ps v
 \vl i
 \ve 
@@ -1313,7 +1313,7 @@
 \lx taariki
 \ph taː.ri.ki
 \va 
-\mm taariki
+\mm taariki::
 \ps n
 \vl 
 \ve 
@@ -1335,7 +1335,7 @@
 \lx ujunaaji
 \ph u.ʒu.naː.ʒi
 \va 
-\mm ujun-aaji
+\mm ujun-aaji::
 \ps n
 \vl 
 \ve 
@@ -1357,7 +1357,7 @@
 \lx mammiraawo
 \ph mam.mi.raː.wo
 \va mammiraaɓe
-\mm mammiraawo
+\mm mammiraawo::
 \ps n
 \vl 
 \ve 
@@ -1379,7 +1379,7 @@
 \lx ronugol
 \ph ro.nu.gol
 \va 
-\mm ron-u-gol
+\mm ron-u-gol::
 \ps v
 \vl t
 \ve 
@@ -1401,7 +1401,7 @@
 \lx ndewgu
 \ph ndeː.gu
 \va ndewguuji
-\mm ndewgu
+\mm ndewgu::
 \ps n
 \vl 
 \ve 
@@ -1423,7 +1423,7 @@
 \lx mahugol
 \ph ma.hu.gol
 \va 
-\mm mah-u-gol
+\mm mah-u-gol::
 \ps v
 \vl t
 \ve 
@@ -1445,7 +1445,7 @@
 \lx dow
 \ph dow
 \va 
-\mm dow
+\mm dow::
 \ps prep
 \vl 
 \ve 
@@ -1467,7 +1467,7 @@
 \lx baale
 \ph baː.le
 \va 
-\mm baale
+\mm baale::
 \ps n
 \vl 
 \ve 
@@ -1489,7 +1489,7 @@
 \lx woodugol
 \ph woː.du.gol
 \va 
-\mm wood-u-gol
+\mm wood-u-gol::
 \ps v
 \vl i
 \ve 
@@ -1511,7 +1511,7 @@
 \lx garoojum
 \ph ga.roː.ʒum
 \va garooje
-\mm war-oo-jum
+\mm war-oo-jum::
 \ps adj
 \vl 
 \ve 
@@ -1533,7 +1533,7 @@
 \lx haanugol
 \ph haː.nu.gol
 \va 
-\mm haan-u-gol
+\mm haan-u-gol::
 \ps v
 \vl i
 \ve 
@@ -1555,7 +1555,7 @@
 \lx ɲemmbude
 \ph ɲem.bu.de
 \va 
-\mm ɲemmb-u-de
+\mm ɲemmb-u-de::
 \ps v
 \vl t
 \ve 
@@ -1577,7 +1577,7 @@
 \lx rewugol
 \ph re.wu.gol
 \va 
-\mm rew-u-gol
+\mm rew-u-gol::
 \ps v
 \vl t
 \ve 
@@ -1599,7 +1599,7 @@
 \lx miijo
 \ph miː.ʒo
 \va miijooji
-\mm miijo
+\mm miijo::
 \ps n
 \vl 
 \ve 
@@ -1621,7 +1621,7 @@
 \lx sa'iidi
 \ph sa.ʔiː.di
 \va sa'iidi'en
-\mm sa'iidi
+\mm sa'iidi::
 \ps n
 \vl 
 \ve 
@@ -1643,7 +1643,7 @@
 \lx waddugol
 \ph wad.du.gol
 \va 
-\mm war-d-u-gol
+\mm war-d-u-gol::
 \ps v
 \vl t
 \ve 
@@ -1665,7 +1665,7 @@
 \lx hewtaare
 \ph hew.taː.re
 \va 
-\mm hewt-aare
+\mm hewt-aare::
 \ps n
 \vl 
 \ve 
@@ -1687,7 +1687,7 @@
 \lx saamugol
 \ph saː.mu.gol
 \va 
-\mm saam-u-gol
+\mm saam-u-gol::
 \ps v
 \vl t
 \ve 
@@ -1709,7 +1709,7 @@
 \lx boowal
 \ph boː.wal
 \va 
-\mm boowal
+\mm boowal::
 \ps n
 \vl 
 \ve 
@@ -1731,7 +1731,7 @@
 \lx wolde
 \ph wol.de
 \va 
-\mm wolde
+\mm wolde::
 \ps n
 \vl 
 \ve 
@@ -1753,7 +1753,7 @@
 \lx kammari
 \ph kam.ma.ri
 \va 
-\mm kammari
+\mm kammari::
 \ps prep
 \vl 
 \ve 
@@ -2195,7 +2195,7 @@
 \lx haɓanagol
 \ph ha.ɓa.na.gol
 \va 
-\mm haɓ-an-a-gol
+\mm haɓ-an-a-gol::
 \ps n.v
 \vl i
 \ve 
@@ -2217,7 +2217,7 @@
 \lx waajibi
 \ph waː.ʒi.bi
 \va 
-\mm waajibi
+\mm waajibi::
 \ps n
 \vl 
 \ve 
@@ -2239,7 +2239,7 @@
 \lx goodal
 \ph goː.dal
 \va 
-\mm wood-al
+\mm wood-al::
 \ps n
 \vl 
 \ve 
@@ -2261,7 +2261,7 @@
 \lx tabitugol
 \ph ta.bi.tu.gol
 \va tabitide
-\mm tabit-u-gol
+\mm tabit-u-gol::
 \ps v
 \vl i
 \ve 
@@ -2283,7 +2283,7 @@
 \lx darjinde
 \ph dar.ʒin.de
 \va 
-\mm darj-in-de
+\mm darj-in-de::
 \ps v
 \vl t
 \ve 
@@ -2305,7 +2305,7 @@
 \lx miijaade
 \ph miː.ʒaː.de
 \va 
-\mm miij-aa-de
+\mm miij-aa-de::
 \ps v
 \vl i
 \ve 
@@ -2327,7 +2327,7 @@
 \lx reenude
 \ph reː.nu.de
 \va 
-\mm reen-u-de
+\mm reen-u-de::
 \ps v
 \vl t
 \ve 
@@ -2349,7 +2349,7 @@
 \lx tawaaɗum
 \ph ta.waː.ɗum
 \va tawaaɗe
-\mm taw-aa-ɗum
+\mm taw-aa-ɗum::
 \ps n
 \vl 
 \ve 
@@ -2371,7 +2371,7 @@
 \lx wonande
 \ph wo.nan.de
 \va 
-\mm won-an-de
+\mm won-an-de::
 \ps prep
 \vl 
 \ve 
@@ -2393,7 +2393,7 @@
 \lx mosalaa
 \ph mo.sa.laː
 \va 
-\mm mosalaa
+\mm mosalaa::
 \ps n
 \vl 
 \ve 
@@ -2415,7 +2415,7 @@
 \lx jamaa
 \ph ʒa.maː
 \va 
-\mm jamaa
+\mm jamaa::
 \ps n
 \vl 
 \ve 
@@ -2437,7 +2437,7 @@
 \lx tabintingol
 \ph ta.bin.tin.gol
 \va 
-\mm tab-in-tin-gol
+\mm tab-in-tin-gol::
 \ps v.n
 \vl t
 \ve 
@@ -2459,7 +2459,7 @@
 \lx jilli
 \ph ʒil.li
 \va 
-\mm jilli
+\mm jilli::
 \ps n
 \vl 
 \ve 
@@ -2481,7 +2481,7 @@
 \lx semmbinde
 \ph sem.bin.de
 \va 
-\mm semmb-in-de
+\mm semmb-in-de::
 \ps v
 \vl t
 \ve 
@@ -2503,7 +2503,7 @@
 \lx kaɓɓondirɗo
 \ph kaɓ.ɓon.dir.ɗo
 \va 
-\mm haɓɓ-on-dir-ɗo
+\mm haɓɓ-on-dir-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -2525,7 +2525,7 @@
 \lx jaltuɗo
 \ph ʒal.tu.ɗo
 \va 
-\mm jalt-u-ɗo
+\mm jalt-u-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -2547,7 +2547,7 @@
 \lx rewolisiyon
 \ph re.wo.li.si.jon
 \va 
-\mm rewolisiyon
+\mm rewolisiyon::
 \ps n
 \vl 
 \ve 
@@ -2569,7 +2569,7 @@
 \lx marsi
 \ph mar.si
 \va 
-\mm marsi
+\mm marsi::
 \ps n
 \vl 
 \ve 
@@ -2591,7 +2591,7 @@
 \lx hitaande
 \ph hi.taːn.de
 \va duuɓi
-\mm hitaande
+\mm hitaande::
 \ps n
 \vl 
 \ve 
@@ -3061,7 +3061,7 @@
 \lx rimaaɗo
 \ph ri.maː.ɗo
 \va rimaaɓe
-\mm rim-aa-ɗo
+\mm rim-aa-ɗo::
 \ps n
 \vl 
 \ve 
@@ -3083,7 +3083,7 @@
 \lx ceenndiigu
 \ph tʃeːn.diː.gu
 \va 
-\mm seennd-ii-gu
+\mm seennd-ii-gu::
 \ps n
 \vl 
 \ve 
@@ -3105,7 +3105,7 @@
 \lx fawugol
 \ph fa.wu.gol
 \va fawude
-\mm faw-u-gol
+\mm faw-u-gol::
 \ps v
 \vl t
 \ve 
@@ -3127,7 +3127,7 @@
 \lx iwdi
 \ph iw.di
 \va 
-\mm iw-di
+\mm iw-di::
 \ps n
 \vl 
 \ve 
@@ -3149,7 +3149,7 @@
 \lx noone
 \ph noː.ne
 \va nooneeji
-\mm noone
+\mm noone::
 \ps n
 \vl 
 \ve 
@@ -3171,7 +3171,7 @@
 \lx ɗemngal
 \ph ɗem.ngal
 \va ɗemle
-\mm ɗem-ngal
+\mm ɗem-ngal::
 \ps n
 \vl 
 \ve 
@@ -3193,7 +3193,7 @@
 \lx sii
 \ph siː
 \va sii-sii
-\mm sii
+\mm sii::
 \ps n
 \vl 
 \ve 
@@ -3215,7 +3215,7 @@
 \lx leɲol
 \ph le.ɲol
 \va leɲi
-\mm leɲ-ol
+\mm leɲ-ol::
 \ps n
 \vl 
 \ve 
@@ -3237,7 +3237,7 @@
 \lx politik
 \ph po.li.tik
 \va 
-\mm politik
+\mm politik::
 \ps n
 \vl 
 \ve 
@@ -3259,7 +3259,7 @@
 \lx haɗugol
 \ph ha.ɗu.gol
 \va haɗude
-\mm haɗ-u-gol
+\mm haɗ-u-gol::
 \ps v
 \vl t
 \ve 
@@ -3281,7 +3281,7 @@
 \lx ɓinngel-aadama
 \ph ɓin.ngel.ʔaː.da.ma
 \va 
-\mm ɓinngel-aadama
+\mm ɓinngel-aadama::
 \ps n
 \vl 
 \ve 
@@ -3303,7 +3303,7 @@
 \lx teddugol
 \ph ted.du.gol
 \va teddude
-\mm tedd-u-gol
+\mm tedd-u-gol::
 \ps v
 \vl i
 \ve 
@@ -3325,7 +3325,7 @@
 \lx memugol
 \ph me.mu.gol
 \va memude
-\mm mem-u-gol
+\mm mem-u-gol::
 \ps v
 \vl t
 \ve 
@@ -3347,7 +3347,7 @@
 \lx neɗɗanke
 \ph neɗ.ɗan.ke
 \va 
-\mm neɗɗ-an-ke
+\mm neɗɗ-an-ke::
 \ps n
 \vl 
 \ve 
@@ -3369,7 +3369,7 @@
 \lx calɗi
 \ph tʃal.ɗi
 \va 
-\mm cal-ɗi
+\mm cal-ɗi::
 \ps n
 \vl 
 \ve 
@@ -3391,7 +3391,7 @@
 \lx suka
 \ph su.ka
 \va sukaaɓe
-\mm suka
+\mm suka::
 \ps n
 \vl 
 \ve 
@@ -3413,7 +3413,7 @@
 \lx soottugol
 \ph soːt.tu.gol
 \va soottude
-\mm soott-u-gol
+\mm soott-u-gol::
 \ps v
 \vl t
 \ve 
@@ -3435,7 +3435,7 @@
 \lx luutugol
 \ph luː.tu.gol
 \va luutude
-\mm luut-u-gol
+\mm luut-u-gol::
 \ps v
 \vl t
 \ve 
@@ -3457,7 +3457,7 @@
 \lx winndagol
 \ph win.da.gol
 \va 
-\mm winnd-a-gol
+\mm winnd-a-gol::
 \ps n.v
 \vl i
 \ve 
@@ -3479,7 +3479,7 @@
 \lx pelle
 \ph pel.le
 \va 
-\mm pelle
+\mm pelle::
 \ps n
 \vl 
 \ve 
@@ -3501,7 +3501,7 @@
 \lx murtugol
 \ph mur.tu.gol
 \va murtude
-\mm murt-u-gol
+\mm murt-u-gol::
 \ps v
 \vl i
 \ve 
@@ -3523,7 +3523,7 @@
 \lx bomɓe
 \ph bom.ɓe
 \va 
-\mm bomɓe
+\mm bomɓe::
 \ps n
 \vl 
 \ve 
@@ -3545,7 +3545,7 @@
 \lx torra
 \ph tor.ra
 \va torraaji
-\mm torra
+\mm torra::
 \ps n
 \vl 
 \ve 
@@ -3567,7 +3567,7 @@
 \lx bonugol
 \ph bo.nu.gol
 \va bonude
-\mm bon-u-gol
+\mm bon-u-gol::
 \ps v
 \vl i
 \ve 
@@ -3589,7 +3589,7 @@
 \lx maccungaaku
 \ph mat.tʃun.gaː.ku
 \va 
-\mm maccu-ngaaku
+\mm maccu-ngaaku::
 \ps n
 \vl 
 \ve 
@@ -3611,7 +3611,7 @@
 \lx ngaɗuki
 \ph nga.ɗu.ki
 \va 
-\mm waɗ-u-ki
+\mm waɗ-u-ki::
 \ps n.v
 \vl t
 \ve 
@@ -3633,7 +3633,7 @@
 \lx mbonki
 \ph mbon.ki
 \va 
-\mm bon-ki
+\mm bon-ki::
 \ps n
 \vl 
 \ve 
@@ -3655,7 +3655,7 @@
 \lx sattugol
 \ph sat.tu.gol
 \va sattude
-\mm satt-u-gol
+\mm satt-u-gol::
 \ps v
 \vl i
 \ve 
@@ -3677,7 +3677,7 @@
 \lx aybinoowi
 \ph aj.bi.noː.wi
 \va 
-\mm ayb-in-oo-wi
+\mm ayb-in-oo-wi::
 \ps adj
 \vl 
 \ve 
@@ -3699,7 +3699,7 @@
 \lx jukkugol
 \ph ʒuk.ku.gol
 \va jukkude
-\mm jukk-u-gol
+\mm jukk-u-gol::
 \ps v
 \vl t
 \ve 
@@ -3721,7 +3721,7 @@
 \lx ferngo
 \ph fɛr.ngɔ
 \va 
-\mm fer-ng-o
+\mm fer-ng-o::
 \ps n
 \vl 
 \ve 
@@ -3743,7 +3743,7 @@
 \lx goonɗinal
 \ph goːn.ɗi.nal
 \va 
-\mm goonɗ-in-al
+\mm goonɗ-in-al::
 \ps n
 \vl 
 \ve 
@@ -3765,7 +3765,7 @@
 \lx duruwa
 \ph du.ru.wa
 \va 
-\mm duruwa
+\mm duruwa::
 \ps n
 \vl 
 \ve 
@@ -3787,7 +3787,7 @@
 \lx leeru
 \ph leː.ru
 \va leeruuji
-\mm leeru
+\mm leeru::
 \ps n
 \vl 
 \ve 
@@ -3809,7 +3809,7 @@
 \lx debe
 \ph dɛ.bɛ
 \va 
-\mm debe
+\mm debe::
 \ps num
 \vl 
 \ve 
@@ -3831,7 +3831,7 @@
 \lx jeetti
 \ph ʒeːt.ti
 \va 
-\mm jeetti
+\mm jeetti::
 \ps num
 \vl 
 \ve 
@@ -3853,7 +3853,7 @@
 \lx yamiroore
 \ph ja.mi.roː.re
 \va 
-\mm yam-ir-oo-re
+\mm yam-ir-oo-re::
 \ps n
 \vl 
 \ve 
@@ -3875,7 +3875,7 @@
 \lx juuju
 \ph ʒuː.ʒu
 \va juuju'en
-\mm juuju
+\mm juuju::
 \ps n
 \vl 
 \ve 
@@ -3897,7 +3897,7 @@
 \lx talkuru
 \ph tal.ku.ru
 \va talki
-\mm talk-u-ru
+\mm talk-u-ru::
 \ps n
 \vl 
 \ve 
@@ -3919,7 +3919,7 @@
 \lx nanngirdu
 \ph nan.ngir.du
 \va 
-\mm nanng-ir-du
+\mm nanng-ir-du::
 \ps n
 \vl 
 \ve 
@@ -3941,7 +3941,7 @@
 \lx jaadirɗo
 \ph ʒaː.dir.ɗo
 \va 
-\mm jaad-ir-ɗo
+\mm jaad-ir-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -3963,7 +3963,7 @@
 \lx sareneede
 \ph sa.rɛ.neː.de
 \va 
-\mm sar-en-ee-de
+\mm sar-en-ee-de::
 \ps v
 \vl i
 \ve 
@@ -3985,7 +3985,7 @@
 \lx sarti
 \ph sar.ti
 \va sarɗiiji
-\mm sarti
+\mm sarti::
 \ps n
 \vl 
 \ve 
@@ -4007,7 +4007,7 @@
 \lx kakindiiɗo
 \ph ka.kin.diː.ɗo
 \va 
-\mm kakind-ii-ɗo
+\mm kakind-ii-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -4029,7 +4029,7 @@
 \lx walleede
 \ph wal.leː.de
 \va 
-\mm wall-ee-de
+\mm wall-ee-de::
 \ps v
 \vl i
 \ve 
@@ -4051,7 +4051,7 @@
 \lx faaboreede
 \ph faː.bo.reː.de
 \va 
-\mm faab-or-ee-de
+\mm faab-or-ee-de::
 \ps v
 \vl i
 \ve 
@@ -4073,7 +4073,7 @@
 \lx awoka
 \ph a.wo.ka
 \va awoka'en
-\mm awoka
+\mm awoka::
 \ps n
 \vl 
 \ve 
@@ -4095,7 +4095,7 @@
 \lx anketti
 \ph an.kɛt.ti
 \va 
-\mm anketti
+\mm anketti::
 \ps n
 \vl 
 \ve 
@@ -4117,7 +4117,7 @@
 \lx noddugol
 \ph nɔd.du.gɔl
 \va noddude
-\mm nodd-u-gol
+\mm nodd-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4139,7 +4139,7 @@
 \lx tuumugol
 \ph tuː.mu.gɔl
 \va tuumude
-\mm tuum-u-gol
+\mm tuum-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4161,7 +4161,7 @@
 \lx felnaaki
 \ph fɛl.naː.ki
 \va 
-\mm feln-aa-ki
+\mm feln-aa-ki::
 \ps n
 \vl 
 \ve 
@@ -4183,7 +4183,7 @@
 \lx felloore
 \ph fɛl.loː.rɛ
 \va 
-\mm fell-oo-re
+\mm fell-oo-re::
 \ps n
 \vl 
 \ve 
@@ -4205,7 +4205,7 @@
 \lx happugol
 \ph hap.pu.gɔl
 \va happude
-\mm happ-u-gol
+\mm happ-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4227,7 +4227,7 @@
 \lx fonndoode
 \ph fɔn.doː.dɛ
 \va 
-\mm fonnd-oo-de
+\mm fonnd-oo-de::
 \ps n
 \vl 
 \ve 
@@ -4249,7 +4249,7 @@
 \lx toownugol
 \ph toːw.nu.gɔl
 \va toownude
-\mm toow-n-u-gol
+\mm toow-n-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4271,7 +4271,7 @@
 \lx darja
 \ph dar.ʒa
 \va 
-\mm darja
+\mm darja::
 \ps n
 \vl 
 \ve 
@@ -4293,7 +4293,7 @@
 \lx jannde
 \ph ʒan.dɛ
 \va 
-\mm jannde
+\mm jannde::
 \ps n
 \vl 
 \ve 
@@ -4315,7 +4315,7 @@
 \lx ekkitagol
 \ph ɛk.ki.ta.gɔl
 \va 
-\mm ekk-it-a-gol
+\mm ekk-it-a-gol::
 \ps n
 \vl 
 \ve 
@@ -4337,7 +4337,7 @@
 \lx weltaare
 \ph wɛl.taː.rɛ
 \va weltaareeji
-\mm welt-aare
+\mm welt-aare::
 \ps n
 \vl 
 \ve 
@@ -4359,7 +4359,7 @@
 \lx cellal
 \ph tʃɛl.lal
 \va 
-\mm sell-al
+\mm sell-al::
 \ps n
 \vl 
 \ve 
@@ -4381,7 +4381,7 @@
 \lx ɲaamdu
 \ph ɲaːm.du
 \va 
-\mm ɲaam-du
+\mm ɲaam-du::
 \ps n
 \vl 
 \ve 
@@ -4402,7 +4402,7 @@
 \lx ndiyam
 \ph ndi.jam
 \va 
-\mm ndiyam
+\mm ndiyam::
 \ps n
 \vl 
 \ve 
@@ -4423,7 +4423,7 @@
 \lx annditugol
 \ph an.di.tu.gol
 \va annditide
-\mm annd-it-u-gol
+\mm annd-it-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4444,7 +4444,7 @@
 \lx janngingol
 \ph ʒan.ngin.gol
 \va jannginde
-\mm janng-in-gol
+\mm janng-in-gol::
 \ps n.v
 \vl t
 \ve 
@@ -4465,7 +4465,7 @@
 \lx foroba
 \ph fo.ro.ba
 \va 
-\mm foroba
+\mm foroba::
 \ps adj
 \vl 
 \ve 
@@ -4486,7 +4486,7 @@
 \lx yoɓugol
 \ph jo.ɓu.gol
 \va yoɓude
-\mm yoɓ-u-gol
+\mm yoɓ-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4507,7 +4507,7 @@
 \lx fonnugol
 \ph fon.nu.gol
 \va fonnude
-\mm fonn-u-gol
+\mm fonn-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4528,7 +4528,7 @@
 \lx sirri
 \ph sir.ri
 \va 
-\mm sirri
+\mm sirri::
 \ps n
 \vl 
 \ve 
@@ -4549,7 +4549,7 @@
 \lx ɓataaki
 \ph ɓa.taː.ki
 \va ɓataakiiji
-\mm ɓataaki
+\mm ɓataaki::
 \ps n
 \vl 
 \ve 
@@ -4570,7 +4570,7 @@
 \lx kumpiti
 \ph kum.pi.ti
 \va 
-\mm humpit-i
+\mm humpit-i::
 \ps n
 \vl 
 \ve 
@@ -4591,7 +4591,7 @@
 \lx firritugol
 \ph fir.ri.tu.gol
 \va firritude
-\mm firr-it-u-gol
+\mm firr-it-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4612,7 +4612,7 @@
 \lx jeyal
 \ph ʒɛ.jal
 \va 
-\mm jey-al
+\mm jey-al::
 \ps n
 \vl 
 \ve 
@@ -4633,7 +4633,7 @@
 \lx teetugol
 \ph teː.tu.gol
 \va teetude
-\mm teet-u-gol
+\mm teet-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4654,7 +4654,7 @@
 \lx nawtorgol
 \ph naw.tor.gol
 \va nawtorde
-\mm naw-t-or-gol
+\mm naw-t-or-gol::
 \ps v
 \vl t
 \ve 
@@ -4675,7 +4675,7 @@
 \lx njomnaari
 \ph nʒom.naː.ri
 \va 
-\mm njomn-aari
+\mm njomn-aari::
 \ps n
 \vl 
 \ve 
@@ -4696,7 +4696,7 @@
 \lx laaɓugol
 \ph laː.ɓu.gol
 \va laaɓude
-\mm laaɓ-u-gol
+\mm laaɓ-u-gol::
 \ps v
 \vl i
 \ve 
@@ -4717,7 +4717,7 @@
 \lx miilo
 \ph miː.lo
 \va miilooji
-\mm miilo
+\mm miilo::
 \ps n
 \vl 
 \ve 
@@ -4757,7 +4757,7 @@
 \lx suɓagol
 \ph su.ɓa.gol
 \va suɓaade
-\mm suɓ-a-gol
+\mm suɓ-a-gol::
 \ps n.v
 \vl t
 \ve 
@@ -4778,7 +4778,7 @@
 \lx anndingol
 \ph an.din.gol
 \va anndinde
-\mm annd-in-gol
+\mm annd-in-gol::
 \ps v
 \vl t
 \ve 
@@ -4799,7 +4799,7 @@
 \lx humpitugol
 \ph hum.pi.tu.gol
 \va humpitide
-\mm humpit-u-gol
+\mm humpit-u-gol::
 \ps v
 \vl t
 \ve 
@@ -4820,7 +4820,7 @@
 \lx ɲeeɲal
 \ph ɲeː.ɲal
 \va 
-\mm ɲeeɲ-al
+\mm ɲeeɲ-al::
 \ps n
 \vl 
 \ve 
@@ -4841,7 +4841,7 @@
 \lx fijo
 \ph fi.ʒo
 \va 
-\mm fij-o
+\mm fij-o::
 \ps n
 \vl 
 \ve 
@@ -4862,7 +4862,7 @@
 \lx yaade
 \ph jaː.de
 \va yahugol
-\mm yaa-de
+\mm yaa-de::
 \ps v
 \vl i
 \ve 
@@ -4883,7 +4883,7 @@
 \lx warde
 \ph war.de
 \va arugol
-\mm war-de
+\mm war-de::
 \ps v
 \vl i
 \ve 
@@ -4904,7 +4904,7 @@
 \lx hoɗorde
 \ph ho.ɗor.de
 \va 
-\mm hoɗ-or-de
+\mm hoɗ-or-de::
 \ps n
 \vl 
 \ve 
@@ -4925,7 +4925,7 @@
 \lx waalde
 \ph waːl.de
 \va 
-\mm waal-de
+\mm waal-de::
 \ps n
 \vl 
 \ve 
@@ -4946,7 +4946,7 @@
 \lx batu
 \ph ba.tu
 \va batuuji
-\mm batu
+\mm batu::
 \ps n
 \vl 
 \ve 
@@ -4967,7 +4967,7 @@
 \lx ɗowtondiral
 \ph ɗow.ton.di.ral
 \va 
-\mm ɗow-t-on-dir-al
+\mm ɗow-t-on-dir-al::
 \ps n
 \vl 
 \ve 
@@ -4988,7 +4988,7 @@
 \lx maajagol
 \ph maː.ʒa.gol
 \va 
-\mm maaj-a-gol
+\mm maaj-a-gol::
 \ps n
 \vl 
 \ve 
@@ -5010,7 +5010,7 @@
 \lx fooftere
 \ph foːf.tɛ.rɛ
 \va 
-\mm foof-t-ere
+\mm foof-t-ere::
 \ps n
 \vl 
 \ve 
@@ -5032,7 +5032,7 @@
 \lx senndika
 \ph sɛn.di.ka
 \va 
-\mm senndika
+\mm senndika::
 \ps n
 \vl 
 \ve 
@@ -5054,7 +5054,7 @@
 \lx ɓillaare
 \ph ɓil.laː.rɛ
 \va 
-\mm ɓill-aare
+\mm ɓill-aare::
 \ps n
 \vl 
 \ve 
@@ -5076,7 +5076,7 @@
 \lx kaaddi
 \ph kaːd.di
 \va 
-\mm kaaddi
+\mm kaaddi::
 \ps n
 \vl 
 \ve 
@@ -5098,7 +5098,7 @@
 \lx salagol
 \ph sa.la.gɔl
 \va 
-\mm sal-a-gol
+\mm sal-a-gol::
 \ps n.v
 \vl i
 \ve 
@@ -5120,7 +5120,7 @@
 \lx ceniiɗo
 \ph tʃɛ.niː.ɗo
 \va 
-\mm sen-ii-ɗo
+\mm sen-ii-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -5142,7 +5142,7 @@
 \lx ɲiiɓuɗo
 \ph ɲiː.ɓu.ɗo
 \va 
-\mm ɲiiɓ-u-ɗo
+\mm ɲiiɓ-u-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -5164,7 +5164,7 @@
 \lx leydiyanke
 \ph lɛj.di.jan.kɛ
 \va 
-\mm leydi-yan-ke
+\mm leydi-yan-ke::
 \ps n
 \vl 
 \ve 
@@ -5186,7 +5186,7 @@
 \lx soldasaaku
 \ph sɔl.da.saː.ku
 \va 
-\mm soldasi-aaku
+\mm soldasi-aaku::
 \ps n
 \vl 
 \ve 
@@ -5208,7 +5208,7 @@
 \lx lampo
 \ph lam.pɔ
 \va lampooji
-\mm lampo
+\mm lampo::
 \ps n
 \vl 
 \ve 
@@ -5230,7 +5230,7 @@
 \lx sarwuusi
 \ph sar.wuː.si
 \va sarwuusiiji
-\mm sarwuusi
+\mm sarwuusi::
 \ps n
 \vl 
 \ve 
@@ -5252,7 +5252,7 @@
 \lx dewal
 \ph dɛ.wal
 \va 
-\mm dew-al
+\mm dew-al::
 \ps n
 \vl 
 \ve 
@@ -5274,7 +5274,7 @@
 \lx ngootiri
 \ph ŋgoː.ti.ri
 \va 
-\mm ngoot-iri
+\mm ngoot-iri::
 \ps adj
 \vl 
 \ve 
@@ -5296,7 +5296,7 @@
 \lx feccataake
 \ph fɛt.tʃa.taː.kɛ
 \va 
-\mm fecc-ata-ake
+\mm fecc-ata-ake::
 \ps adj
 \vl 
 \ve 
@@ -5318,7 +5318,7 @@
 \lx kapital
 \ph ka.pi.tal
 \va 
-\mm kapital
+\mm kapital::
 \ps n
 \vl 
 \ve 
@@ -5340,7 +5340,7 @@
 \lx sottinugol
 \ph sɔt.ti.nu.gɔl
 \va 
-\mm sott-in-u-gol
+\mm sott-in-u-gol::
 \ps v
 \vl t
 \ve 
@@ -5362,7 +5362,7 @@
 \lx deesewal
 \ph deː.sɛ.wal
 \va 
-\mm deesewal
+\mm deesewal::
 \ps n
 \vl 
 \ve 
@@ -5384,7 +5384,7 @@
 \lx oolol
 \ph oː.lɔl
 \va 
-\mm oolol
+\mm oolol::
 \ps adj
 \vl 
 \ve 
@@ -5406,7 +5406,7 @@
 \lx boɗewol
 \ph bɔ.ɗɛ.wɔl
 \va 
-\mm boɗ-ewol
+\mm boɗ-ewol::
 \ps adj
 \vl 
 \ve 
@@ -5428,7 +5428,7 @@
 \lx hoɗu-heccowol
 \ph hɔ.ɗu.hɛt.tʃɔ.wɔl
 \va 
-\mm hoɗu-heccowol
+\mm hoɗu-heccowol::
 \ps adj
 \vl 
 \ve 
@@ -5450,7 +5450,7 @@
 \lx kunorgol
 \ph ku.nɔr.gɔl
 \va 
-\mm kun-or-gol
+\mm kun-or-gol::
 \ps n
 \vl 
 \ve 
@@ -5472,7 +5472,7 @@
 \lx yimre
 \ph jim.rɛ
 \va 
-\mm yim-re
+\mm yim-re::
 \ps n
 \vl 
 \ve 
@@ -5494,7 +5494,7 @@
 \lx Faransinkoore
 \ph fa.ran.sin.koː.rɛ
 \va 
-\mm Faransi-nkoore
+\mm Faransi-nkoore::
 \ps n
 \vl 
 \ve 
@@ -5516,7 +5516,7 @@
 \lx muɲondiral
 \ph mu.ɲɔn.di.ral
 \va 
-\mm muɲ-on-dir-al
+\mm muɲ-on-dir-al::
 \ps n
 \vl 
 \ve 
@@ -5538,7 +5538,7 @@
 \lx kaaldal
 \ph kaːl.dal
 \va 
-\mm haal-d-al
+\mm haal-d-al::
 \ps n
 \vl 
 \ve 
@@ -5560,7 +5560,7 @@
 \lx paamondiral
 \ph paː.mɔn.di.ral
 \va 
-\mm faam-on-dir-al
+\mm faam-on-dir-al::
 \ps n
 \vl 
 \ve 
@@ -5582,7 +5582,7 @@
 \lx wujjugol
 \ph wuʒ.ʒu.gɔl
 \va 
-\mm wujj-u-gol
+\mm wujj-u-gol::
 \ps v
 \vl t
 \ve 
@@ -5604,7 +5604,7 @@
 \lx kooreeji
 \ph koː.reː.ʒi
 \va 
-\mm kooreeji
+\mm kooreeji::
 \ps n
 \vl 
 \ve 
@@ -5626,7 +5626,7 @@
 \lx heedaare
 \ph hɛː.daː.rɛ
 \va 
-\mm heed-aare
+\mm heed-aare::
 \ps n
 \vl 
 \ve 
@@ -5648,7 +5648,7 @@
 \lx jammba
 \ph ʒam.ba
 \va 
-\mm jammba
+\mm jammba::
 \ps n
 \vl 
 \ve 
@@ -5670,7 +5670,7 @@
 \lx joolle
 \ph ʒoːl.lɛ
 \va 
-\mm joolle
+\mm joolle::
 \ps n
 \vl 
 \ve 
@@ -5692,7 +5692,7 @@
 \lx guɓal
 \ph gu.ɓal
 \va 
-\mm guɓ-al
+\mm guɓ-al::
 \ps n
 \vl 
 \ve 
@@ -5714,7 +5714,7 @@
 \lx heƴaawo
 \ph hɛ.ʔjaː.wo
 \va heƴaaɓe
-\mm heƴ-aa-wo
+\mm heƴ-aa-wo::
 \ps n
 \vl 
 \ve 
@@ -5736,7 +5736,7 @@
 \lx suɓtaade
 \ph suɓ.taː.dɛ
 \va 
-\mm suɓ-t-aa-de
+\mm suɓ-t-aa-de::
 \ps v
 \vl i
 \ve 
@@ -5758,7 +5758,7 @@
 \lx wote
 \ph wɔ.tɛ
 \va woteeji
-\mm wote
+\mm wote::
 \ps n
 \vl 
 \ve 
@@ -5780,7 +5780,7 @@
 \lx cuuccukka
 \ph tʃuːt.tʃuk.ka
 \va 
-\mm suucc-uk-ka
+\mm suucc-uk-ka::
 \ps n
 \vl 
 \ve 
@@ -5802,7 +5802,7 @@
 \lx cuppiiɗo
 \ph tʃup.piː.ɗo
 \va 
-\mm supp-ii-ɗo
+\mm supp-ii-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -5824,7 +5824,7 @@
 \lx hiɓɓingol
 \ph hiɓ.ɓiŋ.gɔl
 \va hiɓɓinde
-\mm hiɓɓ-in-gol
+\mm hiɓɓ-in-gol::
 \ps v
 \vl t
 \ve 
@@ -5846,7 +5846,7 @@
 \lx ɲaakko'aaku
 \ph ɲaːk.ko.ʔaː.ku
 \va 
-\mm ɲaakko-aaku
+\mm ɲaakko-aaku::
 \ps n
 \vl 
 \ve 
@@ -5868,7 +5868,7 @@
 \lx pewtuɗo
 \ph pɛw.tu.ɗo
 \va 
-\mm fewt-u-ɗo
+\mm fewt-u-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -5890,7 +5890,7 @@
 \lx joonnde
 \ph ʒoːn.dɛ
 \va 
-\mm joonn-de
+\mm joonn-de::
 \ps n
 \vl 
 \ve 
@@ -5912,7 +5912,7 @@
 \lx wotande
 \ph wɔ.tan.dɛ
 \va 
-\mm wot-an-de
+\mm wot-an-de::
 \ps v
 \vl t
 \ve 
@@ -5934,7 +5934,7 @@
 \lx kanndida
 \ph kan.di.da
 \va 
-\mm kanndida
+\mm kanndida::
 \ps n
 \vl 
 \ve 
@@ -5956,7 +5956,7 @@
 \lx needi
 \ph nɛː.di
 \va 
-\mm needi
+\mm needi::
 \ps n
 \vl 
 \ve 
@@ -5978,7 +5978,7 @@
 \lx tilsundu
 \ph til.sun.du
 \va 
-\mm tils-un-du
+\mm tils-un-du::
 \ps adj
 \vl 
 \ve 
@@ -6000,7 +6000,7 @@
 \lx loomto
 \ph loːm.tɔ
 \va 
-\mm loomt-o
+\mm loomt-o::
 \ps n
 \vl 
 \ve 
@@ -6022,7 +6022,7 @@
 \lx kunol
 \ph ku.nɔl
 \va 
-\mm kun-ol
+\mm kun-ol::
 \ps n
 \vl 
 \ve 
@@ -6044,7 +6044,7 @@
 \lx hunaade
 \ph hu.naː.dɛ
 \va 
-\mm hun-aa-de
+\mm hun-aa-de::
 \ps v
 \vl i
 \ve 
@@ -6066,7 +6066,7 @@
 \lx dewoowo
 \ph dɛ.woː.wo
 \va 
-\mm dew-oo-wo
+\mm dew-oo-wo::
 \ps n
 \vl 
 \ve 
@@ -6088,7 +6088,7 @@
 \lx permel ministiri
 \ph pɛr.mɛl mi.nis.ti.ri
 \va 
-\mm permel ministiri
+\mm permel ministiri::
 \ps n
 \vl 
 \ve 
@@ -6110,7 +6110,7 @@
 \lx sellingol
 \ph sɛl.liŋ.gɔl
 \va sellinde
-\mm sell-in-gol
+\mm sell-in-gol::
 \ps n.v
 \vl t
 \ve 
@@ -6132,7 +6132,7 @@
 \lx referandom
 \ph rɛ.fɛ.ran.dɔm
 \va 
-\mm referandom
+\mm referandom::
 \ps n
 \vl 
 \ve 
@@ -6154,7 +6154,7 @@
 \lx sefagol
 \ph sɛ.fa.gɔl
 \va sefude
-\mm sef-a-gol
+\mm sef-a-gol::
 \ps v
 \vl t
 \ve 
@@ -6176,7 +6176,7 @@
 \lx hooreyaaku
 \ph hoː.rɛ.jaː.ku
 \va 
-\mm hoore-yaaku
+\mm hoore-yaaku::
 \ps n
 \vl 
 \ve 
@@ -6198,7 +6198,7 @@
 \lx yaafagol
 \ph jaː.fa.gɔl
 \va yaafamuya
-\mm yaaf-a-gol
+\mm yaaf-a-gol::
 \ps n.v
 \vl t
 \ve 
@@ -6220,7 +6220,7 @@
 \lx sammingol
 \ph sam.miŋ.gɔl
 \va samminde
-\mm samm-in-gol
+\mm samm-in-gol::
 \ps n.v
 \vl t
 \ve 
@@ -6242,7 +6242,7 @@
 \lx kalmeede
 \ph kal.mɛː.dɛ
 \va 
-\mm kalm-ee-de
+\mm kalm-ee-de::
 \ps v
 \vl i
 \ve 
@@ -6264,7 +6264,7 @@
 \lx deppiteyaaku
 \ph dɛp.pi.tɛ.jaː.ku
 \va 
-\mm deppite-yaaku
+\mm deppite-yaaku::
 \ps n
 \vl 
 \ve 
@@ -6286,7 +6286,7 @@
 \lx wakiilaaku
 \ph wa.kiː.laː.ku
 \va 
-\mm wakiil-aaku
+\mm wakiil-aaku::
 \ps n
 \vl 
 \ve 
@@ -6308,7 +6308,7 @@
 \lx meccee
 \ph mɛt.tʃɛː
 \va 
-\mm meccee
+\mm meccee::
 \ps n
 \vl 
 \ve 
@@ -6330,7 +6330,7 @@
 \lx tirbine
 \ph tir.bi.nɛ
 \va 
-\mm tirbine
+\mm tirbine::
 \ps n
 \vl 
 \ve 
@@ -6352,7 +6352,7 @@
 \lx bone
 \ph bɔ.nɛ
 \va 
-\mm bone
+\mm bone::
 \ps n
 \vl 
 \ve 
@@ -6374,7 +6374,7 @@
 \lx dewtere
 \ph dɛw.tɛ.rɛ
 \va 
-\mm dewtere
+\mm dewtere::
 \ps n
 \vl 
 \ve 
@@ -6396,7 +6396,7 @@
 \lx almusaɗɗa
 \ph al.mu.saɗ.ɗa
 \va almusaɗɗaaji
-\mm almusaɗɗa
+\mm almusaɗɗa::
 \ps n
 \vl 
 \ve 
@@ -6418,7 +6418,7 @@
 \lx finansi
 \ph fi.nan.si
 \va 
-\mm finansi
+\mm finansi::
 \ps n
 \vl 
 \ve 
@@ -6440,7 +6440,7 @@
 \lx faanda
 \ph faːn.da
 \va 
-\mm faanda
+\mm faanda::
 \ps n
 \vl 
 \ve 
@@ -6462,7 +6462,7 @@
 \lx dekere
 \ph dɛ.kɛ.rɛ
 \va 
-\mm dekere
+\mm dekere::
 \ps n
 \vl 
 \ve 
@@ -6484,7 +6484,7 @@
 \lx nasonal
 \ph na.so.nal
 \va 
-\mm nasonal
+\mm nasonal::
 \ps adj
 \vl 
 \ve 
@@ -6506,7 +6506,7 @@
 \lx huultingol
 \ph huːl.tiŋ.gɔl
 \va 
-\mm huul-t-in-gol
+\mm huul-t-in-gol::
 \ps n.v
 \vl t
 \ve 
@@ -6528,7 +6528,7 @@
 \lx semmbe
 \ph sɛm.bɛ
 \va 
-\mm semmbe
+\mm semmbe::
 \ps n
 \vl 
 \ve 
@@ -6550,7 +6550,7 @@
 \lx juunnugol
 \ph ʒuːn.nu.gɔl
 \va 
-\mm juun-n-u-gol
+\mm juun-n-u-gol::
 \ps v
 \vl t
 \ve 
@@ -6572,7 +6572,7 @@
 \lx wattu
 \ph wat.tu
 \va 
-\mm wattu
+\mm wattu::
 \ps n
 \vl 
 \ve 
@@ -6594,7 +6594,7 @@
 \lx saamburu
 \ph saːm.bu.ru
 \va 
-\mm saamburu
+\mm saamburu::
 \ps n
 \vl 
 \ve 
@@ -6616,7 +6616,7 @@
 \lx sena
 \ph sɛ.na
 \va 
-\mm sena
+\mm sena::
 \ps n
 \vl 
 \ve 
@@ -6638,7 +6638,7 @@
 \lx kongere
 \ph kɔn.gɛ.rɛ
 \va 
-\mm kongere
+\mm kongere::
 \ps n
 \vl 
 \ve 
@@ -6660,7 +6660,7 @@
 \lx Malinkeejo
 \ph ma.lin.keː.ʒɔ
 \va Malinkooɓe
-\mm Malinke-ejo
+\mm Malinke-ejo::
 \ps n
 \vl 
 \ve 
@@ -6682,7 +6682,7 @@
 \lx komisiyon
 \ph kɔ.mi.si.jɔn
 \va 
-\mm komisiyon
+\mm komisiyon::
 \ps n
 \vl 
 \ve 
@@ -6704,7 +6704,7 @@
 \lx ordonansi
 \ph ɔr.dɔ.nan.si
 \va 
-\mm ordonansi
+\mm ordonansi::
 \ps n
 \vl 
 \ve 
@@ -6726,7 +6726,7 @@
 \lx muraadu
 \ph mu.raː.du
 \va 
-\mm muraadu
+\mm muraadu::
 \ps n
 \vl 
 \ve 
@@ -6748,7 +6748,7 @@
 \lx nakkinsingol
 \ph nak.kin.siŋ.gɔl
 \va 
-\mm nakkin-s-in-gol
+\mm nakkin-s-in-gol::
 \ps n.v
 \vl t
 \ve 
@@ -6770,7 +6770,7 @@
 \lx jilluɗo
 \ph ʒil.lu.ɗo
 \va 
-\mm jill-u-ɗo
+\mm jill-u-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -6792,7 +6792,7 @@
 \lx fedde
 \ph fɛd.dɛ
 \va 
-\mm fedde
+\mm fedde::
 \ps n
 \vl 
 \ve 
@@ -6814,7 +6814,7 @@
 \lx heɲaare
 \ph hɛ.ɲaː.rɛ
 \va 
-\mm heɲ-aare
+\mm heɲ-aare::
 \ps n
 \vl 
 \ve 
@@ -6836,7 +6836,7 @@
 \lx konsee
 \ph kɔn.seː
 \va 
-\mm konsee
+\mm konsee::
 \ps n
 \vl 
 \ve 
@@ -6858,7 +6858,7 @@
 \lx wullitogol
 \ph wul.li.tɔ.gɔl
 \va wullitaade
-\mm wull-it-o-gol
+\mm wull-it-o-gol::
 \ps n.v
 \vl i
 \ve 
@@ -6880,7 +6880,7 @@
 \lx jaakitit-
 \ph ʒaː.ki.tit
 \va jaakitittaade
-\mm jaak-it-it
+\mm jaak-it-it::
 \ps v
 \vl t
 \ve 
@@ -6902,7 +6902,7 @@
 \lx gullital
 \ph gul.li.tal
 \va gullitaali
-\mm wull-it-al
+\mm wull-it-al::
 \ps n
 \vl 
 \ve 
@@ -6924,7 +6924,7 @@
 \lx immingol
 \ph im.miŋ.gɔl
 \va imminde
-\mm imm-in-gol
+\mm imm-in-gol::
 \ps v
 \vl t
 \ve 
@@ -6946,7 +6946,7 @@
 \lx hiini-hoore
 \ph hiː.ni.hoː.rɛ
 \va 
-\mm hiini-hoore
+\mm hiini-hoore::
 \ps adj
 \vl 
 \ve 
@@ -6968,7 +6968,7 @@
 \lx kontaabulu
 \ph kɔn.taː.bu.lu
 \va 
-\mm kontaabulu
+\mm kontaabulu::
 \ps n
 \vl 
 \ve 
@@ -6990,7 +6990,7 @@
 \lx kasindine
 \ph ka.sin.di.nɛ
 \va 
-\mm kasindine
+\mm kasindine::
 \ps n
 \vl 
 \ve 
@@ -7012,7 +7012,7 @@
 \lx yela
 \ph jɛ.la
 \va yelaaji
-\mm yela
+\mm yela::
 \ps n
 \vl 
 \ve 
@@ -7034,7 +7034,7 @@
 \lx tiiɗalla
 \ph tiː.ɗal.la
 \va tiiɗallaaji
-\mm tiiɗalla
+\mm tiiɗalla::
 \ps n
 \vl 
 \ve 
@@ -7056,7 +7056,7 @@
 \lx ɓillitingol
 \ph ɓil.li.tiŋ.gɔl
 \va 
-\mm ɓill-it-in-gol
+\mm ɓill-it-in-gol::
 \ps n
 \vl 
 \ve 
@@ -7078,7 +7078,7 @@
 \lx haggitere
 \ph hag.gi.tɛ.rɛ
 \va 
-\mm hagg-it-ere
+\mm hagg-it-ere::
 \ps n
 \vl 
 \ve 
@@ -7100,7 +7100,7 @@
 \lx jaaleɲi
 \ph ʒaː.lɛ.ɲi
 \va 
-\mm jaaleɲi
+\mm jaaleɲi::
 \ps n
 \vl 
 \ve 
@@ -7122,7 +7122,7 @@
 \lx kuɓeeje
 \ph ku.ɓeː.ʒɛ
 \va 
-\mm kuɓeeje
+\mm kuɓeeje::
 \ps n
 \vl 
 \ve 
@@ -7144,7 +7144,7 @@
 \lx neesuusi
 \ph nɛː.suː.si
 \va 
-\mm neesu-usi
+\mm neesu-usi::
 \ps n
 \vl 
 \ve 
@@ -7166,7 +7166,7 @@
 \lx teedagol
 \ph tɛː.da.gɔl
 \va 
-\mm teed-a-gol
+\mm teed-a-gol::
 \ps n
 \vl 
 \ve 
@@ -7188,7 +7188,7 @@
 \lx baasi
 \ph baː.si
 \va baasiiji
-\mm baasi
+\mm baasi::
 \ps n
 \vl 
 \ve 
@@ -7210,7 +7210,7 @@
 \lx ruunde
 \ph ruːn.dɛ
 \va 
-\mm ruunde
+\mm ruunde::
 \ps n
 \vl 
 \ve 
@@ -7232,7 +7232,7 @@
 \lx aadondirde
 \ph aː.dɔn.dir.dɛ
 \va 
-\mm aad-on-dir-de
+\mm aad-on-dir-de::
 \ps v
 \vl i
 \ve 
@@ -7254,7 +7254,7 @@
 \lx termugol
 \ph tɛr.mu.gɔl
 \va 
-\mm term-u-gol
+\mm term-u-gol::
 \ps n.v
 \vl t
 \ve 
@@ -7276,7 +7276,7 @@
 \lx jaagu
 \ph ʒaː.gu
 \va 
-\mm jaagu
+\mm jaagu::
 \ps n
 \vl 
 \ve 
@@ -7298,7 +7298,7 @@
 \lx nookun
 \ph noː.kun
 \va 
-\mm nookun
+\mm nookun::
 \ps n
 \vl 
 \ve 
@@ -7320,7 +7320,7 @@
 \lx ɗowtaare
 \ph ɗɔw.taː.rɛ
 \va 
-\mm ɗowt-aare
+\mm ɗowt-aare::
 \ps n
 \vl 
 \ve 
@@ -7342,7 +7342,7 @@
 \lx siwil
 \ph si.wil
 \va 
-\mm siwil
+\mm siwil::
 \ps adj
 \vl 
 \ve 
@@ -7364,7 +7364,7 @@
 \lx kuu deta
 \ph kuː dɛ.ta
 \va 
-\mm kuu deta
+\mm kuu deta::
 \ps n
 \vl 
 \ve 
@@ -7386,7 +7386,7 @@
 \lx putsi
 \ph put.si
 \va 
-\mm putsi
+\mm putsi::
 \ps n
 \vl 
 \ve 
@@ -7408,7 +7408,7 @@
 \lx yaafagol
 \ph jaː.fa.gɔl
 \va 
-\mm yaaf-a-gol
+\mm yaaf-a-gol::
 \ps n.v
 \vl t
 \ve 
@@ -7430,7 +7430,7 @@
 \lx ŋoottugol
 \ph ŋoːt.tu.gɔl
 \va 
-\mm ŋoott-u-gol
+\mm ŋoott-u-gol::
 \ps v
 \vl i
 \ve 
@@ -7452,7 +7452,7 @@
 \lx jottintingol
 \ph ʒɔt.tin.tiŋ.gɔl
 \va 
-\mm jott-in-tin-gol
+\mm jott-in-tin-gol::
 \ps v
 \vl t
 \ve 
@@ -7474,7 +7474,7 @@
 \lx keeccuɗo
 \ph keːt.tʃu.ɗo
 \va 
-\mm keecc-u-ɗo
+\mm keecc-u-ɗo::
 \ps adj
 \vl 
 \ve 
@@ -7496,7 +7496,7 @@
 \lx barkaniijo
 \ph bar.ka.niː.ʒɔ
 \va 
-\mm barkani-ijo
+\mm barkani-ijo::
 \ps n
 \vl 
 \ve 
@@ -7518,7 +7518,7 @@
 \lx waalde
 \ph waːl.dɛ
 \va 
-\mm waalde
+\mm waalde::
 \ps n
 \vl 
 \ve 
@@ -7540,7 +7540,7 @@
 \lx seettanaade
 \ph seːt.ta.naː.dɛ
 \va 
-\mm seett-an-aa-de
+\mm seett-an-aa-de::
 \ps v
 \vl i
 \ve 
@@ -7562,7 +7562,7 @@
 \lx yeeyugol
 \ph jeː.ju.gɔl
 \va 
-\mm yeey-u-gol
+\mm yeey-u-gol::
 \ps v
 \vl t
 \ve 
@@ -7584,7 +7584,7 @@
 \lx jurnal
 \ph ʒur.nal
 \va 
-\mm jurnal
+\mm jurnal::
 \ps n
 \vl 
 \ve 
@@ -7606,7 +7606,7 @@
 \lx laamunke
 \ph laː.mun.kɛ
 \va 
-\mm laam-un-ke
+\mm laam-un-ke::
 \ps n
 \vl 
 \ve 
@@ -7628,7 +7628,7 @@
 \lx farati
 \ph fa.ra.ti
 \va 
-\mm farati
+\mm farati::
 \ps n
 \vl 
 \ve 
