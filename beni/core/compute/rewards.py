@@ -169,16 +169,84 @@ class RewardManager:
 
     @staticmethod
     def extract_json(text: Any) -> dict:
-        text = RewardManager.completion_text(text).strip()
+        raw_text = RewardManager.completion_text(text).strip()
+        if not raw_text:
+            return {}
+
+        # 1. Direct parse attempt
         try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            match = re.search(r'\{.*\}', text, re.DOTALL)
-            if match:
+            res = json.loads(raw_text)
+            if isinstance(res, dict):
+                return res
+            if isinstance(res, str):
+                nested = RewardManager.extract_json(res)
+                if nested:
+                    return nested
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+        # 2. Extract from markdown code fences: ```json ... ``` or ``` ... ```
+        fence_pattern = re.compile(r"```(?:json)?\s*([\s\S]*?)\s*```", re.IGNORECASE)
+        for match in fence_pattern.finditer(raw_text):
+            block = match.group(1).strip()
+            try:
+                res = json.loads(block)
+                if isinstance(res, dict):
+                    return res
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        # 3. Balanced brace finder to extract valid JSON objects even with surrounding text
+        start_idx = 0
+        while True:
+            open_pos = raw_text.find('{', start_idx)
+            if open_pos == -1:
+                break
+            depth = 0
+            in_str = False
+            escape = False
+            close_pos = -1
+            for i in range(open_pos, len(raw_text)):
+                c = raw_text[i]
+                if escape:
+                    escape = False
+                    continue
+                if c == '\\':
+                    escape = True
+                    continue
+                if c == '"':
+                    in_str = not in_str
+                    continue
+                if not in_str:
+                    if c == '{':
+                        depth += 1
+                    elif c == '}':
+                        depth -= 1
+                        if depth == 0:
+                            close_pos = i
+                            break
+            if close_pos != -1:
+                candidate = raw_text[open_pos:close_pos + 1].strip()
                 try:
-                    return json.loads(match.group(0))
-                except json.JSONDecodeError:
+                    res = json.loads(candidate)
+                    if isinstance(res, dict):
+                        return res
+                except (json.JSONDecodeError, TypeError):
                     pass
+                start_idx = open_pos + 1
+            else:
+                break
+
+        # 4. Fallback regex greedy attempt
+        match = re.search(r'\{.*\}', raw_text, re.DOTALL)
+        if match:
+            try:
+                res = json.loads(match.group(0))
+                if isinstance(res, dict):
+                    return res
+            except (json.JSONDecodeError, TypeError):
+                pass
+
         return {}
 
     def completions_to_sentences(self, completions: List[str]) -> List[Sentence]:

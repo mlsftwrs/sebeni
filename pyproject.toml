@@ -34,7 +34,8 @@ dependencies = [
     "pytrie",
     "attrdict3",
     "regex",
-    "torchao"
+    "torchao>=0.16.0",
+    "bitsandbytes"
 ]
 
 [project.optional-dependencies]
