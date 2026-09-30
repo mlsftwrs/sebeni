@@ -234,6 +234,15 @@ def train(
         None, "--grad-checkpoint/--no-grad-checkpoint"
     ),
     use_cpu: Optional[bool] = typer.Option(None, "--use-cpu/--no-use-cpu"),
+    kveritas: Optional[bool] = typer.Option(
+        None, "--kveritas/--no-kveritas", help="Stream step rewards and eval metrics via K-Veritas protocol."
+    ),
+    eval_ratio: Optional[float] = typer.Option(
+        None, "--eval-ratio", help="Fraction of user dataset held out for evaluation (default: 0.1)."
+    ),
+    eval_steps: Optional[int] = typer.Option(
+        None, "--eval-steps", help="Number of update steps between evaluations."
+    ),
 ):
     """Train one arm. Distills and freezes G/D first when that has not been done."""
     mc = _load_config(config, working_dir)
@@ -268,6 +277,9 @@ def train(
         gradient_checkpointing=gradient_checkpointing,
         lr_scheduler_type=lr_scheduler,
         hitl=hitl,
+        kveritas=kveritas,
+        eval_ratio=eval_ratio,
+        eval_steps=eval_steps,
     )
     from beni.core.pipeline import run_arm
 

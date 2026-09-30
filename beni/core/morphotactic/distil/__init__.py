@@ -1,6 +1,7 @@
 import json
-
 from dataclasses import dataclass
+from typing import Optional, Dict, Union, Any
+from pathlib import Path
 from pydantic import BaseModel, Field
 
 class DistilOutput(BaseModel):
@@ -14,6 +15,108 @@ class DistilSysPrompt:
     current_gram: str = None
     current_dict: str = None
     mode: str = "delta"  # delta | bootstrap
+
+    @staticmethod
+    def get_cache_contents(
+        language_meta: Optional[Dict] = None,
+        gram_path: Optional[Union[str, Path]] = None,
+        dict_path: Optional[Union[str, Path]] = None,
+        max_dict_chars: int = 50000,
+    ) -> str:
+        """Assemble reference samples, format guides, and baseline definitions into cache contents.
+
+        Ensures explicit Gemini context cache exceeds minimum token requirements (1,024 tokens).
+        """
+        import os
+        from pathlib import Path
+        from beni.utils import config as cfg
+
+        sections = []
+
+        # 1. System Role & Linguistic Context
+        sections.append(
+            "# Sɛbɛni Morphotactic Distillation Reference & Baseline Cache\n"
+            "You are an expert computational linguist specializing in the SebenX / Daba "
+            "morphological parser family for Mande and related West-African languages "
+            "(Bamana/Bambara, Maninka, Dogon, etc.).\n"
+            "This cached context provides canonical format guides, grammar/dictionary samples, "
+            "and language baselines."
+        )
+
+        # 2. Language Metadata
+        if language_meta:
+            meta_json = json.dumps(language_meta, indent=2, ensure_ascii=False)
+            sections.append(f"## Language Metadata\n```json\n{meta_json}\n```")
+
+        # 3. Reference Samples and Format Guides from beni.data.samples
+        sample_dir = cfg.DATA_DIR / "samples"
+        if sample_dir.exists():
+            guide_files = [
+                "grammar.guide",
+                "formats.guide",
+                "bamana.gram",
+                "bamana.dict",
+                "meta.en.md.guide",
+            ]
+            for fname in guide_files:
+                fpath = sample_dir / fname
+                if fpath.is_file():
+                    try:
+                        content = fpath.read_text(encoding="utf-8")
+                        sections.append(f"## Reference Sample: {fname}\n```text\n{content}\n```")
+                    except Exception:
+                        pass
+
+        # 4. Baseline Grammar
+        lang_code = ""
+        if isinstance(language_meta, dict):
+            lang_code = (
+                language_meta.get("code")
+                or language_meta.get("group_code")
+                or language_meta.get("iso_639_3")
+                or ""
+            )
+
+        gram_text = ""
+        if gram_path and Path(gram_path).is_file():
+            try:
+                gram_text = Path(gram_path).read_text(encoding="utf-8")
+            except Exception:
+                pass
+        if not gram_text and lang_code:
+            pkg_base = cfg.DATA_DIR / "baselines" / lang_code
+            for cand in [pkg_base / "baseline.gram", pkg_base / "baseline.gram.txt"]:
+                if cand.is_file():
+                    try:
+                        gram_text = cand.read_text(encoding="utf-8")
+                        break
+                    except Exception:
+                        pass
+        if gram_text:
+            sections.append(f"## Baseline Grammar\n```text\n{gram_text}\n```")
+
+        # 5. Baseline Dictionary
+        dict_text = ""
+        if dict_path and Path(dict_path).is_file():
+            try:
+                dict_text = Path(dict_path).read_text(encoding="utf-8")
+            except Exception:
+                pass
+        if not dict_text and lang_code:
+            pkg_base = cfg.DATA_DIR / "baselines" / lang_code
+            for cand in [pkg_base / "baseline.dict", pkg_base / "baseline.dict.txt"]:
+                if cand.is_file():
+                    try:
+                        dict_text = cand.read_text(encoding="utf-8")
+                        break
+                    except Exception:
+                        pass
+        if dict_text:
+            clipped_dict = dict_text[:max_dict_chars]
+            sections.append(f"## Baseline Dictionary (MDF)\n```text\n{clipped_dict}\n```")
+
+        return "\n\n".join(sections)
+
 
     def prompt(self) -> str:
         if self.mode == "bootstrap":

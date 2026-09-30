@@ -86,8 +86,17 @@ class GoogleProvider(base.BaseProvider):
     def __get_cache(self, cache_name: str=None, model=None, contents=None):
         """ Get live cache if exists else lazy load contexts to context cache """
 
-        if(contents is None): 
+        if contents is None: 
             print(f"Cache contents not provided for {self.cache_name}, skipping cache creation")
+            return None
+
+        # Google Gemini explicit caching requires a minimum token threshold of 1024 tokens (~3500-4000 characters).
+        # Skip cache creation defensively if contents are too small to avoid 400 INVALID_ARGUMENT.
+        if isinstance(contents, str) and len(contents) < 3500:
+            logger.info(
+                "Cache contents size (%d characters) is below explicit caching threshold (~1024 tokens); skipping cache creation.",
+                len(contents),
+            )
             return None
 
         cache_name = self.cache_name if not cache_name else cache_name
@@ -95,7 +104,7 @@ class GoogleProvider(base.BaseProvider):
 
         try:
             for cache in self._client.caches.list():
-                if(cache.display_name == cache_name):
+                if cache.display_name == cache_name:
                     self._client.caches.update(
                         name=cache.name,
                         config={"ttl": "3600s"} 

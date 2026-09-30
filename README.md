@@ -4,16 +4,19 @@
   <img src="logo_rm.jpeg" alt="RobotsMali" width="220"/>
 </p>
 
-[![docs](https://img.shields.io/badge/docs-seben.robotsmali.org-indigo)](https://seben.robotsmali.org/docs)
+[![docs](https://img.shields.io/badge/docs-Documentation-indigo)](https://mlsftwrs.github.io/sebeni)
 [![site](https://img.shields.io/badge/home-seben.robotsmali.org-blue)](https://seben.robotsmali.org)
 [![hub](https://img.shields.io/badge/hub-mlsftwrs-yellow)](https://huggingface.co/mlsftwrs)
 [![github](https://img.shields.io/badge/code-mlsftwrs/sebeni-black)](https://github.com/mlsftwrs/sebeni)
 
 Sebeni is a morphotactic post-training toolkit for Manding and related
-extremely low-resource languages. One run is three stages: **distill** grammar
-G and dictionary D once per language, **train one arm** (SFT, GRPO, DPO, or
-APO) against those frozen files, then **evaluate** held-out MER, MCS, and
-UWEC. Completions are morphological JSON, not a chatbot.
+extremely low-resource languages. One run is three stages: 
+
+- **distill** grammar G and dictionary D once per language, 
+- **train one arm** (SFT, GRPO, DPO, or APO) against those frozen files, then 
+- **evaluate** held-out MER, MCS, and UWEC.
+
+**Completions are morphological JSON, not a chatbot.**
 
 ```bash
 pip install "sebeni[train,distil] @ git+https://github.com/mlsftwrs/sebeni.git"
@@ -21,9 +24,10 @@ pip install "daba @ git+https://github.com/maslinych/daba.git" --no-deps
 sebeni --help
 ```
 
-- Docs: [seben.robotsmali.org/docs](https://seben.robotsmali.org/docs)
+- Docs: [mlsftwrs.github.io/sebeni](https://mlsftwrs.github.io/sebeni)
 - Project home: [seben.robotsmali.org](https://seben.robotsmali.org)
 - Hub org: [huggingface.co/mlsftwrs](https://huggingface.co/mlsftwrs)
+- Contact: [seben@robotsmali.org](mailto:seben@robotsmali.org)
 
 ## Install
 
@@ -69,7 +73,7 @@ sebeni exp --preset single --lang bam --algorithm grpo -w ./runs/bam-grpo
 If `-c` and `--preset` are omitted, Sebeni loads the MULTI13 preset.
 `sebeni exp` trains on `beni/data/raw/dataset_300_samples.jsonl` and
 evaluates `beni/data/test.json`. Details:
-[Experiments](https://seben.robotsmali.org/docs/experiments/).
+[Experiments](https://mlsftwrs.github.io/sebeni/experiments/).
 
 **Your own jsonl:**
 
@@ -77,7 +81,7 @@ evaluates `beni/data/test.json`. Details:
 sebeni init --lang bam --lang mku -w ./runs/manding-001
 # point data.source at jsonl/csv with text + lang
 sebeni distill -c ./runs/manding-001/config.yaml
-sebeni train   -c ./runs/manding-001/config.yaml --algorithm grpo --lr 1e-5 --max-steps 50
+sebeni train   -c ./runs/manding-001/config.yaml --algorithm grpo --lr 1e-5 --max-steps 50 --kveritas --eval-ratio 0.1 --eval-steps 10
 sebeni eval    -c ./runs/manding-001/config.yaml
 sebeni generate -c ./runs/manding-001/config.yaml --prompt "Aw ka kɛnɛ wa?" --lang bam
 sebeni wordfreq -c ./runs/manding-001/config.yaml
@@ -87,7 +91,7 @@ sebeni wordfreq -c ./runs/manding-001/config.yaml
 `--lang multi13` (or `all`) is the 13 canonical groups. `--lang bam` is one
 language. Trainer / LoRA knobs are YAML keys under `model:` / `trainer:` /
 `dpo:` / `apo:` and CLI flags on `sebeni train`. Full tables:
-[Hyperparameters](https://seben.robotsmali.org/docs/hyperparams/).
+[Hyperparameters](https://mlsftwrs.github.io/sebeni/hyperparams/).
 
 Presets: [`configs/presets/multi13.yaml`](configs/presets/multi13.yaml),
 [`configs/presets/single.yaml`](configs/presets/single.yaml).
@@ -130,15 +134,15 @@ kept for `--lang bbo`. Completions use JSON `tokens`.
    morphemes (MER) and tokens (MCS, UWEC). UWEC is evaluation-only.
 
 One policy θ; `(G_ℓ, D_ℓ)` per language. τ defaults to **0.5**. Full narrative:
-[SAMPG](https://seben.robotsmali.org/docs/sampg/). Metrics:
-[Rewards](https://seben.robotsmali.org/docs/rewards/).
+[SAMPG](https://mlsftwrs.github.io/sebeni/sampg/). Metrics:
+[Rewards](https://mlsftwrs.github.io/sebeni/rewards/).
 
 ## CLI
 
 ```
 sebeni init      --lang bam --lang mku -w ./runs/manding-001
 sebeni distill   -c config.yaml
-sebeni train     -c config.yaml --algorithm grpo [--lr 1e-5] [--lora-r 32]
+sebeni train     -c config.yaml --algorithm grpo [--lr 1e-5] [--kveritas] [--eval-ratio 0.1]
 sebeni eval      -c config.yaml
 sebeni exp       --preset multi13 --algorithm sft -w ./runs/multi13-sft
 sebeni wordfreq  -c config.yaml
@@ -173,7 +177,19 @@ export:
 - Training distrust U and KL-to-ref (`beta`) down-weight noisy rewards
 - **No Hub push** without a model card and `safety_snapshot.json` (Φ, τ, checkpoint id)
 
-Push checklist and org transfer: [Hub](https://seben.robotsmali.org/docs/hub/).
+Push checklist and org transfer: [Hub](https://mlsftwrs.github.io/sebeni/hub/).
+
+## Cookbooks & Evaluation Notebooks
+
+Ready-to-run Jupyter notebooks are provided in [`cookbooks/`](cookbooks/):
+
+| Notebook | Purpose |
+| --- | --- |
+| [`cookbooks/eval_grpo.ipynb`](cookbooks/eval_grpo.ipynb) | End-to-end GRPO training and held-out evaluation on `dataset_300_samples.jsonl` with K-Veritas stream |
+| [`cookbooks/eval_dpo.ipynb`](cookbooks/eval_dpo.ipynb) | End-to-end DPO training and evaluation on `dataset_300_samples.jsonl` |
+| [`cookbooks/eval_apo.ipynb`](cookbooks/eval_apo.ipynb) | End-to-end APO training and evaluation on `dataset_300_samples.jsonl` |
+| [`cookbooks/eval_sft.ipynb`](cookbooks/eval_sft.ipynb) | End-to-end SFT training and evaluation on `dataset_300_samples.jsonl` |
+| [`cookbooks/run_exp.ipynb`](cookbooks/run_exp.ipynb) | Rapid multi-arm benchmark (`sebeni exp`) across all algorithms on `dataset_10_samples.jsonl` |
 
 ## Parser
 
@@ -190,10 +206,17 @@ runtime libraries. Do not vendor GPL sources into this MIT tree. A CLI-only fork
 pytest tests
 ```
 
+## Contact & Support
+
+- Contact email: [seben@robotsmali.org](mailto:seben@robotsmali.org)
+- Documentation: [seben.robotsmali.org/docs](https://mlsftwrs.github.io/sebeni)
+- Project home: [seben.robotsmali.org](https://seben.robotsmali.org)
+- Organization: [RobotsMali](https://robotsmali.org)
+
 ## License
 
 MIT (this tree). Daba remains GPLv2+.
 
-Sebeni — write in Malian languages.
-[seben.robotsmali.org](https://seben.robotsmali.org) ·
+Sebeni - write in Malian languages.  
+[seben.robotsmali.org](https://seben.robotsmali.org)·
 [seben.robotsmali.org/docs](https://seben.robotsmali.org/docs)

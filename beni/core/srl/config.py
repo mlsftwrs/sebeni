@@ -142,6 +142,7 @@ class DataConfig:
     hf_streaming: bool = False
     hf_kwargs: Optional[Dict[str, Any]] = None
     clear_on_load: bool = False
+    eval_ratio: float = 0.1
 
     def __post_init__(self) -> None:
         from beni.core.language import parse_lang_codes
@@ -207,6 +208,10 @@ class GRPOTrainerConfig:
     use_cpu: bool = False
     framework: str = "torch"  # torch | jax
 
+    # Evaluation
+    eval_strategy: Optional[str] = None
+    eval_steps: Optional[int] = None
+
     def to_dict(self) -> dict:
         """Export to dictionary for easy unpacking into GRPOConfig."""
         data = {
@@ -245,6 +250,10 @@ class GRPOTrainerConfig:
             "hub_token": self.hub_token,
             "hub_private_repo": self.hub_private_repo,
         }
+        if self.eval_strategy is not None:
+            data["eval_strategy"] = self.eval_strategy
+        if self.eval_steps is not None:
+            data["eval_steps"] = self.eval_steps
         if self.num_generations:
             data["num_generations"] = self.num_generations
         return data
@@ -279,8 +288,12 @@ class DPOTrainerConfig:
     hub_token: Optional[str] = None
     hub_private_repo: bool = True
 
+    # Evaluation
+    eval_strategy: Optional[str] = None
+    eval_steps: Optional[int] = None
+
     def to_dict(self) -> dict:
-        return {
+        data = {
             "learning_rate": self.learning_rate,
             "per_device_train_batch_size": self.per_device_train_batch_size,
             "gradient_accumulation_steps": self.gradient_accumulation_steps,
@@ -306,6 +319,11 @@ class DPOTrainerConfig:
             "hub_model_id": self.hub_model_id,
             "hub_token": self.hub_token,
         }
+        if self.eval_strategy is not None:
+            data["eval_strategy"] = self.eval_strategy
+        if self.eval_steps is not None:
+            data["eval_steps"] = self.eval_steps
+        return data
 
 
 @dataclass
@@ -337,8 +355,12 @@ class APOTrainerConfig:
     hub_token: Optional[str] = None
     hub_private_repo: bool = True
 
+    # Evaluation
+    eval_strategy: Optional[str] = None
+    eval_steps: Optional[int] = None
+
     def to_dict(self) -> dict:
-        return {
+        data = {
             "learning_rate": self.learning_rate,
             "per_device_train_batch_size": self.per_device_train_batch_size,
             "gradient_accumulation_steps": self.gradient_accumulation_steps,
@@ -364,6 +386,11 @@ class APOTrainerConfig:
             "hub_model_id": self.hub_model_id,
             "hub_token": self.hub_token,
         }
+        if self.eval_strategy is not None:
+            data["eval_strategy"] = self.eval_strategy
+        if self.eval_steps is not None:
+            data["eval_steps"] = self.eval_steps
+        return data
 
 
 @dataclass
@@ -441,8 +468,12 @@ class SFTTrainerConfig:
     hub_token: Optional[str] = None
     hub_private_repo: bool = True
 
+    # Evaluation
+    eval_strategy: Optional[str] = None
+    eval_steps: Optional[int] = None
+
     def to_dict(self) -> dict:
-        return {
+        data = {
             "learning_rate": self.learning_rate,
             "per_device_train_batch_size": self.per_device_train_batch_size,
             "gradient_accumulation_steps": self.gradient_accumulation_steps,
@@ -465,6 +496,11 @@ class SFTTrainerConfig:
             "hub_model_id": self.hub_model_id,
             "hub_token": self.hub_token,
         }
+        if self.eval_strategy is not None:
+            data["eval_strategy"] = self.eval_strategy
+        if self.eval_steps is not None:
+            data["eval_steps"] = self.eval_steps
+        return data
 
 
 @dataclass
@@ -595,6 +631,9 @@ class MasterConfig:
         gradient_checkpointing: Optional[bool] = None,
         lr_scheduler_type: Optional[str] = None,
         hitl: Optional[bool] = None,
+        kveritas: Optional[bool] = None,
+        eval_ratio: Optional[float] = None,
+        eval_steps: Optional[int] = None,
     ) -> "MasterConfig":
         """Apply non-None CLI hyperparameter overrides onto trainer / model / data."""
         if languages:
@@ -632,10 +671,13 @@ class MasterConfig:
             "bf16": bf16,
             "fp16": fp16,
             "lr_scheduler_type": lr_scheduler_type,
+            "eval_steps": eval_steps,
         }
         for attr, value in mapping.items():
             if value is not None and hasattr(trainer, attr):
                 setattr(trainer, attr, value)
+        if eval_steps is not None and hasattr(trainer, "eval_strategy"):
+            trainer.eval_strategy = "steps"
         if epochs is not None and max_steps is None and hasattr(trainer, "max_steps"):
             trainer.max_steps = -1
         if num_generations is not None:
@@ -658,6 +700,10 @@ class MasterConfig:
             self.model.use_peft = use_peft
         if hitl is not None:
             self.distillation.hitl = hitl
+        if kveritas is not None:
+            self.experiment.kveritas = kveritas
+        if eval_ratio is not None:
+            self.data.eval_ratio = eval_ratio
         return self
 
     @classmethod

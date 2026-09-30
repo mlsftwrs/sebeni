@@ -84,27 +84,47 @@ class SebeniSft(AlignmentPlugin):
         records = [data[i] for i in range(len(data))] if hasattr(data, "column_names") else list(data or [])
         labeled = self.extract_labels(records)
         dataset = Dataset.from_list([{"text": row["text"]} for row in labeled])
+        train_dataset = dataset
+        eval_dataset = None
+        eval_ratio = getattr(self.config.data, "eval_ratio", 0.0) or 0.0
+        if eval_ratio > 0.0 and hasattr(dataset, "train_test_split") and len(dataset) > 1:
+            split = dataset.train_test_split(test_size=eval_ratio, seed=self.config.sft.seed)
+            train_dataset = split["train"]
+            eval_dataset = split["test"]
+
         if self.model is None:
             self.load_models()
 
         project_name = project_name or self.config.project_name
+        sft_dict = {**self.config.sft.to_dict(), "dataset_text_field": "text"}
+        if eval_dataset is not None:
+            if "eval_strategy" not in sft_dict or not sft_dict["eval_strategy"]:
+                sft_dict["eval_strategy"] = "steps"
+            if "eval_steps" not in sft_dict or not sft_dict["eval_steps"]:
+                sft_dict["eval_steps"] = max(1, sft_dict.get("logging_steps", 10))
+
         args = SFTConfig(
             **trl_config_kwargs(
                 SFTConfig,
-                {**self.config.sft.to_dict(), "dataset_text_field": "text"},
+                sft_dict,
                 project_name=project_name,
             )
         )
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
+        if getattr(self.config.experiment, "kveritas", False):
+            from beni.core.srl.grpo.callbacks import KVeritasCallback
+            callbacks.append(KVeritasCallback(reward_manager=self.reward_manager, config=self.config, eval_dataset=eval_dataset))
         if extra_callbacks:
             callbacks.extend(extra_callbacks)
         trainer_sig = inspect.signature(SFTTrainer.__init__).parameters
         trainer_kwargs = {
             "model": self.model,
             "args": args,
-            "train_dataset": dataset,
+            "train_dataset": train_dataset,
             "callbacks": callbacks,
         }
+        if eval_dataset is not None:
+            trainer_kwargs["eval_dataset"] = eval_dataset
         if "processing_class" in trainer_sig:
             trainer_kwargs["processing_class"] = self.tokenizer
         elif "tokenizer" in trainer_sig:

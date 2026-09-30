@@ -43,30 +43,52 @@ class SebeniDpo(AlignmentPlugin):
             [data[i] for i in range(len(data))] if isinstance(data, Dataset) else data
         )
         dataset = self._preference_dataset(self._preference_records)
+        train_dataset = dataset
+        eval_dataset = None
+        eval_ratio = getattr(self.config.data, "eval_ratio", 0.0) or 0.0
+        if eval_ratio > 0.0 and hasattr(dataset, "train_test_split") and len(dataset) > 1:
+            split = dataset.train_test_split(test_size=eval_ratio, seed=self.config.dpo.seed)
+            train_dataset = split["train"]
+            eval_dataset = split["test"]
+
         if self.model is None:
             self.load_models()
 
         project_name = project_name or self.config.project_name
+        dpo_dict = self.config.dpo.to_dict()
+        if eval_dataset is not None:
+            if "eval_strategy" not in dpo_dict or not dpo_dict["eval_strategy"]:
+                dpo_dict["eval_strategy"] = "steps"
+            if "eval_steps" not in dpo_dict or not dpo_dict["eval_steps"]:
+                dpo_dict["eval_steps"] = max(1, dpo_dict.get("logging_steps", 10))
+
         args = DPOConfig(
             **trl_config_kwargs(
                 DPOConfig,
-                self.config.dpo.to_dict(),
+                dpo_dict,
                 aliases={"max_prompt_length": "max_length"},
                 project_name=project_name,
             )
         )
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
+        if getattr(self.config.experiment, "kveritas", False):
+            from beni.core.srl.grpo.callbacks import KVeritasCallback
+            callbacks.append(KVeritasCallback(reward_manager=self.reward_manager, config=self.config, eval_dataset=eval_dataset))
         if extra_callbacks:
             callbacks.extend(extra_callbacks)
 
-        self.trainer = DPOTrainer(
-            model=self.model,
-            ref_model=self.ref_model,
-            args=args,
-            train_dataset=dataset,
-            processing_class=self.tokenizer,
-            callbacks=callbacks,
-        )
+        trainer_kwargs = {
+            "model": self.model,
+            "ref_model": self.ref_model,
+            "args": args,
+            "train_dataset": train_dataset,
+            "processing_class": self.tokenizer,
+            "callbacks": callbacks,
+        }
+        if eval_dataset is not None:
+            trainer_kwargs["eval_dataset"] = eval_dataset
+
+        self.trainer = DPOTrainer(**trainer_kwargs)
         self._wire_pre_update_hooks(self.trainer)
         self._init_trackio(project_name)
         print("Starting Sebeni DPO Training Loop...")

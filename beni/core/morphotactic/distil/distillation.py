@@ -380,7 +380,12 @@ class Distiller(object):
             )
             cap = getattr(getattr(self.provider, "capability", None), "value", None)
             if not getattr(self.provider, "cache", None) and cap in {"both", "cache"}:
-                self.provider.create_cache(contents=sys_prompt)
+                if hasattr(self.provider, "set_cache_contents"):
+                    self.provider.set_cache_contents(
+                        self.language_meta, self.gram_path, self.dict_path
+                    )
+                else:
+                    self.provider.create_cache(contents=sys_prompt)
             prompt = DistilUserPrompt(
                 f"DabaX miss report for {self.lang}:\n{miss_report}",
                 self.gram_delta,

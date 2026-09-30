@@ -180,3 +180,79 @@ class TrackioMetricsCallback(TrainerCallback):
             if total:
                 extra["sebeni/reward"] = float(total)
         log_trackio(extra, step=getattr(state, "global_step", None))
+
+
+def emit_kveritas_line(name: str, value: float, step: int = 0) -> None:
+    """Print standard K-Veritas protocol metric line."""
+    if value is not None:
+        try:
+            val = float(value)
+            print(f"KVERITAS_METRIC name={name} value={val:.6g} step={int(step)}", flush=True)
+        except (ValueError, TypeError):
+            pass
+
+
+class KVeritasCallback(TrainerCallback):
+    """Callback to stream training step rewards and eval metrics to K-Veritas stdout."""
+
+    def __init__(self, reward_manager=None, config=None, eval_dataset=None):
+        super().__init__()
+        self.reward_manager = reward_manager
+        self.config = config
+        self.eval_dataset = eval_dataset
+
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        step = getattr(state, "global_step", 0)
+        # Log reward metrics from reward_manager if available
+        if self.reward_manager is not None:
+            recent = getattr(self.reward_manager, "recent_rewards", {})
+            for key in ["reward_total", "reward_format", "reward_morph", "reward_rule", "reward_lang"]:
+                if key in recent:
+                    emit_kveritas_line(key, recent[key], step=step)
+            # If reward_total not in recent, fallback to total_reward
+            if "reward_total" not in recent:
+                total = getattr(self.reward_manager, "total_reward", 0.0) or 0.0
+                if total:
+                    emit_kveritas_line("reward_total", total, step=step)
+
+        # Also forward any logs metrics matching reward or loss
+        if logs:
+            for k, v in logs.items():
+                if isinstance(v, (int, float)) and ("reward" in k or "loss" in k):
+                    metric_name = k.replace("/", "_")
+                    if not metric_name.startswith("reward_") and not metric_name.endswith("_loss"):
+                        emit_kveritas_line(metric_name, float(v), step=step)
+
+    def on_evaluate(self, args, state, control, metrics=None, **kwargs):
+        step = getattr(state, "global_step", 0)
+        if metrics:
+            for k, v in metrics.items():
+                if isinstance(v, (int, float)):
+                    clean_name = k.replace("/", "_")
+                    emit_kveritas_line(clean_name, float(v), step=step)
+
+        # Compute phi, mer, mcs, uwec on eval_dataset if present
+        if self.eval_dataset and len(self.eval_dataset) > 0 and self.config is not None:
+            try:
+                from beni.core.pipeline import run_eval
+                eval_records = []
+                for row in self.eval_dataset:
+                    if isinstance(row, dict):
+                        eval_records.append({"text": row.get("text", "") or row.get("prompt", ""), "lang": row.get("lang") or row.get("language")})
+                    elif hasattr(row, "get"):
+                        eval_records.append({"text": row.get("text", ""), "lang": row.get("lang")})
+
+                if eval_records:
+                    report = run_eval(self.config, eval_records)
+                    for metric_key in ["phi", "mer", "mcs", "uwec"]:
+                        val = report.get(metric_key)
+                        if val is not None:
+                            emit_kveritas_line(metric_key, float(val), step=step)
+                    by_lang = report.get("by_language") or {}
+                    for lang, lang_metrics in by_lang.items():
+                        for metric_key in ["phi", "mer", "mcs", "uwec"]:
+                            lval = (lang_metrics or {}).get(metric_key)
+                            if lval is not None:
+                                emit_kveritas_line(f"{metric_key}_{lang}", float(lval), step=step)
+            except Exception:
+                pass

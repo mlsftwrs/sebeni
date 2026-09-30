@@ -15,7 +15,7 @@ from beni.utils.config import get_workdir
 logger = logging.getLogger(__name__)
 
 WIKIDATA_SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
-USER_AGENT = "language-metadata-lookup/1.0 (contact: ml.sftwrs@gmail.com)"
+USER_AGENT = "language-metadata-lookup/1.0 (contact: seben@robotsmali.org)"
 CACHE_FILE = None  # resolved via cache_file() against the active workdir
 
 

@@ -108,20 +108,38 @@ class SebeniGrpo(AlignmentPlugin):
         else:
             dataset = data
 
+        train_dataset = dataset
+        eval_dataset = None
+        eval_ratio = getattr(self.config.data, "eval_ratio", 0.0) or 0.0
+        if eval_ratio > 0.0 and hasattr(dataset, "train_test_split") and len(dataset) > 1:
+            split = dataset.train_test_split(test_size=eval_ratio, seed=self.config.trainer.seed)
+            train_dataset = split["train"]
+            eval_dataset = split["test"]
+
         if self.model is None:
             self.load_models()
 
         project_name = project_name or self.config.project_name
+        grpo_dict = self.config.trainer.to_dict()
+        if eval_dataset is not None:
+            if "eval_strategy" not in grpo_dict or not grpo_dict["eval_strategy"]:
+                grpo_dict["eval_strategy"] = "steps"
+            if "eval_steps" not in grpo_dict or not grpo_dict["eval_steps"]:
+                grpo_dict["eval_steps"] = max(1, grpo_dict.get("logging_steps", 10))
+
         grpo_args = GRPOConfig(
             **trl_config_kwargs(
                 GRPOConfig,
-                self.config.trainer.to_dict(),
+                grpo_dict,
                 project_name=project_name,
             )
         )
         reward_funcs = self.reward_manager.get_reward_functions()
 
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
+        if getattr(self.config.experiment, "kveritas", False):
+            from beni.core.srl.grpo.callbacks import KVeritasCallback
+            callbacks.append(KVeritasCallback(reward_manager=self.reward_manager, config=self.config, eval_dataset=eval_dataset))
         if extra_callbacks:
             callbacks.extend(extra_callbacks)
 
@@ -129,9 +147,11 @@ class SebeniGrpo(AlignmentPlugin):
             "model": self.model,
             "reward_funcs": reward_funcs,
             "args": grpo_args,
-            "train_dataset": dataset,
+            "train_dataset": train_dataset,
             "callbacks": callbacks,
         }
+        if eval_dataset is not None:
+            trainer_kwargs["eval_dataset"] = eval_dataset
         if self.tokenizer is not None:
             trainer_kwargs["processing_class"] = self.tokenizer
 

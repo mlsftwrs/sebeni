@@ -35,6 +35,7 @@ class RewardManager:
         self.total_reward: float = 0.0
         self.predicted_stages: List[List[Any]] = []
         self.custom_rewards: Dict[str, Tuple[Callable, float]] = {}
+        self.recent_rewards: Dict[str, float] = {}
 
     def register_custom_reward(self, name: str, reward_fn: Callable, weight: float = 1.0) -> None:
         """Register a custom reward function with a given weight."""
@@ -65,6 +66,7 @@ class RewardManager:
         self.format_scores.clear()
         self.total_reward = 0.0
         self.predicted_stages.clear()
+        self.recent_rewards.clear()
 
     @staticmethod
     def _as_list(value: Any) -> list:
@@ -275,6 +277,8 @@ class RewardManager:
             self.format_scores.append(score)
             self.total_reward += score
 
+        if scores:
+            self.recent_rewards["reward_format"] = float(sum(scores) / len(scores))
         return scores
 
     def reward_morph(self, 
@@ -302,6 +306,8 @@ class RewardManager:
             self.total_reward += score
             self.predicted_stages.append([t.stage for t in sent.tokens])
 
+        if scores:
+            self.recent_rewards["reward_morph"] = float(sum(scores) / len(scores))
         return scores
 
     def reward_rule(
@@ -331,6 +337,8 @@ class RewardManager:
             self.total_reward += score
             self.predicted_stages.append([t.stage for t in pred_sent.tokens])
 
+        if scores:
+            self.recent_rewards["reward_rule"] = float(sum(scores) / len(scores))
         return scores
 
     @staticmethod
@@ -393,6 +401,8 @@ class RewardManager:
             scores.append(score)
             self.total_reward += score
 
+        if scores:
+            self.recent_rewards["reward_lang"] = float(sum(scores) / len(scores))
         return scores
 
     def compute_rewards(
@@ -413,13 +423,17 @@ class RewardManager:
         lang_scores = self.reward_lang(completions, language=languages) if getattr(
             self.config, "enable_lang_reward", False) else [0.0] * len(completions)
 
+        total_scores = [
+            f + m + r + lg
+            for f, m, r, lg in zip(format_scores, morph_scores, rule_scores, lang_scores)
+        ]
+        if total_scores:
+            self.recent_rewards["reward_total"] = float(sum(total_scores) / len(total_scores))
+
         return {
             "format": format_scores,
             "morph": morph_scores,
             "rule": rule_scores,
             "lang": lang_scores,
-            "total": [
-                f + m + r + lg
-                for f, m, r, lg in zip(format_scores, morph_scores, rule_scores, lang_scores)
-            ],
+            "total": total_scores,
         }
