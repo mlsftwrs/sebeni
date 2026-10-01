@@ -1,4 +1,4 @@
-"""APO policy-update plugin — TRL DPO with ``apo_zero`` / ``apo_down`` loss."""
+"""Anchored Preference Optimization (APO, https://huggingface.co/papers/2408.06266) policy-update plugin — TRL DPO with ``apo_zero`` / ``apo_down`` loss."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from beni.core.srl.dpo.dpo import SebeniDpo
 
 
 class SebeniApo(SebeniDpo):
-    """APO as a TRL DPO ``loss_type`` plugin on the same SAMPG loop."""
+    """Anchored Preference Optimization (APO) as a TRL DPO ``loss_type`` plugin on the same SAMPG loop."""
 
     name = "apo"
 

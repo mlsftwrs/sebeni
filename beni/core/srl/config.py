@@ -328,7 +328,7 @@ class DPOTrainerConfig:
 
 @dataclass
 class APOTrainerConfig:
-    """APO as a TRL DPO loss_type plugin (apo_zero / apo_down)."""
+    """Anchored Preference Optimization (APO, https://huggingface.co/papers/2408.06266) as a TRL DPO loss_type plugin (apo_zero / apo_down)."""
     learning_rate: float = 5e-6
     per_device_train_batch_size: int = 2
     gradient_accumulation_steps: int = 8

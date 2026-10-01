@@ -107,7 +107,7 @@ one JSON object.
 | `sft` | `SebeniSft` | `SFTTrainer` |
 | `grpo` | `SebeniGrpo` | `GRPOTrainer` |
 | `dpo` | `SebeniDpo` | `DPOTrainer` |
-| `apo` | `SebeniApo` | `DPOTrainer` + `apo_zero` / `apo_down` |
+| `apo` | `SebeniApo` | Anchored Preference Optimization ([APO](https://huggingface.co/papers/2408.06266)): `DPOTrainer` + `apo_zero` / `apo_down` |
 
 DPO/APO pairs: `chosen`/`rejected` or `completions`+`scores`.
 For raw `{text, lang}` rows Sebeni builds `chosen=y*` and a legal corrupted

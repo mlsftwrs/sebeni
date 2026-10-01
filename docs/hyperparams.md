@@ -78,11 +78,12 @@ onto `max_length` when the installed TRL no longer has the prompt field.
 | `hub_model_id` | `null` | (YAML) |
 
 `algorithm: sft | grpo | dpo | apo` selects the arm. SFT is torch-only.
-DPO uses the `dpo:` block (`loss_type: sigmoid`); APO uses `apo:`
-(`loss_type: apo_zero` or `apo_down`). Shared optimizer fields (`learning_rate`,
-`beta`, `max_steps`, `warmup_ratio`, `weight_decay`, `lr_scheduler_type`,
-`seed`, `bf16`, `fp16`) overlay onto the active algorithm when you pass the CLI
-flags.
+DPO uses the `dpo:` block (`loss_type: sigmoid`); APO ([Anchored Preference Optimization, arXiv:2408.06266](https://arxiv.org/abs/2408.06266)) uses `apo:`.
+APO anchors policy likelihoods relative to the reference model to prevent reward drift and underspecification:
+- `loss_type: apo_zero`: Anchors win/loss likelihoods to zero drift ($\mathcal{L} = -\sigma(r_\theta(x, y_w)) + \sigma(r_\theta(x, y_l))$). Increases winning completion likelihoods while decreasing losing completion likelihoods. Recommended when target model capability is below the training set preferences.
+- `loss_type: apo_down`: Pushes down both chosen and rejected completions ($\mathcal{L} = \sigma(r_\theta(x, y_w)) - \sigma(r_\theta(x, y_w) - r_\theta(x, y_l))$) with stronger downward force on rejected completions. Recommended when the base model is already strong to prevent regression.
+
+Shared optimizer fields (`learning_rate`, `beta`, `max_steps`, `warmup_ratio`, `weight_decay`, `lr_scheduler_type`, `seed`, `bf16`, `fp16`) overlay onto the active algorithm when you pass CLI flags.
 
 ## `data:` (multilingual)
 

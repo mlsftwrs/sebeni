@@ -187,7 +187,7 @@ Ready-to-run Jupyter notebooks are provided in [`cookbooks/`](cookbooks/):
 | --- | --- |
 | [`cookbooks/eval_grpo.ipynb`](cookbooks/eval_grpo.ipynb) | End-to-end GRPO training and held-out evaluation on `dataset_300_samples.jsonl` with K-Veritas stream |
 | [`cookbooks/eval_dpo.ipynb`](cookbooks/eval_dpo.ipynb) | End-to-end DPO training and evaluation on `dataset_300_samples.jsonl` |
-| [`cookbooks/eval_apo.ipynb`](cookbooks/eval_apo.ipynb) | End-to-end APO training and evaluation on `dataset_300_samples.jsonl` |
+| [`cookbooks/eval_apo.ipynb`](cookbooks/eval_apo.ipynb) | End-to-end Anchored Preference Optimization (APO, [paper](https://huggingface.co/papers/2408.06266)) training and evaluation on `dataset_300_samples.jsonl` |
 | [`cookbooks/eval_sft.ipynb`](cookbooks/eval_sft.ipynb) | End-to-end SFT training and evaluation on `dataset_300_samples.jsonl` |
 | [`cookbooks/run_exp.ipynb`](cookbooks/run_exp.ipynb) | Rapid multi-arm benchmark (`sebeni exp`) across all algorithms on `dataset_10_samples.jsonl` |
 
