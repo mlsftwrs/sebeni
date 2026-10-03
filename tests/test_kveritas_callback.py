@@ -7,9 +7,23 @@ import sys
 import types
 
 # Ensure dependencies are available even in minimal environment
-for mod in ["torch", "torch.nn", "torch.nn.functional", "trl", "datasets", "numpy", "typer", "trackio"]:
+for mod in ["torch", "torch.nn", "torch.nn.functional", "trl", "numpy", "typer", "trackio"]:
     if mod not in sys.modules:
         sys.modules[mod] = MagicMock()
+
+if "datasets" not in sys.modules:
+    datasets_mod = types.ModuleType("datasets")
+    class DummyDataset(list):
+        @classmethod
+        def from_dict(cls, data_dict):
+            keys = list(data_dict.keys())
+            n = len(data_dict[keys[0]]) if keys else 0
+            rows = []
+            for i in range(n):
+                rows.append({k: data_dict[k][i] for k in keys})
+            return cls(rows)
+    datasets_mod.Dataset = DummyDataset
+    sys.modules["datasets"] = datasets_mod
 
 if "transformers" not in sys.modules:
     transformers = types.ModuleType("transformers")
@@ -106,6 +120,29 @@ class TestKVeritasCallback(unittest.TestCase):
         grpo_dict = mc.trainer.to_dict()
         self.assertEqual(grpo_dict["eval_steps"], 50)
         self.assertEqual(grpo_dict["eval_strategy"], "steps")
+
+
+    def test_preference_dataset_conversational(self):
+        from beni.data.datasets import rank_group_to_preference
+
+        reference = {
+            "text": "aw",
+            "lang": "bam",
+            "tokens": [{"surface": "aw", "stage": 1, "analyses": []}],
+        }
+        dataset = rank_group_to_preference(
+            [{"text": "aw", "lang": "bam", "reference": reference}],
+            scheme_prompt=True,
+        )
+        row = dataset[0]
+        # Verify conversational structure required by TRL DPOTrainer
+        self.assertIsInstance(row["prompt"], list)
+        self.assertIsInstance(row["chosen"], list)
+        self.assertIsInstance(row["rejected"], list)
+        self.assertEqual(row["chosen"][0]["role"], "assistant")
+        self.assertEqual(row["rejected"][0]["role"], "assistant")
+        self.assertNotEqual(row["chosen"][0]["content"], "aw")
+        self.assertNotEqual(row["chosen"][0]["content"], row["rejected"][0]["content"])
 
 
 if __name__ == "__main__":

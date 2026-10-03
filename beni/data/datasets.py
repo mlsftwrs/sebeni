@@ -1,5 +1,7 @@
 # Dataset loader for Sebeni Alignment
 
+from __future__ import annotations
+
 import csv
 import copy
 import glob
@@ -16,6 +18,24 @@ try:
     _HF_AVAILABLE = True
 except ImportError:
     _HF_AVAILABLE = False
+    class Dataset(list):  # type: ignore
+        """Fallback lightweight Dataset when datasets package is not installed."""
+        @classmethod
+        def from_dict(cls, data_dict):
+            keys = list(data_dict.keys())
+            n = len(data_dict[keys[0]]) if keys else 0
+            rows = []
+            for i in range(n):
+                rows.append({k: data_dict[k][i] for k in keys})
+            inst = cls(rows)
+            inst.column_names = keys
+            return inst
+
+        def train_test_split(self, test_size=0.1, seed=None):
+            n = len(self)
+            n_test = max(1, int(n * test_size)) if test_size < 1.0 else int(test_size)
+            return {"train": Dataset(self[:-n_test]), "test": Dataset(self[-n_test:])}
+
 
 try:
     from langdetect import detect as _detect_lang
@@ -487,16 +507,19 @@ def rank_group_to_preference(
             chosen = json.dumps(chosen, ensure_ascii=False)
         if isinstance(rejected, dict):
             rejected = json.dumps(rejected, ensure_ascii=False)
-        rows["prompt"].append(
-            [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ]
-            if scheme_prompt
-            else user
-        )
-        rows["chosen"].append(str(chosen))
-        rows["rejected"].append(str(rejected))
+        if scheme_prompt:
+            rows["prompt"].append(
+                [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user},
+                ]
+            )
+            rows["chosen"].append([{"role": "assistant", "content": str(chosen)}])
+            rows["rejected"].append([{"role": "assistant", "content": str(rejected)}])
+        else:
+            rows["prompt"].append(user)
+            rows["chosen"].append(str(chosen))
+            rows["rejected"].append(str(rejected))
         rows["language"].append(lang)
     return Dataset.from_dict(rows)
 

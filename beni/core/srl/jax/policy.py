@@ -359,8 +359,14 @@ class JaxPolicyPlugin(AlignmentPlugin):
                 prompt = "\n".join(message["content"] for message in prompt_value)
             else:
                 prompt = str(prompt_value)
+            chosen_val = row["chosen"]
+            if isinstance(chosen_val, list) and chosen_val and isinstance(chosen_val[0], dict) and "content" in chosen_val[0]:
+                chosen_val = chosen_val[0]["content"]
+            rejected_val = row["rejected"]
+            if isinstance(rejected_val, list) and rejected_val and isinstance(rejected_val[0], dict) and "content" in rejected_val[0]:
+                rejected_val = rejected_val[0]["content"]
             loss, u = self._preference_step(
-                prompt, str(row["chosen"]), str(row["rejected"])
+                prompt, str(chosen_val), str(rejected_val)
             )
             history.append({"step": step, "loss": loss, **u})
             _log_metrics(history[-1])

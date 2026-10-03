@@ -237,10 +237,23 @@ class KVeritasCallback(TrainerCallback):
                 from beni.core.pipeline import run_eval
                 eval_records = []
                 for row in self.eval_dataset:
-                    if isinstance(row, dict):
-                        eval_records.append({"text": row.get("text", "") or row.get("prompt", ""), "lang": row.get("lang") or row.get("language")})
-                    elif hasattr(row, "get"):
-                        eval_records.append({"text": row.get("text", ""), "lang": row.get("lang")})
+                    text_val = ""
+                    lang_val = ""
+                    if isinstance(row, dict) or hasattr(row, "get"):
+                        text_val = row.get("text") or ""
+                        if not text_val:
+                            p = row.get("prompt")
+                            if isinstance(p, list):
+                                for msg in reversed(p):
+                                    if isinstance(msg, dict) and msg.get("role") == "user":
+                                        text_val = msg.get("content", "")
+                                        break
+                                if not text_val and p and isinstance(p[-1], dict):
+                                    text_val = p[-1].get("content", "")
+                            elif isinstance(p, str):
+                                text_val = p
+                        lang_val = row.get("lang") or row.get("language") or ""
+                    eval_records.append({"text": text_val, "lang": lang_val})
 
                 if eval_records:
                     report = run_eval(self.config, eval_records)
