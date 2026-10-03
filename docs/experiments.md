@@ -104,6 +104,7 @@ Optional Google refinement accepts ADC or `GOOGLE_API_KEY`.
 
 ## Next
 
+- [Cookbooks](getting-started.md#cookbooks) for Colab / Kaggle notebooks
 - [Use cases](use-cases.md) for your own jsonl
 - [SAMPG](sampg.md) for distill → one arm → eval
 - [Rewards](rewards.md) for MER, MCS, and UWEC

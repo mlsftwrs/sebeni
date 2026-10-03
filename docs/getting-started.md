@@ -83,6 +83,18 @@ sebeni exp --preset single --lang bam --algorithm sft -w ./runs/bam-sft
 `runtime/`. `--lang multi13` is the default scope. `--lang bam` is one language.
 Trainer / LoRA knobs: [Hyperparameters](hyperparams.md) or `sebeni train --help`.
 
+## Cookbooks
+
+Open a notebook in Colab or Kaggle. Each installs Sebeni from GitHub (no clone).
+
+| Notebook | Launch |
+| --- | --- |
+| [eval_grpo.ipynb](https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_grpo.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/eval_grpo.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_grpo.ipynb) |
+| [eval_dpo.ipynb](https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_dpo.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/eval_dpo.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_dpo.ipynb) |
+| [eval_apo.ipynb](https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_apo.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/eval_apo.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_apo.ipynb) |
+| [eval_sft.ipynb](https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_sft.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/eval_sft.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_sft.ipynb) |
+| [run_exp.ipynb](https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/run_exp.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/run_exp.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/run_exp.ipynb) |
+
 ## Relocatable working directory
 
 Later wins if set:

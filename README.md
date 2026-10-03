@@ -181,15 +181,15 @@ Push checklist and org transfer: [Hub](https://mlsftwrs.github.io/sebeni/hub/).
 
 ## Cookbooks & Evaluation Notebooks
 
-Ready-to-run Jupyter notebooks are provided in [`cookbooks/`](cookbooks/):
+Ready-to-run Jupyter notebooks are in [`cookbooks/`](cookbooks/). Open them in Colab or Kaggle — no repo clone is required; each notebook installs Sebeni from GitHub.
 
-| Notebook | Purpose |
-| --- | --- |
-| [`cookbooks/eval_grpo.ipynb`](cookbooks/eval_grpo.ipynb) | End-to-end GRPO training and held-out evaluation on `dataset_300_samples.jsonl` with K-Veritas stream |
-| [`cookbooks/eval_dpo.ipynb`](cookbooks/eval_dpo.ipynb) | End-to-end DPO training and evaluation on `dataset_300_samples.jsonl` |
-| [`cookbooks/eval_apo.ipynb`](cookbooks/eval_apo.ipynb) | End-to-end Anchored Preference Optimization (APO, [paper](https://huggingface.co/papers/2408.06266)) training and evaluation on `dataset_300_samples.jsonl` |
-| [`cookbooks/eval_sft.ipynb`](cookbooks/eval_sft.ipynb) | End-to-end SFT training and evaluation on `dataset_300_samples.jsonl` |
-| [`cookbooks/run_exp.ipynb`](cookbooks/run_exp.ipynb) | Rapid multi-arm benchmark (`sebeni exp`) across all algorithms on `dataset_10_samples.jsonl` |
+| Notebook | Purpose | Launch |
+| --- | --- | --- |
+| [`cookbooks/eval_grpo.ipynb`](cookbooks/eval_grpo.ipynb) | End-to-end GRPO training and held-out evaluation on `dataset_300_samples.jsonl` with K-Veritas stream | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/eval_grpo.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_grpo.ipynb) |
+| [`cookbooks/eval_dpo.ipynb`](cookbooks/eval_dpo.ipynb) | End-to-end DPO training and evaluation on `dataset_300_samples.jsonl` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/eval_dpo.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_dpo.ipynb) |
+| [`cookbooks/eval_apo.ipynb`](cookbooks/eval_apo.ipynb) | End-to-end Anchored Preference Optimization (APO, [paper](https://huggingface.co/papers/2408.06266)) training and evaluation on `dataset_300_samples.jsonl` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/eval_apo.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_apo.ipynb) |
+| [`cookbooks/eval_sft.ipynb`](cookbooks/eval_sft.ipynb) | End-to-end SFT training and evaluation on `dataset_300_samples.jsonl` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/eval_sft.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/eval_sft.ipynb) |
+| [`cookbooks/run_exp.ipynb`](cookbooks/run_exp.ipynb) | Rapid multi-arm benchmark (`sebeni exp`) across all algorithms on `dataset_10_samples.jsonl` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mlsftwrs/sebeni/blob/main/cookbooks/run_exp.ipynb) [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/run_exp.ipynb) |
 
 ## Parser
 
