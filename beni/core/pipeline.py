@@ -128,6 +128,8 @@ def _distiller_for(mc: MasterConfig, group: str):
         model=mc.distillation.model,
         working_dir=mc.distillation.working_dir or mc.working_dir,
         vertex=mc.distillation.vertex,
+        location=getattr(mc.distillation, "location", None),
+        project_id=getattr(mc.distillation, "project_id", None),
         base_url=mc.distillation.base_url,
         gguf_path=mc.distillation.gguf_path,
         n_ctx=mc.distillation.n_ctx,

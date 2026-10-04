@@ -326,7 +326,7 @@ class TestSebeniGrpoPipeline:
         mock_distiller_cls.assert_called_once_with(
             lang_code="bam",
             backend="google",
-            model="gemini-2.5-flash",
+            model="gemini-3.7-flash",
             working_dir=None,
             vertex=None,
             base_url=None,

@@ -9,7 +9,10 @@ import types
 # Ensure dependencies are available even in minimal environment
 for mod in ["torch", "torch.nn", "torch.nn.functional", "trl", "numpy", "typer", "trackio"]:
     if mod not in sys.modules:
-        sys.modules[mod] = MagicMock()
+        try:
+            __import__(mod)
+        except ImportError:
+            sys.modules[mod] = MagicMock()
 
 if "datasets" not in sys.modules:
     datasets_mod = types.ModuleType("datasets")

@@ -5,7 +5,7 @@ site_author: RobotsMali
 repo_url: https://github.com/mlsftwrs/sebeni
 repo_name: mlsftwrs/sebeni
 edit_uri: ""
-copyright: "sebeni — write in Malian languages"
+copyright: "sebeni - write in Malian languages"
 
 theme:
   name: material

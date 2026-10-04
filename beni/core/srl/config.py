@@ -399,13 +399,15 @@ class DistillationConfig:
     enabled: bool = True
     backend: str = "algorithmic"
     provider: Optional[str] = None  # deprecated alias for backend
-    model: str = "gemini-2.5-flash"
+    model: str = "gemini-3.7-flash"
     working_dir: Optional[str] = None
     batch_size: int = 10
     auto_update_baselines: bool = True
     tau: float = 0.5
     hitl: bool = False
     vertex: Optional[bool] = None
+    location: Optional[str] = "global"
+    project_id: Optional[str] = None
     base_url: Optional[str] = None
     gguf_path: Optional[str] = None
     n_ctx: int = 4096

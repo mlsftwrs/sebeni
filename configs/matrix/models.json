@@ -1,0 +1,98 @@
+[
+  {
+    "id": "LiquidAI/LFM2.5-230M",
+    "slug": "lfm2.5-230m",
+    "display_name": "LFM2.5-230M",
+    "params": "230M",
+    "trust_remote_code": true,
+    "recommended_batch_size": 4
+  },
+  {
+    "id": "HuggingFaceTB/SmolLM2-135M",
+    "slug": "smollm2-135m",
+    "display_name": "SmolLM2-135M",
+    "params": "135M",
+    "trust_remote_code": false,
+    "recommended_batch_size": 4
+  },
+  {
+    "id": "ibm-granite/granite-4.0-h-350m",
+    "slug": "granite-4.0-h-350m",
+    "display_name": "granite-4.0-h-350m",
+    "params": "350M",
+    "trust_remote_code": false,
+    "recommended_batch_size": 2
+  },
+  {
+    "id": "Qwen/Qwen3-0.6B",
+    "slug": "qwen3-0.6b",
+    "display_name": "Qwen3-0.6B",
+    "params": "600M",
+    "trust_remote_code": false,
+    "recommended_batch_size": 2
+  },
+  {
+    "id": "Qwen/Qwen2.5-0.5B",
+    "slug": "qwen2.5-0.5b",
+    "display_name": "Qwen2.5-0.5B",
+    "params": "500M",
+    "trust_remote_code": false,
+    "recommended_batch_size": 2
+  },
+  {
+    "id": "HuggingFaceTB/SmolLM3-3B",
+    "slug": "smollm3-3b",
+    "display_name": "SmolLM3-3B",
+    "params": "3B",
+    "trust_remote_code": false,
+    "recommended_batch_size": 1
+  },
+  {
+    "id": "LiquidAI/LFM2.5-350M",
+    "slug": "lfm2.5-350m",
+    "display_name": "LFM2.5-350M",
+    "params": "350M",
+    "trust_remote_code": true,
+    "recommended_batch_size": 2
+  },
+  {
+    "id": "google/gemma-3-270m",
+    "slug": "gemma-3-270m",
+    "display_name": "gemma-3-270m",
+    "params": "270M",
+    "trust_remote_code": false,
+    "recommended_batch_size": 4
+  },
+  {
+    "id": "microsoft/Phi-3.5-mini-instruct",
+    "slug": "phi-3.5-mini-instruct",
+    "display_name": "Phi-3.5-mini-instruct",
+    "params": "3.8B",
+    "trust_remote_code": false,
+    "recommended_batch_size": 1
+  },
+  {
+    "id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "slug": "tinyllama-1.1b",
+    "display_name": "TinyLlama-1.1B",
+    "params": "1.1B",
+    "trust_remote_code": false,
+    "recommended_batch_size": 2
+  },
+  {
+    "id": "google/gemma-4-E2B",
+    "slug": "gemma-4-e2b",
+    "display_name": "gemma-4-E2B",
+    "params": "2B",
+    "trust_remote_code": false,
+    "recommended_batch_size": 1
+  },
+  {
+    "id": "google/gemma-4-E4B",
+    "slug": "gemma-4-e4b",
+    "display_name": "gemma-4-E4B",
+    "params": "4B",
+    "trust_remote_code": false,
+    "recommended_batch_size": 1
+  }
+]

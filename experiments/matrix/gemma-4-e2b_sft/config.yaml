@@ -1,0 +1,57 @@
+algorithm: sft
+data:
+  default_lang: bam
+  languages:
+  - multi13
+  scheme: completion
+distillation:
+  backend: google
+  enabled: true
+  hitl: false
+  location: global
+  model: gemini-3.7-flash
+  tau: 0.5
+  vertex: true
+experiment:
+  dataset: packaged
+  eval_file: test.json
+  freeze_resources: true
+  kveritas: true
+  kveritas_seal: true
+  max_eval_rows: null
+  scope: MULTI13
+model:
+  load_in_4bit: true
+  lora_alpha: 32
+  lora_dropout: 0.1
+  lora_r: 16
+  model_name: google/gemma-4-E2B
+  use_peft: true
+preset: multi13
+project_name: matrix_gemma-4-e2b_sft
+reward:
+  format_weight: 0.2
+  lang_weight: 0.2
+  morph_weight: 0.3
+  rule_weight: 0.3
+safety:
+  enabled: true
+scope: MULTI13
+trainer:
+  beta: 0.1
+  bf16: false
+  framework: torch
+  gradient_accumulation_steps: 8
+  gradient_checkpointing: false
+  learning_rate: 5.0e-06
+  lr_scheduler_type: cosine
+  max_steps: 500
+  num_generations: 4
+  num_train_epochs: 1.0
+  per_device_train_batch_size: 1
+  report_to: trackio
+  seed: 42
+  temperature: 0.9
+  use_cpu: false
+  warmup_ratio: 0.03
+  weight_decay: 0.01

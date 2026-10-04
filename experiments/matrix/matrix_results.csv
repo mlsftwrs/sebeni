@@ -1,0 +1,2 @@
+model,scope,method,mer,mcs,uwec,phi,seed,config,status
+HuggingFaceTB/SmolLM2-135M,MULTI13,SFT,,,,,42,experiments/matrix/smollm2-135m_sft/config.yaml,DRY_RUN

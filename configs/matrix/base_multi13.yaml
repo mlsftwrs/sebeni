@@ -1,0 +1,68 @@
+# Canonical MULTI13 Experimentation Matrix Base Configuration
+# 500-step budget across 12 models x 4 post-training arms (SFT, GRPO, DPO, APO)
+# Distillation: Google GenAI (gemini-3.7-flash, Vertex AI, global)
+# Evaluation: Held-out test split from beni.data/test.json
+
+preset: multi13
+project_name: sebeni-matrix
+scope: MULTI13
+algorithm: grpo          # overridden per matrix cell: sft | grpo | dpo | apo
+
+model:
+  model_name: HuggingFaceTB/SmolLM2-135M
+  load_in_4bit: true
+  use_peft: true
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.1
+
+data:
+  default_lang: bam
+  languages: [multi13]
+  scheme: completion
+
+trainer:
+  framework: torch
+  learning_rate: 5.0e-6
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  max_steps: 500
+  num_train_epochs: 1.0
+  beta: 0.1
+  num_generations: 4
+  temperature: 0.9
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  lr_scheduler_type: cosine
+  seed: 42
+  bf16: false
+  gradient_checkpointing: false
+  use_cpu: false
+  report_to: trackio
+
+distillation:
+  enabled: true
+  backend: google
+  model: gemini-3.7-flash
+  vertex: true
+  location: global
+  tau: 0.5
+  hitl: false
+
+experiment:
+  dataset: packaged
+  freeze_resources: true
+  scope: MULTI13
+  eval_file: test.json
+  max_eval_rows: null      # Evaluates all held-out paragraphs from beni.data/test.json
+  kveritas: true
+  kveritas_seal: true
+
+reward:
+  format_weight: 0.2
+  morph_weight: 0.3
+  rule_weight: 0.3
+  lang_weight: 0.2
+
+safety:
+  enabled: true

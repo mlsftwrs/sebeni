@@ -45,6 +45,8 @@ class Distiller(object):
         api_key: Optional[str] = None,
         working_dir: Union[None, str] = None,
         vertex: Optional[bool] = None,
+        location: Optional[str] = None,
+        project_id: Optional[str] = None,
         base_url: Optional[str] = None,
         gguf_path: Optional[str] = None,
         n_ctx: int = 4096,
@@ -65,6 +67,8 @@ class Distiller(object):
         self.language_meta = self._valid_language(lang_code)
         self.provider_name = str(backend or provider or "algorithmic").lower()
         self.max_input_chars = int(max_input_chars)
+        self.location = location
+        self.project_id = project_id
         self.provider = None
         if self.provider_name != "algorithmic":
             key = api_key or cfg.provider_api_key(self.provider_name)
@@ -79,8 +83,8 @@ class Distiller(object):
                 use_vertex = cfg.use_google_vertex(vertex, key)
                 extra["vertex"] = use_vertex
                 if use_vertex:
-                    extra["project_id"] = cfg.google_project_id()
-                    extra["region"] = cfg.google_location()
+                    extra["project_id"] = project_id or cfg.google_project_id()
+                    extra["region"] = location or cfg.google_location()
                     if key:
                         logger.warning(
                             "GOOGLE_API_KEY is set but Vertex/ADC is selected; "

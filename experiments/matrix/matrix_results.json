@@ -1,0 +1,14 @@
+[
+  {
+    "model": "HuggingFaceTB/SmolLM2-135M",
+    "scope": "MULTI13",
+    "method": "SFT",
+    "mer": null,
+    "mcs": null,
+    "uwec": null,
+    "phi": null,
+    "seed": 42,
+    "config": "experiments/matrix/smollm2-135m_sft/config.yaml",
+    "status": "DRY_RUN"
+  }
+]
