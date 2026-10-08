@@ -412,6 +412,49 @@ class TestGRPOTrainingModel:
         assert kwargs.get("quantization_config") is None
         assert kwargs.get("device_map") == "cpu"
 
+    @patch("beni.core.srl.plugin.BitsAndBytesConfig")
+    @patch("beni.core.srl.plugin._bitsandbytes_usable", return_value=True)
+    @patch("beni.core.srl.plugin.torch.cuda.is_available", return_value=True)
+    @patch("beni.core.srl.plugin.get_peft_model")
+    @patch("beni.core.srl.plugin.AutoTokenizer.from_pretrained")
+    @patch("beni.core.srl.plugin.AutoModelForCausalLM.from_pretrained")
+    def test_load_models_uses_8bit_quantization(
+        self,
+        mock_model_from_pretrained,
+        mock_tok_from_pretrained,
+        mock_get_peft,
+        _mock_cuda_available,
+        _mock_bitsandbytes_usable,
+        mock_bnb_config,
+    ):
+        tokenizer = MagicMock()
+        tokenizer.pad_token = "<pad>"
+        tokenizer.eos_token = "<eos>"
+        tokenizer.chat_template = "template"
+        mock_tok_from_pretrained.return_value = tokenizer
+        mock_model_from_pretrained.return_value = MagicMock()
+        mock_get_peft.return_value = MagicMock()
+        quantization_config = MagicMock()
+        mock_bnb_config.return_value = quantization_config
+
+        pipeline = SebeniGrpo(model_name="HuggingFaceTB/SmolLM2-135M")
+        pipeline.config.model.load_in_4bit = False
+        pipeline.config.model.load_in_8bit = True
+        pipeline.config.model.use_peft = False
+        pipeline.config.trainer.use_cpu = False
+        pipeline.load_models()
+
+        mock_bnb_config.assert_called_once_with(load_in_8bit=True)
+        assert mock_model_from_pretrained.call_args.kwargs["quantization_config"] is quantization_config
+
+    def test_load_models_rejects_conflicting_quantization_modes(self):
+        pipeline = SebeniGrpo(model_name="HuggingFaceTB/SmolLM2-135M")
+        pipeline.config.model.load_in_4bit = True
+        pipeline.config.model.load_in_8bit = True
+
+        with pytest.raises(ValueError, match="Choose only one quantization mode"):
+            pipeline.load_models()
+
     @patch("beni.core.srl.plugin.get_peft_model")
     @patch("beni.core.srl.plugin.AutoTokenizer.from_pretrained")
     @patch("beni.core.srl.plugin.AutoModelForCausalLM.from_pretrained")

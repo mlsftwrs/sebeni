@@ -19,3 +19,12 @@ review.md
 .env
 testing_guide.md
 RunNB.ipynb
+.gcloudignore
+scripts/create_vertex_notebook_l4.sh
+scripts/deploy_cloud_run.sh
+scripts/run_gce_l4.sh
+scripts/run_vertex_cpu.sh
+scripts/run_vertex_l4.sh
+scripts/run_workbench_cli.py
+scripts/run_workbench_cli.sh
+scripts/startup_l4.sh

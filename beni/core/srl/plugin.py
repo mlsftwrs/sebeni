@@ -138,6 +138,8 @@ class AlignmentPlugin:
     def load_models(self, model_name: Optional[str] = None, device_map: str = "auto", remote_code: bool = True):
         """Load policy causal LM, optional reference model, and tokenizer."""
         model_name = model_name or self.config.model.model_name
+        if self.config.model.load_in_4bit and self.config.model.load_in_8bit:
+            raise ValueError("Choose only one quantization mode: load_in_4bit or load_in_8bit.")
         use_cpu = bool(
             getattr(self.config.trainer, "use_cpu", False)
             or getattr(self.config.dpo, "use_cpu", False)
@@ -154,13 +156,16 @@ class AlignmentPlugin:
 
         bnb_config = None
         use_4bit = self.config.model.load_in_4bit and device_map != "cpu"
-        if use_4bit and not _bitsandbytes_usable():
+        use_8bit = self.config.model.load_in_8bit and device_map != "cpu"
+        if (use_4bit or use_8bit) and not _bitsandbytes_usable():
+            quantization_mode = "4-bit" if use_4bit else "8-bit"
             print(
-                "load_in_4bit requested but bitsandbytes/CUDA is unavailable; "
+                f"{quantization_mode} quantization requested but bitsandbytes/CUDA is unavailable; "
                 "loading full precision. Install bitsandbytes, or set "
-                "model.load_in_4bit: false and trainer.use_cpu: true."
+                "model.load_in_4bit and model.load_in_8bit to false, or trainer.use_cpu: true."
             )
             use_4bit = False
+            use_8bit = False
         if use_4bit:
             bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
@@ -168,6 +173,8 @@ class AlignmentPlugin:
                 bnb_4bit_use_double_quant=self.config.model.bnb_4bit_use_double_quant,
                 bnb_4bit_quant_type=self.config.model.bnb_4bit_quant_type,
             )
+        elif use_8bit:
+            bnb_config = BitsAndBytesConfig(load_in_8bit=True)
 
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,

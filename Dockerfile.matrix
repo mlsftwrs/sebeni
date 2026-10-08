@@ -1,0 +1,72 @@
+# CUDA base image compatible with NVIDIA L4 (Compute Capability 8.9 / sm_89)
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+
+# Prevent interactive prompts & bufferless python logs
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+# Install system dependencies, Python 3.11, and git
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    git \
+    curl \
+    ca-certificates \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set python3.11 as default python
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+
+# Install kveritas binary
+RUN curl -fsSL https://github.com/27-GROUP/kveritas-releases/raw/main/bin/kveritas-linux-amd64 -o /usr/local/bin/kveritas \
+    && chmod +x /usr/local/bin/kveritas || true
+
+WORKDIR /app
+
+# Install CUDA-enabled PyTorch & BitsAndBytes for L4 GPU
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+RUN pip install --no-cache-dir "daba @ git+https://github.com/maslinych/daba.git" --no-deps
+RUN pip install --no-cache-dir \
+    transformers \
+    trl>=0.14 \
+    peft \
+    datasets \
+    accelerate \
+    trackio \
+    google-genai>=0.17.0 \
+    bigframes \
+    rich \
+    pyyaml \
+    jinja2 \
+    numpy \
+    pydantic \
+    funcparserlib \
+    intervaltree \
+    pytrie \
+    attrdict3 \
+    regex \
+    bitsandbytes
+
+# Copy codebase
+COPY . /app
+
+# Install local package in editable mode
+RUN pip install --no-cache-dir -e ".[train,distil]"
+
+# Default environment variables for Google Cloud Vertex AI
+ENV GOOGLE_CLOUD_LOCATION=global \
+    GOOGLE_LOCATION=global
+
+# Entrypoint for run_matrix
+ENTRYPOINT ["python3", "scripts/run_matrix.py"]
+CMD ["--models", "SmolLM2-135M", "--algorithms", "grpo", "--max-steps", "2", "--scope", "MULTI13", "--distil-model", "gemini-3.7-flash", "--location", "global", "--vertex", "--output-dir", "experiments/matrix"]

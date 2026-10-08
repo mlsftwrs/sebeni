@@ -52,6 +52,9 @@ def build_config(
     vertex: bool,
     backend: str,
     run_dir: Path,
+    quantization: Optional[str] = None,
+    max_eval_rows: Optional[int] = None,
+    kveritas_disclosure: str = "open",
 ) -> Dict[str, Any]:
     """Compose experiment configuration for a single matrix cell."""
     with open(base_config_path, "r", encoding="utf-8") as f:
@@ -66,6 +69,11 @@ def build_config(
     cfg["model"]["model_name"] = model_entry["id"]
     if model_entry.get("trust_remote_code"):
         cfg["model"]["trust_remote_code"] = True
+    if quantization is not None:
+        if quantization not in {"4bit", "8bit", "none"}:
+            raise ValueError(f"Unsupported quantization mode: {quantization}")
+        cfg["model"]["load_in_4bit"] = quantization == "4bit"
+        cfg["model"]["load_in_8bit"] = quantization == "8bit"
 
     # Data & Scope
     cfg.setdefault("data", {})
@@ -89,13 +97,16 @@ def build_config(
     cfg["distillation"]["vertex"] = vertex
     cfg["distillation"]["location"] = location
 
-    # Experiment & Evaluation invariant: strictly test.json
+    # Experiment & Evaluation invariant
     cfg.setdefault("experiment", {})
     cfg["experiment"]["dataset"] = "packaged"
     cfg["experiment"]["eval_file"] = "test.json"
     cfg["experiment"]["scope"] = scope
     cfg["experiment"]["kveritas"] = True
     cfg["experiment"]["kveritas_seal"] = True
+    if max_eval_rows is not None:
+        cfg["experiment"]["max_eval_rows"] = max_eval_rows
+    cfg["experiment"]["kveritas_disclosure"] = kveritas_disclosure
 
     return cfg
 
@@ -147,8 +158,9 @@ def run_experiment_cell(
     mc = MasterConfig.from_dict(cfg_data)
     mc.working_dir = str(run_dir)
 
-    # 1. K-Veritas Init
-    maybe_kveritas_init(run_dir)
+    # 1. K-Veritas Init with open disclosure
+    disclosure = cfg_data.get("experiment", {}).get("kveritas_disclosure", "open")
+    maybe_kveritas_init(run_dir, disclosure=disclosure)
 
     # 2. Morphotactic Distillation (if not already cached)
     logger.info("Executing distillation step with teacher %s (Vertex AI, %s)...", mc.distillation.model, mc.distillation.location)
@@ -285,6 +297,28 @@ def main() -> None:
         default=500,
         help="Training step budget per experiment (default: 500).",
     )
+    quantization_group = parser.add_mutually_exclusive_group()
+    quantization_group.add_argument(
+        "--load-in-4bit",
+        dest="quantization",
+        action="store_const",
+        const="4bit",
+        help="Load models with 4-bit quantization.",
+    )
+    quantization_group.add_argument(
+        "--load-in-8bit",
+        dest="quantization",
+        action="store_const",
+        const="8bit",
+        help="Load models with 8-bit quantization.",
+    )
+    quantization_group.add_argument(
+        "--no-quantization",
+        dest="quantization",
+        action="store_const",
+        const="none",
+        help="Load models without BitsAndBytes quantization.",
+    )
     parser.add_argument(
         "--distil-model",
         type=str,
@@ -315,6 +349,18 @@ def main() -> None:
         type=Path,
         default=Path("experiments/matrix"),
         help="Output directory for matrix experiments and reports.",
+    )
+    parser.add_argument(
+        "--max-eval-rows",
+        type=int,
+        default=None,
+        help="Cap evaluation rows for fast trial/validation (e.g. 10).",
+    )
+    parser.add_argument(
+        "--kveritas-disclosure",
+        type=str,
+        default="open",
+        help="K-Veritas provenance disclosure level (default: open).",
     )
     parser.add_argument(
         "--dry-run",
@@ -358,6 +404,10 @@ def main() -> None:
     logger.info("  Models (%d): %s", len(selected_models), [m["slug"] for m in selected_models])
     logger.info("  Algorithms (%d): %s", len(selected_algorithms), selected_algorithms)
     logger.info("  Budget: %d steps per run", args.max_steps)
+    logger.info(
+        "  Quantization: %s",
+        args.quantization or "base config default",
+    )
     logger.info("  Distillation: %s (%s, Vertex=%s, backend=%s)", args.distil_model, args.location, args.vertex, args.backend)
     logger.info("  Evaluation Split: Held-out beni.data/test.json")
     logger.info("  Total Experiment Cells: %d", total_runs)
@@ -367,6 +417,9 @@ def main() -> None:
     for model_entry in selected_models:
         for algo in selected_algorithms:
             run_slug = f"{model_entry['slug']}_{algo}"
+            if args.quantization is not None:
+                quant_slug = {"4bit": "int4", "8bit": "int8", "none": "fp"}[args.quantization]
+                run_slug = f"{run_slug}_{quant_slug}"
             run_dir = args.output_dir / run_slug
 
             # Check if resuming and already completed
@@ -404,6 +457,9 @@ def main() -> None:
                 vertex=args.vertex,
                 backend=args.backend,
                 run_dir=run_dir,
+                quantization=args.quantization,
+                max_eval_rows=args.max_eval_rows,
+                kveritas_disclosure=args.kveritas_disclosure,
             )
 
             result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)

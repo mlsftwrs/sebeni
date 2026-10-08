@@ -49,7 +49,7 @@ def emit_kveritas_metrics(report: Dict, step: int = 0) -> None:
         typer.echo(f"KVERITAS_METRIC name=phi_{lang} value={float(val):.6g} step={step}")
 
 
-def maybe_kveritas_init(working_dir: Optional[Path] = None) -> None:
+def maybe_kveritas_init(working_dir: Optional[Path] = None, disclosure: str = "open") -> None:
     """Ensure K-Veritas session is initialized in working_dir or current directory."""
     import shutil
     import subprocess
@@ -59,8 +59,11 @@ def maybe_kveritas_init(working_dir: Optional[Path] = None) -> None:
         return
     target_dir = Path(working_dir) if working_dir else Path.cwd()
     if not (target_dir / ".kveritas").is_dir() and not (Path.cwd() / ".kveritas").is_dir():
-        typer.echo(f"[kveritas] Initializing session in {target_dir}")
-        result = subprocess.run([binary, "init"], cwd=str(target_dir), check=False)
+        typer.echo(f"[kveritas] Initializing session in {target_dir} with disclosure={disclosure}")
+        cmd = [binary, "init"]
+        if disclosure:
+            cmd.extend(["--disclosure", disclosure])
+        result = subprocess.run(cmd, cwd=str(target_dir), check=False)
         if result.returncode != 0:
             typer.echo(f"Warning: kveritas init exited {result.returncode}", err=True)
 

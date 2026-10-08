@@ -88,6 +88,7 @@ class ModelConfig:
     
     # Quantization (BitsAndBytes)
     load_in_4bit: bool = True
+    load_in_8bit: bool = False
     bnb_4bit_quant_type: str = "nf4"
     bnb_4bit_use_double_quant: bool = True
     
