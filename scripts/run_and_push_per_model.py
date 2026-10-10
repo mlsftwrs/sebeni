@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
-"""Run N Models x N Algorithms (50 steps, max_eval=10) & Direct Push to Private Org Repos.
+"""Run N Models x N Algorithms (50 steps, max_eval=10) & Direct Push Training Data to Private Org Repos.
 
 Direct push target pattern:
-    mlsftwrs/sebeni-[model_base]-[algo]_[params]
-    (e.g., mlsftwrs/sebeni-smollm2-135m-grpo_135m)
+    mlsftwrs/sebeni-smollm2-135-sft-number_steps
+    (e.g., mlsftwrs/sebeni-smollm2-135-sft-50)
 
-After each individual (model, algorithm) run completes:
-1. Validates training logs, weights, tokenizer, and K-Veritas provenance seal.
-2. Auto-creates the private repository under the organization (default: mlsftwrs).
-3. Generates a tailored model card README.md with evaluation metrics (MER, MCS, UWEC, Phi).
-4. Directly uploads all model weights, configs, safety snapshots, and training logs.
+Pushes training data, logs, configs, evaluation reports, and K-Veritas provenance seals.
+Weights (*.safetensors, *.bin, models/) are explicitly excluded.
 """
 
 from __future__ import annotations
@@ -62,19 +59,18 @@ def format_repo_id(
     params: str,
     steps: int,
 ) -> str:
-    """Format target repository name conforming to Hugging Face naming conventions."""
-    safe_params = re.sub(r"[^a-zA-Z0-9_-]", "", str(params).lower())
-    safe_model = re.sub(r"[^a-zA-Z0-9_-]", "-", str(model_slug).lower()).strip("-")
-    safe_algo = re.sub(r"[^a-zA-Z0-9_-]", "", str(algo).lower())
+    """Format target repository name: e.g. mlsftwrs/sebeni-smollm2-135-sft-50."""
+    clean_model = re.sub(r"(\d+)m$", r"\1", str(model_slug).lower())
+    clean_model = re.sub(r"[^a-zA-Z0-9.-]", "-", clean_model).strip("-")
+    clean_algo = str(algo).lower()
 
     repo_name = template.format(
         org=org,
-        model=safe_model,
-        algo=safe_algo,
-        params=safe_params,
+        model=clean_model,
+        algo=clean_algo,
+        params=str(params).lower(),
         steps=steps,
     )
-    # Ensure standard org/name structure
     if "/" not in repo_name:
         repo_name = f"{org}/{repo_name}"
     return repo_name
@@ -88,7 +84,7 @@ def generate_cell_model_card(
     steps: int,
     metrics: Dict[str, Any],
 ) -> str:
-    """Generate model card README with exact performance metrics and loading code."""
+    """Generate model card README with exact performance metrics and run parameters."""
     model_id = model_entry["id"]
     mer_str = f"{metrics['mer']:.2f}" if metrics.get("mer") is not None else "N/A"
     mcs_str = f"{metrics['mcs']:.4f}" if metrics.get("mcs") is not None else "N/A"
@@ -104,15 +100,17 @@ tags:
   - multi13
   - low-resource-languages
   - morphotactics
+  - training-data
 license: apache-2.0
-pipeline_tag: text-generation
 ---
 
-# Sebeni Morphotactic Policy: {model_id} ({algo.upper()})
+# Sebeni Training Run: {model_id} ({algo.upper()})
 
-This repository contains trained weights, adapters, safety snapshots, and training logs for **{model_id}** post-trained with **{algo.upper()}** under the **{scope}** multilingual low-resource scope.
+This repository contains the **training data, execution logs, evaluation reports, configuration, and K-Veritas provenance seals** for **{model_id}** post-trained with **{algo.upper()}** under the **{scope}** multilingual low-resource scope.
 
-## Model Details
+*(Note: Model weights and checkpoints are excluded to preserve raw training telemetry, configs, and provenance).*
+
+## Run Details
 - **Base Model**: `{model_id}` ({model_entry.get('params', 'N/A')})
 - **Algorithm**: `{algo.upper()}`
 - **Scope**: `{scope}` (13 Sahelian / West-African low-resource languages)
@@ -126,27 +124,15 @@ This repository contains trained weights, adapters, safety snapshots, and traini
 - **MCS (Morpheme Cosine Similarity)**: `{mcs_str}`
 - **UWEC (Unweighted Edit Cost)**: `{uwec_str}`
 
-## How to Load in Python
-
-```python
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
-
-base_model_name = "{model_id}"
-repo_id = "{repo_id}"
-
-tokenizer = AutoTokenizer.from_pretrained(repo_id)
-base_model = AutoModelForCausalLM.from_pretrained(
-    base_model_name,
-    torch_dtype=torch.bfloat16,
-    device_map="auto"
-)
-model = PeftModel.from_pretrained(base_model, repo_id)
+## Repository Directory Structure
 ```
-
-## Audit & Verification
-- Includes K-Veritas cryptographic verification seal and safety governor snapshots in the repository files.
+├── data/               # Processed distillation dataset, grammar, dictionary, splits
+├── exp/                # Evaluation reports and benchmark JSON outputs
+├── runtime/            # Trackio / TensorBoard step loss curves and reward telemetry
+├── config.yaml         # Complete experiment hyperparameter configuration
+├── kveritas_report.pdf # Cryptographic K-Veritas verification seal and provenance
+└── README.md           # This metadata card
+```
 """
 
 
@@ -160,8 +146,9 @@ def direct_push_cell(
     steps: int,
     metrics: Dict[str, Any],
     private: bool = True,
+    include_weights: bool = False,
 ) -> bool:
-    """Direct push of model weights, logs, configs, and card to a dedicated HF repo."""
+    """Direct push of training data, logs, configs, and card to a dedicated HF repo."""
     if not run_dir.exists():
         logger.warning("Run directory %s not found. Skipping push.", run_dir)
         return False
@@ -171,7 +158,7 @@ def direct_push_cell(
     logger.info("=" * 60)
 
     try:
-        # 1. Create or verify private repository
+        # 1. Create or verify private repository under org (mlsftwrs)
         api.create_repo(
             repo_id=repo_id,
             repo_type="model",
@@ -191,17 +178,37 @@ def direct_push_cell(
         readme_path = run_dir / "README.md"
         readme_path.write_text(card_content, encoding="utf-8")
 
-        # 3. Upload all artifacts (model, tokenizer, configs, trackio/runs logs)
-        ignore_patterns = ["*.pyc", "__pycache__/*", ".venv/*", "tmp/*", "*.tmp"]
+        # 3. Exclude heavy model weights and checkpoints (only upload training data, configs, logs)
+        ignore_patterns = [
+            "*.pyc",
+            "__pycache__/*",
+            ".venv/*",
+            "tmp/*",
+            "*.tmp",
+        ]
+        if not include_weights:
+            ignore_patterns.extend([
+                "*.safetensors",
+                "*.bin",
+                "*.pt",
+                "*.pth",
+                "*.ckpt",
+                "*.h5",
+                "*.onnx",
+                "checkpoint-*",
+                "checkpoint-*/*",
+                "models/*",
+                "models",
+            ])
 
         api.upload_folder(
             folder_path=str(run_dir),
             repo_id=repo_id,
             repo_type="model",
             ignore_patterns=ignore_patterns,
-            commit_message=f"Sebeni direct push: {model_entry['slug']} {algo.upper()} ({steps} steps)",
+            commit_message=f"Sebeni training data & telemetry: {model_entry['slug']} {algo.upper()} ({steps} steps)",
         )
-        logger.info("Successfully pushed to https://huggingface.co/%s", repo_id)
+        logger.info("Successfully pushed training data to https://huggingface.co/%s", repo_id)
         return True
     except Exception as exc:
         logger.error("Direct push to %s failed: %s", repo_id, exc)
@@ -210,20 +217,20 @@ def direct_push_cell(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run N Models x N Algorithms (50 steps, max_eval=10) & direct push to HF"
+        description="Run N Models x N Algorithms (50 steps, max_eval=10) & direct push training data to HF"
     )
     # Organization and Repo naming
     parser.add_argument(
         "--org",
         type=str,
         default="mlsftwrs",
-        help="Target Hugging Face organization or username (default: mlsftwrs)",
+        help="Target Hugging Face organization (default: mlsftwrs)",
     )
     parser.add_argument(
         "--repo-template",
         type=str,
-        default="{org}/sebeni-{model}-{algo}_{params}",
-        help="Repository naming template (default: '{org}/sebeni-{model}-{algo}_{params}')",
+        default="{org}/sebeni-{model}-{algo}-{steps}",
+        help="Repository naming template (default: '{org}/sebeni-{model}-{algo}-{steps}')",
     )
     parser.add_argument(
         "--hf-token",
@@ -236,6 +243,12 @@ def main() -> None:
         action="store_true",
         default=False,
         help="Make repository public (default: private to org)",
+    )
+    parser.add_argument(
+        "--include-weights",
+        action="store_true",
+        default=False,
+        help="Include model weights (*.safetensors, models/) in upload (default: False, training data only)",
     )
 
     # Matrix execution parameters
@@ -326,7 +339,8 @@ def main() -> None:
     if not args.dry_run:
         try:
             user_info = api.whoami()
-            logger.info("Authenticated to Hugging Face as: %s", user_info.get("name") or user_info.get("fullname"))
+            username = user_info.get("name") or user_info.get("fullname")
+            logger.info("Authenticated to Hugging Face as: %s", username)
         except Exception as exc:
             logger.error("Hugging Face auth verification failed: %s", exc)
             sys.exit(1)
@@ -363,12 +377,12 @@ def main() -> None:
     logger.info("Models (%d): %s", len(selected_models), [m["slug"] for m in selected_models])
     logger.info("Algorithms (%d): %s", len(selected_algorithms), selected_algorithms)
     logger.info("Budget: %d steps per cell | Max Eval Rows: %d", args.max_steps, args.max_eval_rows)
-    logger.info("Quantization: %s", quantization or "none (bf16/fp16)")
-    logger.info("Total Runs to Execute: %d", total_cells)
+    logger.info("Include Weights: %s (default: False -> training data, telemetry, and logs only)", args.include_weights)
     logger.info("Target Org / Namespace: %s (private=%s)", args.org, is_private)
+    logger.info("Total Runs to Execute: %d", total_cells)
     logger.info("=" * 70)
 
-    # 3. Main Execution Loop: Train Cell -> Direct Push to Dedicated HF Repo
+    # 3. Main Execution Loop: Train Cell -> Direct Push Training Data to Dedicated HF Repo
     all_results: List[Dict[str, Any]] = []
     current_idx = 0
 
@@ -430,6 +444,7 @@ def main() -> None:
                     steps=args.max_steps,
                     metrics=result,
                     private=is_private,
+                    include_weights=args.include_weights,
                 )
 
     # 4. Save Global Reporting Frames
