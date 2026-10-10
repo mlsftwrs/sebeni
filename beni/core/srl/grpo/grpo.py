@@ -115,6 +115,12 @@ class SebeniGrpo(AlignmentPlugin):
             split = dataset.train_test_split(test_size=eval_ratio, seed=self.config.trainer.seed)
             train_dataset = split["train"]
             eval_dataset = split["test"]
+            max_eval = getattr(self.config.experiment, "max_eval_rows", None)
+            if max_eval is not None and max_eval > 0 and len(eval_dataset) > max_eval:
+                if hasattr(eval_dataset, "select"):
+                    eval_dataset = eval_dataset.select(range(max_eval))
+                else:
+                    eval_dataset = eval_dataset[:max_eval]
 
         if self.model is None:
             self.load_models()

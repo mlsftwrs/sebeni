@@ -12,6 +12,12 @@ try:
 except PackageNotFoundError:  # pragma: no cover
     __version__ = "0.1.0"
 
+import sys
+if not hasattr(sys, "get_int_max_str_digits"):
+    sys.get_int_max_str_digits = lambda: 4300
+if not hasattr(sys, "set_int_max_str_digits"):
+    sys.set_int_max_str_digits = lambda digits: None
+
 import warnings
 warnings.filterwarnings("ignore", message=".*pkg_resources is deprecated as an API.*", category=UserWarning)
 

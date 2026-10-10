@@ -23,6 +23,12 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# Polyfill for Python < 3.10.7 (CVE-2020-10735 integer string conversion limit)
+if not hasattr(sys, "get_int_max_str_digits"):
+    sys.get_int_max_str_digits = lambda: 4300
+if not hasattr(sys, "set_int_max_str_digits"):
+    sys.set_int_max_str_digits = lambda digits: None
+
 import yaml
 
 logging.basicConfig(
