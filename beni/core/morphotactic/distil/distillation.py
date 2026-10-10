@@ -643,10 +643,14 @@ class Distiller(object):
         """ Load samples and reference files to guide LLM response """
         samples = {}
 
-        if(self.sample_dir.exists()):
-            for f in os.listdir(self.sample_dir):
-                if(f.endswith('.gram') or f.endswith('.dict') or f.endswith('.guide')):
-                    samples[f] = open(self.sample_dir/f, "r").read()
+        if self.sample_dir.exists():
+            guide_files = sorted([f for f in os.listdir(self.sample_dir) if f.endswith('.guide')])
+            other_files = sorted([f for f in os.listdir(self.sample_dir) if f.endswith('.gram') or f.endswith('.dict')])
+            for f in guide_files + other_files:
+                try:
+                    samples[f] = open(self.sample_dir / f, "r", encoding="utf-8").read()
+                except Exception:
+                    pass
 
         return samples
 

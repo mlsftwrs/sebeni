@@ -427,6 +427,13 @@ def main() -> None:
                 kveritas_disclosure="open",
             )
 
+            # Explicitly enforce max_steps and batch size across all algorithm sections
+            rec_batch = model_entry.get("recommended_batch_size", 2)
+            for sec in ("trainer", "sft", "dpo", "apo"):
+                cfg_data.setdefault(sec, {})
+                cfg_data[sec]["max_steps"] = args.max_steps
+                cfg_data[sec]["per_device_train_batch_size"] = rec_batch
+
             # Execute Cell
             result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)
             result["hf_repo"] = target_repo

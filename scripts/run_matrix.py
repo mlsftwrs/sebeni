@@ -89,11 +89,12 @@ def build_config(
         cfg["data"]["languages"] = [scope.lower()]
         cfg["data"]["default_lang"] = scope.lower()
 
-    # Trainer budget (500 steps)
-    cfg.setdefault("trainer", {})
-    cfg["trainer"]["max_steps"] = max_steps
+    # Trainer budget across all algorithms (GRPO uses trainer, SFT uses sft, DPO uses dpo, APO uses apo)
     rec_batch = model_entry.get("recommended_batch_size", 2)
-    cfg["trainer"]["per_device_train_batch_size"] = rec_batch
+    for section in ("trainer", "sft", "dpo", "apo"):
+        cfg.setdefault(section, {})
+        cfg[section]["max_steps"] = max_steps
+        cfg[section]["per_device_train_batch_size"] = rec_batch
 
     # Distillation configuration
     cfg.setdefault("distillation", {})
@@ -163,6 +164,8 @@ def run_experiment_cell(
     logger.info("Starting experiment %s with %s (500 steps, eval=beni.data/test.json)...", model_name, algo)
     mc = MasterConfig.from_dict(cfg_data)
     mc.working_dir = str(run_dir)
+    active_steps = cfg_data.get(algo, {}).get("max_steps") or cfg_data.get("trainer", {}).get("max_steps", 10)
+    mc.apply_cli_overrides(max_steps=active_steps)
 
     # 1. K-Veritas Init with open disclosure
     disclosure = cfg_data.get("experiment", {}).get("kveritas_disclosure", "open")
@@ -175,8 +178,9 @@ def run_experiment_cell(
     except Exception as exc:
         logger.warning("Distillation note: %s. Continuing with cached/algorithmic baselines.", exc)
 
-    # 3. Post-Training Arm (500 steps)
-    logger.info("Running post-training arm: %s for %d steps...", algo, mc.trainer.max_steps)
+    # 3. Post-Training Arm
+    active_trainer = getattr(mc, mc.algorithm if mc.algorithm in ("sft", "dpo", "apo") else "trainer")
+    logger.info("Running post-training arm: %s for %d steps...", algo, active_trainer.max_steps)
     start_time = time.time()
     try:
         run_arm(mc)

@@ -51,14 +51,13 @@ class DistilSysPrompt:
         # 3. Reference Samples and Format Guides from beni.data.samples
         sample_dir = cfg.DATA_DIR / "samples"
         if sample_dir.exists():
-            guide_files = [
-                "grammar.guide",
-                "formats.guide",
-                "bamana.gram",
-                "bamana.dict",
-                "meta.en.md.guide",
-            ]
-            for fname in guide_files:
+            # Prioritize all .guide files first to establish canonical morphological guidelines
+            guide_files = sorted([f.name for f in sample_dir.glob("*.guide")])
+            # Followed by canonical reference grammars and dictionaries
+            ref_files = sorted([f.name for f in sample_dir.iterdir() if f.is_file() and f.suffix in (".gram", ".dict")])
+            all_samples = guide_files + ref_files
+
+            for fname in all_samples:
                 fpath = sample_dir / fname
                 if fpath.is_file():
                     try:
