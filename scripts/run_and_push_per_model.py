@@ -44,6 +44,7 @@ from scripts.run_matrix import (
     save_reporting_frames,
     print_summary_table,
 )
+from beni.core.srl.config import MasterConfig
 
 logging.basicConfig(
     level=logging.INFO,
@@ -790,32 +791,31 @@ def main() -> None:
                         target_repo,
                         reason,
                     )
-                    from scripts.recompute_and_push_eval import recompute_cell_eval
-                    cfg_data = build_config(
-                        base_config_path=base_config_path,
-                        model_entry=model_entry,
-                        algorithm=algo,
-                        scope=args.scope,
-                        max_steps=args.max_steps,
-                        distil_model=args.distil_model,
-                        location=args.location,
-                        vertex=args.vertex,
-                        backend=args.backend,
-                        run_dir=run_dir,
-                        quantization=quantization,
-                        max_eval_rows=args.max_eval_rows,
-                        kveritas_disclosure="open",
-                        use_vllm=args.use_vllm if algo == "grpo" else False,
-                    )
-                    mc = MasterConfig.from_dict(cfg_data)
-                    mc.working_dir = run_dir
-                    cfg.set_working_dir(run_dir)
-                    local_models = run_dir / "models"
-                    has_local = local_models.exists() and any(local_models.iterdir())
-
-                    weights_source = str(local_models) if has_local else target_repo
-
                     try:
+                        from scripts.recompute_and_push_eval import recompute_cell_eval
+                        cfg_data = build_config(
+                            base_config_path=base_config_path,
+                            model_entry=model_entry,
+                            algorithm=algo,
+                            scope=args.scope,
+                            max_steps=args.max_steps,
+                            distil_model=args.distil_model,
+                            location=args.location,
+                            vertex=args.vertex,
+                            backend=args.backend,
+                            run_dir=run_dir,
+                            quantization=quantization,
+                            max_eval_rows=args.max_eval_rows,
+                            kveritas_disclosure="open",
+                            use_vllm=args.use_vllm if algo == "grpo" else False,
+                        )
+                        mc = MasterConfig.from_dict(cfg_data)
+                        mc.apply_workdir(run_dir)
+                        local_models = run_dir / "models"
+                        has_local = local_models.exists() and any(local_models.iterdir())
+
+                        weights_source = str(local_models) if has_local else target_repo
+
                         eval_report = recompute_cell_eval(
                             mc,
                             weights_source=weights_source,
@@ -986,8 +986,7 @@ def main() -> None:
                 if args.eval_only:
                     from scripts.recompute_and_push_eval import recompute_cell_eval
                     mc = MasterConfig.from_dict(cfg_data)
-                    mc.working_dir = run_dir
-                    cfg.set_working_dir(run_dir)
+                    mc.apply_workdir(run_dir)
                     local_models = run_dir / "models"
                     has_local = local_models.exists() and any(local_models.iterdir())
                     has_remote = False

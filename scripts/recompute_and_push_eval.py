@@ -247,8 +247,7 @@ def main():
             max_eval_rows=args.max_eval_rows,
         )
         mc = MasterConfig.from_dict(cfg_data)
-        mc.working_dir = run_dir
-        cfg.set_working_dir(run_dir)
+        mc.apply_workdir(run_dir)
 
         # Locate aligned weights: local run_dir/models or HF repo
         local_models = run_dir / "models"
