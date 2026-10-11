@@ -387,7 +387,8 @@ def run_eval(
                 sentences.extend(dabax.loader(text) or [])
             except Exception:
                 continue
-        phi = scorer.phi_corpus(sentences)["avg"] if sentences else 0.0
+        ref_phi = scorer.phi_corpus(sentences)["avg"] if sentences else 0.0
+        all_hyp_sentences = []
         mer_ops = 0
         mer_n = 0
         mcs_mis = 0.0
@@ -403,16 +404,39 @@ def run_eval(
                     continue
                 if not completion:
                     continue
-                try:
-                    hyp_sentences = dabax.loader(completion) or []
-                except Exception:
-                    hyp_sentences = []
+                hyp_sentences = []
+                # Attempt structured JSON parsing first
+                clean = completion.strip()
+                if clean.startswith("```json"):
+                    clean = clean[7:]
+                if clean.startswith("```"):
+                    clean = clean[3:]
+                if clean.endswith("```"):
+                    clean = clean[:-3]
+                clean = clean.strip()
+                if clean.startswith("{") and clean.endswith("}"):
+                    try:
+                        import json as _json
+                        data = _json.loads(clean)
+                        if isinstance(data, dict) and "tokens" in data:
+                            from beni.core.compute.rewards import RewardManager
+                            sent = RewardManager.parse_json_to_sentence(data, text=text)
+                            if sent and sent.tokens:
+                                hyp_sentences = [sent]
+                    except Exception:
+                        pass
+                if not hyp_sentences:
+                    try:
+                        hyp_sentences = dabax.loader(completion) or []
+                    except Exception:
+                        hyp_sentences = []
                 try:
                     ref_sentences = dabax.loader(text) or []
                 except Exception:
                     ref_sentences = []
                 if not ref_sentences or not hyp_sentences:
                     continue
+                all_hyp_sentences.extend(hyp_sentences)
                 ref_sent, hyp_sent = ref_sentences[0], hyp_sentences[0]
                 ops, n_ref = mer_edit_counts(_morphemes(ref_sent), _morphemes(hyp_sent), xp=xp)
                 mer_ops += int(ops)
@@ -439,6 +463,11 @@ def run_eval(
                 uwec_sum += float(mean) * n_u
                 uwec_n += n_u
                 n_scored += 1
+
+        if all_hyp_sentences:
+            phi = scorer.phi_corpus(all_hyp_sentences)["avg"]
+        else:
+            phi = ref_phi
 
         mer = (mer_ops / mer_n) if mer_n else None
         mcs = (mcs_mis / mcs_n) if mcs_n else None

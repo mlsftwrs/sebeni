@@ -21,6 +21,7 @@ import shutil
 import subprocess
 import sys
 import time
+import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -191,6 +192,79 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 """
 
 
+def push_error_to_hub(
+    api: Optional[HfApi],
+    repo_id: str,
+    run_dir: Path,
+    model_entry: Dict[str, Any],
+    algo: str,
+    scope: str,
+    steps: int,
+    error_msg: str,
+    traceback_str: str,
+    private: bool = True,
+) -> None:
+    """Log failure and push error details and updated README to Hugging Face."""
+    if not api:
+        return
+    try:
+        api.create_repo(repo_id=repo_id, repo_type="model", private=private, exist_ok=True)
+        run_dir.mkdir(parents=True, exist_ok=True)
+
+        # 1. Write error.log locally
+        err_file = run_dir / "error.log"
+        err_content = (
+            f"Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}\n"
+            f"Model: {model_entry.get('id', 'unknown')}\n"
+            f"Algorithm: {algo.upper()}\n"
+            f"Error: {error_msg}\n\n"
+            f"Traceback:\n{traceback_str}\n"
+        )
+        err_file.write_text(err_content, encoding="utf-8")
+
+        # 2. Write model card reflecting failure state
+        card_content = generate_cell_model_card(
+            repo_id=repo_id,
+            model_entry=model_entry,
+            algo=algo,
+            scope=scope,
+            steps=steps,
+            metrics={
+                "model": model_entry["id"],
+                "scope": scope,
+                "method": algo.upper(),
+                "mer": None,
+                "mcs": None,
+                "uwec": None,
+                "phi": None,
+                "seed": 42,
+                "config": str(run_dir / "config.yaml"),
+                "status": f"FAILED: {error_msg[:120]}",
+            },
+        )
+        readme_path = run_dir / "README.md"
+        readme_path.write_text(card_content, encoding="utf-8")
+
+        # 3. Upload error.log and README.md to Hugging Face Hub
+        api.upload_file(
+            path_or_fileobj=str(err_file),
+            path_in_repo="error.log",
+            repo_id=repo_id,
+            repo_type="model",
+            commit_message=f"ci: log training/eval error: {error_msg[:60]}",
+        )
+        api.upload_file(
+            path_or_fileobj=str(readme_path),
+            path_in_repo="README.md",
+            repo_id=repo_id,
+            repo_type="model",
+            commit_message="docs: record failure status in model card",
+        )
+        logger.info("Successfully pushed failure report & error.log to HF: %s", repo_id)
+    except Exception as exc:
+        logger.warning("Could not push error report to HF repo %s: %s", repo_id, exc)
+
+
 def direct_push_cell(
     api: HfApi,
     repo_id: str,
@@ -338,12 +412,12 @@ def check_cell_completed(
     if not skip_completed:
         return False, "Force rerun requested"
 
-    if algo == "grpo" and restart_grpo:
-        return False, "Restarting GRPO run as requested"
-
     # 1. Check Hugging Face Hub
     if api and is_repo_completed_on_hub(api, target_repo):
         return True, f"Remote Hugging Face repository '{target_repo}' is already completed"
+
+    if algo == "grpo" and restart_grpo:
+        return False, "Restarting GRPO run as requested"
 
     # 2. Check local completion
     eval_file = run_dir / "exp" / "eval.json"
@@ -569,6 +643,24 @@ def main() -> None:
         help="vLLM GPU memory utilization fraction (default: 0.3)",
     )
     parser.add_argument(
+        "--recompute-completed",
+        action="store_true",
+        default=True,
+        help="Skip re-training already uploaded/completed models, but recompute post-aligned evaluation and push updated model cards (default: True)",
+    )
+    parser.add_argument(
+        "--no-recompute-completed",
+        dest="recompute_completed",
+        action="store_false",
+        help="Do not recompute evaluation for completed models; use cached metrics",
+    )
+    parser.add_argument(
+        "--eval-only",
+        action="store_true",
+        default=False,
+        help="Skip post-training and evaluate post-aligned weights to recompute and update benchmark reports",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         default=False,
@@ -673,30 +765,150 @@ def main() -> None:
                 steps=args.max_steps,
             )
 
-            # Check if this cell is already completed and should be skipped
-            is_done, reason = check_cell_completed(
-                api=api if not args.dry_run else None,
-                target_repo=target_repo,
-                run_dir=run_dir,
-                algo=algo,
-                restart_grpo=args.restart_grpo,
-                skip_completed=args.skip_completed or args.resume,
-            )
+            # Check if this cell is already completed and should be skipped (unless --eval-only is set)
+            if args.eval_only:
+                is_done, reason = False, "Evaluating post-aligned weights (--eval-only)"
+            else:
+                is_done, reason = check_cell_completed(
+                    api=api if not args.dry_run else None,
+                    target_repo=target_repo,
+                    run_dir=run_dir,
+                    algo=algo,
+                    restart_grpo=args.restart_grpo,
+                    skip_completed=args.skip_completed or args.resume,
+                )
 
             if is_done:
-                logger.info(
-                    "\n[%d/%d] SKIPPING (ALREADY COMPLETED): %s (%s) with %s -> TARGET: %s\n  Reason: %s",
-                    current_idx,
-                    total_cells,
-                    model_entry["id"],
-                    model_entry["slug"],
-                    algo.upper(),
-                    target_repo,
-                    reason,
-                )
-                cached_res = load_cached_metrics(run_dir, model_entry, algo, args.scope, target_repo)
-                all_results.append(cached_res)
-                continue
+                if args.recompute_completed and not args.dry_run:
+                    logger.info(
+                        "\n[%d/%d] SKIPPING TRAINING (ALREADY COMPLETED) -> RECOMPUTING EVAL: %s (%s) with %s -> TARGET: %s\n  Reason: %s",
+                        current_idx,
+                        total_cells,
+                        model_entry["id"],
+                        model_entry["slug"],
+                        algo.upper(),
+                        target_repo,
+                        reason,
+                    )
+                    from scripts.recompute_and_push_eval import recompute_cell_eval
+                    cfg_data = build_config(
+                        base_config_path=base_config_path,
+                        model_entry=model_entry,
+                        algorithm=algo,
+                        scope=args.scope,
+                        max_steps=args.max_steps,
+                        distil_model=args.distil_model,
+                        location=args.location,
+                        vertex=args.vertex,
+                        backend=args.backend,
+                        run_dir=run_dir,
+                        quantization=quantization,
+                        max_eval_rows=args.max_eval_rows,
+                        kveritas_disclosure="open",
+                        use_vllm=args.use_vllm if algo == "grpo" else False,
+                    )
+                    mc = MasterConfig.from_dict(cfg_data)
+                    mc.working_dir = run_dir
+                    cfg.set_working_dir(run_dir)
+                    local_models = run_dir / "models"
+                    has_local = local_models.exists() and any(local_models.iterdir())
+
+                    weights_source = str(local_models) if has_local else target_repo
+
+                    try:
+                        eval_report = recompute_cell_eval(
+                            mc,
+                            weights_source=weights_source,
+                            run_dir=run_dir,
+                            max_eval_rows=args.max_eval_rows,
+                        )
+
+                        # Save local eval results
+                        exp_dir = run_dir / "exp"
+                        exp_dir.mkdir(parents=True, exist_ok=True)
+                        eval_path = exp_dir / "eval.json"
+                        eval_path.write_text(json.dumps(eval_report, indent=2, ensure_ascii=False), encoding="utf-8")
+                        shutil.copy2(eval_path, run_dir / "eval_results.json")
+
+                        result = {
+                            "model": model_entry["id"],
+                            "scope": args.scope,
+                            "method": algo.upper(),
+                            "phi": eval_report.get("phi"),
+                            "mer": eval_report.get("mer"),
+                            "mcs": eval_report.get("mcs"),
+                            "uwec": eval_report.get("uwec"),
+                            "eval_report": eval_report,
+                            "seed": 42,
+                            "config": str(run_dir / "config.yaml"),
+                            "status": "COMPLETED",
+                            "hf_repo": target_repo,
+                        }
+
+                        # Push updated README.md and eval_results.json to Hugging Face
+                        if api is not None:
+                            card_content = generate_cell_model_card(
+                                repo_id=target_repo,
+                                model_entry=model_entry,
+                                algo=algo,
+                                scope=args.scope,
+                                steps=args.max_steps,
+                                metrics=result,
+                            )
+                            readme_path = run_dir / "README.md"
+                            readme_path.write_text(card_content, encoding="utf-8")
+
+                            api.upload_file(
+                                path_or_fileobj=str(readme_path),
+                                path_in_repo="README.md",
+                                repo_id=target_repo,
+                                repo_type="model",
+                                commit_message="docs: recompute benchmark scores with post-aligned weights",
+                            )
+                            api.upload_file(
+                                path_or_fileobj=str(run_dir / "eval_results.json"),
+                                path_in_repo="eval_results.json",
+                                repo_id=target_repo,
+                                repo_type="model",
+                                commit_message="docs: update held-out eval_results.json",
+                            )
+                            logger.info("Successfully pushed recomputed scores to HF: %s", target_repo)
+
+                        all_results.append(result)
+                        continue
+                    except Exception as recompute_err:
+                        logger.error("Failed to recompute eval for %s: %s", target_repo, recompute_err, exc_info=True)
+                        tb_str = traceback.format_exc()
+                        if not args.dry_run and api is not None:
+                            push_error_to_hub(
+                                api=api,
+                                repo_id=target_repo,
+                                run_dir=run_dir,
+                                model_entry=model_entry,
+                                algo=algo,
+                                scope=args.scope,
+                                steps=args.max_steps,
+                                error_msg=str(recompute_err),
+                                traceback_str=tb_str,
+                                private=is_private,
+                            )
+                        cached_res = load_cached_metrics(run_dir, model_entry, algo, args.scope, target_repo)
+                        all_results.append(cached_res)
+                        continue
+                else:
+                    logger.info(
+                        "\n[%d/%d] SKIPPING (ALREADY COMPLETED): %s (%s) with %s -> TARGET: %s\n  Reason: %s",
+                        current_idx,
+                        total_cells,
+                        model_entry["id"],
+                        model_entry["slug"],
+                        algo.upper(),
+                        target_repo,
+                        reason,
+                    )
+                    cached_res = load_cached_metrics(run_dir, model_entry, algo, args.scope, target_repo)
+                    all_results.append(cached_res)
+                    continue
 
             # For GRPO restart: clean up stale partial run artifacts
             if algo == "grpo":
@@ -712,67 +924,119 @@ def main() -> None:
                 target_repo,
             )
 
-            cfg_data = build_config(
-                base_config_path=base_config_path,
-                model_entry=model_entry,
-                algorithm=algo,
-                scope=args.scope,
-                max_steps=args.max_steps,
-                distil_model=args.distil_model,
-                location=args.location,
-                vertex=args.vertex,
-                backend=args.backend,
-                run_dir=run_dir,
-                quantization=quantization,
-                max_eval_rows=args.max_eval_rows,
-                kveritas_disclosure="open",
-                use_vllm=args.use_vllm if algo == "grpo" else False,
-            )
-
-            # Explicitly enforce max_steps, batch size, and eval_steps (10 evals per run)
-            calc_eval_steps = args.eval_steps if args.eval_steps is not None else max(1, args.max_steps // 10)
-            rec_batch = model_entry.get("recommended_batch_size", 2)
-            models_dir = str(run_dir / "models")
-            for sec in ("trainer", "sft", "dpo", "apo"):
-                cfg_data.setdefault(sec, {})
-                cfg_data[sec]["max_steps"] = args.max_steps
-                cfg_data[sec]["per_device_train_batch_size"] = rec_batch
-                cfg_data[sec]["output_dir"] = models_dir
-                cfg_data[sec]["eval_strategy"] = "steps"
-                cfg_data[sec]["eval_steps"] = calc_eval_steps
-
-            logger.info("Evaluation interval set to every %d steps (10 evals total for %d steps)", calc_eval_steps, args.max_steps)
-
-            # Specialized GRPO optimizations:
-            if algo == "grpo":
-                params_str = str(model_entry.get("params", "")).upper()
-                is_large = ("4B" in params_str) or ("7B" in params_str) or ("8B" in params_str)
-                if not is_large:
-                    # Unquantize small models to eliminate 650s/step dequant lag and allow vLLM
-                    cfg_data["model"]["load_in_4bit"] = False
-                    cfg_data["model"]["load_in_8bit"] = False
-                    logger.info(
-                        "GRPO: Disabled 4-bit quantization on %s (%s) for fast native BF16 rollouts.",
-                        model_entry["slug"],
-                        model_entry.get("params", "small"),
-                    )
-
-                cfg_data["trainer"]["bf16"] = True
-                cfg_data["trainer"]["use_vllm"] = bool(args.use_vllm)
-                cfg_data["trainer"]["vllm_gpu_memory_utilization"] = args.vllm_gpu_memory_utilization
-                cfg_data["trainer"]["vllm_mode"] = "colocate"
-                cfg_data["trainer"]["max_prompt_length"] = 512
-                cfg_data["trainer"]["max_completion_length"] = args.max_completion_length
-                cfg_data["trainer"]["eval_strategy"] = "steps"
-                cfg_data["trainer"]["eval_steps"] = calc_eval_steps
-                cfg_data["trainer"]["gradient_accumulation_steps"] = min(
-                    cfg_data["trainer"].get("gradient_accumulation_steps", 2), 2
-                )
-                cfg_data["trainer"]["per_device_train_batch_size"] = min(rec_batch, 2)
-
             # Execute Cell with fault tolerance so subsequent runs continue uninterrupted
             try:
-                result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)
+                cfg_data = build_config(
+                    base_config_path=base_config_path,
+                    model_entry=model_entry,
+                    algorithm=algo,
+                    scope=args.scope,
+                    max_steps=args.max_steps,
+                    distil_model=args.distil_model,
+                    location=args.location,
+                    vertex=args.vertex,
+                    backend=args.backend,
+                    run_dir=run_dir,
+                    quantization=quantization,
+                    max_eval_rows=args.max_eval_rows,
+                    kveritas_disclosure="open",
+                    use_vllm=args.use_vllm if algo == "grpo" else False,
+                )
+
+                # Explicitly enforce max_steps, batch size, and eval_steps (10 evals per run)
+                calc_eval_steps = args.eval_steps if args.eval_steps is not None else max(1, args.max_steps // 10)
+                rec_batch = model_entry.get("recommended_batch_size", 2)
+                models_dir = str(run_dir / "models")
+                for sec in ("trainer", "sft", "dpo", "apo"):
+                    cfg_data.setdefault(sec, {})
+                    cfg_data[sec]["max_steps"] = args.max_steps
+                    cfg_data[sec]["per_device_train_batch_size"] = rec_batch
+                    cfg_data[sec]["output_dir"] = models_dir
+                    cfg_data[sec]["eval_strategy"] = "steps"
+                    cfg_data[sec]["eval_steps"] = calc_eval_steps
+
+                logger.info("Evaluation interval set to every %d steps (10 evals total for %d steps)", calc_eval_steps, args.max_steps)
+
+                # Specialized GRPO optimizations:
+                if algo == "grpo":
+                    params_str = str(model_entry.get("params", "")).upper()
+                    is_large = ("4B" in params_str) or ("7B" in params_str) or ("8B" in params_str)
+                    if not is_large:
+                        # Unquantize small models to eliminate 650s/step dequant lag and allow vLLM
+                        cfg_data["model"]["load_in_4bit"] = False
+                        cfg_data["model"]["load_in_8bit"] = False
+                        logger.info(
+                            "GRPO: Disabled 4-bit quantization on %s (%s) for fast native BF16 rollouts.",
+                            model_entry["slug"],
+                            model_entry.get("params", "small"),
+                        )
+
+                    cfg_data["trainer"]["bf16"] = True
+                    cfg_data["trainer"]["use_vllm"] = bool(args.use_vllm)
+                    cfg_data["trainer"]["vllm_gpu_memory_utilization"] = args.vllm_gpu_memory_utilization
+                    cfg_data["trainer"]["vllm_mode"] = "colocate"
+                    cfg_data["trainer"]["max_prompt_length"] = 512
+                    cfg_data["trainer"]["max_completion_length"] = args.max_completion_length
+                    cfg_data["trainer"]["eval_strategy"] = "steps"
+                    cfg_data["trainer"]["eval_steps"] = calc_eval_steps
+                    cfg_data["trainer"]["gradient_accumulation_steps"] = min(
+                        cfg_data["trainer"].get("gradient_accumulation_steps", 2), 2
+                    )
+                    cfg_data["trainer"]["per_device_train_batch_size"] = min(rec_batch, 2)
+                if args.eval_only:
+                    from scripts.recompute_and_push_eval import recompute_cell_eval
+                    mc = MasterConfig.from_dict(cfg_data)
+                    mc.working_dir = run_dir
+                    cfg.set_working_dir(run_dir)
+                    local_models = run_dir / "models"
+                    has_local = local_models.exists() and any(local_models.iterdir())
+                    has_remote = False
+                    if not has_local and api is not None:
+                        try:
+                            has_remote = api.repo_exists(repo_id=target_repo, repo_type="model")
+                        except Exception:
+                            has_remote = False
+
+                    if not has_local and not has_remote:
+                        logger.warning(
+                            "Skipping %s [%s]: No aligned weights found locally in %s or on HF repo %s",
+                            model_entry["slug"],
+                            algo,
+                            local_models,
+                            target_repo,
+                        )
+                        continue
+
+                    weights_source = str(local_models) if has_local else target_repo
+                    eval_report = recompute_cell_eval(
+                        mc,
+                        weights_source=weights_source,
+                        run_dir=run_dir,
+                        max_eval_rows=args.max_eval_rows,
+                    )
+
+                    # Save eval report locally so direct_push_cell surfaces it
+                    exp_dir = run_dir / "exp"
+                    exp_dir.mkdir(parents=True, exist_ok=True)
+                    eval_path = exp_dir / "eval.json"
+                    eval_path.write_text(json.dumps(eval_report, indent=2, ensure_ascii=False), encoding="utf-8")
+                    shutil.copy2(eval_path, run_dir / "eval_results.json")
+
+                    result = {
+                        "model": model_entry["id"],
+                        "scope": args.scope,
+                        "method": algo.upper(),
+                        "phi": eval_report.get("phi"),
+                        "mer": eval_report.get("mer"),
+                        "mcs": eval_report.get("mcs"),
+                        "uwec": eval_report.get("uwec"),
+                        "eval_report": eval_report,
+                        "seed": 42,
+                        "config": str(run_dir / "config.yaml"),
+                        "status": "COMPLETED",
+                    }
+                else:
+                    result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)
             except Exception as cell_err:
                 logger.error(
                     "Cell execution failed for %s [%s]: %s",
@@ -781,6 +1045,7 @@ def main() -> None:
                     cell_err,
                     exc_info=True,
                 )
+                tb_str = traceback.format_exc()
                 result = {
                     "model": model_entry["id"],
                     "scope": args.scope,
@@ -793,6 +1058,19 @@ def main() -> None:
                     "config": str(run_dir / "config.yaml"),
                     "status": f"FAILED: {cell_err}",
                 }
+                if not args.dry_run and api is not None:
+                    push_error_to_hub(
+                        api=api,
+                        repo_id=target_repo,
+                        run_dir=run_dir,
+                        model_entry=model_entry,
+                        algo=algo,
+                        scope=args.scope,
+                        steps=args.max_steps,
+                        error_msg=str(cell_err),
+                        traceback_str=tb_str,
+                        private=is_private,
+                    )
 
             result["hf_repo"] = target_repo
             all_results.append(result)

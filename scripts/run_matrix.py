@@ -205,8 +205,25 @@ def run_experiment_cell(
     # 4. Evaluation on held-out beni.data/test.json using post-trained policy
     logger.info("Scoring post-trained model evaluation on held-out split beni.data/test.json...")
     try:
+        if hasattr(trainer, "model") and trainer.model is not None:
+            trainer.model.eval()
+
         def _generate(text: str, _lang: str) -> str:
-            return trainer.generate(text)
+            from beni.core.srl.config import SRLGrpoPrompt
+            system_prompt = SRLGrpoPrompt(languages=[_lang] if _lang else None).prompt()
+            tokenizer = getattr(trainer, "tokenizer", None)
+            if tokenizer is not None and getattr(tokenizer, "chat_template", None):
+                messages = [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": text},
+                ]
+                try:
+                    formatted = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+                    return trainer.generate(formatted)
+                except Exception:
+                    pass
+            prompt = f"{system_prompt}\n\nUser: {text}\nAssistant:"
+            return trainer.generate(prompt)
 
         eval_report = run_eval(mc, generate=_generate, policy=getattr(trainer, "plugin", trainer))
         result_row["phi"] = eval_report.get("phi")
@@ -251,6 +268,7 @@ def save_reporting_frames(results: List[Dict[str, Any]], output_dir: Path) -> No
         writer = csv.DictWriter(
             f,
             fieldnames=["model", "scope", "method", "mer", "mcs", "uwec", "phi", "seed", "config", "status"],
+            extrasaction="ignore",
         )
         writer.writeheader()
         for r in results:

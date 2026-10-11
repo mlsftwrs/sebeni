@@ -125,15 +125,52 @@ class AlignmentPlugin:
 
     def apply_lora(self, model):
         """Apply LoRA PEFT adapters to the causal LM based on ModelConfig."""
-        lora_cfg = LoraConfig(
-            r=self.config.model.lora_r,
-            lora_alpha=self.config.model.lora_alpha,
-            target_modules=self.config.model.lora_target_modules,
-            lora_dropout=self.config.model.lora_dropout,
-            bias=self.config.model.lora_bias,
-            task_type=TaskType.CAUSAL_LM,
-        )
-        return get_peft_model(model, lora_cfg)
+        # Discover any custom module classes (e.g. LiquidAI LFM, custom Conv/Linear)
+        custom_classes = set()
+        for _, module in model.named_modules():
+            cls = module.__class__
+            if cls not in (torch.nn.Linear, torch.nn.Embedding, torch.nn.Conv1d, torch.nn.Conv2d):
+                if hasattr(module, "weight") and hasattr(module, "in_features") and hasattr(module, "out_features"):
+                    custom_classes.add(cls)
+
+        lora_kwargs = {
+            "r": self.config.model.lora_r,
+            "lora_alpha": self.config.model.lora_alpha,
+            "target_modules": self.config.model.lora_target_modules,
+            "lora_dropout": self.config.model.lora_dropout,
+            "bias": self.config.model.lora_bias,
+            "task_type": TaskType.CAUSAL_LM,
+        }
+        if custom_classes:
+            lora_kwargs["custom_module_classes"] = list(custom_classes)
+
+        try:
+            lora_cfg = LoraConfig(**lora_kwargs)
+            return get_peft_model(model, lora_cfg)
+        except Exception as exc:
+            logger.warning("LoRA injection failed with error: %s. Attempting fallback...", exc)
+
+            # Fallback 1: Filter target_modules to only standard supported linear modules
+            supported_target_names = set()
+            for name, module in model.named_modules():
+                if isinstance(module, (torch.nn.Linear, torch.nn.Embedding)):
+                    supported_target_names.add(name.split(".")[-1])
+
+            filtered_targets = [t for t in self.config.model.lora_target_modules if t in supported_target_names]
+            if filtered_targets:
+                try:
+                    fallback_kwargs = dict(lora_kwargs)
+                    fallback_kwargs["target_modules"] = filtered_targets
+                    fallback_kwargs.pop("custom_module_classes", None)
+                    return get_peft_model(model, LoraConfig(**fallback_kwargs))
+                except Exception as exc2:
+                    logger.warning("Fallback targeting standard linear modules failed: %s", exc2)
+
+            # Fallback 2: Full parameter fine-tuning fallback
+            logger.warning("Model does not support PEFT LoRA adapter wrapping. Falling back to fine-tuning mode.")
+            for param in model.parameters():
+                param.requires_grad = True
+            return model
 
     def load_models(self, model_name: Optional[str] = None, device_map: str = "auto", remote_code: bool = True):
         """Load policy causal LM, optional reference model, and tokenizer."""
@@ -455,19 +492,72 @@ class AlignmentPlugin:
         self.model.push_to_hub(repo_id=repo_id, token=token, private=private, **kwargs)
         self.tokenizer.push_to_hub(repo_id=repo_id, token=token, private=private, **kwargs)
 
+    def load_aligned_weights(self, weights_path_or_repo: Union[str, Path]):
+        """Load trained LoRA adapter or fine-tuned model checkpoint for evaluation."""
+        import torch
+        from pathlib import Path
+
+        if self.model is None or self.tokenizer is None:
+            self.load_models()
+
+        target = Path(weights_path_or_repo)
+        target_str = str(weights_path_or_repo)
+
+        # Check for LoRA adapter
+        is_adapter = False
+        if target.is_dir() and (target / "adapter_config.json").is_file():
+            is_adapter = True
+        elif not target.exists():
+            # Could be a Hugging Face repo ID
+            try:
+                from huggingface_hub import HfApi
+                api = HfApi()
+                repo_files = api.list_repo_files(target_str)
+                if "adapter_config.json" in repo_files:
+                    is_adapter = True
+            except Exception:
+                pass
+
+        if is_adapter:
+            from peft import PeftModel
+            try:
+                if hasattr(self.model, "load_adapter"):
+                    self.model.load_adapter(target_str, adapter_name="default")
+                else:
+                    self.model = PeftModel.from_pretrained(self.model, target_str)
+            except Exception as e:
+                print(f"[Warning] Failed to load PeftModel adapter from {target_str}: {e}")
+        else:
+            from transformers import AutoModelForCausalLM
+            try:
+                device_map = "auto" if torch.cuda.is_available() else "cpu"
+                torch_dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    target_str,
+                    device_map=device_map,
+                    torch_dtype=torch_dtype,
+                )
+            except Exception as e:
+                print(f"[Warning] Failed to load full model from {target_str}: {e}")
+
+        self.model.eval()
+        return self.model
+
     def generate(
         self,
         prompt: str,
-        max_length: int = 128,
-        temperature: float = 1.0,
+        max_length: Optional[int] = None,
+        max_new_tokens: int = 128,
+        temperature: float = 0.7,
         top_k: int = 50,
         top_p: float = 0.95,
         **kwargs,
     ) -> str:
-        """Generate text from the policy model given a prompt."""
+        """Generate text from the policy model given a prompt, returning only new tokens."""
         if self.model is None or self.tokenizer is None:
             raise ValueError("Model and tokenizer must be loaded before generation.")
 
+        self.model.eval()
         device = getattr(self.model, "device", None)
         if device is None:
             try:
@@ -475,16 +565,28 @@ class AlignmentPlugin:
             except Exception:
                 device = "cpu"
         inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
+        input_len = inputs["input_ids"].shape[-1]
+
+        gen_kwargs = {
+            "temperature": temperature,
+            "top_k": top_k,
+            "top_p": top_p,
+            "do_sample": (temperature > 0.0),
+            **kwargs,
+        }
+        if max_length is not None:
+            gen_kwargs["max_length"] = max_length
+        else:
+            gen_kwargs["max_new_tokens"] = max_new_tokens
+
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
-                max_length=max_length,
-                temperature=temperature,
-                top_k=top_k,
-                top_p=top_p,
-                **kwargs,
+                **gen_kwargs,
             )
-        return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        # Strip prompt tokens so completion contains only generated content
+        generated_ids = outputs[0][input_len:]
+        return self.tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
 
     def token_probabilities(self, text: str):
         """Per-token π_θ and π_ref as probabilities. Forward pass may use Torch."""
