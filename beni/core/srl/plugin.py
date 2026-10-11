@@ -7,12 +7,16 @@ around Transformers + PEFT + Hub cards.
 from __future__ import annotations
 
 import datetime
+import inspect
+import logging
 from pathlib import Path
 from typing import Any, Callable, List, Optional, Sequence, Union
 
 import torch
 from peft import LoraConfig, TaskType, get_peft_model
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+
+logger = logging.getLogger("sebeni.srl.plugin")
 
 from beni.core.compute.rewards import RewardManager
 from beni.core.hub.model_card import write_model_card
@@ -125,13 +129,18 @@ class AlignmentPlugin:
 
     def apply_lora(self, model):
         """Apply LoRA PEFT adapters to the causal LM based on ModelConfig."""
-        # Discover any custom module classes (e.g. LiquidAI LFM, custom Conv/Linear)
+        # Discover any custom module classes (e.g. LiquidAI LFM)
+        # Exclude standard torch modules and bitsandbytes modules which PEFT supports natively
         custom_classes = set()
         for _, module in model.named_modules():
             cls = module.__class__
-            if cls not in (torch.nn.Linear, torch.nn.Embedding, torch.nn.Conv1d, torch.nn.Conv2d):
-                if hasattr(module, "weight") and hasattr(module, "in_features") and hasattr(module, "out_features"):
-                    custom_classes.add(cls)
+            module_module = getattr(cls, "__module__", "")
+            if "bitsandbytes" in module_module:
+                continue
+            if cls in (torch.nn.Linear, torch.nn.Embedding, torch.nn.Conv1d, torch.nn.Conv2d):
+                continue
+            if hasattr(module, "weight") and hasattr(module, "in_features") and hasattr(module, "out_features"):
+                custom_classes.add(cls)
 
         lora_kwargs = {
             "r": self.config.model.lora_r,
@@ -141,7 +150,9 @@ class AlignmentPlugin:
             "bias": self.config.model.lora_bias,
             "task_type": TaskType.CAUSAL_LM,
         }
-        if custom_classes:
+        # Only pass custom_module_classes if supported by the installed PEFT version
+        peft_supports_custom = "custom_module_classes" in inspect.signature(LoraConfig.__init__).parameters
+        if custom_classes and peft_supports_custom:
             lora_kwargs["custom_module_classes"] = list(custom_classes)
 
         try:
@@ -150,10 +161,12 @@ class AlignmentPlugin:
         except Exception as exc:
             logger.warning("LoRA injection failed with error: %s. Attempting fallback...", exc)
 
-            # Fallback 1: Filter target_modules to only standard supported linear modules
+            # Fallback 1: Filter target_modules to only standard supported linear/quantized modules
             supported_target_names = set()
             for name, module in model.named_modules():
-                if isinstance(module, (torch.nn.Linear, torch.nn.Embedding)):
+                cls = module.__class__
+                mod_name = getattr(cls, "__module__", "")
+                if isinstance(module, (torch.nn.Linear, torch.nn.Embedding)) or "bitsandbytes" in mod_name:
                     supported_target_names.add(name.split(".")[-1])
 
             filtered_targets = [t for t in self.config.model.lora_target_modules if t in supported_target_names]
