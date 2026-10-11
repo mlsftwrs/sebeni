@@ -39,7 +39,11 @@ class GoogleProvider(base.BaseProvider):
                 logger.debug("Could not auto-generate cache contents: %s", e)
                 cache_contents = None
 
-        self.cache = self.__get_cache(contents=cache_contents)
+        if self.vertex and (not self.region or str(self.region).strip().lower() in ("global", "multi-region")):
+            self.cache = None
+            logger.info("Vertex AI global location selected (%s); using system instruction for distillation.", self.model)
+        else:
+            self.cache = self.__get_cache(contents=cache_contents)
         self._cache_created_at = 0
 
 
@@ -106,6 +110,16 @@ class GoogleProvider(base.BaseProvider):
 
         if contents is None: 
             logger.info("Cache contents not provided for %s, skipping cache creation", self.cache_name)
+            return None
+
+        # Google Vertex AI context caching requires a regional location (e.g. us-central1, us-west1).
+        # It is not supported on the multi-region 'global' endpoint and returns 403 PERMISSION_DENIED.
+        if self.vertex and (not self.region or str(self.region).strip().lower() in ("global", "multi-region")):
+            logger.info(
+                "Vertex AI context caching requires a regional location (e.g. us-central1). "
+                "Current location is '%s'; continuing without explicit context cache.",
+                self.region,
+            )
             return None
 
         # Google Gemini explicit caching requires a minimum token threshold of 1024 tokens (~3500-4000 characters).
@@ -179,6 +193,8 @@ class GoogleProvider(base.BaseProvider):
         }
         if self.cache is not None:
             config_kwargs["cached_content"] = self.cache.name
+        elif sys_instruct:
+            config_kwargs["system_instruction"] = sys_instruct
         config = genai.types.GenerateContentConfig(**config_kwargs)
 
         if(indicator):

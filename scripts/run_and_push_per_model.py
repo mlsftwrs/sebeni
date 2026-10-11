@@ -367,6 +367,7 @@ def main() -> None:
         "--location",
         type=str,
         default="global",
+        help="Google Cloud location for Vertex AI (default: global)",
     )
     parser.add_argument(
         "--vertex",
