@@ -90,6 +90,7 @@ def generate_cell_model_card(
     mer_str = f"{metrics['mer']:.2f}" if metrics.get("mer") is not None else "N/A"
     mcs_str = f"{metrics['mcs']:.4f}" if metrics.get("mcs") is not None else "N/A"
     uwec_str = f"{metrics['uwec']:.4f}" if metrics.get("uwec") is not None else "N/A"
+    phi_str = f"{metrics['phi']:.4f}" if metrics.get("phi") is not None else "N/A"
     eval_report = metrics.get("eval_report") or {}
     by_lang = eval_report.get("by_language") or {}
     lang_table = ""
@@ -284,7 +285,7 @@ def direct_push_cell(
         logger.info("Successfully pushed model weights, tokenizer, and bundle to https://huggingface.co/%s", repo_id)
         return True
     except Exception as exc:
-        logger.error("Direct push to %s failed: %s", repo_id, exc)
+        logger.error("Direct push to %s failed: %s", repo_id, exc, exc_info=True)
         return False
 
 
@@ -434,15 +435,39 @@ def main() -> None:
     catalog_path = repo_root / "configs" / "matrix" / "models.json"
     catalog = load_model_catalog(catalog_path)
 
-    # Filter models
+    # Filter models while strictly preserving CLI order and supporting slug aliases
     if args.models.strip().lower() == "all":
         selected_models = catalog
     else:
-        filter_tokens = {m.strip().lower() for m in args.models.split(",") if m.strip()}
-        selected_models = [
-            m for m in catalog
-            if m["id"].lower() in filter_tokens or m["slug"].lower() in filter_tokens
-        ]
+        import re
+
+        def _norm(s: str) -> str:
+            return re.sub(r"[^a-z0-9]", "", str(s).lower())
+
+        catalog_map = {}
+        for m in catalog:
+            s_norm = _norm(m["slug"])
+            catalog_map[s_norm] = m
+            catalog_map[_norm(m["id"])] = m
+            catalog_map[_norm(m.get("display_name", ""))] = m
+            if s_norm.endswith("m") or s_norm.endswith("b"):
+                catalog_map[s_norm[:-1]] = m
+            if "granite" in s_norm and "350" in s_norm:
+                catalog_map["granite40350m"] = m
+                catalog_map["granite40350"] = m
+                catalog_map["granite4350m"] = m
+
+        selected_models = []
+        for raw_token in args.models.split(","):
+            tok = raw_token.strip()
+            if not tok:
+                continue
+            matched = catalog_map.get(_norm(tok))
+            if matched and matched not in selected_models:
+                selected_models.append(matched)
+            elif not matched:
+                logger.warning("Model token '%s' did not match catalog. Available: %s", tok, [m["slug"] for m in catalog])
+
         if not selected_models:
             logger.error("No models matched '%s'. Available: %s", args.models, [m["slug"] for m in catalog])
             sys.exit(1)
@@ -510,10 +535,12 @@ def main() -> None:
 
             # Explicitly enforce max_steps and batch size across all algorithm sections
             rec_batch = model_entry.get("recommended_batch_size", 2)
+            models_dir = str(run_dir / "models")
             for sec in ("trainer", "sft", "dpo", "apo"):
                 cfg_data.setdefault(sec, {})
                 cfg_data[sec]["max_steps"] = args.max_steps
                 cfg_data[sec]["per_device_train_batch_size"] = rec_batch
+                cfg_data[sec]["output_dir"] = models_dir
 
             # Execute Cell
             result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)

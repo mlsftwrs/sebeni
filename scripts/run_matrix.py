@@ -91,10 +91,12 @@ def build_config(
 
     # Trainer budget across all algorithms (GRPO uses trainer, SFT uses sft, DPO uses dpo, APO uses apo)
     rec_batch = model_entry.get("recommended_batch_size", 2)
+    models_dir = str(run_dir / "models")
     for section in ("trainer", "sft", "dpo", "apo"):
         cfg.setdefault(section, {})
         cfg[section]["max_steps"] = max_steps
         cfg[section]["per_device_train_batch_size"] = rec_batch
+        cfg[section]["output_dir"] = models_dir
 
     # Distillation configuration
     cfg.setdefault("distillation", {})
@@ -163,7 +165,7 @@ def run_experiment_cell(
 
     logger.info("Starting experiment %s with %s (500 steps, eval=beni.data/test.json)...", model_name, algo)
     mc = MasterConfig.from_dict(cfg_data)
-    mc.working_dir = str(run_dir)
+    mc.apply_workdir(run_dir)
     active_steps = cfg_data.get(algo, {}).get("max_steps") or cfg_data.get("trainer", {}).get("max_steps", 10)
     mc.apply_cli_overrides(max_steps=active_steps)
 

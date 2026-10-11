@@ -450,7 +450,13 @@ class AlignmentPlugin:
         if self.model is None or self.tokenizer is None:
             raise ValueError("Model and tokenizer must be loaded before generation.")
 
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        device = getattr(self.model, "device", None)
+        if device is None:
+            try:
+                device = next(self.model.parameters()).device
+            except Exception:
+                device = "cpu"
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
