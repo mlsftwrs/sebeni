@@ -470,6 +470,18 @@ def main() -> None:
         help="Evaluation row cap (default: 10)",
     )
     parser.add_argument(
+        "--eval-steps",
+        type=int,
+        default=None,
+        help="Evaluation interval in steps (defaults to max_steps // 10, i.e. 10 evaluations per run)",
+    )
+    parser.add_argument(
+        "--max-completion-length",
+        type=int,
+        default=256,
+        help="Maximum generation completion length for rollouts (default: 256)",
+    )
+    parser.add_argument(
         "--load-in-4bit",
         action="store_true",
         default=False,
@@ -717,7 +729,8 @@ def main() -> None:
                 use_vllm=args.use_vllm if algo == "grpo" else False,
             )
 
-            # Explicitly enforce max_steps and batch size across all algorithm sections
+            # Explicitly enforce max_steps, batch size, and eval_steps (10 evals per run)
+            calc_eval_steps = args.eval_steps if args.eval_steps is not None else max(1, args.max_steps // 10)
             rec_batch = model_entry.get("recommended_batch_size", 2)
             models_dir = str(run_dir / "models")
             for sec in ("trainer", "sft", "dpo", "apo"):
@@ -725,6 +738,10 @@ def main() -> None:
                 cfg_data[sec]["max_steps"] = args.max_steps
                 cfg_data[sec]["per_device_train_batch_size"] = rec_batch
                 cfg_data[sec]["output_dir"] = models_dir
+                cfg_data[sec]["eval_strategy"] = "steps"
+                cfg_data[sec]["eval_steps"] = calc_eval_steps
+
+            logger.info("Evaluation interval set to every %d steps (10 evals total for %d steps)", calc_eval_steps, args.max_steps)
 
             # Specialized GRPO optimizations:
             if algo == "grpo":
@@ -745,7 +762,9 @@ def main() -> None:
                 cfg_data["trainer"]["vllm_gpu_memory_utilization"] = args.vllm_gpu_memory_utilization
                 cfg_data["trainer"]["vllm_mode"] = "colocate"
                 cfg_data["trainer"]["max_prompt_length"] = 512
-                cfg_data["trainer"]["max_completion_length"] = 512
+                cfg_data["trainer"]["max_completion_length"] = args.max_completion_length
+                cfg_data["trainer"]["eval_strategy"] = "steps"
+                cfg_data["trainer"]["eval_steps"] = calc_eval_steps
                 cfg_data["trainer"]["gradient_accumulation_steps"] = min(
                     cfg_data["trainer"].get("gradient_accumulation_steps", 2), 2
                 )

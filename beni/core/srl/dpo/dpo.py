@@ -75,7 +75,8 @@ class SebeniDpo(AlignmentPlugin):
             if "eval_strategy" not in dpo_dict or not dpo_dict["eval_strategy"]:
                 dpo_dict["eval_strategy"] = "steps"
             if "eval_steps" not in dpo_dict or not dpo_dict["eval_steps"]:
-                dpo_dict["eval_steps"] = max(1, dpo_dict.get("logging_steps", 10))
+                max_st = dpo_dict.get("max_steps", 100)
+                dpo_dict["eval_steps"] = max(1, max_st // 10) if max_st else max(1, dpo_dict.get("logging_steps", 10))
 
         args = DPOConfig(
             **trl_config_kwargs(

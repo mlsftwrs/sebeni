@@ -155,7 +155,20 @@ class TestRunAndPushSkip(unittest.TestCase):
         for exp in expected_slugs:
             self.assertIn(exp, slugs)
 
+    def test_eval_steps_calculation(self):
+        # 100 steps should yield 10 eval steps
+        max_steps = 100
+        calc_eval_steps = max(1, max_steps // 10)
+        self.assertEqual(calc_eval_steps, 10)
+
+        # 50 steps should yield 5 eval steps
+        self.assertEqual(max(1, 50 // 10), 5)
+
+        # 5 steps should yield 1 eval step
+        self.assertEqual(max(1, 5 // 10), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

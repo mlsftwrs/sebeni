@@ -116,7 +116,8 @@ class SebeniSft(AlignmentPlugin):
             if "eval_strategy" not in sft_dict or not sft_dict["eval_strategy"]:
                 sft_dict["eval_strategy"] = "steps"
             if "eval_steps" not in sft_dict or not sft_dict["eval_steps"]:
-                sft_dict["eval_steps"] = max(1, sft_dict.get("logging_steps", 10))
+                max_st = sft_dict.get("max_steps", 100)
+                sft_dict["eval_steps"] = max(1, max_st // 10) if max_st else max(1, sft_dict.get("logging_steps", 10))
 
         args = SFTConfig(
             **trl_config_kwargs(

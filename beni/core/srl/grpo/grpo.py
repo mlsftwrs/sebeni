@@ -163,7 +163,8 @@ class SebeniGrpo(AlignmentPlugin):
             if "eval_strategy" not in grpo_dict or not grpo_dict["eval_strategy"]:
                 grpo_dict["eval_strategy"] = "steps"
             if "eval_steps" not in grpo_dict or not grpo_dict["eval_steps"]:
-                grpo_dict["eval_steps"] = max(1, grpo_dict.get("logging_steps", 10))
+                max_st = grpo_dict.get("max_steps", 100)
+                grpo_dict["eval_steps"] = max(1, max_st // 10) if max_st else max(1, grpo_dict.get("logging_steps", 10))
 
         grpo_args = GRPOConfig(
             **trl_config_kwargs(
