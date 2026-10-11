@@ -90,7 +90,18 @@ def generate_cell_model_card(
     mer_str = f"{metrics['mer']:.2f}" if metrics.get("mer") is not None else "N/A"
     mcs_str = f"{metrics['mcs']:.4f}" if metrics.get("mcs") is not None else "N/A"
     uwec_str = f"{metrics['uwec']:.4f}" if metrics.get("uwec") is not None else "N/A"
-    phi_str = f"{metrics['phi']:.4f}" if metrics.get("phi") is not None else "N/A"
+    eval_report = metrics.get("eval_report") or {}
+    by_lang = eval_report.get("by_language") or {}
+    lang_table = ""
+    if by_lang:
+        lang_table = "\n### Per-Language Evaluation Scores\n\n| Language | Phi | MER | MCS | UWEC | Scored Sentences |\n|---|---|---|---|---|---|\n"
+        for lang_code, lang_stats in sorted(by_lang.items()):
+            p = f"{lang_stats.get('phi', 0.0):.4f}" if lang_stats.get('phi') is not None else "-"
+            m = f"{lang_stats.get('mer', 0.0):.2f}" if lang_stats.get('mer') is not None else "-"
+            c = f"{lang_stats.get('mcs', 0.0):.4f}" if lang_stats.get('mcs') is not None else "-"
+            u = f"{lang_stats.get('uwec', 0.0):.4f}" if lang_stats.get('uwec') is not None else "-"
+            n = lang_stats.get("n_scored", 0)
+            lang_table += f"| `{lang_code}` | {p} | {m} | {c} | {u} | {n} |\n"
 
     return f"""---
 library_name: transformers
@@ -122,7 +133,7 @@ This repository contains the **trained model weights, tokenizer, training data, 
 - **MER (Morpheme Error Rate)**: `{mer_str}`
 - **MCS (Morpheme Cosine Similarity)**: `{mcs_str}`
 - **UWEC (Unweighted Edit Cost)**: `{uwec_str}`
-
+{lang_table}
 ## Inference & Usage
 
 You can load this post-trained model and tokenizer directly using Hugging Face `transformers` and `peft`:
@@ -209,7 +220,7 @@ def direct_push_cell(
             exist_ok=True,
         )
 
-        # 2. Surface final model weights, configs, and tokenizer to repo root
+        # 2. Surface final model weights, configs, tokenizer, and eval results to repo root
         # so standard AutoModelForCausalLM / AutoTokenizer / PeftModel can load directly from HF
         if include_weights:
             models_dir = run_dir / "models"
@@ -219,6 +230,11 @@ def direct_push_cell(
                         dest = run_dir / item.name
                         if not dest.exists():
                             shutil.copy2(item, dest)
+
+        # Surface evaluation results JSON to repo root for transparent benchmarking
+        eval_json = run_dir / "exp" / "eval.json"
+        if eval_json.exists():
+            shutil.copy2(eval_json, run_dir / "eval_results.json")
 
         # 3. Generate and write README.md
         card_content = generate_cell_model_card(

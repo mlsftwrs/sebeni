@@ -87,11 +87,20 @@ class SebeniSft(AlignmentPlugin):
         train_dataset = dataset
         eval_dataset = None
         eval_ratio = getattr(self.config.data, "eval_ratio", 0.0) or 0.0
-        if eval_ratio > 0.0 and hasattr(dataset, "train_test_split") and len(dataset) > 1:
-            split = dataset.train_test_split(test_size=eval_ratio, seed=self.config.sft.seed)
+        max_eval = getattr(self.config.experiment, "max_eval_rows", None)
+        if (eval_ratio > 0.0 or (max_eval and max_eval > 0)) and hasattr(dataset, "train_test_split") and len(dataset) > 1:
+            n_samples = len(dataset)
+            if max_eval is not None and max_eval > 0:
+                target_test = min(int(max_eval), max(1, n_samples - 1))
+                if n_samples > 2 and target_test >= n_samples:
+                    target_test = max(1, n_samples // 2)
+                test_size = target_test
+            else:
+                test_size = eval_ratio
+
+            split = dataset.train_test_split(test_size=test_size, seed=self.config.sft.seed)
             train_dataset = split["train"]
             eval_dataset = split["test"]
-            max_eval = getattr(self.config.experiment, "max_eval_rows", None)
             if max_eval is not None and max_eval > 0 and len(eval_dataset) > max_eval:
                 if hasattr(eval_dataset, "select"):
                     eval_dataset = eval_dataset.select(range(max_eval))

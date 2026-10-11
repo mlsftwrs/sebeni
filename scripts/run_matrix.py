@@ -183,7 +183,7 @@ def run_experiment_cell(
     logger.info("Running post-training arm: %s for %d steps...", algo, active_trainer.max_steps)
     start_time = time.time()
     try:
-        run_arm(mc)
+        trainer = run_arm(mc)
         elapsed = time.time() - start_time
         logger.info("Training completed in %.1f seconds", elapsed)
     except Exception as exc:
@@ -191,14 +191,18 @@ def run_experiment_cell(
         result_row["status"] = f"FAILED: {exc}"
         return result_row
 
-    # 4. Evaluation on held-out beni.data/test.json
-    logger.info("Scoring evaluation on held-out split beni.data/test.json...")
+    # 4. Evaluation on held-out beni.data/test.json using post-trained policy
+    logger.info("Scoring post-trained model evaluation on held-out split beni.data/test.json...")
     try:
-        eval_report = run_eval(mc)
+        def _generate(text: str, _lang: str) -> str:
+            return trainer.generate(text)
+
+        eval_report = run_eval(mc, generate=_generate, policy=getattr(trainer, "plugin", trainer))
         result_row["phi"] = eval_report.get("phi")
         result_row["mer"] = eval_report.get("mer")
         result_row["mcs"] = eval_report.get("mcs")
         result_row["uwec"] = eval_report.get("uwec")
+        result_row["eval_report"] = eval_report
         result_row["status"] = "COMPLETED"
         logger.info(
             "Evaluation complete: Phi=%.4f MER=%.2f MCS=%.4f UWEC=%.4f",
