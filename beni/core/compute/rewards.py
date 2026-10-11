@@ -1,6 +1,7 @@
 import re
 import json
 import math
+import functools
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Callable, Tuple
 from beni.core.compute.metrics import MorphologyScorer
@@ -174,14 +175,18 @@ class RewardManager:
         raw_text = RewardManager.completion_text(text).strip()
         if not raw_text:
             return {}
+        return dict(RewardManager._extract_json_cached(raw_text))
 
+    @staticmethod
+    @functools.lru_cache(maxsize=8192)
+    def _extract_json_cached(raw_text: str) -> dict:
         # 1. Direct parse attempt
         try:
             res = json.loads(raw_text)
             if isinstance(res, dict):
                 return res
             if isinstance(res, str):
-                nested = RewardManager.extract_json(res)
+                nested = RewardManager._extract_json_cached(res.strip())
                 if nested:
                     return nested
         except (json.JSONDecodeError, TypeError):

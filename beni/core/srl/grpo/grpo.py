@@ -136,6 +136,29 @@ class SebeniGrpo(AlignmentPlugin):
 
         project_name = project_name or self.config.project_name
         grpo_dict = self.config.trainer.to_dict()
+
+        if grpo_dict.get("use_vllm"):
+            import torch
+            vllm_available = False
+            try:
+                import vllm  # noqa: F401
+                vllm_available = True
+            except ImportError:
+                vllm_available = False
+
+            if not torch.cuda.is_available() or not vllm_available:
+                print(
+                    "[GRPO Notice] use_vllm was enabled, but CUDA or vLLM is not installed. "
+                    "Falling back to standard Hugging Face generation. "
+                    "Install vLLM (pip install vllm) on a CUDA device to enable ultra-fast rollout generation."
+                )
+                grpo_dict["use_vllm"] = False
+            else:
+                print(
+                    f"[GRPO] vLLM rollout acceleration ENABLED (mode: {grpo_dict.get('vllm_mode', 'colocate')}, "
+                    f"vllm_gpu_memory_utilization: {grpo_dict.get('vllm_gpu_memory_utilization', 0.3)})."
+                )
+
         if eval_dataset is not None:
             if "eval_strategy" not in grpo_dict or not grpo_dict["eval_strategy"]:
                 grpo_dict["eval_strategy"] = "steps"

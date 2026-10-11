@@ -61,6 +61,7 @@ def build_config(
     quantization: Optional[str] = None,
     max_eval_rows: Optional[int] = None,
     kveritas_disclosure: str = "open",
+    use_vllm: Optional[bool] = None,
 ) -> Dict[str, Any]:
     """Compose experiment configuration for a single matrix cell."""
     with open(base_config_path, "r", encoding="utf-8") as f:
@@ -80,6 +81,11 @@ def build_config(
             raise ValueError(f"Unsupported quantization mode: {quantization}")
         cfg["model"]["load_in_4bit"] = quantization == "4bit"
         cfg["model"]["load_in_8bit"] = quantization == "8bit"
+
+    # Trainer parameters
+    if use_vllm is not None:
+        cfg.setdefault("trainer", {})
+        cfg["trainer"]["use_vllm"] = use_vllm
 
     # Data & Scope
     cfg.setdefault("data", {})
@@ -388,6 +394,18 @@ def main() -> None:
         action="store_true",
         help="Skip runs that have already produced a valid eval.json and sealed report.",
     )
+    parser.add_argument(
+        "--use-vllm",
+        action="store_true",
+        default=None,
+        help="Enable vLLM rollout acceleration for GRPO.",
+    )
+    parser.add_argument(
+        "--no-use-vllm",
+        dest="use_vllm",
+        action="store_false",
+        help="Disable vLLM rollout acceleration.",
+    )
 
     args = parser.parse_args()
 
@@ -476,6 +494,7 @@ def main() -> None:
                 quantization=args.quantization,
                 max_eval_rows=args.max_eval_rows,
                 kveritas_disclosure=args.kveritas_disclosure,
+                use_vllm=args.use_vllm,
             )
 
             result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)

@@ -142,6 +142,19 @@ class TestTrlConfigKwargs:
         assert "project" not in out
         assert "run_name" not in out
 
+    def test_passes_vllm_fields_when_supported(self):
+        from beni.core.srl.config import GRPOTrainerConfig, trl_config_kwargs
+
+        class FakeGRPOWithVLLM:
+            def __init__(self, use_vllm=False, vllm_gpu_memory_utilization=0.3, vllm_mode="colocate"):
+                pass
+
+        cfg = GRPOTrainerConfig(use_vllm=True, vllm_gpu_memory_utilization=0.25, vllm_mode="colocate")
+        out = trl_config_kwargs(FakeGRPOWithVLLM, cfg.to_dict())
+        assert out["use_vllm"] is True
+        assert out["vllm_gpu_memory_utilization"] == 0.25
+        assert out["vllm_mode"] == "colocate"
+
     def test_installed_grpo_config_accepts_filtered_kwargs(self):
         trl = pytest.importorskip("trl")
         from beni.core.srl.config import GRPOTrainerConfig, trl_config_kwargs

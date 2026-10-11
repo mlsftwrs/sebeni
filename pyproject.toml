@@ -46,6 +46,7 @@ train = [
     "peft",
     "datasets",
     "accelerate",
+    "vllm",
     "trackio",
 ]
 wandb = [

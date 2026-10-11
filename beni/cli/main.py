@@ -294,6 +294,12 @@ def train(
     eval_steps: Optional[int] = typer.Option(
         None, "--eval-steps", help="Number of update steps between evaluations."
     ),
+    use_vllm: Optional[bool] = typer.Option(
+        None, "--use-vllm/--no-use-vllm", help="Enable vLLM rollout acceleration for GRPO."
+    ),
+    vllm_gpu_memory_utilization: Optional[float] = typer.Option(
+        None, "--vllm-gpu-memory-utilization", help="GPU memory fraction reserved for vLLM rollouts (e.g. 0.3)."
+    ),
 ):
     """Train one arm. Distills and freezes G/D first when that has not been done."""
     mc = _load_config(config, working_dir)
@@ -331,6 +337,8 @@ def train(
         kveritas=kveritas,
         eval_ratio=eval_ratio,
         eval_steps=eval_steps,
+        use_vllm=use_vllm,
+        vllm_gpu_memory_utilization=vllm_gpu_memory_utilization,
     )
     if mc.experiment.kveritas:
         maybe_kveritas_init(mc.working_dir)

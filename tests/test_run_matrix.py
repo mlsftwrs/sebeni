@@ -80,3 +80,25 @@ def test_build_config_rejects_unknown_quantization(tmp_path):
         assert "Unsupported quantization mode" in str(exc)
     else:
         raise AssertionError("Unsupported quantization mode should be rejected")
+
+
+def test_build_config_sets_use_vllm(tmp_path):
+    base_config_path = tmp_path / "base.yaml"
+    base_config_path.write_text("{}", encoding="utf-8")
+
+    cfg = build_config(
+        base_config_path=base_config_path,
+        model_entry={"id": "example/model", "slug": "example"},
+        algorithm="grpo",
+        scope="MULTI13",
+        max_steps=1,
+        distil_model="teacher",
+        location="global",
+        vertex=False,
+        backend="algorithmic",
+        run_dir=tmp_path / "run",
+        use_vllm=True,
+    )
+
+    assert cfg["trainer"]["use_vllm"] is True
+

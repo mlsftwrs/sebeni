@@ -209,6 +209,12 @@ class GRPOTrainerConfig:
     use_cpu: bool = False
     framework: str = "torch"  # torch | jax
 
+    # vLLM Acceleration
+    use_vllm: bool = False
+    vllm_gpu_memory_utilization: float = 0.3
+    vllm_mode: str = "colocate"
+    vllm_device: Optional[str] = None
+
     # Evaluation
     eval_strategy: Optional[str] = None
     eval_steps: Optional[int] = None
@@ -251,6 +257,13 @@ class GRPOTrainerConfig:
             "hub_token": self.hub_token,
             "hub_private_repo": self.hub_private_repo,
         }
+        if self.use_vllm:
+            data["use_vllm"] = self.use_vllm
+            data["vllm_gpu_memory_utilization"] = self.vllm_gpu_memory_utilization
+            if self.vllm_mode:
+                data["vllm_mode"] = self.vllm_mode
+            if self.vllm_device:
+                data["vllm_device"] = self.vllm_device
         if self.eval_strategy is not None:
             data["eval_strategy"] = self.eval_strategy
         if self.eval_steps is not None:
@@ -637,6 +650,8 @@ class MasterConfig:
         kveritas: Optional[bool] = None,
         eval_ratio: Optional[float] = None,
         eval_steps: Optional[int] = None,
+        use_vllm: Optional[bool] = None,
+        vllm_gpu_memory_utilization: Optional[float] = None,
     ) -> "MasterConfig":
         """Apply non-None CLI hyperparameter overrides onto trainer / model / data."""
         if languages:
@@ -691,6 +706,10 @@ class MasterConfig:
             self.trainer.temperature = temperature
         if gradient_checkpointing is not None:
             self.trainer.gradient_checkpointing = gradient_checkpointing
+        if use_vllm is not None:
+            self.trainer.use_vllm = use_vllm
+        if vllm_gpu_memory_utilization is not None:
+            self.trainer.vllm_gpu_memory_utilization = vllm_gpu_memory_utilization
         if lora_r is not None:
             self.model.lora_r = lora_r
         if lora_alpha is not None:

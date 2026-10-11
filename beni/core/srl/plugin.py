@@ -166,6 +166,15 @@ class AlignmentPlugin:
             )
             use_4bit = False
             use_8bit = False
+        use_vllm_active = bool(getattr(getattr(self.config, "trainer", None), "use_vllm", False))
+        if use_vllm_active and use_4bit:
+            print(
+                "[GRPO Notice] Disabling 4-bit quantization because vLLM rollout acceleration requires "
+                "native unquantized weights (bf16/fp16). Loading in native precision."
+            )
+            use_4bit = False
+            self.config.model.load_in_4bit = False
+
         if use_4bit:
             bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
@@ -176,9 +185,18 @@ class AlignmentPlugin:
         elif use_8bit:
             bnb_config = BitsAndBytesConfig(load_in_8bit=True)
 
+        torch_dtype = None
+        if not bnb_config and device_map != "cpu":
+            trainer_cfg = getattr(self.config, "trainer", None) or getattr(self.config, "sft", None) or getattr(self.config, "dpo", None) or getattr(self.config, "apo", None)
+            if getattr(trainer_cfg, "bf16", False):
+                torch_dtype = torch.bfloat16
+            elif getattr(trainer_cfg, "fp16", False):
+                torch_dtype = torch.float16
+
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
             quantization_config=bnb_config,
+            torch_dtype=torch_dtype,
             device_map=device_map,
             trust_remote_code=remote_code,
         )

@@ -42,6 +42,7 @@ RUN pip install --no-cache-dir \
     peft \
     datasets \
     accelerate \
+    vllm \
     trackio \
     google-genai>=0.17.0 \
     bigframes \

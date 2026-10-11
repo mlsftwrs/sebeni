@@ -274,8 +274,50 @@ def main() -> None:
     parser.add_argument(
         "--resume",
         action="store_true",
-        default=False,
-        help="Resume previously completed cells without re-running",
+        default=True,
+        help="Resume previously completed cells without re-running (default: True)",
+    )
+    parser.add_argument(
+        "--skip-completed",
+        action="store_true",
+        default=True,
+        help="Skip runs already completed on Hugging Face Hub or locally (default: True)",
+    )
+    parser.add_argument(
+        "--force-rerun",
+        dest="skip_completed",
+        action="store_false",
+        help="Force re-running all cells even if already completed",
+    )
+    parser.add_argument(
+        "--restart-grpo",
+        action="store_true",
+        default=True,
+        help="Always restart GRPO training to ensure clean run with vLLM fixes (default: True)",
+    )
+    parser.add_argument(
+        "--no-restart-grpo",
+        dest="restart_grpo",
+        action="store_false",
+        help="Allow skipping GRPO if already completed on Hugging Face Hub",
+    )
+    parser.add_argument(
+        "--use-vllm",
+        action="store_true",
+        default=True,
+        help="Enable vLLM rollout acceleration for GRPO (default: True)",
+    )
+    parser.add_argument(
+        "--no-use-vllm",
+        dest="use_vllm",
+        action="store_false",
+        help="Disable vLLM rollout acceleration",
+    )
+    parser.add_argument(
+        "--vllm-gpu-memory-utilization",
+        type=float,
+        default=0.3,
+        help="vLLM GPU memory utilization fraction (default: 0.3)",
     )
     parser.add_argument(
         "--dry-run",
@@ -287,7 +329,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # 1. Resolve and Validate Hugging Face Token & Permissions Early
-    token = args.hf_token or os.environ.get("HF_TOKEN") or get_token()
+    token = args.hf_token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_HUB_TOKEN") or get_token()
     if not token and not args.dry_run:
         logger.error(
             "No Hugging Face token provided. Pass --hf-token <token>, set export HF_TOKEN=<token>, "
@@ -351,15 +393,78 @@ def main() -> None:
     logger.info("Target HF Repo: %s (private=%s)", args.hf_repo, not args.public)
     logger.info("=" * 70)
 
+    # Fetch remote repository files once for efficient skip checks
+    remote_files = set()
+    if not args.dry_run and api:
+        try:
+            remote_files = set(api.list_repo_files(repo_id=args.hf_repo, repo_type="model"))
+        except Exception as exc:
+            logger.debug("Could not pre-fetch remote repo files: %s", exc)
+
     all_results: List[Dict[str, Any]] = []
 
-    # 3. Execute Experiment Matrix Across All 4 Arms
+    # 3. Execute Experiment Matrix Across All Arms
     for model_entry in selected_models:
         for algo in selected_algorithms:
             run_slug = f"{model_entry['slug']}_{algo}"
             run_dir = args.output_dir / run_slug
 
-            logger.info("\n>>> [1/4+] Starting Arm: %s | Model: %s <<<", algo.upper(), model_entry["id"])
+            # Check if this cell should be skipped
+            is_completed = False
+            skip_reason = ""
+            if (args.skip_completed or args.resume) and not (algo == "grpo" and args.restart_grpo):
+                # Check remote HF subfolder
+                algo_prefix = f"{algo}/"
+                has_remote = any(f.startswith(algo_prefix) for f in remote_files)
+                if has_remote:
+                    is_completed = True
+                    skip_reason = f"Artifacts present in remote HF repo under '{algo}/'"
+                else:
+                    eval_f = run_dir / "exp" / "eval.json"
+                    if eval_f.is_file():
+                        try:
+                            with open(eval_f, "r", encoding="utf-8") as f:
+                                d = json.load(f)
+                            if d and (d.get("phi") is not None or d.get("mer") is not None):
+                                is_completed = True
+                                skip_reason = f"Local evaluation report found in {eval_f}"
+                        except Exception:
+                            pass
+
+            if is_completed:
+                logger.info("\n>>> Skipping Arm %s | Model: %s (%s) <<<", algo.upper(), model_entry["id"], skip_reason)
+                eval_file = run_dir / "exp" / "eval.json"
+                eval_report = {}
+                if eval_file.is_file():
+                    try:
+                        with open(eval_file, "r", encoding="utf-8") as f:
+                            eval_report = json.load(f)
+                    except Exception:
+                        pass
+                all_results.append({
+                    "model": model_entry["id"],
+                    "scope": args.scope,
+                    "method": algo.upper(),
+                    "mer": eval_report.get("mer"),
+                    "mcs": eval_report.get("mcs"),
+                    "uwec": eval_report.get("uwec"),
+                    "phi": eval_report.get("phi"),
+                    "seed": 42,
+                    "config": str(run_dir / "config.yaml"),
+                    "status": "CACHED",
+                    "eval_report": eval_report,
+                })
+                continue
+
+            if algo == "grpo" and run_dir.exists():
+                # Clean stale partial files from aborted run
+                for sub in ("models", "runs", "tmp"):
+                    shutil.rmtree(run_dir / sub, ignore_errors=True)
+                for p in run_dir.glob("checkpoint-*"):
+                    if p.is_dir():
+                        shutil.rmtree(p, ignore_errors=True)
+
+            logger.info("\n>>> Starting Arm: %s | Model: %s <<<", algo.upper(), model_entry["id"])
 
             cfg_data = build_config(
                 base_config_path=base_config_path,
@@ -375,14 +480,72 @@ def main() -> None:
                 quantization=quantization,
                 max_eval_rows=args.max_eval_rows,
                 kveritas_disclosure=args.kveritas_disclosure,
+                use_vllm=args.use_vllm if algo == "grpo" else False,
             )
 
-            result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)
+            rec_batch = model_entry.get("recommended_batch_size", 2)
+            models_dir = str(run_dir / "models")
+            for sec in ("trainer", "sft", "dpo", "apo"):
+                cfg_data.setdefault(sec, {})
+                cfg_data[sec]["max_steps"] = args.max_steps
+                cfg_data[sec]["per_device_train_batch_size"] = rec_batch
+                cfg_data[sec]["output_dir"] = models_dir
+
+            if algo == "grpo":
+                params_str = str(model_entry.get("params", "")).upper()
+                is_large = ("4B" in params_str) or ("7B" in params_str) or ("8B" in params_str)
+                if not is_large:
+                    cfg_data["model"]["load_in_4bit"] = False
+                    cfg_data["model"]["load_in_8bit"] = False
+                cfg_data["trainer"]["bf16"] = True
+                cfg_data["trainer"]["use_vllm"] = bool(args.use_vllm)
+                cfg_data["trainer"]["vllm_gpu_memory_utilization"] = args.vllm_gpu_memory_utilization
+                cfg_data["trainer"]["vllm_mode"] = "colocate"
+                cfg_data["trainer"]["max_prompt_length"] = 512
+                cfg_data["trainer"]["max_completion_length"] = 512
+                cfg_data["trainer"]["gradient_accumulation_steps"] = min(
+                    cfg_data["trainer"].get("gradient_accumulation_steps", 2), 2
+                )
+                cfg_data["trainer"]["per_device_train_batch_size"] = min(rec_batch, 2)
+
+            try:
+                result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)
+            except Exception as cell_exc:
+                logger.error("Arm %s failed on %s: %s", algo, model_entry["slug"], cell_exc, exc_info=True)
+                result = {
+                    "model": model_entry["id"],
+                    "scope": args.scope,
+                    "method": algo.upper(),
+                    "mer": None,
+                    "mcs": None,
+                    "uwec": None,
+                    "phi": None,
+                    "seed": 42,
+                    "config": str(run_dir / "config.yaml"),
+                    "status": f"FAILED: {cell_exc}",
+                }
             all_results.append(result)
 
             # Upload algorithm artifacts to HF immediately upon completion
             if not args.dry_run and result.get("status") in ("COMPLETED", "CACHED"):
-                upload_algorithm_artifacts(api, args.hf_repo, algo, run_dir)
+                for attempt in range(1, 4):
+                    try:
+                        upload_algorithm_artifacts(api, args.hf_repo, algo, run_dir)
+                        break
+                    except Exception as upload_exc:
+                        logger.warning("Upload attempt %d for %s failed: %s", attempt, algo, upload_exc)
+                        time.sleep(2 * attempt)
+
+            # GPU Cache Clearing & Garbage Collection
+            import gc
+            gc.collect()
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.ipc_collect()
+            except Exception:
+                pass
 
     # 4. Save Section 10 Canonical Reporting Frames
     save_reporting_frames(all_results, args.output_dir)

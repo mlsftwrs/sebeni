@@ -229,8 +229,7 @@ def direct_push_cell(
                 for item in models_dir.iterdir():
                     if item.is_file() and item.name not in ("README.md",):
                         dest = run_dir / item.name
-                        if not dest.exists():
-                            shutil.copy2(item, dest)
+                        shutil.copy2(item, dest)
 
         # Surface evaluation results JSON to repo root for transparent benchmarking
         eval_json = run_dir / "exp" / "eval.json"
@@ -287,6 +286,119 @@ def direct_push_cell(
     except Exception as exc:
         logger.error("Direct push to %s failed: %s", repo_id, exc, exc_info=True)
         return False
+
+
+def cleanup_stale_run_dir(run_dir: Path) -> None:
+    """Clean partial / broken run artifacts from previous aborted attempts."""
+    if not run_dir.exists():
+        return
+    for sub in ("models", "runs", "tmp"):
+        sub_path = run_dir / sub
+        if sub_path.exists():
+            shutil.rmtree(sub_path, ignore_errors=True)
+    for p in run_dir.glob("checkpoint-*"):
+        if p.is_dir():
+            shutil.rmtree(p, ignore_errors=True)
+    eval_f = run_dir / "exp" / "eval.json"
+    if eval_f.exists():
+        try:
+            with open(eval_f, "r", encoding="utf-8") as f:
+                d = json.load(f)
+            if not d or (d.get("phi") is None and d.get("mer") is None):
+                eval_f.unlink(missing_ok=True)
+        except Exception:
+            eval_f.unlink(missing_ok=True)
+
+
+def is_repo_completed_on_hub(api: HfApi, repo_id: str) -> bool:
+    """Check if target repository exists on Hugging Face Hub and has completed artifacts."""
+    try:
+        if not api.repo_exists(repo_id=repo_id, repo_type="model"):
+            return False
+        files = api.list_repo_files(repo_id=repo_id, repo_type="model")
+        has_readme = "README.md" in files
+        has_content = any(
+            f in files for f in ("config.yaml", "training_data.jsonl", "kveritas_report.pdf", "eval_results.json")
+        ) or any("eval" in f.lower() or "adapter" in f.lower() for f in files)
+        return has_readme and (has_content or len(files) >= 2)
+    except Exception as exc:
+        logger.debug("Failed checking remote repo %s: %s", repo_id, exc)
+        return False
+
+
+def check_cell_completed(
+    api: Optional[HfApi],
+    target_repo: str,
+    run_dir: Path,
+    algo: str,
+    restart_grpo: bool = True,
+    skip_completed: bool = True,
+) -> tuple[bool, str]:
+    """Determine whether an experiment cell should be skipped or run."""
+    if not skip_completed:
+        return False, "Force rerun requested"
+
+    if algo == "grpo" and restart_grpo:
+        return False, "Restarting GRPO run as requested"
+
+    # 1. Check Hugging Face Hub
+    if api and is_repo_completed_on_hub(api, target_repo):
+        return True, f"Remote Hugging Face repository '{target_repo}' is already completed"
+
+    # 2. Check local completion
+    eval_file = run_dir / "exp" / "eval.json"
+    if eval_file.is_file():
+        try:
+            with open(eval_file, "r", encoding="utf-8") as f:
+                d = json.load(f)
+            if d and (d.get("phi") is not None or d.get("mer") is not None):
+                return True, f"Local evaluation report found in {eval_file}"
+        except Exception:
+            pass
+
+    adapter_file = run_dir / "models" / "adapter_config.json"
+    if adapter_file.is_file():
+        return True, f"Local trained weights found in {adapter_file}"
+
+    return False, "Not completed"
+
+
+def load_cached_metrics(
+    run_dir: Path,
+    model_entry: Dict[str, Any],
+    algo: str,
+    scope: str,
+    target_repo: str,
+) -> Dict[str, Any]:
+    """Construct result dictionary for a skipped / cached cell."""
+    eval_file = run_dir / "exp" / "eval.json"
+    phi, mer, mcs, uwec = None, None, None, None
+    eval_report = {}
+    if eval_file.is_file():
+        try:
+            with open(eval_file, "r", encoding="utf-8") as f:
+                eval_report = json.load(f)
+            phi = eval_report.get("phi")
+            mer = eval_report.get("mer")
+            mcs = eval_report.get("mcs")
+            uwec = eval_report.get("uwec")
+        except Exception:
+            pass
+
+    return {
+        "model": model_entry["id"],
+        "scope": scope,
+        "method": algo.upper(),
+        "mer": mer,
+        "mcs": mcs,
+        "uwec": uwec,
+        "phi": phi,
+        "seed": 42,
+        "config": str(run_dir / "config.yaml"),
+        "status": "CACHED",
+        "hf_repo": target_repo,
+        "eval_report": eval_report,
+    }
 
 
 def main() -> None:
@@ -399,8 +511,50 @@ def main() -> None:
     parser.add_argument(
         "--resume",
         action="store_true",
-        default=False,
-        help="Skip previously completed runs",
+        default=True,
+        help="Skip previously completed runs (default: True)",
+    )
+    parser.add_argument(
+        "--skip-completed",
+        action="store_true",
+        default=True,
+        help="Skip runs already completed on Hugging Face Hub or locally (default: True)",
+    )
+    parser.add_argument(
+        "--force-rerun",
+        dest="skip_completed",
+        action="store_false",
+        help="Force re-running all cells even if already present on Hugging Face Hub",
+    )
+    parser.add_argument(
+        "--restart-grpo",
+        action="store_true",
+        default=True,
+        help="Always restart GRPO training to ensure clean run with vLLM fixes (default: True)",
+    )
+    parser.add_argument(
+        "--no-restart-grpo",
+        dest="restart_grpo",
+        action="store_false",
+        help="Allow skipping GRPO if already completed on Hugging Face Hub",
+    )
+    parser.add_argument(
+        "--use-vllm",
+        action="store_true",
+        default=True,
+        help="Enable vLLM rollout acceleration for GRPO (default: True)",
+    )
+    parser.add_argument(
+        "--no-use-vllm",
+        dest="use_vllm",
+        action="store_false",
+        help="Disable vLLM rollout acceleration",
+    )
+    parser.add_argument(
+        "--vllm-gpu-memory-utilization",
+        type=float,
+        default=0.3,
+        help="vLLM GPU memory utilization fraction (default: 0.3)",
     )
     parser.add_argument(
         "--dry-run",
@@ -507,6 +661,35 @@ def main() -> None:
                 steps=args.max_steps,
             )
 
+            # Check if this cell is already completed and should be skipped
+            is_done, reason = check_cell_completed(
+                api=api if not args.dry_run else None,
+                target_repo=target_repo,
+                run_dir=run_dir,
+                algo=algo,
+                restart_grpo=args.restart_grpo,
+                skip_completed=args.skip_completed or args.resume,
+            )
+
+            if is_done:
+                logger.info(
+                    "\n[%d/%d] SKIPPING (ALREADY COMPLETED): %s (%s) with %s -> TARGET: %s\n  Reason: %s",
+                    current_idx,
+                    total_cells,
+                    model_entry["id"],
+                    model_entry["slug"],
+                    algo.upper(),
+                    target_repo,
+                    reason,
+                )
+                cached_res = load_cached_metrics(run_dir, model_entry, algo, args.scope, target_repo)
+                all_results.append(cached_res)
+                continue
+
+            # For GRPO restart: clean up stale partial run artifacts
+            if algo == "grpo":
+                cleanup_stale_run_dir(run_dir)
+
             logger.info(
                 "\n[%d/%d] RUNNING: %s (%s) with %s -> TARGET: %s",
                 current_idx,
@@ -531,6 +714,7 @@ def main() -> None:
                 quantization=quantization,
                 max_eval_rows=args.max_eval_rows,
                 kveritas_disclosure="open",
+                use_vllm=args.use_vllm if algo == "grpo" else False,
             )
 
             # Explicitly enforce max_steps and batch size across all algorithm sections
@@ -542,25 +726,93 @@ def main() -> None:
                 cfg_data[sec]["per_device_train_batch_size"] = rec_batch
                 cfg_data[sec]["output_dir"] = models_dir
 
-            # Execute Cell
-            result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)
+            # Specialized GRPO optimizations:
+            if algo == "grpo":
+                params_str = str(model_entry.get("params", "")).upper()
+                is_large = ("4B" in params_str) or ("7B" in params_str) or ("8B" in params_str)
+                if not is_large:
+                    # Unquantize small models to eliminate 650s/step dequant lag and allow vLLM
+                    cfg_data["model"]["load_in_4bit"] = False
+                    cfg_data["model"]["load_in_8bit"] = False
+                    logger.info(
+                        "GRPO: Disabled 4-bit quantization on %s (%s) for fast native BF16 rollouts.",
+                        model_entry["slug"],
+                        model_entry.get("params", "small"),
+                    )
+
+                cfg_data["trainer"]["bf16"] = True
+                cfg_data["trainer"]["use_vllm"] = bool(args.use_vllm)
+                cfg_data["trainer"]["vllm_gpu_memory_utilization"] = args.vllm_gpu_memory_utilization
+                cfg_data["trainer"]["vllm_mode"] = "colocate"
+                cfg_data["trainer"]["max_prompt_length"] = 512
+                cfg_data["trainer"]["max_completion_length"] = 512
+                cfg_data["trainer"]["gradient_accumulation_steps"] = min(
+                    cfg_data["trainer"].get("gradient_accumulation_steps", 2), 2
+                )
+                cfg_data["trainer"]["per_device_train_batch_size"] = min(rec_batch, 2)
+
+            # Execute Cell with fault tolerance so subsequent runs continue uninterrupted
+            try:
+                result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)
+            except Exception as cell_err:
+                logger.error(
+                    "Cell execution failed for %s [%s]: %s",
+                    model_entry["slug"],
+                    algo,
+                    cell_err,
+                    exc_info=True,
+                )
+                result = {
+                    "model": model_entry["id"],
+                    "scope": args.scope,
+                    "method": algo.upper(),
+                    "mer": None,
+                    "mcs": None,
+                    "uwec": None,
+                    "phi": None,
+                    "seed": 42,
+                    "config": str(run_dir / "config.yaml"),
+                    "status": f"FAILED: {cell_err}",
+                }
+
             result["hf_repo"] = target_repo
             all_results.append(result)
 
-            # Direct Push to Hugging Face immediately after run finishes
+            # Direct Push to Hugging Face immediately after run finishes (with retries)
             if not args.dry_run and result.get("status") in ("COMPLETED", "CACHED"):
-                direct_push_cell(
-                    api=api,
-                    repo_id=target_repo,
-                    run_dir=run_dir,
-                    model_entry=model_entry,
-                    algo=algo,
-                    scope=args.scope,
-                    steps=args.max_steps,
-                    metrics=result,
-                    private=is_private,
-                    include_weights=args.include_weights,
-                )
+                pushed = False
+                for attempt in range(1, 4):
+                    try:
+                        pushed = direct_push_cell(
+                            api=api,
+                            repo_id=target_repo,
+                            run_dir=run_dir,
+                            model_entry=model_entry,
+                            algo=algo,
+                            scope=args.scope,
+                            steps=args.max_steps,
+                            metrics=result,
+                            private=is_private,
+                            include_weights=args.include_weights,
+                        )
+                        if pushed:
+                            break
+                    except Exception as push_err:
+                        logger.warning("Push attempt %d for %s failed: %s", attempt, target_repo, push_err)
+                        time.sleep(2 * attempt)
+                if not pushed:
+                    logger.error("Failed to push %s after 3 attempts.", target_repo)
+
+            # GPU Cache Clearing & Garbage Collection
+            import gc
+            gc.collect()
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.ipc_collect()
+            except Exception:
+                pass
 
     # 4. Save Global Reporting Frames
     save_reporting_frames(all_results, args.output_dir)
