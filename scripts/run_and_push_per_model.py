@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Run N Models x N Algorithms (50 steps, max_eval=10) & Direct Push Training Data to Private Org Repos.
+"""Run N Models x N Algorithms (50 steps, max_eval=10) & Direct Push Model Weights, Tokenizers, and Training Data to Private Org Repos.
 
 Direct push target pattern:
     mlsftwrs/sebeni-smollm2-135-sft-number_steps
     (e.g., mlsftwrs/sebeni-smollm2-135-sft-50)
 
-Pushes training data, logs, configs, evaluation reports, and K-Veritas provenance seals.
-Weights (*.safetensors, *.bin, models/) are explicitly excluded.
+Pushes trained model weights (*.safetensors, adapter configs), tokenizers, training datasets,
+telemetry logs, configs, evaluation reports, and K-Veritas provenance seals.
+Ready for direct downstream inference with transformers / peft.
 """
 
 from __future__ import annotations
@@ -106,9 +107,7 @@ license: apache-2.0
 
 # Sebeni Training Run: {model_id} ({algo.upper()})
 
-This repository contains the **training data, execution logs, evaluation reports, configuration, and K-Veritas provenance seals** for **{model_id}** post-trained with **{algo.upper()}** under the **{scope}** multilingual low-resource scope.
-
-*(Note: Model weights and checkpoints are excluded to preserve raw training telemetry, configs, and provenance).*
+This repository contains the **trained model weights, tokenizer, training data, execution logs, evaluation reports, configuration, and K-Veritas provenance seals** for **{model_id}** post-trained with **{algo.upper()}** under the **{scope}** multilingual low-resource scope.
 
 ## Run Details
 - **Base Model**: `{model_id}` ({model_entry.get('params', 'N/A')})
@@ -124,14 +123,58 @@ This repository contains the **training data, execution logs, evaluation reports
 - **MCS (Morpheme Cosine Similarity)**: `{mcs_str}`
 - **UWEC (Unweighted Edit Cost)**: `{uwec_str}`
 
+## Inference & Usage
+
+You can load this post-trained model and tokenizer directly using Hugging Face `transformers` and `peft`:
+
+```python
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
+
+base_model_id = "{model_id}"
+repo_id = "{repo_id}"
+
+# 1. Load Tokenizer
+tokenizer = AutoTokenizer.from_pretrained(repo_id)
+
+# 2. Load Model (LoRA Adapter or Full Pretrained)
+try:
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_id,
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
+    )
+    model = PeftModel.from_pretrained(base_model, repo_id)
+    print(f"Loaded PEFT adapter from {repo_id}")
+except Exception:
+    model = AutoModelForCausalLM.from_pretrained(
+        repo_id,
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
+    )
+    print(f"Loaded model from {repo_id}")
+
+# 3. Generate morphological segmentation / SRL completion
+prompt = "Linguistic input sentence here..."
+inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+with torch.no_grad():
+    outputs = model.generate(**inputs, max_new_tokens=128)
+print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+```
+
 ## Repository Directory Structure
 ```
-├── data/               # Processed distillation dataset, grammar, dictionary, splits
-├── exp/                # Evaluation reports and benchmark JSON outputs
-├── runtime/            # Trackio / TensorBoard step loss curves and reward telemetry
-├── config.yaml         # Complete experiment hyperparameter configuration
-├── kveritas_report.pdf # Cryptographic K-Veritas verification seal and provenance
-└── README.md           # This metadata card
+├── adapter_model.safetensors # LoRA trained adapter weights (or model.safetensors)
+├── adapter_config.json       # PEFT adapter hyperparameter configuration
+├── tokenizer.json            # Model tokenizer vocabulary and merges
+├── tokenizer_config.json     # Tokenizer settings and special tokens map
+├── data/                     # Processed distillation dataset, grammar, dictionary, splits
+├── exp/                      # Evaluation reports and benchmark JSON outputs
+├── runtime/                  # Trackio / TensorBoard step loss curves and reward telemetry
+├── config.yaml               # Complete experiment hyperparameter configuration
+├── kveritas_report.pdf       # Cryptographic K-Veritas verification seal and provenance
+└── README.md                 # This metadata card
 ```
 """
 
@@ -146,9 +189,9 @@ def direct_push_cell(
     steps: int,
     metrics: Dict[str, Any],
     private: bool = True,
-    include_weights: bool = False,
+    include_weights: bool = True,
 ) -> bool:
-    """Direct push of training data, logs, configs, and card to a dedicated HF repo."""
+    """Direct push of trained model weights, tokenizer, logs, configs, and card to a dedicated HF repo."""
     if not run_dir.exists():
         logger.warning("Run directory %s not found. Skipping push.", run_dir)
         return False
@@ -166,7 +209,18 @@ def direct_push_cell(
             exist_ok=True,
         )
 
-        # 2. Generate and write README.md
+        # 2. Surface final model weights, configs, and tokenizer to repo root
+        # so standard AutoModelForCausalLM / AutoTokenizer / PeftModel can load directly from HF
+        if include_weights:
+            models_dir = run_dir / "models"
+            if models_dir.exists():
+                for item in models_dir.iterdir():
+                    if item.is_file() and item.name not in ("README.md",):
+                        dest = run_dir / item.name
+                        if not dest.exists():
+                            shutil.copy2(item, dest)
+
+        # 3. Generate and write README.md
         card_content = generate_cell_model_card(
             repo_id=repo_id,
             model_entry=model_entry,
@@ -178,13 +232,18 @@ def direct_push_cell(
         readme_path = run_dir / "README.md"
         readme_path.write_text(card_content, encoding="utf-8")
 
-        # 3. Exclude heavy model weights and checkpoints (only upload training data, configs, logs)
+        # 4. Exclude temporary cache files and intermediate checkpoints
+        # (Preserve final weights, tokenizers, configs, data, and provenance)
         ignore_patterns = [
             "*.pyc",
             "__pycache__/*",
+            "*/__pycache__/*",
             ".venv/*",
             "tmp/*",
             "*.tmp",
+            "checkpoint-*",
+            "checkpoint-*/*",
+            "*/checkpoint-*/*",
         ]
         if not include_weights:
             ignore_patterns.extend([
@@ -195,8 +254,6 @@ def direct_push_cell(
                 "*.ckpt",
                 "*.h5",
                 "*.onnx",
-                "checkpoint-*",
-                "checkpoint-*/*",
                 "models/*",
                 "models",
             ])
@@ -206,9 +263,9 @@ def direct_push_cell(
             repo_id=repo_id,
             repo_type="model",
             ignore_patterns=ignore_patterns,
-            commit_message=f"Sebeni training data & telemetry: {model_entry['slug']} {algo.upper()} ({steps} steps)",
+            commit_message=f"Sebeni trained model, tokenizer & training bundle: {model_entry['slug']} {algo.upper()} ({steps} steps)",
         )
-        logger.info("Successfully pushed training data to https://huggingface.co/%s", repo_id)
+        logger.info("Successfully pushed model weights, tokenizer, and bundle to https://huggingface.co/%s", repo_id)
         return True
     except Exception as exc:
         logger.error("Direct push to %s failed: %s", repo_id, exc)
@@ -246,10 +303,17 @@ def main() -> None:
     )
     parser.add_argument(
         "--include-weights",
+        dest="include_weights",
         action="store_true",
-        default=False,
-        help="Include model weights (*.safetensors, models/) in upload (default: False, training data only)",
+        help="Include trained model weights and tokenizers in upload (default: True)",
     )
+    parser.add_argument(
+        "--no-weights",
+        dest="include_weights",
+        action="store_false",
+        help="Exclude model weights and tokenizers from upload (upload training data only)",
+    )
+    parser.set_defaults(include_weights=True)
 
     # Matrix execution parameters
     parser.add_argument(

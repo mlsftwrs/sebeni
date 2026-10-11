@@ -69,6 +69,19 @@ class Distiller(object):
         self.max_input_chars = int(max_input_chars)
         self.location = location
         self.project_id = project_id
+        packaged = cfg.resolve_packaged_baseline_dir(self.lang)
+        self.lang_baseline = Path(packaged) if packaged else None
+        self.sample_dir = REF_SAMPLES_DIR
+        root = Path(working_dir) if working_dir else cfg.get_workdir().root
+        self.working_root = Path(root)
+        self.baselines_dir = self.working_root / "data" / "baselines" / self.lang
+        latest = self.__get_latest_ckpt()
+        self.gram_path = latest["gram"] or (self.baselines_dir / "baseline.gram")
+        self.dict_path = latest["dict"] or (self.baselines_dir / "baseline.dict")
+        self.gram_delta = None
+        self.dict_delta = None
+        self.bootstrapped = False
+
         self.provider = None
         if self.provider_name != "algorithmic":
             key = api_key or cfg.provider_api_key(self.provider_name)
@@ -91,22 +104,19 @@ class Distiller(object):
                             "the Gemini Developer API key will not be used. "
                             "Set distillation.vertex: false to use AI Studio."
                         )
+                try:
+                    from beni.core.morphotactic.distil import DistilSysPrompt
+                    extra["cache_contents"] = DistilSysPrompt.get_cache_contents(
+                        language_meta=self.language_meta,
+                        gram_path=self.gram_path,
+                        dict_path=self.dict_path,
+                    )
+                except Exception as exc:
+                    logger.debug("Failed to pre-assemble cache contents: %s", exc)
+
             self.provider = create_provider(
                 self.provider_name, api_key=key, model=model, **extra
             )
-
-        packaged = cfg.resolve_packaged_baseline_dir(self.lang)
-        self.lang_baseline = Path(packaged) if packaged else None
-        self.sample_dir = REF_SAMPLES_DIR
-        root = Path(working_dir) if working_dir else cfg.get_workdir().root
-        self.working_root = Path(root)
-        self.baselines_dir = self.working_root / "data" / "baselines" / self.lang
-        latest = self.__get_latest_ckpt()
-        self.gram_path = latest["gram"] or (self.baselines_dir / "baseline.gram")
-        self.dict_path = latest["dict"] or (self.baselines_dir / "baseline.dict")
-        self.gram_delta = None
-        self.dict_delta = None
-        self.bootstrapped = False
 
     def handle_baselines(self):
         """Copy packaged baselines or write scratch stubs under the workdir."""

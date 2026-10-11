@@ -29,6 +29,16 @@ class GoogleProvider(base.BaseProvider):
         self.cache_name = f"{self.language}_{cfg.CACHE_NAME}"
         self.ttl = TTL
         self._client = self.initialize()
+
+        if cache_contents is None:
+            try:
+                from beni.core.morphotactic.distil import DistilSysPrompt
+                lang_meta = cfg.get_language_metadata(self.language) if self.language else None
+                cache_contents = DistilSysPrompt.get_cache_contents(language_meta=lang_meta)
+            except Exception as e:
+                logger.debug("Could not auto-generate cache contents: %s", e)
+                cache_contents = None
+
         self.cache = self.__get_cache(contents=cache_contents)
         self._cache_created_at = 0
 
@@ -86,8 +96,16 @@ class GoogleProvider(base.BaseProvider):
     def __get_cache(self, cache_name: str=None, model=None, contents=None):
         """ Get live cache if exists else lazy load contexts to context cache """
 
+        if contents is None:
+            try:
+                from beni.core.morphotactic.distil import DistilSysPrompt
+                lang_meta = cfg.get_language_metadata(self.language) if self.language else None
+                contents = DistilSysPrompt.get_cache_contents(language_meta=lang_meta)
+            except Exception as e:
+                logger.debug("Failed to auto-assemble cache contents in __get_cache: %s", e)
+
         if contents is None: 
-            print(f"Cache contents not provided for {self.cache_name}, skipping cache creation")
+            logger.info("Cache contents not provided for %s, skipping cache creation", self.cache_name)
             return None
 
         # Google Gemini explicit caching requires a minimum token threshold of 1024 tokens (~3500-4000 characters).
