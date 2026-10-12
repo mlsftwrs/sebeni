@@ -4,10 +4,12 @@
 This script:
 1. Pre-validates Hugging Face credentials and permissions (fails early if invalid).
 2. Creates or verifies a private Hugging Face model repository.
-3. Executes the full 4-algorithm matrix (SFT, GRPO, DPO, APO) on the specified model.
-4. Generates canonical Section 10 reporting frames and K-Veritas cryptographic provenance seals.
-5. Uploads model weights, tokenizers, training configs, trackio logs, and benchmark tables
-   to the private Hugging Face repository organized by algorithm subdirectories.
+3. Executes a full rerun of the alignment matrix (SFT, GRPO, DPO, APO) on the specified model.
+   Completed local cells and existing Hub artifacts are retrained and overwritten.
+4. Skips Gemini distillation (Vertex AI off). Training uses the packaged dataset.
+5. Generates canonical Section 10 reporting frames and K-Veritas cryptographic provenance seals.
+6. Uploads model weights, tokenizers, training configs, trackio logs, and benchmark tables
+   to the private Hugging Face repository, replacing any existing algorithm subdirectory.
 """
 
 from __future__ import annotations
@@ -87,7 +89,7 @@ def generate_repo_readme(
         f"- **Scope**: `{scope}` (13 low-resource Sahelian/West-African language groups)",
         f"- **Training Budget**: `{max_steps}` steps per arm",
         f"- **Hardware Target**: NVIDIA L4 GPU (24GB VRAM)",
-        f"- **Distillation Teacher**: Gemini 3.7 Flash via Google Cloud Vertex AI",
+        f"- **Distillation**: skipped (Vertex AI disabled; packaged dataset only)",
         "",
         "## Canonical Benchmark Results (Section 10 Reporting Frame)",
         "",
@@ -143,13 +145,15 @@ def upload_algorithm_artifacts(
     repo_id: str,
     algo: str,
     run_dir: Path,
+    *,
+    private: bool = True,
 ) -> None:
     """Upload model weights, configs, tokenizer, and logs for a single algorithm."""
     if not run_dir.exists():
         logger.warning("Run directory %s does not exist, skipping upload.", run_dir)
         return
 
-    logger.info("Uploading %s artifacts to %s/%s/ ...", algo.upper(), repo_id, algo)
+    logger.info("Overwriting %s artifacts at %s/%s/ ...", algo.upper(), repo_id, algo)
 
     # Exclude temporary cache folders and virtualenvs
     ignore_patterns = [
@@ -161,13 +165,23 @@ def upload_algorithm_artifacts(
     ]
 
     try:
+        # Recreate if a previous upload 404'd because the repo was missing.
+        api.create_repo(
+            repo_id=repo_id,
+            repo_type="model",
+            private=private,
+            exist_ok=True,
+        )
         api.upload_folder(
             folder_path=str(run_dir),
             path_in_repo=algo,
             repo_id=repo_id,
             repo_type="model",
             ignore_patterns=ignore_patterns,
-            commit_message=f"Add {algo.upper()} model weights, tokenizer, configs, and training logs",
+            # Patterns are relative to path_in_repo. "**" drops stale files in this
+            # algorithm folder; files uploaded in the same commit are kept.
+            delete_patterns="**",
+            commit_message=f"Overwrite {algo.upper()} model weights, tokenizer, configs, and training logs",
         )
         logger.info("Successfully uploaded %s to %s/%s/", algo.upper(), repo_id, algo)
     except Exception as exc:
@@ -267,9 +281,21 @@ def main() -> None:
     )
     parser.add_argument(
         "--vertex",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Use Vertex AI for Google GenAI distillation (default: False)",
+    )
+    parser.add_argument(
+        "--skip-distillation",
         action="store_true",
         default=True,
-        help="Use Vertex AI for Google GenAI distillation (default: True)",
+        help="Skip Gemini distillation and train on the packaged dataset (default: True)",
+    )
+    parser.add_argument(
+        "--distill",
+        dest="skip_distillation",
+        action="store_false",
+        help="Run Gemini distillation before training",
     )
     parser.add_argument(
         "--backend",
@@ -286,20 +312,26 @@ def main() -> None:
     parser.add_argument(
         "--resume",
         action="store_true",
-        default=True,
-        help="Resume previously completed cells without re-running (default: True)",
+        default=False,
+        help="Resume previously completed cells without re-running (default: full rerun)",
     )
     parser.add_argument(
         "--skip-completed",
         action="store_true",
-        default=True,
-        help="Skip runs already completed on Hugging Face Hub or locally (default: True)",
+        default=False,
+        help="Skip runs already completed on Hugging Face Hub or locally (default: full rerun)",
     )
     parser.add_argument(
         "--force-rerun",
-        dest="skip_completed",
+        action="store_true",
+        default=True,
+        help="Re-run every cell and overwrite existing Hub artifacts (default: True)",
+    )
+    parser.add_argument(
+        "--no-force-rerun",
+        dest="force_rerun",
         action="store_false",
-        help="Force re-running all cells even if already completed",
+        help="Allow --resume / --skip-completed to keep existing cells",
     )
     parser.add_argument(
         "--restart-grpo",
@@ -402,6 +434,12 @@ def main() -> None:
     logger.info("Algorithms (%d): %s", len(selected_algorithms), selected_algorithms)
     logger.info("Budget: %d steps per arm", args.max_steps)
     logger.info("Quantization: %s", quantization or "none (bf16/fp16)")
+    logger.info(
+        "Distillation: %s | Vertex: %s",
+        "skipped" if args.skip_distillation else args.distil_model,
+        args.vertex,
+    )
+    logger.info("Full rerun (overwrite Hub): %s", args.force_rerun)
     logger.info("Target HF Repo: %s (private=%s)", args.hf_repo, not args.public)
     logger.info("=" * 70)
 
@@ -424,7 +462,11 @@ def main() -> None:
             # Check if this cell should be skipped
             is_completed = False
             skip_reason = ""
-            if (args.skip_completed or args.resume) and not (algo == "grpo" and args.restart_grpo):
+            if (
+                not args.force_rerun
+                and (args.skip_completed or args.resume)
+                and not (algo == "grpo" and args.restart_grpo)
+            ):
                 # Check remote HF subfolder
                 algo_prefix = f"{algo}/"
                 has_remote = any(f.startswith(algo_prefix) for f in remote_files)
@@ -468,10 +510,12 @@ def main() -> None:
                 })
                 continue
 
-            if algo == "grpo" and run_dir.exists():
-                # Clean stale partial files from aborted run
-                for sub in ("models", "runs", "tmp"):
+            if args.force_rerun and run_dir.exists():
+                # Drop stale weights so the arm trains from scratch and the Hub copy is a full replace.
+                for sub in ("models", "runs", "tmp", "exp"):
                     shutil.rmtree(run_dir / sub, ignore_errors=True)
+                for name in ("eval_results.json", "config.yaml"):
+                    (run_dir / name).unlink(missing_ok=True)
                 for p in run_dir.glob("checkpoint-*"):
                     if p.is_dir():
                         shutil.rmtree(p, ignore_errors=True)
@@ -494,6 +538,9 @@ def main() -> None:
                 kveritas_disclosure=args.kveritas_disclosure,
                 use_vllm=args.use_vllm if algo == "grpo" else False,
             )
+            cfg_data.setdefault("distillation", {})
+            cfg_data["distillation"]["enabled"] = not args.skip_distillation
+            cfg_data["distillation"]["vertex"] = bool(args.vertex) and not args.skip_distillation
 
             calc_eval_steps = args.eval_steps if args.eval_steps is not None else max(1, args.max_steps // 10)
             rec_batch = model_entry.get("recommended_batch_size", 2)
@@ -547,7 +594,13 @@ def main() -> None:
             if not args.dry_run and result.get("status") in ("COMPLETED", "CACHED"):
                 for attempt in range(1, 4):
                     try:
-                        upload_algorithm_artifacts(api, args.hf_repo, algo, run_dir)
+                        upload_algorithm_artifacts(
+                            api,
+                            args.hf_repo,
+                            algo,
+                            run_dir,
+                            private=not args.public,
+                        )
                         break
                     except Exception as upload_exc:
                         logger.warning("Upload attempt %d for %s failed: %s", attempt, algo, upload_exc)
