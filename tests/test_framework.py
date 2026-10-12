@@ -241,6 +241,12 @@ class TestEvalCosts:
         _, known = uwec([1], [0.5], [0.5], beta=0.1, eps=1e-8)
         assert float(unknown) == pytest.approx(0.0)
         assert float(known) == pytest.approx(1.0)
+        import math
+        from beni.core.pipeline import _finite_uwec
+
+        value, n = _finite_uwec([1, 2], [-2.0, -3.0], [-2.2, -2.5], beta=0.1, eps=1e-8)
+        assert n == 2
+        assert math.isfinite(value)
 
     def test_mer_pools_by_morpheme_count(self):
         from beni.core.compute.helpers import mer_edit_counts, mer_micro
@@ -252,16 +258,23 @@ class TestEvalCosts:
         assert pooled == pytest.approx(0.25)
         assert mean_of_rates == pytest.approx(0.5)
 
-    def test_reported_mcs_is_mismatch_reward_mcs_is_match(self):
+    def test_reported_mcs_matches_consistency_score(self):
         from beni.core.compute.helpers import mcs_mismatch
 
         scorer = MorphologyScorer()
         pred = Sentence(text="x", tokens=[Token(surface="a", stage=1), Token(surface="b", stage=-1)])
         ref = Sentence(text="x", tokens=[Token(surface="a", stage=1), Token(surface="b", stage=1)])
+        from beni.core.compute.helpers import mcs_match_counts
+
         assert scorer.mcs(pred, ref) == pytest.approx(0.5)
+        hits, n = mcs_match_counts([1, -1], [1, 1])
+        assert float(hits) / float(n) == pytest.approx(scorer.mcs(pred, ref))
         assert float(mcs_mismatch([1, -1], [1, 1])) == pytest.approx(0.5)
         extra = float(mcs_mismatch([1], [1, 2]))
         assert extra == pytest.approx(0.5)
+        miss_hits, miss_n = mcs_match_counts([1], [2])
+        assert float(miss_hits) / float(miss_n) == pytest.approx(0.0)
+        assert float(mcs_mismatch([1], [2])) == pytest.approx(1.0)
 
     def test_numpy_and_jax_match_when_jax_is_installed(self):
         numpy = pytest.importorskip("numpy")

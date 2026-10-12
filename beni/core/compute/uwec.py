@@ -53,6 +53,25 @@ def _align_probs(xp: Any, probs, n: int) -> Any:
     return mean * xp.ones((n,), dtype=float)
 
 
+def _as_probabilities(xp: Any, probs, n: int, *, log_input: bool = False) -> Any:
+    """Align token scores to ``n`` morphological tokens and return probabilities.
+
+    Negative values are log-probabilities. Non-finite scores fall back to 1
+    so the log-ratio term stays defined and UWEC remains a finite token mean.
+    """
+    arr = _align_probs(xp, probs, n)
+    if n <= 0:
+        return arr
+    host = np.asarray(arr)
+    if not np.all(np.isfinite(host)):
+        host = np.where(np.isfinite(host), host, 1.0)
+        arr = xp.asarray(host, dtype=float)
+    # Log-probabilities are <= 0. Exponentiate those; leave real probabilities alone.
+    if host.size and (log_input or (float(np.min(host)) < 0.0 and float(np.max(host)) <= 0.0)):
+        arr = xp.exp(arr)
+    return xp.clip(arr, 0.0, 1.0)
+
+
 def uwec(
     stages,
     pi_theta,
@@ -81,11 +100,8 @@ def uwec(
     if n == 0:
         empty = xp.asarray([], dtype=float)
         return empty, xp.asarray(0.0, dtype=float)
-    theta = _align_probs(xp, pi_theta, n)
-    ref = _align_probs(xp, pi_ref, n)
-    if log_input:
-        theta = xp.exp(theta)
-        ref = xp.exp(ref)
+    theta = _as_probabilities(xp, pi_theta, n, log_input=log_input)
+    ref = _as_probabilities(xp, pi_ref, n, log_input=log_input)
     indicator = xp.where(stage_arr != -1.0, 1.0, 0.0)
     log_ratio = xp.log((theta + eps) / (ref + eps))
     per_token = indicator + float(beta) * xp.abs(log_ratio)

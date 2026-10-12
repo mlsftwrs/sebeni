@@ -314,6 +314,36 @@ def run_arm(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None):
     return trainer
 
 
+def _finite_uwec(stages, pi_theta, pi_ref, *, beta: float, eps: float):
+    """Token-mean Uncertainty Weighted Error Cost and the token count.
+
+    Non-finite probability ratios are retried with uniform probabilities so a
+    scored sentence still contributes the stage-indicator cost.
+    """
+    import math
+
+    import numpy as np
+
+    from beni.core.compute.uwec import uwec
+
+    def _mean(theta, ref):
+        per_token, mean = uwec(stages, theta, ref, beta=beta, eps=eps, xp=np)
+        n = int(getattr(per_token, "size", len(per_token)))
+        if n <= 0:
+            return 0.0, 0
+        value = float(np.asarray(mean).reshape(-1)[0])
+        if not math.isfinite(value):
+            return float("nan"), n
+        return value, n
+
+    value, n = _mean(pi_theta, pi_ref)
+    if n and not math.isfinite(value):
+        value, n = _mean(None, None)
+    if not n or not math.isfinite(value):
+        return 0.0, 0
+    return value, n
+
+
 def run_eval(
     mc: MasterConfig,
     records: Optional[List[Dict[str, Any]]] = None,
@@ -321,9 +351,9 @@ def run_eval(
     policy: Any = None,
 ) -> Dict[str, Any]:
     """Score held-out test text. MER, MCS, and UWEC pool by morpheme or token count."""
-    from beni.core.compute.helpers import mer_edit_counts, mcs_mismatch_counts
+    from beni.core.compute.helpers import mer_edit_counts, mcs_match_counts
     from beni.core.compute.metrics import MorphologyScorer
-    from beni.core.compute.uwec import array_module, uwec
+    from beni.core.compute.uwec import array_module
     from beni.core.morphotactic.dabax import get_dabax
     from beni.core.safety.governor import SafetyGovernor
 
@@ -354,7 +384,7 @@ def run_eval(
     cap = max(int(mc.experiment.max_eval_rows or 0), 0)
     scope_mer_ops = 0
     scope_mer_n = 0
-    scope_mcs_mis = 0.0
+    scope_mcs_hit = 0.0
     scope_mcs_n = 0.0
     scope_uwec_sum = 0.0
     scope_uwec_n = 0
@@ -368,9 +398,6 @@ def run_eval(
 
     def _morphemes(sentence):
         return [form for token in sentence.tokens for form in token.best_morphemes()]
-
-    def _stages(sentence):
-        return [token.stage for token in sentence.tokens]
 
     for group, texts in grouped.items():
         from beni.core.morphotactic.dabax import resolve_baseline_files
@@ -398,7 +425,7 @@ def run_eval(
         all_hyp_sentences = []
         mer_ops = 0
         mer_n = 0
-        mcs_mis = 0.0
+        mcs_hit = 0.0
         mcs_n = 0.0
         uwec_sum = 0.0
         uwec_n = 0
@@ -448,11 +475,15 @@ def run_eval(
                     continue
                 all_hyp_sentences.extend(hyp_sentences)
                 ref_sent, hyp_sent = ref_sentences[0], hyp_sentences[0]
+                hyp_tokens = list(getattr(hyp_sent, "tokens", None) or [])
+                ref_tokens = list(getattr(ref_sent, "tokens", None) or [])
+                hyp_stages = [token.stage for token in hyp_tokens]
+                ref_stages = [token.stage for token in ref_tokens]
                 ops, n_ref = mer_edit_counts(_morphemes(ref_sent), _morphemes(hyp_sent), xp=xp)
                 mer_ops += int(ops)
                 mer_n += int(n_ref)
-                mis, n_tok = mcs_mismatch_counts(_stages(hyp_sent), _stages(ref_sent), xp=xp)
-                mcs_mis += float(mis)
+                hits, n_tok = mcs_match_counts(hyp_stages, ref_stages, xp=xp)
+                mcs_hit += float(hits)
                 mcs_n += float(n_tok)
                 pi_theta = pi_ref = None
                 if policy is not None and hasattr(policy, "token_probabilities"):
@@ -460,18 +491,16 @@ def run_eval(
                         pi_theta, pi_ref = policy.token_probabilities(completion)
                     except Exception:
                         pi_theta, pi_ref = None, None
-                hyp_stages = _stages(hyp_sent)
-                _, mean = uwec(
+                mean, n_u = _finite_uwec(
                     hyp_stages,
                     pi_theta,
                     pi_ref,
                     beta=scorer.beta,
                     eps=scorer.eps,
-                    xp=xp,
                 )
-                n_u = len(hyp_stages)
-                uwec_sum += float(mean) * n_u
-                uwec_n += n_u
+                if n_u:
+                    uwec_sum += mean * n_u
+                    uwec_n += n_u
                 n_scored += 1
 
         if all_hyp_sentences:
@@ -480,11 +509,11 @@ def run_eval(
             phi = ref_phi
 
         mer = (mer_ops / mer_n) if mer_n else None
-        mcs = (mcs_mis / mcs_n) if mcs_n else None
+        mcs = (mcs_hit / mcs_n) if mcs_n else None
         uwec_val = (uwec_sum / uwec_n) if uwec_n else None
         scope_mer_ops += mer_ops
         scope_mer_n += mer_n
-        scope_mcs_mis += mcs_mis
+        scope_mcs_hit += mcs_hit
         scope_mcs_n += mcs_n
         scope_uwec_sum += uwec_sum
         scope_uwec_n += uwec_n
@@ -510,7 +539,7 @@ def run_eval(
         "by_language": by_language,
         "phi": _macro(by_language, "phi"),
         "mer": (scope_mer_ops / scope_mer_n) if scope_mer_n else None,
-        "mcs": (scope_mcs_mis / scope_mcs_n) if scope_mcs_n else None,
+        "mcs": (scope_mcs_hit / scope_mcs_n) if scope_mcs_n else None,
         "uwec": (scope_uwec_sum / scope_uwec_n) if scope_uwec_n else None,
         "n_morphemes": scope_mer_n,
         "n_tokens": int(scope_mcs_n) if scope_mcs_n else scope_uwec_n,

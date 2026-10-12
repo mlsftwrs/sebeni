@@ -8,7 +8,7 @@ Includes MER, MCS, Uncertainty, and Phi scores.
 
 Metrics:
     - MER  : micro morpheme edit rate (S_m + D_m + I_m) / N_m
-    - MCS  : match fraction in rewards; mismatch cost in held-out reports
+    - MCS  : morphosyntactic consistency score, the stage-match fraction
     - UWEC : I(stage != -1) + beta * |log((pi_theta + eps) / (pi_ref + eps))|
     - Phi  : corpus-level morphological integrity score
 """
@@ -109,7 +109,7 @@ class MorphologyScorer:
 
     def mcs(self, predicted: Union[Sentence, List[Token]], reference: Union[Sentence, List[Token]]) -> float:
         """
-        Compute Morphosyntatic Consistency Score
+        Compute Morphosyntactic Consistency Score
         MCS = (1/|T|) * Σ I(Stage_pred(w) == Stage_ref(w))
         """
         pred_tokens = predicted.tokens if isinstance(predicted, Sentence) else predicted

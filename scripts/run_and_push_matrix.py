@@ -93,7 +93,7 @@ def generate_repo_readme(
         "",
         "## Canonical Benchmark Results (Section 10 Reporting Frame)",
         "",
-        "| Algorithm | Scope | MER (Morpheme Error) | MCS (Cosine Sim) | UWEC | Phi (Constraint) | Status |",
+        "| Algorithm | Scope | MER (Morpheme Error) | MCS (Morphosyntactic Consistency) | UWEC (Uncertainty Weighted Error Cost) | Phi (Integrity Score) | Status |",
         "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
     ]
 

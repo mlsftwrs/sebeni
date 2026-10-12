@@ -151,10 +151,10 @@ This repository contains the **trained model weights, tokenizer, training data, 
 - **Distillation**: skipped (Vertex AI disabled; packaged dataset only)
 
 ## Evaluation Metrics (Held-out `test.json`)
-- **Phi (Constraint Satisfaction)**: `{phi_str}`
+- **Phi (Integrity Score)**: `{phi_str}`
 - **MER (Morpheme Error Rate)**: `{mer_str}`
-- **MCS (Morpheme Cosine Similarity)**: `{mcs_str}`
-- **UWEC (Unweighted Edit Cost)**: `{uwec_str}`
+- **MCS (Morphosyntactic Consistency Score)**: `{mcs_str}`
+- **UWEC (Uncertainty Weighted Error Cost)**: `{uwec_str}`
 {lang_table}
 ## Inference & Usage
 

@@ -61,6 +61,15 @@ def mcs_mismatch(pred_stages, ref_stages, xp: Optional[Any] = None) -> Any:
 
 def mcs_mismatch_counts(pred_stages, ref_stages, xp: Optional[Any] = None) -> Tuple[Any, Any]:
     """Return ``(mismatches, n_tokens)`` using max(pred, ref) length."""
+    matches, n = mcs_match_counts(pred_stages, ref_stages, xp=xp)
+    return n - matches, n
+
+
+def mcs_match_counts(pred_stages, ref_stages, xp: Optional[Any] = None) -> Tuple[Any, Any]:
+    """Return ``(matches, n_tokens)`` for the morphosyntactic consistency score.
+
+    MCS = matches / n, with n = max(pred, ref). Unpaired tokens are not matches.
+    """
     xp = array_module(xp)
     pred = [str(s) for s in list(pred_stages or [])]
     ref = [str(s) for s in list(ref_stages or [])]
@@ -71,8 +80,7 @@ def mcs_mismatch_counts(pred_stages, ref_stages, xp: Optional[Any] = None) -> Tu
     for i in range(min(len(pred), len(ref))):
         if pred[i] == ref[i]:
             matches += 1
-    mismatches = n - matches
-    return xp.asarray(mismatches, dtype=float), xp.asarray(n, dtype=float)
+    return xp.asarray(matches, dtype=float), xp.asarray(n, dtype=float)
 
 
 def _traceback_ld_ops(ld, ref: List[str], hyp: List[str]) -> Tuple[int, int, int]:

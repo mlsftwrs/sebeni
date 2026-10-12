@@ -4,7 +4,7 @@
 This script:
 1. Loads post-aligned model weights (from local run directories or Hugging Face repos).
 2. Runs post-training evaluation on held-out `beni/data/test.json`.
-3. Computes genuine hypothesis-based Phi (Constraint Satisfaction), MER, MCS, and UWEC.
+3. Computes genuine hypothesis-based Phi (Integrity Score), MER, MCS, and UWEC.
 4. Regenerates canonical Section 10 model card tables and README.md.
 5. Updates `README.md` and `eval_results.json` directly on Hugging Face Hub without re-training.
 """
