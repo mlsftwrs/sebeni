@@ -107,6 +107,16 @@ def build_config(
         cfg[section]["eval_strategy"] = "steps"
         cfg[section]["eval_steps"] = eval_interval
 
+    # Ensure GRPO generation_batch_size (per_device_train_batch_size * gradient_accumulation_steps) is divisible by num_generations
+    if algorithm.lower() == "grpo":
+        num_gen = cfg.get("trainer", {}).get("num_generations", 4)
+        grad_accum = cfg.get("trainer", {}).get("gradient_accumulation_steps", 2)
+        if (rec_batch * grad_accum) % num_gen != 0:
+            needed_accum = max(1, (num_gen + rec_batch - 1) // rec_batch)
+            while (rec_batch * needed_accum) % num_gen != 0:
+                needed_accum += 1
+            cfg["trainer"]["gradient_accumulation_steps"] = needed_accum
+
     # Distillation configuration
     cfg.setdefault("distillation", {})
     cfg["distillation"]["enabled"] = True

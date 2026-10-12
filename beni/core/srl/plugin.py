@@ -142,10 +142,44 @@ class AlignmentPlugin:
             if hasattr(module, "weight") and hasattr(module, "in_features") and hasattr(module, "out_features"):
                 custom_classes.add(cls)
 
+        # Collect supported linear/embedding modules vs unsupported wrapper modules
+        supported_exact_modules = []
+        unsupported_matching_modules = []
+        base_targets = self.config.model.lora_target_modules
+        if isinstance(base_targets, (list, tuple, set)):
+            target_set = set(base_targets)
+            for name, module in model.named_modules():
+                cls = module.__class__
+                mod_name = getattr(cls, "__module__", "")
+                is_supported = (
+                    isinstance(module, (torch.nn.Linear, torch.nn.Embedding, torch.nn.Conv1d, torch.nn.Conv2d))
+                    or "bitsandbytes" in mod_name
+                    or cls in custom_classes
+                )
+                for t in target_set:
+                    if name == t or name.endswith(f".{t}"):
+                        if is_supported:
+                            supported_exact_modules.append(name)
+                        else:
+                            unsupported_matching_modules.append((name, cls.__name__))
+
+        # If unsupported modules match targets (e.g. Gemma4ClippableLinear in Gemma 4 vision/audio encoders),
+        # scope target_modules strictly to supported modules so PEFT doesn't crash on non-linear wrappers.
+        effective_target_modules = self.config.model.lora_target_modules
+        if unsupported_matching_modules and supported_exact_modules:
+            logger.info(
+                "Detected %d unsupported module(s) (%s) matching LoRA targets. "
+                "Scoping target_modules to %d supported linear layers.",
+                len(unsupported_matching_modules),
+                unsupported_matching_modules[0][1],
+                len(supported_exact_modules),
+            )
+            effective_target_modules = supported_exact_modules
+
         lora_kwargs = {
             "r": self.config.model.lora_r,
             "lora_alpha": self.config.model.lora_alpha,
-            "target_modules": self.config.model.lora_target_modules,
+            "target_modules": effective_target_modules,
             "lora_dropout": self.config.model.lora_dropout,
             "bias": self.config.model.lora_bias,
             "task_type": TaskType.CAUSAL_LM,
@@ -162,27 +196,22 @@ class AlignmentPlugin:
             logger.warning("LoRA injection failed with error: %s. Attempting fallback...", exc)
 
             # Fallback 1: Filter target_modules to only standard supported linear/quantized modules
-            supported_target_names = set()
-            for name, module in model.named_modules():
-                cls = module.__class__
-                mod_name = getattr(cls, "__module__", "")
-                if isinstance(module, (torch.nn.Linear, torch.nn.Embedding)) or "bitsandbytes" in mod_name:
-                    supported_target_names.add(name.split(".")[-1])
-
-            filtered_targets = [t for t in self.config.model.lora_target_modules if t in supported_target_names]
-            if filtered_targets:
+            if supported_exact_modules:
                 try:
                     fallback_kwargs = dict(lora_kwargs)
-                    fallback_kwargs["target_modules"] = filtered_targets
+                    fallback_kwargs["target_modules"] = supported_exact_modules
                     fallback_kwargs.pop("custom_module_classes", None)
                     return get_peft_model(model, LoraConfig(**fallback_kwargs))
                 except Exception as exc2:
                     logger.warning("Fallback targeting standard linear modules failed: %s", exc2)
 
-            # Fallback 2: Full parameter fine-tuning fallback
+            # Fallback 2: Full parameter fine-tuning fallback (only floating-point & complex tensors can require gradients)
             logger.warning("Model does not support PEFT LoRA adapter wrapping. Falling back to fine-tuning mode.")
             for param in model.parameters():
-                param.requires_grad = True
+                if param.is_floating_point() or param.is_complex():
+                    param.requires_grad = True
+                else:
+                    param.requires_grad = False
             return model
 
     def load_models(self, model_name: Optional[str] = None, device_map: str = "auto", remote_code: bool = True):

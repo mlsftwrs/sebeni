@@ -166,6 +166,20 @@ class SebeniGrpo(AlignmentPlugin):
                 max_st = grpo_dict.get("max_steps", 100)
                 grpo_dict["eval_steps"] = max(1, max_st // 10) if max_st else max(1, grpo_dict.get("logging_steps", 10))
 
+        # Guard: effective batch size must be divisible by num_generations for GRPO group advantage calculation
+        num_gen = grpo_dict.get("num_generations", 4) or 4
+        per_dev_bs = grpo_dict.get("per_device_train_batch_size", 1) or 1
+        grad_accum = grpo_dict.get("gradient_accumulation_steps", 1) or 1
+        if (per_dev_bs * grad_accum) % num_gen != 0:
+            needed_accum = max(1, (num_gen + per_dev_bs - 1) // per_dev_bs)
+            while (per_dev_bs * needed_accum) % num_gen != 0:
+                needed_accum += 1
+            print(
+                f"[GRPO Guard] Adjusted gradient_accumulation_steps from {grad_accum} to {needed_accum} "
+                f"so effective generation batch size ({per_dev_bs * needed_accum}) is divisible by num_generations ({num_gen})."
+            )
+            grpo_dict["gradient_accumulation_steps"] = needed_accum
+
         grpo_args = GRPOConfig(
             **trl_config_kwargs(
                 GRPOConfig,
