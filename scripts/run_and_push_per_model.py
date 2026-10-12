@@ -148,7 +148,7 @@ This repository contains the **trained model weights, tokenizer, training data, 
 - **Scope**: `{scope}` (13 Sahelian / West-African low-resource languages)
 - **Training Budget**: `{steps}` steps
 - **Hardware Target**: NVIDIA L4 GPU (24GB VRAM)
-- **Distillation Teacher**: Gemini 3.7 Flash via Google Cloud Vertex AI
+- **Distillation**: skipped (Vertex AI disabled; packaged dataset only)
 
 ## Evaluation Metrics (Held-out `test.json`)
 - **Phi (Constraint Satisfaction)**: `{phi_str}`
@@ -373,7 +373,9 @@ def direct_push_cell(
             repo_id=repo_id,
             repo_type="model",
             ignore_patterns=ignore_patterns,
-            commit_message=f"Sebeni trained model, tokenizer & training bundle: {model_entry['slug']} {algo.upper()} ({steps} steps)",
+            # Replace the existing repo contents. Files added in this commit are kept.
+            delete_patterns="**",
+            commit_message=f"Overwrite {model_entry['slug']} {algo.upper()} ({steps} steps) weights, tokenizer, and training bundle",
         )
         logger.info("Successfully pushed model weights, tokenizer, and bundle to https://huggingface.co/%s", repo_id)
         return True
@@ -382,17 +384,22 @@ def direct_push_cell(
         return False
 
 
-def cleanup_stale_run_dir(run_dir: Path) -> None:
+def cleanup_stale_run_dir(run_dir: Path, *, full: bool = False) -> None:
     """Clean partial / broken run artifacts from previous aborted attempts."""
     if not run_dir.exists():
         return
-    for sub in ("models", "runs", "tmp"):
+    folders = ("models", "runs", "tmp", "exp") if full else ("models", "runs", "tmp")
+    for sub in folders:
         sub_path = run_dir / sub
         if sub_path.exists():
             shutil.rmtree(sub_path, ignore_errors=True)
     for p in run_dir.glob("checkpoint-*"):
         if p.is_dir():
             shutil.rmtree(p, ignore_errors=True)
+    if full:
+        for name in ("eval_results.json", "config.yaml"):
+            (run_dir / name).unlink(missing_ok=True)
+        return
     eval_f = run_dir / "exp" / "eval.json"
     if eval_f.exists():
         try:
@@ -606,8 +613,21 @@ def main() -> None:
     )
     parser.add_argument(
         "--vertex",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Use Vertex AI for Google GenAI distillation (default: False)",
+    )
+    parser.add_argument(
+        "--skip-distillation",
         action="store_true",
         default=True,
+        help="Skip Gemini distillation and train on the packaged dataset (default: True)",
+    )
+    parser.add_argument(
+        "--distill",
+        dest="skip_distillation",
+        action="store_false",
+        help="Run Gemini distillation before training",
     )
     parser.add_argument(
         "--backend",
@@ -617,20 +637,26 @@ def main() -> None:
     parser.add_argument(
         "--resume",
         action="store_true",
-        default=True,
-        help="Skip previously completed runs (default: True)",
+        default=False,
+        help="Skip previously completed runs (default: full rerun)",
     )
     parser.add_argument(
         "--skip-completed",
         action="store_true",
-        default=True,
-        help="Skip runs already completed on Hugging Face Hub or locally (default: True)",
+        default=False,
+        help="Skip runs already completed on Hugging Face Hub or locally (default: full rerun)",
     )
     parser.add_argument(
         "--force-rerun",
-        dest="skip_completed",
+        action="store_true",
+        default=True,
+        help="Retrain every cell and overwrite the existing Hugging Face repo (default: True)",
+    )
+    parser.add_argument(
+        "--no-force-rerun",
+        dest="force_rerun",
         action="store_false",
-        help="Force re-running all cells even if already present on Hugging Face Hub",
+        help="Allow --resume / --skip-completed to keep existing cells",
     )
     parser.add_argument(
         "--restart-grpo",
@@ -665,8 +691,8 @@ def main() -> None:
     parser.add_argument(
         "--recompute-completed",
         action="store_true",
-        default=True,
-        help="Skip re-training already uploaded/completed models, but recompute post-aligned evaluation and push updated model cards (default: True)",
+        default=False,
+        help="Skip re-training already uploaded models and only recompute evaluation (default: off; full overwrite)",
     )
     parser.add_argument(
         "--no-recompute-completed",
@@ -762,6 +788,12 @@ def main() -> None:
     logger.info("Algorithms (%d): %s", len(selected_algorithms), selected_algorithms)
     logger.info("Budget: %d steps per cell | Max Eval Rows: %d", args.max_steps, args.max_eval_rows)
     logger.info("Include Weights: %s (default: False -> training data, telemetry, and logs only)", args.include_weights)
+    logger.info(
+        "Distillation: %s | Vertex: %s",
+        "skipped" if args.skip_distillation else args.distil_model,
+        args.vertex,
+    )
+    logger.info("Full rerun (overwrite Hub repo): %s", args.force_rerun)
     logger.info("Target Org / Namespace: %s (private=%s)", args.org, is_private)
     logger.info("Total Runs to Execute: %d", total_cells)
     logger.info("=" * 70)
@@ -785,9 +817,11 @@ def main() -> None:
                 steps=args.max_steps,
             )
 
-            # Check if this cell is already completed and should be skipped (unless --eval-only is set)
+            # Completed Hub repos are retrained and overwritten unless the user opts out.
             if args.eval_only:
                 is_done, reason = False, "Evaluating post-aligned weights (--eval-only)"
+            elif args.force_rerun:
+                is_done, reason = False, f"Full rerun: {target_repo} will be overwritten"
             else:
                 is_done, reason = check_cell_completed(
                     api=api if not args.dry_run else None,
@@ -828,6 +862,9 @@ def main() -> None:
                             kveritas_disclosure="open",
                             use_vllm=args.use_vllm if algo == "grpo" else False,
                         )
+                        cfg_data.setdefault("distillation", {})
+                        cfg_data["distillation"]["enabled"] = not args.skip_distillation
+                        cfg_data["distillation"]["vertex"] = bool(args.vertex) and not args.skip_distillation
                         mc = MasterConfig.from_dict(cfg_data)
                         mc.apply_workdir(run_dir)
                         local_models = run_dir / "models"
@@ -929,8 +966,9 @@ def main() -> None:
                     all_results.append(cached_res)
                     continue
 
-            # For GRPO restart: clean up stale partial run artifacts
-            if algo == "grpo":
+            if args.force_rerun and not args.eval_only:
+                cleanup_stale_run_dir(run_dir, full=True)
+            elif algo == "grpo":
                 cleanup_stale_run_dir(run_dir)
 
             logger.info(
@@ -961,6 +999,9 @@ def main() -> None:
                     kveritas_disclosure="open",
                     use_vllm=args.use_vllm if algo == "grpo" else False,
                 )
+                cfg_data.setdefault("distillation", {})
+                cfg_data["distillation"]["enabled"] = not args.skip_distillation
+                cfg_data["distillation"]["vertex"] = bool(args.vertex) and not args.skip_distillation
 
                 # Explicitly enforce max_steps, batch size, and eval_steps (10 evals per run)
                 calc_eval_steps = args.eval_steps if args.eval_steps is not None else max(1, args.max_steps // 10)
