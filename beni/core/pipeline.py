@@ -373,18 +373,25 @@ def run_eval(
         return [token.stage for token in sentence.tokens]
 
     for group, texts in grouped.items():
-        distiller = _distiller_for(mc, group)
+        from beni.core.morphotactic.dabax import resolve_baseline_files
+        gram_path, dict_path, checkpoint_id = resolve_baseline_files(group, mc.working_dir)
         dabax = get_dabax(
             group,
-            gram=distiller.gram_path,
-            ldict=distiller.dict_path,
+            gram=gram_path,
+            ldict=dict_path,
             process=True,
             runtime_dir=cfg.get_workdir().runtime,
         )
+        # Fast evaluation: parse only the evaluated subset (or small sample for ref_phi) instead of 1800+ texts
+        eval_sample_size = cap if cap else min(20, len(texts))
+        sample_texts = texts[:eval_sample_size]
+        parsed_ref_cache = {}
         sentences = []
-        for text in texts:
+        for text in sample_texts:
             try:
-                sentences.extend(dabax.loader(text) or [])
+                parsed = dabax.loader(text) or []
+                parsed_ref_cache[text] = parsed
+                sentences.extend(parsed)
             except Exception:
                 continue
         ref_phi = scorer.phi_corpus(sentences)["avg"] if sentences else 0.0
@@ -430,10 +437,13 @@ def run_eval(
                         hyp_sentences = dabax.loader(completion) or []
                     except Exception:
                         hyp_sentences = []
-                try:
-                    ref_sentences = dabax.loader(text) or []
-                except Exception:
-                    ref_sentences = []
+                ref_sentences = parsed_ref_cache.get(text)
+                if ref_sentences is None:
+                    try:
+                        ref_sentences = dabax.loader(text) or []
+                        parsed_ref_cache[text] = ref_sentences
+                    except Exception:
+                        ref_sentences = []
                 if not ref_sentences or not hyp_sentences:
                     continue
                 all_hyp_sentences.extend(hyp_sentences)
@@ -487,7 +497,7 @@ def run_eval(
             "n_scored": n_scored,
             "n_morphemes": mer_n,
             "n_tokens": int(mcs_n) if mcs_n else uwec_n,
-            "checkpoint_id": distiller.checkpoint_id(),
+            "checkpoint_id": checkpoint_id,
             "language": group,
             "scope": scope.label,
         }
