@@ -25,6 +25,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+
 # Polyfill for Python < 3.10.7 (CVE-2020-10735 integer string conversion limit)
 if not hasattr(sys, "get_int_max_str_digits"):
     sys.get_int_max_str_digits = lambda: 4300
@@ -544,33 +546,80 @@ def main() -> None:
 
             calc_eval_steps = args.eval_steps if args.eval_steps is not None else max(1, args.max_steps // 10)
             rec_batch = model_entry.get("recommended_batch_size", 2)
+            eval_batch = min(rec_batch, 1)
             models_dir = str(run_dir / "models")
             for sec in ("trainer", "sft", "dpo", "apo"):
                 cfg_data.setdefault(sec, {})
                 cfg_data[sec]["max_steps"] = args.max_steps
                 cfg_data[sec]["per_device_train_batch_size"] = rec_batch
+                cfg_data[sec]["per_device_eval_batch_size"] = eval_batch
                 cfg_data[sec]["output_dir"] = models_dir
                 cfg_data[sec]["eval_strategy"] = "steps"
                 cfg_data[sec]["eval_steps"] = calc_eval_steps
 
+            # Identify Gemma 4 and large models
+            model_slug_lower = model_entry.get("slug", "").lower()
+            model_id_lower = model_entry.get("id", "").lower()
+            is_gemma4 = "gemma-4" in model_slug_lower or "gemma-4" in model_id_lower or "gemma4" in model_slug_lower
+            params_str = str(model_entry.get("params", "")).upper()
+            is_large = is_gemma4 or any(k in params_str for k in ("3B", "4B", "7B", "8B"))
+
+            # DPO / APO memory safeguards (prevent 10 GiB logits OOM on Gemma 4 / large vocab models)
+            if algo in ("dpo", "apo"):
+                if is_gemma4 or is_large or rec_batch <= 1:
+                    cfg_data["model"]["load_in_4bit"] = True
+                    cfg_data[algo]["gradient_checkpointing"] = True
+                    cfg_data[algo]["per_device_train_batch_size"] = 1
+                    cfg_data[algo]["per_device_eval_batch_size"] = 1
+                    cfg_data[algo]["max_prompt_length"] = min(cfg_data[algo].get("max_prompt_length", 512), 512)
+                    cfg_data[algo]["max_length"] = min(cfg_data[algo].get("max_length", 768), 768)
+                    cfg_data[algo]["eval_accumulation_steps"] = 1
+                    logger.info(
+                        "DPO/APO: Memory guards applied for %s: 4-bit LoRA, grad_checkpointing=True, per_device_eval_batch_size=1, max_length=768.",
+                        model_entry["slug"],
+                    )
+
             if algo == "grpo":
-                params_str = str(model_entry.get("params", "")).upper()
-                is_large = ("4B" in params_str) or ("7B" in params_str) or ("8B" in params_str)
-                if not is_large:
+                if is_gemma4:
+                    # Gemma 4 PLE / custom KV-cache architecture causes cudaErrorInvalidValue in vLLM colocate mode.
+                    # Use Hugging Face generation with 4-bit LoRA and gradient checkpointing.
+                    cfg_data["model"]["load_in_4bit"] = True
+                    cfg_data["model"]["load_in_8bit"] = False
+                    cfg_data["trainer"]["bf16"] = False
+                    cfg_data["trainer"]["use_vllm"] = False
+                    cfg_data["trainer"]["gradient_checkpointing"] = True
+                    logger.info(
+                        "GRPO: Configured %s with 4-bit LoRA and HF generation (vLLM colocate disabled for Gemma 4).",
+                        model_entry["slug"],
+                    )
+                elif is_large:
+                    cfg_data["model"]["load_in_4bit"] = True
+                    cfg_data["model"]["load_in_8bit"] = False
+                    cfg_data["trainer"]["bf16"] = False
+                    cfg_data["trainer"]["use_vllm"] = False
+                    cfg_data["trainer"]["gradient_checkpointing"] = True
+                else:
                     cfg_data["model"]["load_in_4bit"] = False
                     cfg_data["model"]["load_in_8bit"] = False
-                cfg_data["trainer"]["bf16"] = True
-                cfg_data["trainer"]["use_vllm"] = bool(args.use_vllm)
-                cfg_data["trainer"]["vllm_gpu_memory_utilization"] = args.vllm_gpu_memory_utilization
-                cfg_data["trainer"]["vllm_mode"] = "colocate"
+                    cfg_data["trainer"]["bf16"] = True
+                    cfg_data["trainer"]["use_vllm"] = bool(args.use_vllm)
+                    cfg_data["trainer"]["vllm_gpu_memory_utilization"] = args.vllm_gpu_memory_utilization
+                    cfg_data["trainer"]["vllm_mode"] = "colocate"
+
                 cfg_data["trainer"]["max_prompt_length"] = 512
                 cfg_data["trainer"]["max_completion_length"] = args.max_completion_length
                 cfg_data["trainer"]["eval_strategy"] = "steps"
                 cfg_data["trainer"]["eval_steps"] = calc_eval_steps
-                cfg_data["trainer"]["gradient_accumulation_steps"] = min(
-                    cfg_data["trainer"].get("gradient_accumulation_steps", 2), 2
-                )
-                cfg_data["trainer"]["per_device_train_batch_size"] = min(rec_batch, 2)
+                cfg_data["trainer"]["per_device_eval_batch_size"] = 1
+
+                # Ensure gradient_accumulation_steps * per_device_train_batch_size is divisible by num_generations
+                num_gen = cfg_data["trainer"].get("num_generations", 4)
+                grpo_batch = 1 if (is_gemma4 or is_large) else min(rec_batch, 2)
+                cfg_data["trainer"]["per_device_train_batch_size"] = grpo_batch
+                needed_accum = max(1, (num_gen + grpo_batch - 1) // grpo_batch)
+                while (grpo_batch * needed_accum) % num_gen != 0:
+                    needed_accum += 1
+                cfg_data["trainer"]["gradient_accumulation_steps"] = needed_accum
 
             try:
                 result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)

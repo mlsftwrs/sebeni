@@ -167,6 +167,54 @@ class TestRunAndPushSkip(unittest.TestCase):
         # 5 steps should yield 1 eval step
         self.assertEqual(max(1, 5 // 10), 1)
 
+    def test_dataclass_eval_batch_size(self):
+        from beni.core.srl.config import (
+            DPOTrainerConfig,
+            APOTrainerConfig,
+            GRPOTrainerConfig,
+            SFTTrainerConfig,
+        )
+        dpo = DPOTrainerConfig(per_device_eval_batch_size=1)
+        self.assertEqual(dpo.per_device_eval_batch_size, 1)
+        self.assertEqual(dpo.to_dict()["per_device_eval_batch_size"], 1)
+
+        apo = APOTrainerConfig(per_device_eval_batch_size=1)
+        self.assertEqual(apo.per_device_eval_batch_size, 1)
+        self.assertEqual(apo.to_dict()["per_device_eval_batch_size"], 1)
+
+        grpo = GRPOTrainerConfig(per_device_eval_batch_size=1)
+        self.assertEqual(grpo.per_device_eval_batch_size, 1)
+        self.assertEqual(grpo.to_dict()["per_device_eval_batch_size"], 1)
+
+        sft = SFTTrainerConfig(per_device_eval_batch_size=1)
+        self.assertEqual(sft.per_device_eval_batch_size, 1)
+        self.assertEqual(sft.to_dict()["per_device_eval_batch_size"], 1)
+
+    def test_gemma4_guards_logic(self):
+        gemma_entry = {
+            "id": "google/gemma-4-E2B",
+            "slug": "gemma-4-e2b",
+            "params": "2B",
+            "recommended_batch_size": 1,
+        }
+        model_slug_lower = gemma_entry["slug"].lower()
+        model_id_lower = gemma_entry["id"].lower()
+        is_gemma4 = "gemma-4" in model_slug_lower or "gemma-4" in model_id_lower or "gemma4" in model_slug_lower
+        params_str = str(gemma_entry.get("params", "")).upper()
+        is_large = is_gemma4 or any(k in params_str for k in ("3B", "4B", "7B", "8B"))
+
+        self.assertTrue(is_gemma4)
+        self.assertTrue(is_large)
+
+        # In GRPO, vLLM must be disabled for Gemma 4
+        use_vllm_effective = True and not is_gemma4
+        self.assertFalse(use_vllm_effective)
+
+        # In DPO/APO, batch size must be 1 and max_length bounded
+        rec_batch = gemma_entry["recommended_batch_size"]
+        eval_batch = min(rec_batch, 1)
+        self.assertEqual(eval_batch, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

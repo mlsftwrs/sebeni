@@ -9,8 +9,11 @@ from __future__ import annotations
 import datetime
 import inspect
 import logging
+import os
 from pathlib import Path
 from typing import Any, Callable, List, Optional, Sequence, Union
+
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 import torch
 from peft import LoraConfig, TaskType, get_peft_model

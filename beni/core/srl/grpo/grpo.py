@@ -137,6 +137,16 @@ class SebeniGrpo(AlignmentPlugin):
         project_name = project_name or self.config.project_name
         grpo_dict = self.config.trainer.to_dict()
 
+        model_name_lower = (self.config.model.model_name or "").lower()
+        is_gemma4 = "gemma-4" in model_name_lower or "gemma4" in model_name_lower
+        if is_gemma4 and grpo_dict.get("use_vllm"):
+            print(
+                "[GRPO Notice] Disabling vLLM for Gemma 4 architecture as vLLM colocate mode "
+                "encounters CUDA kernel / process group incompatibilities with PLE/custom KV cache. "
+                "Falling back to standard Hugging Face generation."
+            )
+            grpo_dict["use_vllm"] = False
+
         if grpo_dict.get("use_vllm"):
             import torch
             vllm_available = False
@@ -165,6 +175,9 @@ class SebeniGrpo(AlignmentPlugin):
             if "eval_steps" not in grpo_dict or not grpo_dict["eval_steps"]:
                 max_st = grpo_dict.get("max_steps", 100)
                 grpo_dict["eval_steps"] = max(1, max_st // 10) if max_st else max(1, grpo_dict.get("logging_steps", 10))
+
+        if "per_device_eval_batch_size" not in grpo_dict or not grpo_dict["per_device_eval_batch_size"]:
+            grpo_dict["per_device_eval_batch_size"] = min(int(grpo_dict.get("per_device_train_batch_size", 1) or 1), 1)
 
         # Guard: effective batch size must be divisible by num_generations for GRPO group advantage calculation
         num_gen = grpo_dict.get("num_generations", 4) or 4

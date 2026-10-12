@@ -78,6 +78,12 @@ class SebeniDpo(AlignmentPlugin):
                 max_st = dpo_dict.get("max_steps", 100)
                 dpo_dict["eval_steps"] = max(1, max_st // 10) if max_st else max(1, dpo_dict.get("logging_steps", 10))
 
+        # Memory guard for evaluation: default eval batch size to 1 to avoid OOM with large vocabularies (e.g. Gemma 4)
+        if "per_device_eval_batch_size" not in dpo_dict or not dpo_dict["per_device_eval_batch_size"]:
+            dpo_dict["per_device_eval_batch_size"] = min(int(dpo_dict.get("per_device_train_batch_size", 1) or 1), 1)
+        if "eval_accumulation_steps" not in dpo_dict or not dpo_dict["eval_accumulation_steps"]:
+            dpo_dict["eval_accumulation_steps"] = 1
+
         args = DPOConfig(
             **trl_config_kwargs(
                 DPOConfig,

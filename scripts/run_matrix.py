@@ -23,6 +23,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+
 # Polyfill for Python < 3.10.7 (CVE-2020-10735 integer string conversion limit)
 if not hasattr(sys, "get_int_max_str_digits"):
     sys.get_int_max_str_digits = lambda: 4300
@@ -97,25 +99,51 @@ def build_config(
 
     # Trainer budget across all algorithms (GRPO uses trainer, SFT uses sft, DPO uses dpo, APO uses apo)
     rec_batch = model_entry.get("recommended_batch_size", 2)
+    eval_batch = min(rec_batch, 1)
     models_dir = str(run_dir / "models")
     eval_interval = max(1, max_steps // 10)
     for section in ("trainer", "sft", "dpo", "apo"):
         cfg.setdefault(section, {})
         cfg[section]["max_steps"] = max_steps
         cfg[section]["per_device_train_batch_size"] = rec_batch
+        cfg[section]["per_device_eval_batch_size"] = eval_batch
         cfg[section]["output_dir"] = models_dir
         cfg[section]["eval_strategy"] = "steps"
         cfg[section]["eval_steps"] = eval_interval
 
+    model_slug_lower = model_entry.get("slug", "").lower()
+    model_id_lower = model_entry.get("id", "").lower()
+    is_gemma4 = "gemma-4" in model_slug_lower or "gemma-4" in model_id_lower or "gemma4" in model_slug_lower
+    params_str = str(model_entry.get("params", "")).upper()
+    is_large = is_gemma4 or any(k in params_str for k in ("3B", "4B", "7B", "8B"))
+
+    if is_gemma4 or is_large or rec_batch <= 1:
+        cfg.setdefault("model", {})
+        cfg["model"]["load_in_4bit"] = True
+        for section in ("trainer", "sft", "dpo", "apo"):
+            cfg[section]["gradient_checkpointing"] = True
+            cfg[section]["per_device_eval_batch_size"] = 1
+        if "dpo" in cfg:
+            cfg["dpo"]["max_length"] = min(cfg["dpo"].get("max_length", 768), 768)
+            cfg["dpo"]["max_prompt_length"] = min(cfg["dpo"].get("max_prompt_length", 512), 512)
+            cfg["dpo"]["eval_accumulation_steps"] = 1
+        if "apo" in cfg:
+            cfg["apo"]["max_length"] = min(cfg["apo"].get("max_length", 768), 768)
+            cfg["apo"]["max_prompt_length"] = min(cfg["apo"].get("max_prompt_length", 512), 512)
+            cfg["apo"]["eval_accumulation_steps"] = 1
+
     # Ensure GRPO generation_batch_size (per_device_train_batch_size * gradient_accumulation_steps) is divisible by num_generations
     if algorithm.lower() == "grpo":
+        if is_gemma4:
+            cfg["trainer"]["use_vllm"] = False
+            cfg["trainer"]["bf16"] = False
         num_gen = cfg.get("trainer", {}).get("num_generations", 4)
-        grad_accum = cfg.get("trainer", {}).get("gradient_accumulation_steps", 2)
-        if (rec_batch * grad_accum) % num_gen != 0:
-            needed_accum = max(1, (num_gen + rec_batch - 1) // rec_batch)
-            while (rec_batch * needed_accum) % num_gen != 0:
-                needed_accum += 1
-            cfg["trainer"]["gradient_accumulation_steps"] = needed_accum
+        grpo_batch = 1 if (is_gemma4 or is_large) else min(rec_batch, 2)
+        cfg["trainer"]["per_device_train_batch_size"] = grpo_batch
+        needed_accum = max(1, (num_gen + grpo_batch - 1) // grpo_batch)
+        while (grpo_batch * needed_accum) % num_gen != 0:
+            needed_accum += 1
+        cfg["trainer"]["gradient_accumulation_steps"] = needed_accum
 
     # Distillation configuration
     cfg.setdefault("distillation", {})

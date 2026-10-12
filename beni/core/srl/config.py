@@ -218,6 +218,7 @@ class GRPOTrainerConfig:
     # Evaluation
     eval_strategy: Optional[str] = None
     eval_steps: Optional[int] = None
+    per_device_eval_batch_size: Optional[int] = 1
 
     def to_dict(self) -> dict:
         """Export to dictionary for easy unpacking into GRPOConfig."""
@@ -268,6 +269,8 @@ class GRPOTrainerConfig:
             data["eval_strategy"] = self.eval_strategy
         if self.eval_steps is not None:
             data["eval_steps"] = self.eval_steps
+        if self.per_device_eval_batch_size is not None:
+            data["per_device_eval_batch_size"] = self.per_device_eval_batch_size
         if self.num_generations:
             data["num_generations"] = self.num_generations
         return data
@@ -296,6 +299,7 @@ class DPOTrainerConfig:
     seed: int = 42
     bf16: bool = False
     fp16: bool = False
+    gradient_checkpointing: bool = False
     use_cpu: bool = False
     push_to_hub: bool = False
     hub_model_id: Optional[str] = None
@@ -305,6 +309,8 @@ class DPOTrainerConfig:
     # Evaluation
     eval_strategy: Optional[str] = None
     eval_steps: Optional[int] = None
+    per_device_eval_batch_size: Optional[int] = 1
+    eval_accumulation_steps: Optional[int] = 1
 
     def to_dict(self) -> dict:
         data = {
@@ -328,6 +334,7 @@ class DPOTrainerConfig:
             "seed": self.seed,
             "bf16": self.bf16,
             "fp16": self.fp16,
+            "gradient_checkpointing": self.gradient_checkpointing,
             "use_cpu": self.use_cpu,
             "push_to_hub": self.push_to_hub,
             "hub_model_id": self.hub_model_id,
@@ -337,6 +344,10 @@ class DPOTrainerConfig:
             data["eval_strategy"] = self.eval_strategy
         if self.eval_steps is not None:
             data["eval_steps"] = self.eval_steps
+        if self.per_device_eval_batch_size is not None:
+            data["per_device_eval_batch_size"] = self.per_device_eval_batch_size
+        if self.eval_accumulation_steps is not None:
+            data["eval_accumulation_steps"] = self.eval_accumulation_steps
         return data
 
 
@@ -363,6 +374,7 @@ class APOTrainerConfig:
     seed: int = 42
     bf16: bool = False
     fp16: bool = False
+    gradient_checkpointing: bool = False
     use_cpu: bool = False
     push_to_hub: bool = False
     hub_model_id: Optional[str] = None
@@ -372,6 +384,8 @@ class APOTrainerConfig:
     # Evaluation
     eval_strategy: Optional[str] = None
     eval_steps: Optional[int] = None
+    per_device_eval_batch_size: Optional[int] = 1
+    eval_accumulation_steps: Optional[int] = 1
 
     def to_dict(self) -> dict:
         data = {
@@ -395,6 +409,7 @@ class APOTrainerConfig:
             "seed": self.seed,
             "bf16": self.bf16,
             "fp16": self.fp16,
+            "gradient_checkpointing": self.gradient_checkpointing,
             "use_cpu": self.use_cpu,
             "push_to_hub": self.push_to_hub,
             "hub_model_id": self.hub_model_id,
@@ -404,6 +419,10 @@ class APOTrainerConfig:
             data["eval_strategy"] = self.eval_strategy
         if self.eval_steps is not None:
             data["eval_steps"] = self.eval_steps
+        if self.per_device_eval_batch_size is not None:
+            data["per_device_eval_batch_size"] = self.per_device_eval_batch_size
+        if self.eval_accumulation_steps is not None:
+            data["eval_accumulation_steps"] = self.eval_accumulation_steps
         return data
 
 
@@ -478,6 +497,7 @@ class SFTTrainerConfig:
     seed: int = 42
     bf16: bool = False
     fp16: bool = False
+    gradient_checkpointing: bool = False
     use_cpu: bool = False
     push_to_hub: bool = False
     hub_model_id: Optional[str] = None
@@ -487,6 +507,7 @@ class SFTTrainerConfig:
     # Evaluation
     eval_strategy: Optional[str] = None
     eval_steps: Optional[int] = None
+    per_device_eval_batch_size: Optional[int] = 1
 
     def to_dict(self) -> dict:
         data = {
@@ -507,6 +528,7 @@ class SFTTrainerConfig:
             "seed": self.seed,
             "bf16": self.bf16,
             "fp16": self.fp16,
+            "gradient_checkpointing": self.gradient_checkpointing,
             "use_cpu": self.use_cpu,
             "push_to_hub": self.push_to_hub,
             "hub_model_id": self.hub_model_id,
@@ -516,6 +538,8 @@ class SFTTrainerConfig:
             data["eval_strategy"] = self.eval_strategy
         if self.eval_steps is not None:
             data["eval_steps"] = self.eval_steps
+        if self.per_device_eval_batch_size is not None:
+            data["per_device_eval_batch_size"] = self.per_device_eval_batch_size
         return data
 
 
@@ -706,6 +730,9 @@ class MasterConfig:
             self.trainer.temperature = temperature
         if gradient_checkpointing is not None:
             self.trainer.gradient_checkpointing = gradient_checkpointing
+            self.dpo.gradient_checkpointing = gradient_checkpointing
+            self.apo.gradient_checkpointing = gradient_checkpointing
+            self.sft.gradient_checkpointing = gradient_checkpointing
         if use_vllm is not None:
             self.trainer.use_vllm = use_vllm
         if vllm_gpu_memory_utilization is not None:
