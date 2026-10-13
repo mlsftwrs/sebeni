@@ -1081,10 +1081,13 @@ def main() -> None:
                     cfg_data["trainer"]["max_completion_length"] = args.max_completion_length
                     cfg_data["trainer"]["eval_strategy"] = "steps"
                     cfg_data["trainer"]["eval_steps"] = calc_eval_steps
-                    cfg_data["trainer"]["per_device_eval_batch_size"] = 1
+
+                    # GRPO requires: (per_device_eval_batch_size * n_eval_procs) % num_generations == 0.
+                    # The minimum valid value is num_generations itself (single-GPU: 1 process).
+                    num_gen = cfg_data["trainer"].get("num_generations", 4)
+                    cfg_data["trainer"]["per_device_eval_batch_size"] = num_gen
 
                     # Ensure gradient_accumulation_steps * per_device_train_batch_size is divisible by num_generations
-                    num_gen = cfg_data["trainer"].get("num_generations", 4)
                     grpo_batch = 1 if (is_gemma4 or is_large) else min(rec_batch, 2)
                     cfg_data["trainer"]["per_device_train_batch_size"] = grpo_batch
                     needed_accum = max(1, (num_gen + grpo_batch - 1) // grpo_batch)
