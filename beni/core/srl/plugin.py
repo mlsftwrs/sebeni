@@ -163,6 +163,8 @@ class AlignmentPlugin:
         self._last_logps = {"model_logps": None, "ref_logps": None, "kl": None}
         self._last_uncertainty = {}
         self.loaded_weights: Optional[str] = None
+        # Optimizer steps the SafetyGovernor refused (θ unchanged for those steps).
+        self.blocked_steps = 0
         # Languages named in the training system prompt (read from POLICY_META next to loaded weights).
         self.prompt_languages: Optional[List[str]] = None
 
@@ -496,6 +498,11 @@ class AlignmentPlugin:
                 batch_meta["_governor_allowed"] = allowed
                 self.hook_manager(batch_meta)
                 self.reward_manager.clear()
+                if not allowed:
+                    # Zeroed gradients are not enough: AdamW momentum and decoupled
+                    # weight decay would still move θ. Skip the step entirely.
+                    self.blocked_steps += 1
+                    return None
                 return original_step(*args, **kwargs)
 
             optimizer.step = hooked_step
@@ -564,6 +571,7 @@ class AlignmentPlugin:
         langs = extra.pop("languages", None) or self.config.languages()
         nested = dict(extra.pop("extra", None) or {})
         nested["languages"] = langs
+        nested.setdefault("blocked_steps", self.blocked_steps)
         extra.setdefault("language", ",".join(langs) if isinstance(langs, (list, tuple)) else langs)
         extra.setdefault("group_code", extra["language"])
         for key, value in self._last_uncertainty.items():
