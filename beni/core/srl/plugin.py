@@ -56,6 +56,23 @@ def _ensure_chat_template(tokenizer):
     return tokenizer
 
 
+_TRAINER_BLOCKS = ("trainer", "sft", "dpo", "apo")
+
+
+def _active_block(config):
+    """Trainer block of the active arm (``trainer`` for grpo; ``sft`` / ``dpo`` / ``apo`` otherwise)."""
+    algorithm = str(getattr(config, "algorithm", "grpo") or "grpo").lower()
+    block = getattr(config, algorithm, None) if algorithm in ("sft", "dpo", "apo") else None
+    return block if block is not None else getattr(config, "trainer", None)
+
+
+def _resolve_device(config) -> str:
+    """``"cpu"`` when the active arm asks for it or CUDA is missing, else ``"auto"``."""
+    if bool(getattr(_active_block(config), "use_cpu", False)):
+        return "cpu"
+    return "auto" if torch.cuda.is_available() else "cpu"
+
+
 def _bitsandbytes_usable() -> bool:
     if not torch.cuda.is_available():
         return False
@@ -222,19 +239,11 @@ class AlignmentPlugin:
         model_name = model_name or self.config.model.model_name
         if self.config.model.load_in_4bit and self.config.model.load_in_8bit:
             raise ValueError("Choose only one quantization mode: load_in_4bit or load_in_8bit.")
-        use_cpu = bool(
-            getattr(self.config.trainer, "use_cpu", False)
-            or getattr(self.config.dpo, "use_cpu", False)
-            or getattr(self.config.apo, "use_cpu", False)
-        )
-        if use_cpu or not torch.cuda.is_available():
+        if _resolve_device(self.config) == "cpu":
             device_map = "cpu"
-            if getattr(self.config, "trainer", None):
-                self.config.trainer.use_cpu = True
-            if getattr(self.config, "dpo", None):
-                self.config.dpo.use_cpu = True
-            if getattr(self.config, "apo", None):
-                self.config.apo.use_cpu = True
+            for block in _TRAINER_BLOCKS:
+                if getattr(self.config, block, None) is not None:
+                    getattr(self.config, block).use_cpu = True
 
         bnb_config = None
         use_4bit = self.config.model.load_in_4bit and device_map != "cpu"
@@ -269,7 +278,7 @@ class AlignmentPlugin:
 
         torch_dtype = None
         if not bnb_config and device_map != "cpu":
-            trainer_cfg = getattr(self.config, "trainer", None) or getattr(self.config, "sft", None) or getattr(self.config, "dpo", None) or getattr(self.config, "apo", None)
+            trainer_cfg = _active_block(self.config)
             if getattr(trainer_cfg, "bf16", False):
                 torch_dtype = torch.bfloat16
             elif getattr(trainer_cfg, "fp16", False):
