@@ -468,6 +468,9 @@ class Distiller(object):
         phi_prime = self._phi_on_texts_content(
             batch, adjusted_gram, adjusted_dict, fallback=0.0
         )
+        mer = None
+        if not (first_create or bootstrap):
+            mer = self._candidate_mer(batch, current_gram, current_dict, adjusted_gram, adjusted_dict)
 
         return DistillProposal(
             gram_text=adjusted_gram,
@@ -476,8 +479,74 @@ class Distiller(object):
             phi_prime=phi_prime,
             parseable=parseable,
             first_create=first_create or bootstrap,
-            language_ok=True,
+            language_ok=self.dict_language_ok(adjusted_dict, current_dict_text),
+            mer=mer,
         )
+
+    _DICT_LANG = re.compile(r"^\\lang\s+(\S+)", re.MULTILINE)
+
+    def dict_language_ok(self, candidate_dict: str, current_dict: str = "") -> bool:
+        """Candidate D is for this language.
+
+        A ``\\lang`` header must name this group code. A candidate without a
+        header passes only when the current dictionary has none either (so a
+        provider cannot silently drop it).
+        """
+        found = self._DICT_LANG.search(candidate_dict or "")
+        if found is None:
+            return self._DICT_LANG.search(current_dict or "") is None
+        return Language.from_code(found.group(1)).group_code == self.lang
+
+    def _parse_first(self, texts: List[str], gram, ldict) -> List[List[str]]:
+        """Best morpheme forms of each text's first parsed sentence ([] when unparsed)."""
+        dx = self._load_dabax(gram, ldict)
+        out: List[List[str]] = []
+        for text in texts:
+            try:
+                sentences = dx.loader(text) or []
+            except Exception:
+                sentences = []
+            out.append(
+                [form for token in sentences[0].tokens for form in token.best_morphemes()] if sentences else []
+            )
+        return out
+
+    def _candidate_mer(self, batch: List[str], current_gram, current_dict, gram_text: str, dict_text: str) -> Optional[float]:
+        """Pooled MER of the candidate {G, D} parse against the current parse on ``batch``.
+
+        Measures how far a promote would move the analyses (``safety.max_mer``).
+        Returns None when nothing could be scored.
+        """
+        from beni.core.compute.helpers import mer_edit_counts
+
+        texts = [t for t in batch if t]
+        if not texts:
+            return None
+        temp_gram = temp_dict = None
+        try:
+            current = self._parse_first(texts, current_gram, current_dict)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".gram", mode="w", encoding="utf-8") as gf:
+                gf.write(gram_text)
+                temp_gram = Path(gf.name)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".dict", mode="w", encoding="utf-8") as df:
+                df.write(dict_text)
+                temp_dict = Path(df.name)
+            candidate = self._parse_first(texts, temp_gram, temp_dict)
+        except Exception as exc:
+            logger.warning("Candidate MER scoring failed (%s); MER gate not applied", exc)
+            return None
+        finally:
+            for path in (temp_gram, temp_dict):
+                if path and path.exists():
+                    path.unlink()
+        ops = n = 0
+        for ref, hyp in zip(current, candidate):
+            if not ref:
+                continue
+            o, m = mer_edit_counts(ref, hyp)
+            ops += int(o)
+            n += int(m)
+        return (ops / n) if n else None
 
     def _bootstrap_parseable_pair(
         self,
@@ -544,6 +613,7 @@ class Distiller(object):
             parseable=proposal.parseable,
             first_create=proposal.first_create,
             language_ok=proposal.language_ok,
+            mer=proposal.mer,
         )
         if not decision.allowed:
             logger.info("Distiller: promote refused (%s)", decision.reason)
