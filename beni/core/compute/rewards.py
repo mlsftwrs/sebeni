@@ -423,7 +423,7 @@ class RewardManager:
             completions, language=languages, reference=reference, prompts=prompts
         )
         rule_scores = self.reward_rule(
-            completions, prompts=prompts, language=languages, reference=reference
+            prompts=prompts, completions=completions, language=languages, reference=reference
         )
         lang_scores = self.reward_lang(completions, language=languages) if getattr(
             self.config, "enable_lang_reward", False) else [0.0] * len(completions)
