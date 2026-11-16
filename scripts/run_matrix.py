@@ -156,7 +156,6 @@ def build_config(
     # Experiment & Evaluation invariant
     cfg.setdefault("experiment", {})
     cfg["experiment"]["dataset"] = "packaged"
-    cfg["experiment"]["eval_file"] = "test.json"
     cfg["experiment"]["scope"] = scope
     cfg["experiment"]["kveritas"] = True
     cfg["experiment"]["kveritas_seal"] = True

@@ -339,6 +339,30 @@ class AlignmentPlugin:
             raise ValueError("DataLoader yields 0 records. Check source and source_type arguments provided.")
         return self.data_loader.ds()
 
+    def split_eval(self, dataset, seed: Optional[int] = None):
+        """Carve the in-training hold-out from ``dataset``.
+
+        Uses ``data.eval_rows`` (a row count) when set, otherwise
+        ``data.eval_ratio``. ``experiment.max_eval_rows`` is not read here: it
+        only caps the held-out ``test.json`` scored by ``run_eval``.
+        Returns ``(train_dataset, eval_dataset_or_None)``.
+        """
+        n_samples = len(dataset) if hasattr(dataset, "__len__") else 0
+        if not hasattr(dataset, "train_test_split") or n_samples < 2:
+            return dataset, None
+        eval_rows = getattr(self.config.data, "eval_rows", None)
+        eval_ratio = float(getattr(self.config.data, "eval_ratio", 0.0) or 0.0)
+        if eval_rows is not None and int(eval_rows) > 0:
+            test_size = min(int(eval_rows), n_samples - 1)
+        elif eval_ratio > 0.0:
+            if eval_ratio >= 1.0:
+                raise ValueError(f"data.eval_ratio must be below 1.0, got {eval_ratio}")
+            test_size = eval_ratio
+        else:
+            return dataset, None
+        split = dataset.train_test_split(test_size=test_size, seed=seed)
+        return split["train"], split["test"]
+
     def _wire_pre_update_hooks(self, trainer) -> None:
         """Attach SafetyGovernor + logps capture around optimizer.step / compute_loss."""
         self.hook_manager.model = getattr(trainer, "model", self.model)

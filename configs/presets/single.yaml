@@ -47,7 +47,7 @@ experiment:
   dataset: packaged
   freeze_resources: true
   scope: SINGLE_LANG
-  max_eval_rows: 1
+  max_eval_rows: null      # all held-out test.json rows per language
   kveritas: false
   kveritas_seal: false
 

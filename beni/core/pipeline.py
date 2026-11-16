@@ -381,7 +381,8 @@ def run_eval(
 
     scorer = MorphologyScorer()
     by_language = {}
-    cap = max(int(mc.experiment.max_eval_rows or 0), 0)
+    max_rows = mc.experiment.max_eval_rows
+    cap = None if max_rows in (None, 0) else max(int(max_rows), 0)
     scope_mer_ops = 0
     scope_mer_n = 0
     scope_mcs_hit = 0.0
@@ -409,9 +410,8 @@ def run_eval(
             process=True,
             runtime_dir=cfg.get_workdir().runtime,
         )
-        # Fast evaluation: parse only the evaluated subset (or small sample for ref_phi) instead of 1800+ texts
-        eval_sample_size = cap if cap else min(20, len(texts))
-        sample_texts = texts[:eval_sample_size]
+        # Parse only the evaluated subset: all rows when max_eval_rows is null, else the first ``cap``.
+        sample_texts = texts if cap is None else texts[:cap]
         parsed_ref_cache = {}
         sentences = []
         for text in sample_texts:
@@ -431,8 +431,8 @@ def run_eval(
         uwec_n = 0
         n_scored = 0
         n_skipped = 0
-        if decode is not None and cap:
-            for text in texts[:cap]:
+        if decode is not None:
+            for text in sample_texts:
                 try:
                     completion = decode(text, group)
                 except Exception:

@@ -66,3 +66,21 @@ def test_empty_reference_reward_is_finite():
     reference = [{"text": "", "tokens": []}]
     scores = rm.reward_morph([completion], language=["bam"], reference=reference)
     assert scores == [0.0]
+
+
+@pytest.mark.parametrize("max_rows, expected", [(None, 3), (0, 3), (1, 1), (2, 2)])
+def test_max_eval_rows_caps_decoding(eval_env, max_rows, expected):
+    """Issue 8: null / 0 scores every held-out row; an int caps the rows per language."""
+    from beni.core.pipeline import run_eval
+
+    eval_env.experiment.max_eval_rows = max_rows
+    calls = []
+
+    def _decode(text, _lang):
+        calls.append(text)
+        return text
+
+    report = run_eval(eval_env, records=_rows("a b", "c d", "e f"), generate=_decode)
+    assert len(calls) == expected
+    assert report["by_language"]["bam"]["n_scored"] == expected
+    assert report["mer"] == 0.0

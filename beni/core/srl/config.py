@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import datetime
 import inspect
+import logging
 from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
 from typing import Optional, Iterable, Dict, Any, List, Union, Type
 
 from beni.utils import config as cfg
+
+logger = logging.getLogger("sebeni.config")
 
 
 def trl_config_kwargs(
@@ -60,17 +63,21 @@ def trl_config_kwargs(
     return out
 
 
-def _overlay_dataclass(instance, data: Dict[str, Any]):
-    """Apply a (possibly partial) dict onto an existing dataclass instance."""
+def _overlay_dataclass(instance, data: Dict[str, Any], prefix: str = ""):
+    """Apply a (possibly partial) dict onto an existing dataclass instance.
+
+    Unknown keys are ignored with a warning so a typo does not pass silently.
+    """
     if not data:
         return instance
     valid = {f.name for f in fields(instance)}
     for key, val in data.items():
         if key not in valid:
+            logger.warning("Ignoring unknown config key %s%s", prefix, key)
             continue
         current = getattr(instance, key)
         if is_dataclass(current) and isinstance(val, dict):
-            setattr(instance, key, _overlay_dataclass(current, val))
+            setattr(instance, key, _overlay_dataclass(current, val, prefix=f"{prefix}{key}."))
         else:
             setattr(instance, key, val)
     post = getattr(instance, "__post_init__", None)
@@ -143,7 +150,9 @@ class DataConfig:
     hf_streaming: bool = False
     hf_kwargs: Optional[Dict[str, Any]] = None
     clear_on_load: bool = False
+    # In-training hold-out carved from the train data. eval_rows (a row count) wins over eval_ratio.
     eval_ratio: float = 0.1
+    eval_rows: Optional[int] = None
 
     def __post_init__(self) -> None:
         from beni.core.language import parse_lang_codes
@@ -554,7 +563,8 @@ class ExperimentConfig:
     dataset: str = "raw"
     scope: Optional[str] = None
     preset: Optional[str] = None
-    max_eval_rows: int = 1
+    # Held-out test.json rows decoded per language by run_eval. None (or 0) scores every row.
+    max_eval_rows: Optional[int] = None
 
 
 @dataclass
@@ -673,6 +683,7 @@ class MasterConfig:
         hitl: Optional[bool] = None,
         kveritas: Optional[bool] = None,
         eval_ratio: Optional[float] = None,
+        eval_rows: Optional[int] = None,
         eval_steps: Optional[int] = None,
         use_vllm: Optional[bool] = None,
         vllm_gpu_memory_utilization: Optional[float] = None,
@@ -753,6 +764,8 @@ class MasterConfig:
             self.experiment.kveritas = kveritas
         if eval_ratio is not None:
             self.data.eval_ratio = eval_ratio
+        if eval_rows is not None:
+            self.data.eval_rows = eval_rows
         return self
 
     @classmethod
@@ -761,14 +774,25 @@ class MasterConfig:
         config = cls()
         if not data:
             return config
+        data = dict(data)
+        # Top-level shorthands written by presets and the matrix runner.
+        experiment = dict(data.get("experiment") or {})
+        for alias in ("preset", "scope"):
+            if alias in data:
+                experiment.setdefault(alias, data.pop(alias))
+        if experiment:
+            data["experiment"] = experiment
         top = {f.name for f in fields(config)}
+        for key in data:
+            if key not in top:
+                logger.warning("Ignoring unknown config key %s", key)
         for key in top:
             if key not in data:
                 continue
             val = data[key]
             current = getattr(config, key)
             if is_dataclass(current) and isinstance(val, dict):
-                setattr(config, key, _overlay_dataclass(current, val))
+                setattr(config, key, _overlay_dataclass(current, val, prefix=f"{key}."))
             else:
                 setattr(config, key, val)
         return config

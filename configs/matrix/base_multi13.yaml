@@ -5,7 +5,6 @@
 
 preset: multi13
 project_name: sebeni-matrix
-scope: MULTI13
 algorithm: grpo          # overridden per matrix cell: sft | grpo | dpo | apo
 
 model:
@@ -58,8 +57,7 @@ experiment:
   dataset: packaged
   freeze_resources: true
   scope: MULTI13
-  eval_file: test.json
-  max_eval_rows: null      # Evaluates all held-out paragraphs from beni.data/test.json
+  max_eval_rows: null      # all held-out test.json rows per language
   kveritas: true
   kveritas_seal: true
 

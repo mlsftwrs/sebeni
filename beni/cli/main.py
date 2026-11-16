@@ -149,6 +149,7 @@ data:
   languages: {langs_yaml}
   source: null             # path, glob, list of paths, or Hugging Face dataset id
   scheme: completion       # completion | preference | online_group
+  eval_ratio: 0.1          # in-training hold-out fraction (data.eval_rows sets a row count instead)
 
 trainer:
   framework: torch         # torch | jax
@@ -194,7 +195,7 @@ experiment:
   dataset: packaged        # dataset_300_samples.jsonl; test.json stays eval-only
   freeze_resources: true
   scope: {resolved.label}
-  max_eval_rows: 1
+  max_eval_rows: null      # held-out test.json rows per language; null scores all of them
 
 reward:
   format_weight: 0.1
@@ -291,6 +292,9 @@ def train(
     eval_ratio: Optional[float] = typer.Option(
         None, "--eval-ratio", help="Fraction of user dataset held out for evaluation (default: 0.1)."
     ),
+    eval_rows: Optional[int] = typer.Option(
+        None, "--eval-rows", help="Rows of the train data held out for in-training eval. Overrides --eval-ratio."
+    ),
     eval_steps: Optional[int] = typer.Option(
         None, "--eval-steps", help="Number of update steps between evaluations."
     ),
@@ -336,6 +340,7 @@ def train(
         hitl=hitl,
         kveritas=kveritas,
         eval_ratio=eval_ratio,
+        eval_rows=eval_rows,
         eval_steps=eval_steps,
         use_vllm=use_vllm,
         vllm_gpu_memory_utilization=vllm_gpu_memory_utilization,
