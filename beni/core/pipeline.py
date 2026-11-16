@@ -430,6 +430,7 @@ def run_eval(
         uwec_sum = 0.0
         uwec_n = 0
         n_scored = 0
+        n_skipped = 0
         if decode is not None and cap:
             for text in texts[:cap]:
                 try:
@@ -471,7 +472,12 @@ def run_eval(
                         parsed_ref_cache[text] = ref_sentences
                     except Exception:
                         ref_sentences = []
-                if not ref_sentences or not hyp_sentences:
+                ref_morphemes = _morphemes(ref_sentences[0]) if ref_sentences else []
+                if not ref_morphemes:
+                    # An empty reference has no defined MER; count it and keep it out of the pools.
+                    n_skipped += 1
+                    continue
+                if not hyp_sentences:
                     continue
                 all_hyp_sentences.extend(hyp_sentences)
                 ref_sent, hyp_sent = ref_sentences[0], hyp_sentences[0]
@@ -479,7 +485,7 @@ def run_eval(
                 ref_tokens = list(getattr(ref_sent, "tokens", None) or [])
                 hyp_stages = [token.stage for token in hyp_tokens]
                 ref_stages = [token.stage for token in ref_tokens]
-                ops, n_ref = mer_edit_counts(_morphemes(ref_sent), _morphemes(hyp_sent), xp=xp)
+                ops, n_ref = mer_edit_counts(ref_morphemes, _morphemes(hyp_sent), xp=xp)
                 mer_ops += int(ops)
                 mer_n += int(n_ref)
                 hits, n_tok = mcs_match_counts(hyp_stages, ref_stages, xp=xp)
@@ -524,6 +530,7 @@ def run_eval(
             "uwec": uwec_val,
             "n_sentences": len(sentences),
             "n_scored": n_scored,
+            "n_skipped": n_skipped,
             "n_morphemes": mer_n,
             "n_tokens": int(mcs_n) if mcs_n else uwec_n,
             "checkpoint_id": checkpoint_id,
@@ -543,6 +550,8 @@ def run_eval(
         "uwec": (scope_uwec_sum / scope_uwec_n) if scope_uwec_n else None,
         "n_morphemes": scope_mer_n,
         "n_tokens": int(scope_mcs_n) if scope_mcs_n else scope_uwec_n,
+        "n_scored": sum(int(row.get("n_scored") or 0) for row in by_language.values()),
+        "n_skipped": sum(int(row.get("n_skipped") or 0) for row in by_language.values()),
         "beta": scorer.beta,
         "eps": scorer.eps,
         "reference_model": ref_id,
