@@ -174,11 +174,31 @@ def _maybe_reexec_under_kveritas(mc: MasterConfig, config: Optional[Path], seal:
         )
         raise typer.Exit(code=1)
     report = workdir / "exp" / "report.pdf" if seal else None
+    local_key = None
     if report is not None:
         report.parent.mkdir(parents=True, exist_ok=True)
-    cmd = kv.kveritas_command(binary, sys.argv[1:], seal=report, files=_kveritas_files(mc, config))
+        if mc.experiment.kveritas_local:
+            # `kveritas run --seal` signs with keys/private.pem in the session dir; seal
+            # explicitly instead, with the configured key, after the monitored run.
+            local_key = Path(mc.experiment.kveritas_local_key or workdir / "keys" / "private.pem").expanduser()
+            if not local_key.is_absolute():
+                local_key = Path.cwd() / local_key
+            if not local_key.is_file():
+                typer.echo(
+                    f"Error: K-Veritas local mode needs a signing key at {local_key}. Create one with "
+                    f"`openssl genrsa -out {local_key} 3072` or set experiment.kveritas_local_key.",
+                    err=True,
+                )
+                raise typer.Exit(code=1)
+    cmd = kv.kveritas_command(
+        binary, sys.argv[1:], seal=None if local_key else report, files=_kveritas_files(mc, config)
+    )
     typer.echo(f"[kveritas] Monitored run: {' '.join(cmd)}")
     code = subprocess.call(cmd, cwd=str(workdir), env=kv.child_env())
+    if code == 0 and local_key is not None:
+        code = subprocess.call(
+            [binary, "seal", "--local-key", str(local_key), "-o", str(report.resolve())], cwd=str(workdir)
+        )
     if code == 0 and report is not None:
         typer.echo(f"K-Veritas report sealed: {report}")
     raise typer.Exit(code=code)

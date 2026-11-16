@@ -224,3 +224,36 @@ def test_in_training_eval_probe_records_nothing(tmp_path):
         report = run_eval(mc, records=[{"text": "a b", "lang": "bam"}], record=False)
     assert "by_language" in report
     assert not (tmp_path / "run" / "exp" / "eval.json").exists()
+
+
+def test_local_mode_seals_with_configured_key(tmp_path):
+    wd = tmp_path / "run"
+    key = tmp_path / "k.pem"
+    key.write_text("x", encoding="utf-8")
+    config = tmp_path / "c.yaml"
+    config.write_text(
+        f"working_dir: {wd}\nexperiment:\n  kveritas: true\n  kveritas_seal: true\n"
+        f"  kveritas_local: true\n  kveritas_local_key: {key}\n",
+        encoding="utf-8",
+    )
+    which, call, init = _patched()
+    with which, call as call_mock, init:
+        result = runner.invoke(app, ["exp", "-c", str(config), "-w", str(wd)])
+    assert result.exit_code == 0, result.output
+    run_cmd, seal_cmd = (c.args[0] for c in call_mock.call_args_list)
+    assert not any(part.startswith("--seal") for part in run_cmd)
+    assert seal_cmd == ["/usr/bin/kveritas", "seal", "--local-key", str(key), "-o", str((wd / "exp" / "report.pdf").resolve())]
+
+
+def test_local_mode_without_key_refuses(tmp_path):
+    wd = tmp_path / "run"
+    config = tmp_path / "c.yaml"
+    config.write_text(
+        f"working_dir: {wd}\nexperiment:\n  kveritas: true\n  kveritas_seal: true\n  kveritas_local: true\n",
+        encoding="utf-8",
+    )
+    which, call, init = _patched()
+    with which, call as call_mock, init:
+        result = runner.invoke(app, ["exp", "-c", str(config), "-w", str(wd)])
+    assert result.exit_code == 1 and "openssl genrsa" in result.output
+    call_mock.assert_not_called()

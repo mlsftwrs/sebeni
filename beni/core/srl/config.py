@@ -562,6 +562,8 @@ class ExperimentConfig:
     kveritas_disclosure: str = "open"
     # `kveritas init --local`: sign with a local key, no attestation server.
     kveritas_local: bool = False
+    # Local mode signs the report with this RSA private key (PEM). Default {working_dir}/keys/private.pem.
+    kveritas_local_key: Optional[str] = None
     freeze_resources: bool = True
     # ``packaged`` reads dataset_300_samples.jsonl. ``raw`` keeps raw/*.txt for non-experiment train.
     dataset: str = "raw"
