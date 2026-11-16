@@ -57,7 +57,7 @@ class Distiller(object):
         Parameters
         ----------
         lang_code : str
-            ISO or Sebeni group code. Maninka ``mku`` aliases to packaged ``mlq/``.
+            ISO or Sebeni group code. Maninka (``mlq`` / ``mku``) uses packaged ``baselines/mku/``.
         working_dir : str, optional
             Root workdir. Baselines live under ``{root}/data/baselines/{group}/``.
         """
