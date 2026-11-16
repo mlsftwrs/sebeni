@@ -681,6 +681,23 @@ def run_eval(
     out = cfg.get_workdir().exp / "eval.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    # The snapshot lives next to the weights it scores, which is where `sebeni push`
+    # checks. A base-model or Hub-only eval goes to exp/ so it can never clear
+    # trained weights for a push.
+    snapshot_dir = Path(weights) if weights and Path(weights).is_dir() else cfg.get_workdir().exp
+    training = {}
+    previous = snapshot_dir / SafetyGovernor.SNAPSHOT_NAME
+    if previous.is_file():
+        try:
+            prior = json.loads(previous.read_text(encoding="utf-8"))
+            training = {
+                key: prior.get(key)
+                for key in ("blocked_steps", "target_gate", "gates_fired", "u_indicator", "u_kl", "uncertainty")
+                if prior.get(key) is not None
+            }
+            training = prior.get("training") or training
+        except (OSError, ValueError):
+            training = {}
     gov = SafetyGovernor(mc.safety.to_spec(tau=mc.distillation.tau, kl_beta=mc.trainer.beta))
     gov.record_snapshot(
         phi=report["phi"] or 0.0,
@@ -690,9 +707,15 @@ def run_eval(
         checkpoint_id=",".join(str(v.get("checkpoint_id") or "") for v in by_language.values()),
         algorithm=mc.algorithm,
         language=",".join(report["languages"]),
-        extra={"scope": scope.label, "by_language": by_language, "uwec": report["uwec"]},
+        extra={
+            "scope": scope.label,
+            "by_language": by_language,
+            "uwec": report["uwec"],
+            "weights": weights,
+            "training": training,
+        },
     )
-    gov.write_snapshot(cfg.get_workdir().models)
+    report["safety_snapshot"] = str(gov.write_snapshot(snapshot_dir))
     _write_manifest(mc, stage="eval", eval=str(out), scope=scope.label)
     return report
 

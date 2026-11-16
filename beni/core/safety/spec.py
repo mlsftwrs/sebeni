@@ -41,7 +41,10 @@ class SafetySpec:
     require_model_card : bool
         Hub push requires a generated README model card.
     require_safety_snapshot : bool
-        Hub push requires a recorded eval snapshot (Φ, τ, checkpoint id).
+        Hub push requires ``safety_snapshot.json`` next to the pushed weights.
+    require_eval_metrics : bool
+        That snapshot must come from ``sebeni eval`` (Φ plus MER or MCS), not
+        only from training.
     """
 
     enabled: bool = True
@@ -56,6 +59,7 @@ class SafetySpec:
     max_kl: Optional[float] = None
     require_model_card: bool = True
     require_safety_snapshot: bool = True
+    require_eval_metrics: bool = True
     fired: List[str] = field(default_factory=list)
 
     def reset_fired(self) -> None:

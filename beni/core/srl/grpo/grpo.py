@@ -250,12 +250,7 @@ class SebeniGrpo(AlignmentPlugin):
         train_result = self.trainer.train()
         self.save_model(self.config.trainer.output_dir)
 
-        if self.config.trainer.push_to_hub:
-            self.push_to_hub(
-                repo_id=self.config.trainer.hub_model_id,
-                token=self.config.trainer.hub_token,
-                private=self.config.trainer.hub_private_repo,
-            )
+        self.push_after_train(self.config.trainer)
 
         self._finish_trackio()
         return train_result

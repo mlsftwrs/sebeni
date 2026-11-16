@@ -583,6 +583,7 @@ class SafetyConfig:
     uncertainty_downweight: bool = True
     require_model_card: bool = True
     require_safety_snapshot: bool = True
+    require_eval_metrics: bool = True
     max_kl: Optional[float] = None
 
     def to_spec(self, tau: float = 0.5, kl_beta: float = 0.1):
@@ -600,6 +601,7 @@ class SafetyConfig:
             max_kl=self.max_kl,
             require_model_card=self.require_model_card,
             require_safety_snapshot=self.require_safety_snapshot,
+            require_eval_metrics=self.require_eval_metrics,
         )
 
 

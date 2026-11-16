@@ -335,3 +335,19 @@ def test_generate_loads_trained_weights_and_analyzes(workdir):
     assert result.exit_code == 0, result.output
     trainer.load_aligned_weights.assert_called_once_with(str(models))
     trainer.analyze.assert_called_once_with("muso", max_new_tokens=9)
+
+
+def test_push_refusal_exits_cleanly_and_passes_write_card(workdir):
+    config, wd = workdir
+    _with_adapter(wd)
+    trainer = _fake_trainer()
+    trainer.weights_dir = str(wd / "models")
+    trainer.push_to_hub.side_effect = PermissionError("run sebeni eval first")
+    with patch("beni.core.srl.unified.SRLTrainer", return_value=trainer):
+        result = runner.invoke(
+            app, ["push", "-c", str(config), "-w", str(wd), "--repo-id", "org/m", "--write-card"]
+        )
+    assert result.exit_code == 1
+    assert "sebeni eval" in result.output
+    kwargs = trainer.push_to_hub.call_args.kwargs
+    assert kwargs["write_card"] is True and kwargs["output_dir"] == str(wd / "models")

@@ -252,7 +252,12 @@ class SafetyGovernor:
         return self.snapshot.write(Path(directory) / self.SNAPSHOT_NAME)
 
     def allow_hub_push(self, output_dir: Union[str, Path]) -> bool:
-        """Refuse Hub upload without a model card and a recorded safety snapshot."""
+        """Refuse Hub upload without a model card and an eval safety snapshot on disk.
+
+        Both files must be in ``output_dir`` (the weights being pushed). With
+        ``require_eval_metrics`` the snapshot must carry Φ and MER or MCS,
+        i.e. it was written by ``sebeni eval`` / ``run_eval`` for these weights.
+        """
         output_dir = Path(output_dir)
         if not self.spec.enabled:
             return True
@@ -261,9 +266,17 @@ class SafetyGovernor:
         if self.spec.require_model_card and not card.exists():
             self._fire("missing_model_card")
             return False
-        if self.spec.require_safety_snapshot and not snap.exists() and self.snapshot is None:
+        if self.spec.require_safety_snapshot and not snap.exists():
             self._fire("missing_safety_snapshot")
             return False
+        if self.spec.require_eval_metrics:
+            try:
+                data = json.loads(snap.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                data = {}
+            if data.get("phi") is None or (data.get("mer") is None and data.get("mcs") is None):
+                self._fire("missing_eval_metrics")
+                return False
         return True
 
 

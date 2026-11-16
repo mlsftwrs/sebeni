@@ -127,6 +127,10 @@ class TestSafetyGovernor:
         (tmp_path / "README.md").write_text("# card\n", encoding="utf-8")
         gov.record_snapshot(phi=0.7, tau=0.5, checkpoint_id="baseline_v1")
         gov.write_snapshot(tmp_path)
+        # A training-only snapshot (no MER/MCS) is not enough (issue 5).
+        assert gov.allow_hub_push(tmp_path) is False
+        gov.record_snapshot(phi=0.7, tau=0.5, mer=0.3, mcs=0.6, checkpoint_id="baseline_v1")
+        gov.write_snapshot(tmp_path)
         assert gov.allow_hub_push(tmp_path) is True
 
 

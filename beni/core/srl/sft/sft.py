@@ -148,11 +148,6 @@ class SebeniSft(AlignmentPlugin):
         print("Starting Sebeni SFT Training Loop...")
         result = self.trainer.train()
         self.save_model(self.config.sft.output_dir or self.config.trainer.output_dir)
-        if self.config.sft.push_to_hub:
-            self.push_to_hub(
-                repo_id=self.config.sft.hub_model_id,
-                token=self.config.sft.hub_token,
-                private=self.config.sft.hub_private_repo,
-            )
+        self.push_after_train(self.config.sft)
         self._finish_trackio()
         return result

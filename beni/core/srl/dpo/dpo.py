@@ -122,11 +122,6 @@ class SebeniDpo(AlignmentPlugin):
         print("Starting Sebeni DPO Training Loop...")
         result = self.trainer.train()
         self.save_model(self.config.dpo.output_dir or self.config.trainer.output_dir)
-        if self.config.dpo.push_to_hub:
-            self.push_to_hub(
-                repo_id=self.config.dpo.hub_model_id,
-                token=self.config.dpo.hub_token,
-                private=self.config.dpo.hub_private_repo,
-            )
+        self.push_after_train(self.config.dpo)
         self._finish_trackio()
         return result

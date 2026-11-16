@@ -527,20 +527,36 @@ def push(
     config: Path = typer.Option(..., "-c", "--config"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
     repo_id: Optional[str] = typer.Option(None, "--repo-id"),
+    write_card: bool = typer.Option(
+        False, "--write-card", help="Re-render README.md from the eval safety snapshot before pushing."
+    ),
     weights: Optional[str] = typer.Option(
         None,
         "--weights",
         help="Trained adapter/model directory or Hub repo id. Default: the arm's output dir ({working_dir}/models).",
     ),
 ):
-    """Push the trained policy to the Hub (requires model card + safety snapshot).
+    """Push the trained policy to the Hub.
 
-    Refuses when no trained weights are found. A LoRA run pushes the adapter.
+    Requires trained weights, plus README.md and an eval safety_snapshot.json
+    next to them: run ``sebeni eval`` first. ``--write-card`` re-renders the
+    card from that snapshot. A LoRA run pushes the adapter.
     """
     mc = _load_config(config, working_dir)
     trainer = _load_policy(mc, weights, require=True)
     rid = repo_id or mc.trainer.hub_model_id
-    trainer.push_to_hub(repo_id=rid, token=mc.trainer.hub_token, private=mc.trainer.hub_private_repo)
+    try:
+        trainer.push_to_hub(
+            repo_id=rid,
+            token=mc.trainer.hub_token,
+            private=mc.trainer.hub_private_repo,
+            output_dir=trainer.weights_dir,
+            write_card=write_card,
+        )
+    except PermissionError as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"Pushed {trainer.weights_dir} to {rid}")
 
 
 @app.command()

@@ -168,6 +168,8 @@ class AlignmentPlugin:
         self.target_gate_report: Optional[Dict[str, int]] = None
         self._last_uncertainty = {}
         self.loaded_weights: Optional[str] = None
+        # Local directory of the loaded weights (a Hub id resolves to its snapshot).
+        self.weights_dir: Optional[str] = None
         # Optimizer steps the SafetyGovernor refused (θ unchanged for those steps).
         self.blocked_steps = 0
         # Languages named in the training system prompt (read from POLICY_META next to loaded weights).
@@ -807,24 +809,65 @@ class AlignmentPlugin:
         )
         return output_dir
 
-    def push_to_hub(self, repo_id: Optional[str] = None, token=None, private: bool = True, **kwargs):
-        """Push the trained model to the Hub. Refuses without card + safety snapshot."""
+    def push_to_hub(
+        self,
+        repo_id: Optional[str] = None,
+        token=None,
+        private: bool = True,
+        output_dir: Optional[Union[str, Path]] = None,
+        write_card: bool = False,
+        **kwargs,
+    ):
+        """Push the policy to the Hub. Refuses without a model card and an eval safety snapshot.
+
+        ``output_dir`` is the directory of the weights being pushed (default:
+        the loaded weights, else the trainer ``output_dir``). Nothing is
+        written implicitly: run ``sebeni eval`` first (it writes
+        ``safety_snapshot.json`` there). ``write_card=True`` re-renders
+        ``README.md`` from that snapshot.
+        """
         if self.model is None or self.tokenizer is None:
             raise ValueError("Model and tokenizer must be loaded before pushing to hub.")
         if not repo_id:
             raise ValueError("repo_id is required to push to hub.")
-        output_dir = Path(self.config.trainer.output_dir)
-        card = output_dir / "README.md"
-        snap = output_dir / SafetyGovernor.SNAPSHOT_NAME
-        if not card.exists() or not snap.exists():
-            self.write_card_and_snapshot(output_dir)
-        if not self.governor.allow_hub_push(output_dir):
+        directory = Path(output_dir or self.weights_dir or self.config.trainer.output_dir)
+        snap = directory / SafetyGovernor.SNAPSHOT_NAME
+        if write_card:
+            if not snap.is_file():
+                raise PermissionError(
+                    f"Hub push refused: no {SafetyGovernor.SNAPSHOT_NAME} in {directory}. "
+                    "Run `sebeni eval` first; --write-card only renders the card from it."
+                )
+            from beni.core.safety.governor import SafetySnapshot
+
+            write_model_card(directory, snapshot=SafetySnapshot.load(snap), config=self.config)
+        if not self.governor.allow_hub_push(directory):
             raise PermissionError(
-                "Hub push refused: model card and safety snapshot are required "
-                f"(gates={self.config.safety.to_spec().fired or self.governor.spec.fired})."
+                f"Hub push refused for {directory} (gates={self.governor.spec.fired}). "
+                "Run `sebeni eval` first (writes safety_snapshot.json with eval metrics), "
+                "and pass --write-card if README.md is missing."
             )
         self.model.push_to_hub(repo_id=repo_id, token=token, private=private, **kwargs)
         self.tokenizer.push_to_hub(repo_id=repo_id, token=token, private=private, **kwargs)
+
+    def push_after_train(self, block) -> None:
+        """Honour ``<arm>.push_to_hub: true`` at the end of training.
+
+        Training writes a snapshot without eval metrics, so the Hub gate
+        normally refuses here; that is reported, not raised, so a finished
+        training run is not lost.
+        """
+        if not getattr(block, "push_to_hub", False):
+            return
+        try:
+            self.push_to_hub(
+                repo_id=getattr(block, "hub_model_id", None),
+                token=getattr(block, "hub_token", None),
+                private=getattr(block, "hub_private_repo", True),
+                output_dir=getattr(block, "output_dir", None),
+            )
+        except PermissionError as exc:
+            print(f"[SafetyGovernor] Skipped push_to_hub after training: {exc}")
 
     def load_aligned_weights(self, weights_path_or_repo: Union[str, Path]):
         """Load trained weights for evaluation, generation, or push.
@@ -872,6 +915,7 @@ class AlignmentPlugin:
         self.hook_manager.model = self.model
         self.model.eval()
         self.loaded_weights = label if not Path(label).expanduser().exists() else target_str
+        self.weights_dir = target_str
         self.prompt_languages = _read_policy_languages(target)
         return self.model
 
