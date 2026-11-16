@@ -14,6 +14,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
+from beni.core import kveritas as kv
 from beni.core.language import resolve_scope
 from beni.core.srl.config import MasterConfig
 from beni.utils import config as cfg
@@ -326,6 +327,7 @@ def run_distill(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None
 
     if mc.working_dir:
         cfg.set_working_dir(mc.working_dir)
+    kv.emit_phase("distill", mc)
     loaded = None
     if records is None:
         loaded = load_train_records(mc)
@@ -414,6 +416,9 @@ def run_arm(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None):
         raise ValueError("SFT is torch-only. Set trainer.framework: torch for algorithm: sft.")
     from beni.core.srl.unified import SRLTrainer
 
+    kv.emit_phase("train", mc)
+    kv.emit_seed(getattr(_active_trainer(mc), "seed", None), mc)
+
     trainer = SRLTrainer(mc)
     trainer.train(records)
     _write_manifest(
@@ -461,8 +466,12 @@ def run_eval(
     generate: Optional[Callable[[str, str], str]] = None,
     policy: Any = None,
     weights: Optional[str] = None,
+    record: bool = True,
 ) -> Dict[str, Any]:
     """Score held-out test text. MER, MCS, and UWEC pool by morpheme or token count.
+
+    ``record=False`` (in-training probes) only returns the report: no
+    eval.json, safety snapshot, manifest, or K-Veritas phase / claim lines.
 
     ``generate(text, lang)`` decodes one row; without it, ``policy.analyze``
     is used. ``weights`` records which trained weights were scored.
@@ -484,6 +493,8 @@ def run_eval(
 
     if mc.working_dir:
         cfg.set_working_dir(mc.working_dir)
+    if record:
+        kv.emit_phase("eval", mc)
     if records is None:
         records = load_eval_records(mc)
     scope = _scope(mc)
@@ -678,6 +689,8 @@ def run_eval(
         "max_eval_rows": cap,
         "tau": mc.distillation.tau,
     }
+    if not record:
+        return report
     out = cfg.get_workdir().exp / "eval.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -716,6 +729,7 @@ def run_eval(
         },
     )
     report["safety_snapshot"] = str(gov.write_snapshot(snapshot_dir))
+    kv.emit_claims(report, mc)
     _write_manifest(mc, stage="eval", eval=str(out), scope=scope.label)
     return report
 

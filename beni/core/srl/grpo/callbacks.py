@@ -183,13 +183,10 @@ class TrackioMetricsCallback(TrainerCallback):
 
 
 def emit_kveritas_line(name: str, value: float, step: int = 0) -> None:
-    """Print standard K-Veritas protocol metric line."""
-    if value is not None:
-        try:
-            val = float(value)
-            print(f"KVERITAS_METRIC name={name} value={val:.6g} step={int(step)}", flush=True)
-        except (ValueError, TypeError):
-            pass
+    """Print one K-Veritas metric line: ``KV <name>=<value> step=<step>``."""
+    from beni.core.kveritas import emit_metric
+
+    emit_metric(name, value, step=step)
 
 
 class KVeritasCallback(TrainerCallback):
@@ -256,7 +253,7 @@ class KVeritasCallback(TrainerCallback):
                     eval_records.append({"text": text_val, "lang": lang_val})
 
                 if eval_records:
-                    report = run_eval(self.config, eval_records)
+                    report = run_eval(self.config, eval_records, record=False)
                     for metric_key in ["phi", "mer", "mcs", "uwec"]:
                         val = report.get(metric_key)
                         if val is not None:

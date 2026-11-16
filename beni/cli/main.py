@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import typer
 
@@ -16,6 +16,14 @@ app = typer.Typer(
     no_args_is_help=True,
     help="Sebeni — self-aware morphotactic generation for extremely low-resource languages.",
 )
+
+
+@app.callback()
+def _main() -> None:
+    """Sebeni — self-aware morphotactic generation for extremely low-resource languages."""
+    from beni.core.kveritas import restore_caller_cwd
+
+    restore_caller_cwd()
 
 
 def _load_config(
@@ -38,15 +46,14 @@ def _packaged_exp_yaml() -> Path:
 
 
 def emit_kveritas_metrics(report: Dict, step: int = 0) -> None:
-    """Print stdout lines K-Veritas already understands."""
-    phi = report.get("phi")
-    if phi is not None:
-        typer.echo(f"KVERITAS_METRIC name=phi value={float(phi):.6g} step={step}")
+    """Print the report's Φ / MER / MCS / UWEC (scope and per language) as ``KV`` metric lines."""
+    from beni.core import kveritas as kv
+
+    for key in kv.CLAIM_METRICS:
+        kv.emit_metric(key, report.get(key), step=step)
     for lang, row in (report.get("by_language") or {}).items():
-        val = (row or {}).get("phi")
-        if val is None:
-            continue
-        typer.echo(f"KVERITAS_METRIC name=phi_{lang} value={float(val):.6g} step={step}")
+        for key in kv.CLAIM_METRICS:
+            kv.emit_metric(f"{key}_{lang}", (row or {}).get(key), step=step)
 
 
 def maybe_kveritas_init(working_dir: Optional[Path] = None, disclosure: str = "open") -> None:
@@ -58,7 +65,8 @@ def maybe_kveritas_init(working_dir: Optional[Path] = None, disclosure: str = "o
     if not binary:
         return
     target_dir = Path(working_dir) if working_dir else Path.cwd()
-    if not (target_dir / ".kveritas").is_dir() and not (Path.cwd() / ".kveritas").is_dir():
+    target_dir.mkdir(parents=True, exist_ok=True)
+    if not (target_dir / ".kveritas").is_dir():
         typer.echo(f"[kveritas] Initializing session in {target_dir} with disclosure={disclosure}")
         cmd = [binary, "init"]
         if disclosure:
@@ -69,52 +77,91 @@ def maybe_kveritas_init(working_dir: Optional[Path] = None, disclosure: str = "o
 
 
 def maybe_kveritas_seal(output: Path, working_dir: Optional[Path] = None, report: Optional[Dict] = None) -> None:
-    import json
+    """Seal an existing K-Veritas session into ``output``.
+
+    Never creates a run: a session without recorded runs is refused, because a
+    report must cover the experiment that actually ran (``sebeni exp`` / ``train``
+    / ``eval`` with K-Veritas enabled run themselves under ``kveritas run``).
+    """
     import shutil
     import subprocess
 
+    del report  # kept for API compatibility; claims come from the monitored run
     binary = shutil.which("kveritas")
     if not binary:
+        typer.echo("kveritas not on PATH; skip seal. See https://kveritas.org/docs", err=True)
+        return
+    target_dir = Path(working_dir) if working_dir else Path.cwd()
+    session_file = target_dir / ".kveritas" / "session.json"
+    runs = []
+    if session_file.is_file():
+        try:
+            runs = json.loads(session_file.read_text(encoding="utf-8")).get("runs") or []
+        except (OSError, ValueError):
+            runs = []
+    if not runs:
         typer.echo(
-            "kveritas not on PATH; skip seal. See https://kveritas.org/docs",
+            f"Error: no recorded K-Veritas run in {target_dir}; nothing to seal. "
+            "Run `sebeni exp` / `train` / `eval` with experiment.kveritas enabled first.",
             err=True,
         )
         return
-    target_dir = Path(working_dir) if working_dir else Path.cwd()
-    if not (target_dir / ".kveritas").is_dir() and not (Path.cwd() / ".kveritas").is_dir():
-        maybe_kveritas_init(target_dir)
-
-    seal_dir = target_dir if (target_dir / ".kveritas").is_dir() else Path.cwd()
-    session_file = seal_dir / ".kveritas" / "session.json"
-    if session_file.is_file():
-        try:
-            session_data = json.loads(session_file.read_text(encoding="utf-8"))
-            if not session_data.get("runs"):
-                # Anchor the run so kveritas seal has at least one recorded run
-                metric_lines = []
-                if report:
-                    phi = report.get("phi")
-                    if phi is not None:
-                        metric_lines.append(f"KVERITAS_METRIC name=phi value={float(phi):.6g} step=0")
-                    for lang, row in (report.get("by_language") or {}).items():
-                        val = (row or {}).get("phi")
-                        if val is not None:
-                            metric_lines.append(f"KVERITAS_METRIC name=phi_{lang} value={float(val):.6g} step=0")
-                cmd_str = "; ".join(f"echo '{line}'" for line in metric_lines) if metric_lines else "echo '[sebeni] Run recorded'"
-                subprocess.run([binary, "run", "--", "sh", "-c", cmd_str], cwd=str(seal_dir), check=False)
-        except Exception:
-            pass
-
     output.parent.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run(
-        [binary, "seal", "--output", str(output.resolve())],
-        cwd=str(seal_dir),
-        check=False,
-    )
+    result = subprocess.run([binary, "seal", "--output", str(output.resolve())], cwd=str(target_dir), check=False)
     if result.returncode != 0:
         typer.echo(f"kveritas seal exited {result.returncode}", err=True)
     else:
         typer.echo(f"K-Veritas report sealed: {output}")
+
+
+def _kveritas_files(mc: MasterConfig, config: Optional[Path]) -> List[str]:
+    """Inputs hashed before and after the monitored run: config, train data, held-out data."""
+    from beni.core import kveritas as kv
+
+    source = mc.data.source
+    eval_source = mc.experiment.eval_source
+    return kv.evidence_files(
+        [
+            config,
+            source if isinstance(source, (list, tuple)) else [source],
+            eval_source if isinstance(eval_source, (list, tuple)) else [eval_source],
+            cfg.DATA_DIR / "test.json",
+            cfg.DATA_DIR / "raw" / "dataset_300_samples.jsonl",
+        ]
+    )
+
+
+def _maybe_reexec_under_kveritas(mc: MasterConfig, config: Optional[Path], seal: bool) -> None:
+    """Re-run this command once as the monitored subprocess of ``kveritas run``.
+
+    No-op inside the monitored child, when K-Veritas is off, or when the
+    ``kveritas`` binary is missing (a warning is printed). Otherwise exits with
+    the monitored run's return code. ``seal`` writes ``{working_dir}/exp/report.pdf``
+    after the whole command finishes.
+    """
+    import shutil
+    import subprocess
+    import sys
+
+    from beni.core import kveritas as kv
+
+    if kv.under_kveritas() or not (mc.experiment.kveritas or seal):
+        return
+    binary = shutil.which("kveritas")
+    if not binary:
+        typer.echo("Warning: kveritas not on PATH; running without K-Veritas.", err=True)
+        return
+    workdir = Path(mc.working_dir or cfg.get_workdir().root)
+    maybe_kveritas_init(workdir, disclosure=mc.experiment.kveritas_disclosure)
+    report = workdir / "exp" / "report.pdf" if seal else None
+    if report is not None:
+        report.parent.mkdir(parents=True, exist_ok=True)
+    cmd = kv.kveritas_command(binary, sys.argv[1:], seal=report, files=_kveritas_files(mc, config))
+    typer.echo(f"[kveritas] Monitored run: {' '.join(cmd)}")
+    code = subprocess.call(cmd, cwd=str(workdir), env=kv.child_env())
+    if code == 0 and report is not None:
+        typer.echo(f"K-Veritas report sealed: {report}")
+    raise typer.Exit(code=code)
 
 
 def default_config_yaml(langs: List[str], working_dir: str) -> str:
@@ -287,7 +334,14 @@ def train(
     ),
     use_cpu: Optional[bool] = typer.Option(None, "--use-cpu/--no-use-cpu"),
     kveritas: Optional[bool] = typer.Option(
-        None, "--kveritas/--no-kveritas", help="Stream step rewards and eval metrics via K-Veritas protocol."
+        None,
+        "--kveritas/--no-kveritas",
+        help="Run the whole command under `kveritas run` and stream KV metrics. Default: experiment.kveritas.",
+    ),
+    kveritas_seal: Optional[bool] = typer.Option(
+        None,
+        "--kveritas-seal/--no-kveritas-seal",
+        help="Run under `kveritas run --seal` and write {working_dir}/exp/report.pdf. Default: experiment.kveritas_seal.",
     ),
     eval_ratio: Optional[float] = typer.Option(
         None, "--eval-ratio", help="Fraction of user dataset held out for evaluation (default: 0.1)."
@@ -345,8 +399,8 @@ def train(
         use_vllm=use_vllm,
         vllm_gpu_memory_utilization=vllm_gpu_memory_utilization,
     )
-    if mc.experiment.kveritas:
-        maybe_kveritas_init(mc.working_dir)
+    seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    _maybe_reexec_under_kveritas(mc, config, seal=seal)
     from beni.core.pipeline import run_arm
 
     run_arm(mc)
@@ -383,6 +437,16 @@ def eval(
         help="Held-out rows to score (path, glob, or HF dataset id). Overrides experiment.eval_source; "
         "default is the packaged test.json.",
     ),
+    kveritas: Optional[bool] = typer.Option(
+        None,
+        "--kveritas/--no-kveritas",
+        help="Run the eval under `kveritas run` and claim its metrics. Default: experiment.kveritas.",
+    ),
+    kveritas_seal: Optional[bool] = typer.Option(
+        None,
+        "--kveritas-seal/--no-kveritas-seal",
+        help="Run under `kveritas run --seal` and write {working_dir}/exp/report.pdf. Default: experiment.kveritas_seal.",
+    ),
 ):
     """Score the trained policy on held-out rows per language; write ``{working_dir}/exp/eval.json``.
 
@@ -394,6 +458,10 @@ def eval(
     mc.apply_cli_overrides(languages=lang)
     if eval_file:
         mc.experiment.eval_source = eval_file
+    if kveritas is not None:
+        mc.experiment.kveritas = kveritas
+    seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    _maybe_reexec_under_kveritas(mc, config, seal=seal)
     from beni.core.pipeline import run_eval
 
     trainer = _load_policy(mc, weights, require=bool(weights))
@@ -462,8 +530,7 @@ def _run_exp(
         mc.apply_cli_overrides(languages=lang)
     mc.experiment.dataset = "packaged"
     mc.data.source = None
-    if mc.experiment.kveritas or mc.experiment.kveritas_seal:
-        maybe_kveritas_init(mc.working_dir)
+    _maybe_reexec_under_kveritas(mc, Path(cfg_path), seal=bool(mc.experiment.kveritas_seal))
     from beni.core.pipeline import run_experiment
 
     try:
@@ -471,11 +538,8 @@ def _run_exp(
     except RuntimeError as exc:
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=1) from exc
+    del report  # Φ / MER / MCS / UWEC are claimed by run_eval (KV claim lines)
     typer.echo(str(cfg.get_workdir().exp / "eval.json"))
-    if mc.experiment.kveritas:
-        emit_kveritas_metrics(report)
-    if mc.experiment.kveritas_seal:
-        maybe_kveritas_seal(cfg.get_workdir().exp / "report.pdf", working_dir=mc.working_dir, report=report)
 
 
 @app.command("exp")
@@ -639,3 +703,7 @@ def wordfreq(
     summary = root / "wordfreq.json"
     summary.write_text(json.dumps(index, indent=2, ensure_ascii=False), encoding="utf-8")
     typer.echo(str(summary if reports else last_path))
+
+
+if __name__ == "__main__":
+    app()

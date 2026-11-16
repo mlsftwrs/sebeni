@@ -558,6 +558,8 @@ class ExperimentConfig:
 
     kveritas: bool = False
     kveritas_seal: bool = False
+    # `kveritas init --disclosure`: redacted | names | open.
+    kveritas_disclosure: str = "open"
     freeze_resources: bool = True
     # ``packaged`` reads dataset_300_samples.jsonl. ``raw`` keeps raw/*.txt for non-experiment train.
     dataset: str = "raw"

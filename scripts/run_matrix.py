@@ -200,79 +200,49 @@ def run_experiment_cell(
         result_row["status"] = "DRY_RUN"
         return result_row
 
-    # Import internal Sebeni modules
-    from beni.cli.main import maybe_kveritas_init, maybe_kveritas_seal, emit_kveritas_metrics
-    from beni.core.srl.config import MasterConfig
-    from beni.core.pipeline import run_distill, run_arm, run_eval
-    from beni.data.datasets import assert_train_source
-
-    # Enforce evaluation dataset invariant
-    assert_train_source(Path("beni/data/raw/dataset_300_samples.jsonl"))
-
-    logger.info("Starting experiment %s with %s (500 steps, eval=beni.data/test.json)...", model_name, algo)
-    mc = MasterConfig.from_dict(cfg_data)
-    mc.apply_workdir(run_dir)
-    active_steps = cfg_data.get(algo, {}).get("max_steps") or cfg_data.get("trainer", {}).get("max_steps", 10)
-    mc.apply_cli_overrides(max_steps=active_steps)
-
-    # 1. K-Veritas Init with open disclosure
-    disclosure = cfg_data.get("experiment", {}).get("kveritas_disclosure", "open")
-    maybe_kveritas_init(run_dir, disclosure=disclosure)
-
-    # 2. Morphotactic Distillation (if not already cached)
-    logger.info("Executing distillation step with teacher %s (Vertex AI, %s)...", mc.distillation.model, mc.distillation.location)
-    try:
-        run_distill(mc)
-    except Exception as exc:
-        logger.warning("Distillation note: %s. Continuing with cached/algorithmic baselines.", exc)
-
-    # 3. Post-Training Arm
-    active_trainer = getattr(mc, mc.algorithm if mc.algorithm in ("sft", "dpo", "apo") else "trainer")
-    logger.info("Running post-training arm: %s for %d steps...", algo, active_trainer.max_steps)
+    # One `sebeni exp` subprocess per cell. With experiment.kveritas / kveritas_seal on
+    # (set by build_config), that command runs itself under `kveritas run --seal`,
+    # so each cell gets one monitored run covering distill, train and eval, and a
+    # sealed {run_dir}/exp/report.pdf.
+    repo_root = Path(__file__).resolve().parents[1]
+    env = dict(os.environ)
+    env["PYTHONPATH"] = os.pathsep.join(p for p in (str(repo_root), env.get("PYTHONPATH", "")) if p)
+    cmd = [
+        sys.executable, "-m", "beni.cli.main", "exp",
+        "-c", str(cfg_path.resolve()),
+        "-w", str(run_dir.resolve()),
+        "--algorithm", algo,
+    ]
+    logger.info("Starting cell %s [%s]: %s", model_name, algo, " ".join(cmd))
     start_time = time.time()
-    try:
-        trainer = run_arm(mc)
-        elapsed = time.time() - start_time
-        logger.info("Training completed in %.1f seconds", elapsed)
-    except Exception as exc:
-        logger.error("Training failed: %s", exc)
-        result_row["status"] = f"FAILED: {exc}"
-        return result_row
+    proc = subprocess.run(cmd, env=env, check=False)
+    logger.info("Cell finished in %.1f seconds (exit %d)", time.time() - start_time, proc.returncode)
 
-    # 4. Evaluation on held-out beni.data/test.json using post-trained policy
-    logger.info("Scoring post-trained model evaluation on held-out split beni.data/test.json...")
-    try:
-        if hasattr(trainer, "model") and trainer.model is not None:
-            trainer.model.eval()
-
-        def _generate(text: str, _lang: str) -> str:
-            # Same prompt as training, greedy, experiment.eval_max_new_tokens.
-            return trainer.analyze(text)
-
-        eval_report = run_eval(mc, generate=_generate, policy=getattr(trainer, "plugin", trainer))
-        result_row["phi"] = eval_report.get("phi")
-        result_row["mer"] = eval_report.get("mer")
-        result_row["mcs"] = eval_report.get("mcs")
-        result_row["uwec"] = eval_report.get("uwec")
-        result_row["eval_report"] = eval_report
+    eval_path = run_dir / "exp" / "eval.json"
+    eval_report: Dict[str, Any] = {}
+    if eval_path.is_file():
+        try:
+            eval_report = json.loads(eval_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            logger.error("Unreadable %s: %s", eval_path, exc)
+    for key in ("phi", "mer", "mcs", "uwec"):
+        result_row[key] = eval_report.get(key)
+    result_row["eval_report"] = eval_report
+    if proc.returncode != 0:
+        result_row["status"] = f"FAILED: exit {proc.returncode}"
+    elif not eval_report:
+        result_row["status"] = "EVAL_FAILED: no exp/eval.json"
+    else:
         result_row["status"] = "COMPLETED"
-        logger.info(
-            "Evaluation complete: Phi=%.4f MER=%.2f MCS=%.4f UWEC=%.4f",
-            result_row["phi"] or 0.0,
-            result_row["mer"] or 0.0,
-            result_row["mcs"] or 0.0,
-            result_row["uwec"] or 0.0,
-        )
-    except Exception as exc:
-        logger.error("Evaluation failed: %s", exc)
-        eval_report = {}
-        result_row["status"] = f"EVAL_FAILED: {exc}"
 
-    # 5. K-Veritas Sealing
-    report_pdf = run_dir / "kveritas_report.pdf"
-    logger.info("Sealing K-Veritas cryptographic verification report...")
-    maybe_kveritas_seal(report_pdf, working_dir=run_dir, report=eval_report)
-
+    # Keep the historical location used by the push scripts.
+    sealed = run_dir / "exp" / "report.pdf"
+    if sealed.is_file():
+        shutil.copy2(sealed, run_dir / "kveritas_report.pdf")
+        bundle = sealed.with_name(sealed.name + ".kvbundle.zip")
+        if bundle.is_file():
+            shutil.copy2(bundle, run_dir / "kveritas_report.pdf.kvbundle.zip")
+        result_row["kveritas_report"] = str(run_dir / "kveritas_report.pdf")
     return result_row
 
 

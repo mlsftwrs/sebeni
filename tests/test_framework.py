@@ -1113,8 +1113,8 @@ class TestExperimentConfig:
 
         emit_kveritas_metrics({"phi": 0.51, "by_language": {"bam": {"phi": 0.6}}})
         out = capsys.readouterr().out
-        assert "KVERITAS_METRIC name=phi value=0.51 step=0" in out
-        assert "KVERITAS_METRIC name=phi_bam value=0.6 step=0" in out
+        assert "KV phi=0.51 step=0" in out
+        assert "KV phi_bam=0.6 step=0" in out
 
     def test_jsonl_mlq_becomes_mku(self, tmp_path):
         from beni.data.datasets import SebeniDataLoader
