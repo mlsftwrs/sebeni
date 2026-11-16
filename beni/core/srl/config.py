@@ -623,8 +623,25 @@ class MasterConfig:
     experiment: ExperimentConfig = field(default_factory=ExperimentConfig)
     wordfreq: WordfreqConfig = field(default_factory=WordfreqConfig)
 
+    def __post_init__(self) -> None:
+        # The output_dir / runtime_dir defaults come from whichever working dir is
+        # active right now. Remember them so apply_workdir can tell a default
+        # (to be moved into the new working dir) from a path set in the YAML.
+        active = cfg.get_workdir()
+        self._auto_paths = {str(active.models), str(active.runtime)}
+
+    def _is_auto_path(self, value: Optional[str], leaf: str) -> bool:
+        defaults = {"", str(cfg.DEFAULT_WORKING_DIR / leaf)}
+        defaults |= {p for p in getattr(self, "_auto_paths", set()) if Path(p).name == leaf}
+        return value is None or str(value) in defaults
+
     def apply_workdir(self, cli_path: Optional[Union[str, Path]] = None) -> Path:
-        """Resolve and activate working_dir; rewrite default output/runtime paths."""
+        """Resolve and activate working_dir; rewrite default output/runtime paths.
+
+        A default ``output_dir`` / ``runtime_dir`` (not set in the YAML) follows
+        the resolved working dir, even when another working dir was active when
+        this config was built.
+        """
         config_file_dir = getattr(self, "_config_file_dir", None)
         wd = cfg.resolve_working_dir(
             cli_path=cli_path,
@@ -634,14 +651,12 @@ class MasterConfig:
         self.working_dir = str(wd.root)
         if not self.distillation.working_dir:
             self.distillation.working_dir = str(wd.root)
-        default_models = str(cfg.DEFAULT_WORKING_DIR / "models")
-        if self.trainer.output_dir in ("", default_models) or self.trainer.output_dir == str(cfg.DEFAULT_WORKING_DIR / "models"):
-            self.trainer.output_dir = str(wd.models)
-        if self.processor.runtime_dir in ("", str(cfg.DEFAULT_WORKING_DIR / "runtime")):
+        for block in (self.trainer, self.dpo, self.apo, self.sft):
+            if self._is_auto_path(block.output_dir, "models"):
+                block.output_dir = str(wd.models)
+        if self._is_auto_path(self.processor.runtime_dir, "runtime"):
             self.processor.runtime_dir = str(wd.runtime)
-        for sibling in (self.dpo, self.apo, self.sft):
-            if sibling.output_dir in ("", default_models, str(cfg.DEFAULT_WORKING_DIR / "models")):
-                sibling.output_dir = str(wd.models)
+        self._auto_paths = {str(wd.models), str(wd.runtime)}
         return wd.root
 
     def languages(self) -> List[str]:

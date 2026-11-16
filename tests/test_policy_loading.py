@@ -163,11 +163,7 @@ def test_load_unreachable_repo_raises(tmp_path):
 
 @pytest.fixture
 def workdir(tmp_path: Path):
-    from beni.utils import config as cfg
-
     wd = tmp_path / "run"
-    # Pin the global working dir so output_dir defaults point at this run (see issue 23).
-    cfg.set_working_dir(wd, ensure=True)
     config = tmp_path / "config.yaml"
     config.write_text(
         f"algorithm: sft\nworking_dir: {wd}\ndata:\n  languages: [bam]\n", encoding="utf-8"
