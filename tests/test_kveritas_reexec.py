@@ -44,7 +44,7 @@ def _patched(code: int = 0):
     "argv, work",
     [
         (["exp", "--algorithm", "sft"], "beni.core.pipeline.run_experiment"),
-        (["train", "--algorithm", "sft"], "beni.core.pipeline.run_arm"),
+        (["train", "--algorithm", "sft", "--kveritas-seal"], "beni.core.pipeline.run_arm"),
         (["eval"], "beni.core.pipeline.load_policy"),
     ],
 )
@@ -122,11 +122,12 @@ def test_missing_binary_runs_unmonitored(kv_config):
     assert "kveritas not on PATH" in result.output
 
 
-def test_train_no_seal_flag_overrides_config(kv_config):
+def test_train_does_not_seal_unless_asked(kv_config):
+    """Config kveritas_seal does not seal a train run: that would close the session before eval."""
     config, wd = kv_config
     which, call, init = _patched()
     with which, call as call_mock, init, patch("beni.core.pipeline.run_arm"):
-        runner.invoke(app, ["train", "-c", str(config), "-w", str(wd), "--no-kveritas-seal"])
+        runner.invoke(app, ["train", "-c", str(config), "-w", str(wd)])
     assert not any(part.startswith("--seal") for part in call_mock.call_args.args[0])
 
 

@@ -43,15 +43,15 @@ def _sebeni_cmd() -> list:
 
 
 def _config(workdir: Path) -> Path:
-    if os.environ.get("SEBENI_FORCE_CPU") != "1":
-        return CONFIG
+    """Harness config copy: K-Veritas off (covered by scripts/smoke_tinystories.sh), CPU if forced."""
+    text = CONFIG.read_text(encoding="utf-8")
+    text = text.replace("  kveritas: true", "  kveritas: false").replace("  kveritas_seal: true", "  kveritas_seal: false")
+    if os.environ.get("SEBENI_FORCE_CPU") == "1":
+        text = text.replace("use_cpu: false", "use_cpu: true")
     workdir.mkdir(parents=True, exist_ok=True)
-    forced = workdir / "test_tinystories.cpu.yaml"
-    forced.write_text(
-        CONFIG.read_text(encoding="utf-8").replace("use_cpu: false", "use_cpu: true"),
-        encoding="utf-8",
-    )
-    return forced
+    copy = workdir.parent / f"{workdir.name}.yaml"
+    copy.write_text(text, encoding="utf-8")
+    return copy
 
 
 def _run(*args: str, workdir: Path) -> subprocess.CompletedProcess:

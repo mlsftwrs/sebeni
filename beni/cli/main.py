@@ -381,7 +381,8 @@ def train(
     kveritas_seal: Optional[bool] = typer.Option(
         None,
         "--kveritas-seal/--no-kveritas-seal",
-        help="Run under `kveritas run --seal` and write {working_dir}/exp/report.pdf. Default: experiment.kveritas_seal.",
+        help="Run under `kveritas run --seal` and write {working_dir}/exp/report.pdf. Off by default for train "
+        "(sealing closes the session; `sebeni eval` seals train + eval).",
     ),
     eval_ratio: Optional[float] = typer.Option(
         None, "--eval-ratio", help="Fraction of user dataset held out for evaluation (default: 0.1)."
@@ -439,8 +440,9 @@ def train(
         use_vllm=use_vllm,
         vllm_gpu_memory_utilization=vllm_gpu_memory_utilization,
     )
-    seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
-    _maybe_reexec_under_kveritas(mc, config, seal=seal)
+    # Sealing closes the session, so a standalone train seals only on request;
+    # a following `sebeni eval` (experiment.kveritas_seal) seals train + eval together.
+    _maybe_reexec_under_kveritas(mc, config, seal=bool(kveritas_seal))
     from beni.core.pipeline import run_arm
 
     run_arm(mc)

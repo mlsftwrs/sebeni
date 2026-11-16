@@ -6,10 +6,15 @@
 #   scripts/smoke_tinystories.sh sft grpo        # chosen arms only
 #   SEBENI_FORCE_CPU=1 scripts/smoke_tinystories.sh
 #   PYTHON=/path/to/venv/bin/python scripts/smoke_tinystories.sh
+#   KVERITAS_MODE=local|server|off scripts/smoke_tinystories.sh   # default: local
 #
 # SFT and GRPO run distill -> train -> eval; DPO and APO run `sebeni exp`.
 # Each arm gets its own working directory under ${SMOKE_ROOT:-${TMPDIR:-/tmp}/sebeni-smoke-tinystories}.
-# K-Veritas is enabled by the config (experiment.kveritas / kveritas_seal).
+# K-Veritas (#20): every train / eval / exp command runs under `kveritas run`.
+#   local  (default) `kveritas init --local`, signed with a throwaway RSA key in SMOKE_ROOT/keys
+#   server the config as is (attestation server)
+#   off    experiment.kveritas / kveritas_seal set to false
+# A sealed exp/report.pdf is checked with `kveritas verify`.
 # Checks pipeline mechanics only: TinyStories is an English story model.
 set -euo pipefail
 
@@ -27,14 +32,29 @@ sebeni() { "${PYTHON}" -c 'from beni.cli.main import app; app()' "$@"; }
 SMOKE_ROOT="${SMOKE_ROOT:-${TMPDIR:-/tmp}/sebeni-smoke-tinystories}"
 CONFIG="${REPO_ROOT}/configs/test_tinystories.yaml"
 mkdir -p "${SMOKE_ROOT}"
+SMOKE_CONFIG="${SMOKE_ROOT}/test_tinystories.smoke.yaml"
+cp "${CONFIG}" "${SMOKE_CONFIG}"
 if [[ "${SEBENI_FORCE_CPU:-0}" == "1" ]]; then
-  sed 's/use_cpu: false/use_cpu: true/' "${CONFIG}" > "${SMOKE_ROOT}/test_tinystories.cpu.yaml"
-  CONFIG="${SMOKE_ROOT}/test_tinystories.cpu.yaml"
+  sed -i 's/use_cpu: false/use_cpu: true/' "${SMOKE_CONFIG}"
 fi
+KVERITAS_MODE="${KVERITAS_MODE:-local}"
+case "${KVERITAS_MODE}" in
+  local)
+    KEY="${SMOKE_ROOT}/keys/private.pem"
+    if [[ ! -f "${KEY}" ]]; then
+      mkdir -p "$(dirname "${KEY}")" && openssl genrsa -out "${KEY}" 3072 2>/dev/null && chmod 600 "${KEY}"
+    fi
+    sed -i "s|^  kveritas_seal: true|  kveritas_seal: true\n  kveritas_local: true\n  kveritas_local_key: ${KEY}|" "${SMOKE_CONFIG}"
+    ;;
+  server) ;;
+  off) sed -i 's/^  kveritas: true/  kveritas: false/; s/^  kveritas_seal: true/  kveritas_seal: false/' "${SMOKE_CONFIG}" ;;
+  *) echo "KVERITAS_MODE must be local, server or off" >&2; exit 2 ;;
+esac
+CONFIG="${SMOKE_CONFIG}"
 
 DEVICE="$("${PYTHON}" -c 'import torch; print("cuda" if torch.cuda.is_available() else "cpu")' 2>/dev/null || echo unknown)"
 [[ "${SEBENI_FORCE_CPU:-0}" == "1" ]] && DEVICE="cpu (forced)"
-echo "[smoke] python=${PYTHON} config=${CONFIG} device=${DEVICE} root=${SMOKE_ROOT}"
+echo "[smoke] python=${PYTHON} config=${CONFIG} device=${DEVICE} kveritas=${KVERITAS_MODE} root=${SMOKE_ROOT}"
 
 ARMS=("$@")
 [[ ${#ARMS[@]} -eq 0 ]] && ARMS=(sft grpo dpo apo)
@@ -72,7 +92,20 @@ r = json.load(open(sys.argv[1]))
 print(" ".join(f"{k}={r.get(k)}" for k in ("phi", "mer", "mcs", "uwec")))
 PY
 )"
-  RESULT[${arm}]="${status} ${secs}s ${metrics}"
+  kvstatus=""
+  if [[ "${KVERITAS_MODE}" != "off" ]]; then
+    if [[ -f "${wd}/exp/report.pdf" ]] && command -v kveritas >/dev/null; then
+      runs="$(kveritas verify "${wd}/exp/report.pdf" 2>&1 | awk '/^Runs:/ {print $2}')"
+      if kveritas verify "${wd}/exp/report.pdf" >/dev/null 2>&1; then
+        kvstatus=" kveritas=verified runs=${runs}"
+      else
+        kvstatus=" kveritas=VERIFY_FAILED"; status=FAILED
+      fi
+    else
+      kvstatus=" kveritas=NO_REPORT"; status=FAILED
+    fi
+  fi
+  RESULT[${arm}]="${status} ${secs}s ${metrics}${kvstatus}"
   echo "[smoke] ${arm}: ${RESULT[${arm}]}"
 done
 
