@@ -118,6 +118,9 @@ beni = ["*.old", "*.backup", "*Zone.Identifier"]
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-v --strict-markers"
+markers = [
+    "slow: downloads models and trains (TinyStories-1M); run with SEBENI_RUN_SLOW=1",
+]
 
 [tool.ruff]
 target-version = "py310"

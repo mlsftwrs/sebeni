@@ -1,0 +1,94 @@
+# Sebeni test harness: roneneldan/TinyStories-1M.
+# Device: uses the GPU when CUDA is available and falls back to CPU otherwise
+# (use_cpu: false; beni/core/srl/plugin.py load_models switches to CPU when
+# torch.cuda.is_available() is False). Set use_cpu: true to force CPU.
+# Checks pipeline mechanics only (distill -> train -> eval). TinyStories is an
+# English story model, so its MER/MCS/UWEC scores mean nothing.
+# Used by tests/integration/test_tinystories_e2e.py and scripts/smoke_tinystories.sh.
+# Docs: https://mlsftwrs.github.io/sebeni/hyperparams/
+
+project_name: sebeni-test-tinystories
+algorithm: sft
+
+model:
+  model_name: roneneldan/TinyStories-1M
+  load_in_4bit: false
+  load_in_8bit: false
+  use_peft: true
+  lora_r: 4
+  lora_alpha: 8
+  lora_dropout: 0.0
+  # GPT-Neo attention projections; the default o_proj does not exist here.
+  lora_target_modules: [q_proj, k_proj, v_proj, out_proj]
+
+data:
+  default_lang: bam
+  languages: [bam]
+  # Resolved relative to the repository root (run from there).
+  source: tests/fixtures/tinystories_bam.jsonl
+  scheme: completion
+
+trainer:
+  framework: torch
+  learning_rate: 1.0e-4
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 1
+  max_steps: 3
+  num_generations: 2
+  # The Sebeni system prompt is ~970 GPT-2 tokens for Bambara text; keep
+  # prompt + completion within TinyStories' 2048 positions.
+  max_prompt_length: 1024
+  max_completion_length: 64
+  temperature: 0.9
+  seed: 42
+  bf16: false
+  fp16: false
+  use_cpu: false
+  use_vllm: false
+  report_to: none
+
+sft:
+  learning_rate: 1.0e-4
+  per_device_train_batch_size: 2
+  max_steps: 3
+  max_length: 1536
+  use_cpu: false
+  bf16: false
+  report_to: none
+
+dpo:
+  learning_rate: 1.0e-5
+  per_device_train_batch_size: 2
+  max_steps: 3
+  max_prompt_length: 1024
+  max_length: 1536
+  use_cpu: false
+  bf16: false
+  report_to: none
+
+apo:
+  learning_rate: 1.0e-5
+  per_device_train_batch_size: 2
+  max_steps: 3
+  max_prompt_length: 1024
+  max_length: 1536
+  use_cpu: false
+  bf16: false
+  report_to: none
+
+distillation:
+  enabled: true
+  backend: algorithmic
+  tau: 0.5
+  hitl: false
+
+experiment:
+  # K-Veritas stays on in the harness so every phase exercises it (issue 20).
+  # Before the issue 20 fix, `sebeni exp` seals a one-second stub run, so
+  # pre-Phase-3 reports show the bug (useful as a before/after).
+  kveritas: true
+  kveritas_seal: true
+  max_eval_rows: 2
+
+safety:
+  enabled: true
