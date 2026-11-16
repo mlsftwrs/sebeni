@@ -482,7 +482,9 @@ def run_eval(
     scorer = MorphologyScorer()
     by_language = {}
     max_rows = mc.experiment.max_eval_rows
-    cap = None if max_rows in (None, 0) else max(int(max_rows), 0)
+    if max_rows is not None and int(max_rows) < 0:
+        raise ValueError(f"experiment.max_eval_rows must be null or >= 0, got {max_rows}")
+    cap = None if max_rows in (None, 0) else int(max_rows)
     scope_mer_ops = 0
     scope_mer_n = 0
     scope_mcs_hit = 0.0

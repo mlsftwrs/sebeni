@@ -36,6 +36,11 @@ def test_eval_rows_leaves_one_train_row():
     assert (len(train), len(held)) == (1, 3)
 
 
+def test_eval_rows_zero_disables_split():
+    train, held = _plugin(eval_ratio=0.2, eval_rows=0).split_eval(_ds(), seed=0)
+    assert held is None and len(train) == 10
+
+
 def test_no_split_when_disabled():
     train, held = _plugin(eval_ratio=0.0).split_eval(_ds(), seed=0)
     assert held is None and len(train) == 10

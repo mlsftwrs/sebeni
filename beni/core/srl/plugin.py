@@ -381,8 +381,8 @@ class AlignmentPlugin:
     def split_eval(self, dataset, seed: Optional[int] = None):
         """Carve the in-training hold-out from ``dataset``.
 
-        Uses ``data.eval_rows`` (a row count) when set, otherwise
-        ``data.eval_ratio``. ``experiment.max_eval_rows`` is not read here: it
+        Uses ``data.eval_rows`` (a row count; 0 disables the split) when set,
+        otherwise ``data.eval_ratio``. ``experiment.max_eval_rows`` is not read here: it
         only caps the held-out ``test.json`` scored by ``run_eval``.
         Returns ``(train_dataset, eval_dataset_or_None)``.
         """
@@ -391,7 +391,9 @@ class AlignmentPlugin:
             return dataset, None
         eval_rows = getattr(self.config.data, "eval_rows", None)
         eval_ratio = float(getattr(self.config.data, "eval_ratio", 0.0) or 0.0)
-        if eval_rows is not None and int(eval_rows) > 0:
+        if eval_rows is not None:
+            if int(eval_rows) <= 0:
+                return dataset, None  # eval_rows: 0 turns the in-training eval off
             test_size = min(int(eval_rows), n_samples - 1)
         elif eval_ratio > 0.0:
             if eval_ratio >= 1.0:

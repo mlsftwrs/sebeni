@@ -126,3 +126,11 @@ def test_eval_source_default_is_packaged_test_json(eval_env):
     eval_env.experiment.eval_source = None
     rows = load_eval_records(eval_env)
     assert rows and all(r["lang"] == "bam" for r in rows)
+
+
+def test_negative_max_eval_rows_is_rejected(eval_env):
+    from beni.core.pipeline import run_eval
+
+    eval_env.experiment.max_eval_rows = -1
+    with pytest.raises(ValueError):
+        run_eval(eval_env, records=_rows("a b"), generate=lambda t, _l: t)
