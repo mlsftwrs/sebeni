@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from datasets import Dataset
 
+from beni.core.compute.rewards import RewardManager
 from beni.core.srl.config import trl_config_kwargs
 from beni.core.srl.plugin import AlignmentPlugin
 from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
@@ -31,6 +32,12 @@ class SebeniDpo(AlignmentPlugin):
             records, scheme_prompt=True, languages=self.config.languages()
         )
 
+    def _rendered_prompt(self, row: Dict[str, Any]) -> str:
+        prompt = row.get("prompt")
+        if isinstance(prompt, list) and self.tokenizer is not None and getattr(self.tokenizer, "chat_template", None):
+            return self.tokenizer.apply_chat_template(prompt, tokenize=False, add_generation_prompt=True)
+        return RewardManager.completion_text(prompt)
+
     def train(
         self,
         data,
@@ -50,6 +57,17 @@ class SebeniDpo(AlignmentPlugin):
         kept = self.gate_targets(rows, completion_key="chosen", lang_key="language")
         if not kept:
             raise RuntimeError(f"SafetyGovernor refused every preference pair: {self.target_gate_report}")
+        if self.model is None:
+            self.load_models()
+        kept = self.drop_overlength(
+            kept,
+            prompt_of=self._rendered_prompt,
+            answers_of=lambda row: [
+                RewardManager.completion_text(row.get("chosen")),
+                RewardManager.completion_text(row.get("rejected")),
+            ],
+            max_length=getattr(self.config.dpo, "max_length", None),
+        )
         if len(kept) != len(rows):
             dataset = Dataset.from_list(kept)
         train_dataset, eval_dataset = self.split_eval(dataset, seed=self.config.dpo.seed)

@@ -127,6 +127,29 @@ def test_sft_wrong_language_target_blocks_the_step():
     assert "language_mismatch_batch" in plugin.governor.spec.fired
 
 
+def test_sft_logps_survive_trl_popping_labels():
+    """TRL's SFT compute_loss can pop "labels" from the inputs dict."""
+
+    def popping_loss(model, inputs, return_outputs=False, **kwargs):
+        inputs.pop("labels")
+        return _lm_loss(model, inputs, return_outputs=return_outputs)
+
+    plugin, trainer, model, _ = _wire(SebeniSft, popping_loss)
+    trainer.compute_loss(model, _sft_inputs("PROMPT ", _target("bam")))
+    assert plugin._last_logps["model_logps"] is not None
+
+
+def test_sft_logps_when_trl_skips_logits():
+    def no_logits_loss(model, inputs, return_outputs=False, **kwargs):
+        loss, outputs = _lm_loss(model, inputs, return_outputs=True)
+        outputs.logits = None
+        return (loss, outputs) if return_outputs else loss
+
+    plugin, trainer, model, _ = _wire(SebeniSft, no_logits_loss)
+    trainer.compute_loss(model, _sft_inputs("PROMPT ", _target("bam")))
+    assert plugin._last_logps["model_logps"] is not None
+
+
 def test_sft_return_outputs_is_preserved():
     plugin, trainer, model, _ = _wire(SebeniSft, _lm_loss)
     loss, outputs = trainer.compute_loss(model, _sft_inputs("P ", _target()), return_outputs=True)
@@ -199,3 +222,38 @@ def test_gate_targets_off_when_safety_disabled():
     plugin = SebeniSft(mc)
     rows = [{"target": "not json", "lang": "bam"}]
     assert plugin.gate_targets(rows, completion_key="target") == rows
+
+
+# --- issue 24: over-length targets are dropped, not truncated -----------------
+
+
+class LenTokenizer:
+    """One token per character."""
+
+    def __call__(self, text, add_special_tokens=True):
+        return {"input_ids": list(range(len(text)))}
+
+
+def test_drop_overlength_rows():
+    plugin = SebeniSft(MasterConfig())
+    plugin.tokenizer = LenTokenizer()
+    rows = [{"p": "x" * 5, "a": "y" * 4}, {"p": "x" * 5, "a": "y" * 10}]
+    kept = plugin.drop_overlength(rows, lambda r: r["p"], lambda r: [r["a"]], max_length=10)
+    assert kept == rows[:1]
+    assert plugin.target_gate_report["overlength_target"] == 1
+    assert "overlength_target" in plugin.governor.spec.fired
+
+
+def test_drop_overlength_uses_longest_answer():
+    plugin = SebeniDpo(MasterConfig())
+    plugin.tokenizer = LenTokenizer()
+    rows = [{"p": "x" * 4, "c": "y" * 3, "r": "z" * 9}]
+    with pytest.raises(RuntimeError, match="longer than max_length"):
+        plugin.drop_overlength(rows, lambda r: r["p"], lambda r: [r["c"], r["r"]], max_length=10)
+
+
+def test_drop_overlength_noop_without_limit():
+    plugin = SebeniSft(MasterConfig())
+    plugin.tokenizer = LenTokenizer()
+    rows = [{"p": "x" * 50, "a": ""}]
+    assert plugin.drop_overlength(rows, lambda r: r["p"], lambda r: [r["a"]], max_length=None) == rows

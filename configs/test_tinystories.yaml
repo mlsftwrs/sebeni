@@ -51,7 +51,7 @@ sft:
   learning_rate: 1.0e-4
   per_device_train_batch_size: 2
   max_steps: 3
-  max_length: 1536
+  max_length: 2048       # TinyStories' full context; longer rows are dropped, not truncated (#24)
   use_cpu: false
   bf16: false
   report_to: none
@@ -61,7 +61,7 @@ dpo:
   per_device_train_batch_size: 2
   max_steps: 3
   max_prompt_length: 1024
-  max_length: 1536
+  max_length: 1536       # 4 x 2048-token sequences OOM a 6 GB GPU; longer rows are dropped (#24)
   use_cpu: false
   bf16: false
   report_to: none
@@ -71,7 +71,7 @@ apo:
   per_device_train_batch_size: 2
   max_steps: 3
   max_prompt_length: 1024
-  max_length: 1536
+  max_length: 1536       # 4 x 2048-token sequences OOM a 6 GB GPU; longer rows are dropped (#24)
   use_cpu: false
   bf16: false
   report_to: none

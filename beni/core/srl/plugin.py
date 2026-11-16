@@ -449,6 +449,55 @@ class AlignmentPlugin:
             logger.warning("SafetyGovernor dropped training targets: %s", self.target_gate_report)
         return kept
 
+    def drop_overlength(
+        self,
+        rows: List[Dict[str, Any]],
+        prompt_of: Callable[[Dict[str, Any]], str],
+        answers_of: Callable[[Dict[str, Any]], List[str]],
+        max_length: Optional[int],
+    ) -> List[Dict[str, Any]]:
+        """Drop rows whose prompt + longest answer exceeds ``max_length`` tokens.
+
+        TRL truncates such sequences, which cuts the JSON target mid-object and
+        trains the policy on invalid output. Counts go to
+        ``target_gate_report["overlength_target"]``.
+        """
+        report = self.target_gate_report if self.target_gate_report is not None else {"n_kept": len(rows), "n_dropped": 0}
+        if not max_length or self.tokenizer is None:
+            report.setdefault("overlength_target", 0)
+            self.target_gate_report = report
+            return rows
+        kept: List[Dict[str, Any]] = []
+        longest = 0
+        for row in rows:
+            n_prompt = len(self.tokenizer(prompt_of(row))["input_ids"])
+            n_answer = max(
+                (len(self.tokenizer(a, add_special_tokens=False)["input_ids"]) for a in answers_of(row)),
+                default=0,
+            )
+            longest = max(longest, n_prompt + n_answer)
+            if n_prompt + n_answer + 1 <= int(max_length):  # +1 for an appended eos
+                kept.append(row)
+        dropped = len(rows) - len(kept)
+        report["overlength_target"] = dropped
+        report["max_length"] = int(max_length)
+        report["n_kept"] = len(kept)
+        report["n_dropped"] = int(report.get("n_dropped", 0)) + dropped
+        self.target_gate_report = report
+        if dropped:
+            self.governor._fire("overlength_target")
+            logger.warning(
+                "Dropped %d/%d training rows longer than max_length=%d tokens (longest %d); "
+                "raise max_length or use shorter (sentence-level) rows.",
+                dropped, len(rows), int(max_length), longest,
+            )
+        if rows and not kept:
+            raise RuntimeError(
+                f"Every training row is longer than max_length={int(max_length)} tokens (longest {longest}); "
+                "TRL would truncate the JSON targets. Raise max_length or use shorter rows."
+            )
+        return kept
+
     def _decode_targets(self, inputs: Dict[str, Any]) -> List[str]:
         """Decode the target tokens of a batch: DPO ``completion_mask`` (chosen half) or SFT ``labels``."""
         input_ids = inputs.get("input_ids")
@@ -490,11 +539,15 @@ class AlignmentPlugin:
             return result
 
         caller_wants_outputs = bool(kwargs.pop("return_outputs", False))
+        # TRL's SFT compute_loss may pop "labels" (custom compute_loss_func); keep our own references.
+        saved = {k: inputs[k] for k in ("input_ids", "attention_mask", "labels") if inputs.get(k) is not None}
         loss, outputs = original_loss(model, inputs, *args, return_outputs=True, **kwargs)
         try:
-            self._capture_sft_logps(model, inputs, outputs)
+            self._capture_sft_logps(model, saved, outputs)
         except Exception as exc:
-            logger.debug("SFT log-prob capture failed: %s", exc)
+            if not getattr(self, "_warned_logps", False):
+                self._warned_logps = True
+                logger.warning("SFT log-prob capture failed; U and the KL bound get no log-ratio: %r", exc)
         return (loss, outputs) if caller_wants_outputs else loss
 
     def _capture_sft_logps(self, model, inputs, outputs) -> None:
@@ -508,10 +561,14 @@ class AlignmentPlugin:
             return torch.log_softmax(logits[:, :-1, :].float(), dim=-1).gather(-1, safe).squeeze(-1)[mask]
 
         with torch.no_grad():
-            policy = _token_logps(outputs.logits.detach())
             forward = {k: inputs[k] for k in ("input_ids", "attention_mask") if inputs.get(k) is not None}
-            ref = None
             base = getattr(model, "module", model)
+            logits = getattr(outputs, "logits", None)
+            if logits is None:
+                # TRL's SFT loss can skip materialising logits; run one no-grad policy forward.
+                logits = base(**forward).logits
+            policy = _token_logps(logits.detach())
+            ref = None
             if self.ref_model is not None:
                 ref = _token_logps(self.ref_model(**forward).logits)
             elif hasattr(base, "disable_adapter"):

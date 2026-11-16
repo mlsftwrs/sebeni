@@ -60,6 +60,12 @@ class SebeniSft(AlignmentPlugin):
                 }
             )
         accepted = self.gate_targets(accepted, completion_key="target")
+        accepted = self.drop_overlength(
+            accepted,
+            prompt_of=lambda row: row["prompt"],
+            answers_of=lambda row: [row["completion"]],
+            max_length=getattr(self.config.sft, "max_length", None),
+        ) if accepted else accepted
         root = Path(self.config.working_dir or cfg.get_workdir().root)
         dataset_path = root / "data" / "sft" / "train.jsonl"
         dataset_path.parent.mkdir(parents=True, exist_ok=True)
