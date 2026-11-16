@@ -44,12 +44,14 @@ def test_empty_reference_is_skipped_and_counted(eval_env):
     from beni.core.pipeline import run_eval
 
     eval_env.experiment.max_eval_rows = 10
+    decoded = []
     report = run_eval(
         eval_env,
         records=_rows("a b c", "EMPTY row"),
-        generate=lambda text, _lang: "a b x",
+        generate=lambda text, _lang: decoded.append(text) or "a b x",
     )
     row = report["by_language"]["bam"]
+    assert decoded == ["a b c"]  # the empty-reference row is not decoded
     assert row["n_scored"] == 1
     assert row["n_skipped"] == 1
     assert report["n_skipped"] == 1

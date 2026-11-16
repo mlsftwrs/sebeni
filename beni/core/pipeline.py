@@ -533,6 +533,18 @@ def run_eval(
         n_skipped = 0
         if decode is not None:
             for text in sample_texts:
+                ref_sentences = parsed_ref_cache.get(text)
+                if ref_sentences is None:
+                    try:
+                        ref_sentences = dabax.loader(text) or []
+                        parsed_ref_cache[text] = ref_sentences
+                    except Exception:
+                        ref_sentences = []
+                ref_morphemes = _morphemes(ref_sentences[0]) if ref_sentences else []
+                if not ref_morphemes:
+                    # An empty reference has no defined MER; count it, skip decoding, keep it out of the pools.
+                    n_skipped += 1
+                    continue
                 try:
                     completion = decode(text, group)
                 except Exception:
@@ -565,18 +577,6 @@ def run_eval(
                         hyp_sentences = dabax.loader(completion) or []
                     except Exception:
                         hyp_sentences = []
-                ref_sentences = parsed_ref_cache.get(text)
-                if ref_sentences is None:
-                    try:
-                        ref_sentences = dabax.loader(text) or []
-                        parsed_ref_cache[text] = ref_sentences
-                    except Exception:
-                        ref_sentences = []
-                ref_morphemes = _morphemes(ref_sentences[0]) if ref_sentences else []
-                if not ref_morphemes:
-                    # An empty reference has no defined MER; count it and keep it out of the pools.
-                    n_skipped += 1
-                    continue
                 if not hyp_sentences:
                     continue
                 all_hyp_sentences.extend(hyp_sentences)
