@@ -37,7 +37,7 @@ class RewardManager:
         # lang matches the row), False (mismatch or mixed), None (no JSON lang).
         self.lang_ok: List[Optional[bool]] = []
         self.mixed_language: List[bool] = []
-        self._observed_batch: Optional[int] = None
+        self._observed_batch: Optional[Tuple[int, int, int]] = None
         self.total_reward: float = 0.0
         self.predicted_stages: List[List[Any]] = []
         self.custom_rewards: Dict[str, Tuple[Callable, float]] = {}
@@ -337,9 +337,12 @@ class RewardManager:
 
     def observe_language(self, completions: List[Any], language: Optional[List[str]] = None) -> None:
         """Record per-completion language identity for the governor (once per batch)."""
-        if self._observed_batch == id(completions):
+        # TRL calls every reward function with the same list for one batch; key on
+        # identity plus content so a reused id() for a later batch is not skipped.
+        key = (id(completions), len(completions), hash(self.completion_text(completions[0])) if completions else 0)
+        if self._observed_batch == key:
             return
-        self._observed_batch = id(completions)
+        self._observed_batch = key
         langs = list(language) if language else [""] * len(completions)
         for completion, lang in zip(completions, langs):
             ok, mixed = self.language_identity(completion, lang)

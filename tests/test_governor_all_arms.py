@@ -171,14 +171,16 @@ def test_dpo_feeds_chosen_targets_and_log_ratio(cls):
     rm = plugin.reward_manager
     assert rm.format_scores == [1.0]  # chosen half only
     assert rm.lang_ok == [True]
-    assert plugin._last_logps["log_ratio"] == pytest.approx((0.2 - 0.1) / (2 * 0.1))
-    assert plugin._last_logps["kl"] == pytest.approx((0.2 + 0.1) / (2 * 0.1))
+    n_c, n_r = len(chosen), len(rejected)  # one token per character
+    expected = (0.2 / (0.1 * n_c) + 0.1 / (0.1 * n_r)) / 2
+    assert plugin._last_logps["log_ratio"] == pytest.approx(expected)
+    assert plugin._last_logps["kl"] == pytest.approx(expected)
 
 
 def test_dpo_kl_bound_blocks_the_step():
     metrics = {"train": {"rewards/chosen": [5.0], "rewards/rejected": [-5.0]}}
     plugin, trainer, model, optimizer = _wire(SebeniDpo, _lm_loss, _metrics=metrics, beta=0.1)
-    plugin.governor.spec.max_kl = 1.0
+    plugin.governor.spec.max_kl = 0.1  # per-token |log-ratio| here is 5 / (0.1 * len) ≈ 0.6
     ids = torch.tensor([_ids("P " + _target()), _ids("P " + _target())])
     mask = torch.tensor([[0, 0] + [1] * (ids.shape[1] - 2)] * 2)
     loss = trainer.compute_loss(model, {"input_ids": ids, "attention_mask": torch.ones_like(ids), "completion_mask": mask})
@@ -257,3 +259,45 @@ def test_drop_overlength_noop_without_limit():
     plugin.tokenizer = LenTokenizer()
     rows = [{"p": "x" * 50, "a": ""}]
     assert plugin.drop_overlength(rows, lambda r: r["p"], lambda r: [r["a"]], max_length=None) == rows
+
+
+class KeepLM(TinyLM):
+    """Accepts logits_to_keep like HF causal LMs."""
+
+    def forward(self, input_ids, attention_mask=None, logits_to_keep=0):
+        out = super().forward(input_ids, attention_mask)
+        if logits_to_keep:
+            out.logits = out.logits[:, -logits_to_keep:, :]
+        return out
+
+
+def test_target_logps_with_logits_to_keep_matches_full():
+    plugin = SebeniSft(MasterConfig())
+    inputs = _sft_inputs("PROMPT ", _target())
+    forward = {"input_ids": inputs["input_ids"], "attention_mask": inputs["attention_mask"]}
+    labels = inputs["labels"]
+    with torch.no_grad():
+        kept = plugin._target_logps(KeepLM(), forward, labels)
+        full_logits = TinyLM()(inputs["input_ids"]).logits
+        shifted = labels[:, 1:]
+        full = torch.log_softmax(full_logits[:, :-1].float(), -1).gather(-1, shifted.clamp(min=0).unsqueeze(-1)).squeeze(-1)[shifted != -100]
+    assert torch.allclose(kept, full, atol=1e-5)
+    assert kept.numel() == len(_target())
+
+
+def test_last_logps_cleared_after_each_step():
+    plugin, trainer, model, optimizer = _wire(SebeniSft, _lm_loss)
+    loss = trainer.compute_loss(model, _sft_inputs("PROMPT ", _target("bam")))
+    loss.backward()
+    optimizer.step()
+    assert plugin._last_logps["model_logps"] is None and plugin._last_logps["kl"] is None
+
+
+def test_consecutive_blocked_steps_warn(capsys):
+    plugin, trainer, model, optimizer = _wire(SebeniSft, _lm_loss)
+    for _ in range(10):
+        loss = trainer.compute_loss(model, _sft_inputs("P ", _target("dtm")))
+        loss.backward()
+        optimizer.step()
+    assert plugin.blocked_steps == 10
+    assert "10 consecutive optimizer steps refused" in capsys.readouterr().out

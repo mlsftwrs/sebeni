@@ -172,6 +172,7 @@ class AlignmentPlugin:
         self.weights_dir: Optional[str] = None
         # Optimizer steps the SafetyGovernor refused (θ unchanged for those steps).
         self.blocked_steps = 0
+        self._consecutive_blocked = 0
         # Languages named in the training system prompt (read from POLICY_META next to loaded weights).
         self.prompt_languages: Optional[List[str]] = None
 
@@ -535,9 +536,15 @@ class AlignmentPlugin:
         want_logps = training and self._governor_wants_logps()
         sft_like = inputs.get("labels") is not None and inputs.get("completion_mask") is None
         if not (want_logps and sft_like):
+            lengths = (1.0, 1.0)
+            mask = inputs.get("completion_mask")
+            if want_logps and mask is not None:
+                counts = mask[:, 1:].sum(dim=1).float()
+                half = counts.shape[0] // 2
+                lengths = (float(counts[:half].mean().item()), float(counts[half:].mean().item()))
             result = original_loss(model, inputs, *args, **kwargs)
             if want_logps:
-                self._capture_dpo_log_ratio(trainer)
+                self._capture_dpo_log_ratio(trainer, *lengths)
             return result
 
         caller_wants_outputs = bool(kwargs.pop("return_outputs", False))
@@ -552,31 +559,52 @@ class AlignmentPlugin:
                 logger.warning("SFT log-prob capture failed; U and the KL bound get no log-ratio: %r", exc)
         return (loss, outputs) if caller_wants_outputs else loss
 
+    @staticmethod
+    def _selected_logps(logits, labels, mask, chunk: int = 256):
+        """log p(label) at ``mask`` positions only, in row chunks (no full-vocab fp32 copy)."""
+        rows = logits[mask]
+        targets = labels[mask]
+        out = []
+        for i in range(0, rows.shape[0], chunk):
+            block = rows[i : i + chunk].float()
+            out.append(block.gather(-1, targets[i : i + chunk].unsqueeze(-1)).squeeze(-1) - torch.logsumexp(block, dim=-1))
+        return torch.cat(out) if out else rows.new_zeros(0, dtype=torch.float32)
+
+    def _target_logps(self, module, forward, labels):
+        """Per-target-token log-probs from ``module``; only the target suffix's logits are computed when supported."""
+        length = labels.shape[1]
+        positions = (labels != -100).float().argmax(dim=1)
+        keep = int(length - int(positions.min().item()) + 1)
+        try:
+            logits = module(**forward, logits_to_keep=keep).logits
+        except TypeError:
+            logits = module(**forward).logits
+        keep = logits.shape[1]
+        shifted = labels[:, length - keep + 1 :]
+        mask = shifted != -100
+        return self._selected_logps(logits[:, :-1, :], shifted.clamp(min=0), mask)
+
     def _capture_sft_logps(self, model, inputs, outputs) -> None:
-        labels = inputs["labels"][:, 1:]
-        mask = labels != -100
-        if not bool(mask.any()):
+        labels = inputs["labels"]
+        if not bool((labels[:, 1:] != -100).any()):
             return
-        safe = labels.clamp(min=0).unsqueeze(-1)
-
-        def _token_logps(logits):
-            return torch.log_softmax(logits[:, :-1, :].float(), dim=-1).gather(-1, safe).squeeze(-1)[mask]
-
         with torch.no_grad():
             forward = {k: inputs[k] for k in ("input_ids", "attention_mask") if inputs.get(k) is not None}
             base = getattr(model, "module", model)
             logits = getattr(outputs, "logits", None)
-            if logits is None:
-                # TRL's SFT loss can skip materialising logits; run one no-grad policy forward.
-                logits = base(**forward).logits
-            policy = _token_logps(logits.detach())
+            if logits is not None and logits.shape[1] == labels.shape[1]:
+                shifted = labels[:, 1:]
+                policy = self._selected_logps(logits[:, :-1, :].detach(), shifted.clamp(min=0), shifted != -100)
+            else:
+                # TRL's SFT loss (chunked_nll) skips materialising logits; one no-grad policy forward.
+                policy = self._target_logps(base, forward, labels)
             ref = None
             if self.ref_model is not None:
-                ref = _token_logps(self.ref_model(**forward).logits)
+                ref = self._target_logps(self.ref_model, forward, labels)
             elif hasattr(base, "disable_adapter"):
                 with base.disable_adapter():
-                    ref = _token_logps(base(**forward).logits)
-        if ref is None:
+                    ref = self._target_logps(base, forward, labels)
+        if ref is None or ref.shape != policy.shape:
             return
         self._last_logps = {
             "model_logps": policy,
@@ -585,20 +613,23 @@ class AlignmentPlugin:
             "log_ratio": None,
         }
 
-    def _capture_dpo_log_ratio(self, trainer) -> None:
+    def _capture_dpo_log_ratio(self, trainer, n_chosen: float = 1.0, n_rejected: float = 1.0) -> None:
+        """Per-token |log π_θ/π_ref| for the chosen and rejected answers, from TRL's rewards.
+
+        TRL's ``rewards/*`` are β · log-ratio summed over each answer, averaged over
+        the batch; dividing by the mean answer length puts them on the same
+        per-token scale as SFT. Absolute values keep chosen-up / rejected-down
+        drift from cancelling.
+        """
         metrics = (getattr(trainer, "_metrics", None) or {}).get("train") or {}
         chosen, rejected = metrics.get("rewards/chosen"), metrics.get("rewards/rejected")
         beta = float(getattr(trainer, "beta", 0.0) or 0.0)
         if not chosen or not rejected or beta <= 0:
             return
-        rc, rr = float(chosen[-1]), float(rejected[-1])
-        # rewards/* = β · mean log(π_θ / π_ref) over the chosen / rejected answers.
-        self._last_logps = {
-            "model_logps": None,
-            "ref_logps": None,
-            "log_ratio": (rc + rr) / (2.0 * beta),
-            "kl": (abs(rc) + abs(rr)) / (2.0 * beta),
-        }
+        per_token_c = abs(float(chosen[-1])) / (beta * max(float(n_chosen), 1.0))
+        per_token_r = abs(float(rejected[-1])) / (beta * max(float(n_rejected), 1.0))
+        drift = (per_token_c + per_token_r) / 2.0
+        self._last_logps = {"model_logps": None, "ref_logps": None, "log_ratio": drift, "kl": drift}
 
     def _wire_pre_update_hooks(self, trainer) -> None:
         """Attach SafetyGovernor + logps capture around optimizer.step / compute_loss."""
@@ -700,11 +731,21 @@ class AlignmentPlugin:
                 batch_meta["_governor_allowed"] = allowed
                 self.hook_manager(batch_meta)
                 self.reward_manager.clear()
+                # Signals are per step: never let a stale log-ratio reach the next step's gates.
+                self._last_logps = {"model_logps": None, "ref_logps": None, "kl": None, "log_ratio": None}
                 if not allowed:
                     # Zeroed gradients are not enough: AdamW momentum and decoupled
                     # weight decay would still move θ. Skip the step entirely.
                     self.blocked_steps += 1
+                    self._consecutive_blocked += 1
+                    if self._consecutive_blocked in (10, 50) or self._consecutive_blocked % 100 == 0:
+                        print(
+                            f"[SafetyGovernor] Warning: {self._consecutive_blocked} consecutive optimizer steps "
+                            f"refused (gates fired: {list(self.governor.spec.fired)}); θ is not changing. "
+                            "Check the data, max_length, safety.max_kl, or the arm's warm start."
+                        )
                     return None
+                self._consecutive_blocked = 0
                 return original_step(*args, **kwargs)
 
             optimizer.step = hooked_step
