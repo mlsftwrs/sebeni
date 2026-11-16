@@ -278,12 +278,18 @@ class RewardManager:
     _LANG_FIELD = re.compile(r'"lang(?:uage)?"\s*:\s*"([^"]*)"')
 
     @classmethod
-    def language_identity(cls, completion: Any, expected: Optional[str]) -> Tuple[Optional[bool], bool]:
+    def language_identity(
+        cls,
+        completion: Any,
+        expected: Optional[str],
+        allowed: Optional[Any] = None,
+    ) -> Tuple[Optional[bool], bool]:
         """Return ``(ok, mixed)`` for one completion.
 
         ``mixed`` is True when the completion declares more than one language
         (several ``lang`` fields, or one listing several codes). ``ok`` is None
-        when no language is declared, else True iff it is exactly ``expected``.
+        when no language is declared, else True iff it is exactly ``expected``
+        (or, when ``expected`` is unknown, one of the ``allowed`` codes).
         """
         from beni.core.language import Language
 
@@ -298,8 +304,36 @@ class RewardManager:
         mixed = len(declared) > 1
         if mixed:
             return False, True
+        if not expected and allowed:
+            scope = {Language.from_code(str(code)).group_code for code in allowed}
+            return declared <= scope, False
         want = Language.from_code(expected).group_code if expected else ""
         return (bool(want) and declared == {want}), False
+
+    @classmethod
+    def target_valid(cls, completion: Any) -> bool:
+        """R_format validity: a JSON object with a ``tokens`` list."""
+        parsed = cls.extract_json(completion)
+        return bool(parsed and isinstance(parsed.get("tokens"), list))
+
+    def observe_targets(self, completions: List[Any], allowed: Optional[Any] = None) -> None:
+        """Record governor signals for training targets (SFT labels, DPO chosen).
+
+        Unlike the reward functions this adds nothing to the reward totals:
+        ``format_scores`` get 1.0 / 0.0 validity, ``lang_ok`` / ``mixed_language``
+        check the declared language against the run scope, and parsed stages
+        feed the uncertainty indicator.
+        """
+        for completion in completions:
+            valid = self.target_valid(completion)
+            self.format_scores.append(1.0 if valid else 0.0)
+            ok, mixed = self.language_identity(completion, None, allowed=allowed)
+            self.lang_ok.append(ok)
+            self.mixed_language.append(mixed)
+            if valid:
+                parsed = self.extract_json(completion)
+                sent = self.parse_json_to_sentence(parsed, parsed.get("text", ""))
+                self.predicted_stages.append([t.stage for t in sent.tokens])
 
     def observe_language(self, completions: List[Any], language: Optional[List[str]] = None) -> None:
         """Record per-completion language identity for the governor (once per batch)."""

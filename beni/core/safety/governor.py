@@ -221,10 +221,15 @@ class SafetyGovernor:
         if u is None:
             model_logps = batch_meta.get("model_logps")
             ref_logps = batch_meta.get("ref_logps")
-            if model_logps is None or ref_logps is None:
+            log_ratio = batch_meta.get("log_ratio")
+            if model_logps is not None and ref_logps is not None:
+                u_kl = _mean_log_ratio(model_logps, ref_logps, self.spec.kl_beta)
+            elif log_ratio is not None:
+                # Pre-aggregated mean log(π_θ / π_ref), e.g. from DPO's logged rewards.
+                u_kl = self.spec.kl_beta * float(log_ratio)
+            else:
                 return 1.0
             indicator = _mean_stage_indicator(batch_meta.get("predicted_stages"))
-            u_kl = _mean_log_ratio(model_logps, ref_logps, self.spec.kl_beta)
             u = indicator + u_kl
             batch_meta["u_indicator"] = indicator
             batch_meta["u_kl"] = u_kl

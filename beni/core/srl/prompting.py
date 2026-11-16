@@ -9,7 +9,7 @@ the evaluated policy sees the same input it was trained on.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 # End-of-turn markers cut from decoded text. A ChatML fallback template on a base
 # tokenizer renders ``<|im_end|>`` as plain text, so ``skip_special_tokens`` keeps it.
@@ -60,7 +60,18 @@ def build_policy_example(
     tokenizer: Any = None,
     languages: Optional[Sequence[str]] = None,
 ) -> str:
-    """Full SFT training text: exactly :func:`build_policy_prompt`, the answer, then the end of turn.
+    """Full SFT training text: see :func:`build_policy_example_parts`."""
+    prompt, answer = build_policy_example_parts(text, completion, tokenizer, languages)
+    return prompt + answer
+
+
+def build_policy_example_parts(
+    text: str,
+    completion: str,
+    tokenizer: Any = None,
+    languages: Optional[Sequence[str]] = None,
+) -> Tuple[str, str]:
+    """SFT ``(prompt, answer)``: exactly :func:`build_policy_prompt`, then the answer and end of turn.
 
     The prompt is an exact prefix, so templates that inject text before the
     final assistant message (e.g. empty think blocks) cannot teach the policy
@@ -78,7 +89,7 @@ def build_policy_example(
         bos = getattr(tokenizer, "bos_token", None)
         if isinstance(bos, str) and bos and prompt.startswith(bos):
             prompt = prompt[len(bos):]
-    return prompt + completion + suffix
+    return prompt, completion + suffix
 
 
 def end_of_turn_ids(tokenizer: Any) -> List[int]:

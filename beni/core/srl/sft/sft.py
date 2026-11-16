@@ -21,14 +21,18 @@ class SebeniSft(AlignmentPlugin):
     """TRL SFTTrainer over DabaX completion labels."""
 
     name = "sft"
+    signal_source = "targets"
 
     def extract_labels(self, records: List[Dict[str, Any]]) -> List[Dict[str, str]]:
         """Build SFT rows from frozen resources. Skips empty analyses.
 
-        The training text is :func:`beni.core.srl.prompting.build_policy_example`,
-        the same chat prompt GRPO / DPO train on and ``analyze`` decodes with.
+        Each row is a ``prompt`` / ``completion`` pair from
+        :func:`beni.core.srl.prompting.build_policy_example_parts`: the same chat
+        prompt GRPO / DPO train on and ``analyze`` decodes with, so TRL computes
+        the loss on the answer only. Targets the SafetyGovernor would refuse
+        (invalid JSON, wrong or mixed language) are dropped (``gate_targets``).
         """
-        from beni.core.srl.prompting import build_policy_example
+        from beni.core.srl.prompting import build_policy_example_parts
         from beni.data.datasets import build_dabax_reference
 
         languages = self.config.languages()
@@ -44,14 +48,18 @@ class SebeniSft(AlignmentPlugin):
             if not reference or not tokens:
                 invalid.append({"text": text, "lang": lang})
                 continue
-            completion = json.dumps(reference, ensure_ascii=False)
+            target = json.dumps(reference, ensure_ascii=False)
+            prompt, answer = build_policy_example_parts(text, target, self.tokenizer, languages)
             accepted.append(
                 {
-                    "text": build_policy_example(text, completion, self.tokenizer, languages),
+                    "prompt": prompt,
+                    "completion": answer,
+                    "text": prompt + answer,
                     "lang": lang,
-                    "completion": completion,
+                    "target": target,
                 }
             )
+        accepted = self.gate_targets(accepted, completion_key="target")
         root = Path(self.config.working_dir or cfg.get_workdir().root)
         dataset_path = root / "data" / "sft" / "train.jsonl"
         dataset_path.parent.mkdir(parents=True, exist_ok=True)
@@ -64,6 +72,7 @@ class SebeniSft(AlignmentPlugin):
             "dataset_sha256": digest,
             "dataset": str(dataset_path),
             "invalid_sample": invalid[:8],
+            "governor": self.target_gate_report,
         }
         report_path = root / "exp" / "sft_label_report.json"
         report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -89,11 +98,11 @@ class SebeniSft(AlignmentPlugin):
         if self.model is None:
             self.load_models()
         labeled = self.extract_labels(records)
-        dataset = Dataset.from_list([{"text": row["text"]} for row in labeled])
+        dataset = Dataset.from_list([{"prompt": row["prompt"], "completion": row["completion"]} for row in labeled])
         train_dataset, eval_dataset = self.split_eval(dataset, seed=self.config.sft.seed)
 
         project_name = project_name or self.config.project_name
-        sft_dict = {**self.config.sft.to_dict(), "dataset_text_field": "text"}
+        sft_dict = self.config.sft.to_dict()
         if eval_dataset is not None:
             if "eval_strategy" not in sft_dict or not sft_dict["eval_strategy"]:
                 sft_dict["eval_strategy"] = "steps"
@@ -127,8 +136,6 @@ class SebeniSft(AlignmentPlugin):
             trainer_kwargs["processing_class"] = self.tokenizer
         elif "tokenizer" in trainer_sig:
             trainer_kwargs["tokenizer"] = self.tokenizer
-        if "dataset_text_field" in trainer_sig:
-            trainer_kwargs["dataset_text_field"] = "text"
         self.trainer = SFTTrainer(**trainer_kwargs)
         self._wire_pre_update_hooks(self.trainer)
         self._init_trackio(project_name)

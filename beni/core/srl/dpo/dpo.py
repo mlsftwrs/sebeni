@@ -16,6 +16,7 @@ class SebeniDpo(AlignmentPlugin):
     """TRL DPOTrainer. Preference pairs are built from frozen grammar and dictionary."""
 
     name = "dpo"
+    signal_source = "targets"
 
     def _preference_dataset(self, data: Union[List[Dict[str, Any]], Dataset]) -> Dataset:
         if isinstance(data, Dataset):
@@ -43,6 +44,14 @@ class SebeniDpo(AlignmentPlugin):
             [data[i] for i in range(len(data))] if isinstance(data, Dataset) else data
         )
         dataset = self._preference_dataset(self._preference_records)
+        # SafetyGovernor: the gradient pulls θ towards "chosen", so refuse invalid,
+        # wrong-language or mixed-language chosen answers before training.
+        rows = [dataset[i] for i in range(len(dataset))]
+        kept = self.gate_targets(rows, completion_key="chosen", lang_key="language")
+        if not kept:
+            raise RuntimeError(f"SafetyGovernor refused every preference pair: {self.target_gate_report}")
+        if len(kept) != len(rows):
+            dataset = Dataset.from_list(kept)
         train_dataset, eval_dataset = self.split_eval(dataset, seed=self.config.dpo.seed)
 
         if self.model is None:

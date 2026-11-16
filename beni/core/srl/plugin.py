@@ -11,7 +11,7 @@ import inspect
 import logging
 import os
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Sequence, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
@@ -123,6 +123,10 @@ class AlignmentPlugin:
     """
 
     name: str = "base"
+    # What the governor's per-item signals describe: the policy's own completions
+    # ("samples", GRPO) or the training targets the gradient pulls towards
+    # ("targets": SFT labels, DPO/APO chosen answers).
+    signal_source: str = "samples"
 
     def __init__(self, config: Optional[MasterConfig] = None, **kwargs: Any):
         if config is not None:
@@ -160,14 +164,12 @@ class AlignmentPlugin:
         )
         self.hook_manager = PreUpdateHookManager(model=None)
         self.data_loader = DL(config=self.config.data)
-        self._last_logps = {"model_logps": None, "ref_logps": None, "kl": None}
+        self._last_logps = {"model_logps": None, "ref_logps": None, "kl": None, "log_ratio": None}
+        self.target_gate_report: Optional[Dict[str, int]] = None
         self._last_uncertainty = {}
         self.loaded_weights: Optional[str] = None
         # Optimizer steps the SafetyGovernor refused (θ unchanged for those steps).
         self.blocked_steps = 0
-        # What the governor's per-item signals describe: the policy's own
-        # completions ("samples", GRPO) or the training targets ("targets").
-        self.signal_source = "samples"
         # Languages named in the training system prompt (read from POLICY_META next to loaded weights).
         self.prompt_languages: Optional[List[str]] = None
 
@@ -409,6 +411,136 @@ class AlignmentPlugin:
         split = dataset.train_test_split(test_size=test_size, seed=seed)
         return split["train"], split["test"]
 
+    def _governor_wants_logps(self) -> bool:
+        spec = self.governor.spec
+        return bool(spec.enabled and (spec.uncertainty_downweight or spec.max_kl is not None))
+
+    def gate_targets(self, rows: List[Dict[str, Any]], completion_key: str, lang_key: str = "lang"):
+        """Drop training rows whose target the SafetyGovernor would refuse.
+
+        Applies the policy-update gates to each row's target once, before
+        training: format validity (``format_invalid_blocks_update``), declared
+        language vs the row's language (``require_language``) and mixing
+        (``refuse_mixed_language``). Fires ``format_invalid_target`` /
+        ``language_mismatch_target`` / ``mixed_language_target``. Returns the
+        kept rows; counts go to ``self.target_gate_report``.
+        """
+        spec = self.governor.spec
+        kept: List[Dict[str, Any]] = []
+        dropped = {"format_invalid_target": 0, "language_mismatch_target": 0, "mixed_language_target": 0}
+        for row in rows:
+            target = row.get(completion_key)
+            reason = None
+            if spec.enabled:
+                ok, mixed = RewardManager.language_identity(target, row.get(lang_key) or "")
+                if spec.format_invalid_blocks_update and not RewardManager.target_valid(target):
+                    reason = "format_invalid_target"
+                elif spec.refuse_mixed_language and mixed:
+                    reason = "mixed_language_target"
+                elif spec.require_language and ok is False:
+                    reason = "language_mismatch_target"
+            if reason is None:
+                kept.append(row)
+            else:
+                dropped[reason] += 1
+                self.governor._fire(reason)
+        self.target_gate_report = {"n_kept": len(kept), "n_dropped": sum(dropped.values()), **dropped}
+        if self.target_gate_report["n_dropped"]:
+            logger.warning("SafetyGovernor dropped training targets: %s", self.target_gate_report)
+        return kept
+
+    def _decode_targets(self, inputs: Dict[str, Any]) -> List[str]:
+        """Decode the target tokens of a batch: DPO ``completion_mask`` (chosen half) or SFT ``labels``."""
+        input_ids = inputs.get("input_ids")
+        if input_ids is None or self.tokenizer is None:
+            return []
+        if inputs.get("completion_mask") is not None:
+            mask = inputs["completion_mask"].bool()
+            half = input_ids.shape[0] // 2  # DPO batches are [chosen..., rejected...]
+            input_ids, mask = input_ids[:half], mask[:half]
+        elif inputs.get("labels") is not None:
+            mask = inputs["labels"] != -100
+        else:
+            return []
+        return [
+            self.tokenizer.decode(ids[row_mask].tolist(), skip_special_tokens=True)
+            for ids, row_mask in zip(input_ids, mask)
+        ]
+
+    def _targets_loss(self, trainer, original_loss, model, inputs, *args, **kwargs):
+        """compute_loss for target-driven arms: feed the governor, then return the loss.
+
+        Records format / language signals for the batch's targets and the
+        policy-vs-reference log-ratio (SFT: per target token, with the adapter
+        disabled or the ref model; DPO/APO: from TRL's ``rewards/chosen`` and
+        ``rewards/rejected``).
+        """
+        training = bool(getattr(model, "training", False))
+        if training:
+            try:
+                self.reward_manager.observe_targets(self._decode_targets(inputs), allowed=self.config.languages())
+            except Exception as exc:  # signals must never break training
+                logger.debug("Target observation failed: %s", exc)
+        want_logps = training and self._governor_wants_logps()
+        sft_like = inputs.get("labels") is not None and inputs.get("completion_mask") is None
+        if not (want_logps and sft_like):
+            result = original_loss(model, inputs, *args, **kwargs)
+            if want_logps:
+                self._capture_dpo_log_ratio(trainer)
+            return result
+
+        caller_wants_outputs = bool(kwargs.pop("return_outputs", False))
+        loss, outputs = original_loss(model, inputs, *args, return_outputs=True, **kwargs)
+        try:
+            self._capture_sft_logps(model, inputs, outputs)
+        except Exception as exc:
+            logger.debug("SFT log-prob capture failed: %s", exc)
+        return (loss, outputs) if caller_wants_outputs else loss
+
+    def _capture_sft_logps(self, model, inputs, outputs) -> None:
+        labels = inputs["labels"][:, 1:]
+        mask = labels != -100
+        if not bool(mask.any()):
+            return
+        safe = labels.clamp(min=0).unsqueeze(-1)
+
+        def _token_logps(logits):
+            return torch.log_softmax(logits[:, :-1, :].float(), dim=-1).gather(-1, safe).squeeze(-1)[mask]
+
+        with torch.no_grad():
+            policy = _token_logps(outputs.logits.detach())
+            forward = {k: inputs[k] for k in ("input_ids", "attention_mask") if inputs.get(k) is not None}
+            ref = None
+            base = getattr(model, "module", model)
+            if self.ref_model is not None:
+                ref = _token_logps(self.ref_model(**forward).logits)
+            elif hasattr(base, "disable_adapter"):
+                with base.disable_adapter():
+                    ref = _token_logps(base(**forward).logits)
+        if ref is None:
+            return
+        self._last_logps = {
+            "model_logps": policy,
+            "ref_logps": ref,
+            "kl": float((policy - ref).mean().item()),
+            "log_ratio": None,
+        }
+
+    def _capture_dpo_log_ratio(self, trainer) -> None:
+        metrics = (getattr(trainer, "_metrics", None) or {}).get("train") or {}
+        chosen, rejected = metrics.get("rewards/chosen"), metrics.get("rewards/rejected")
+        beta = float(getattr(trainer, "beta", 0.0) or 0.0)
+        if not chosen or not rejected or beta <= 0:
+            return
+        rc, rr = float(chosen[-1]), float(rejected[-1])
+        # rewards/* = β · mean log(π_θ / π_ref) over the chosen / rejected answers.
+        self._last_logps = {
+            "model_logps": None,
+            "ref_logps": None,
+            "log_ratio": (rc + rr) / (2.0 * beta),
+            "kl": (abs(rc) + abs(rr)) / (2.0 * beta),
+        }
+
     def _wire_pre_update_hooks(self, trainer) -> None:
         """Attach SafetyGovernor + logps capture around optimizer.step / compute_loss."""
         self.hook_manager.model = getattr(trainer, "model", self.model)
@@ -443,6 +575,8 @@ class AlignmentPlugin:
                                     None,
                                 ),
                             )
+                if self.signal_source == "targets" and isinstance(inputs, dict):
+                    return self._targets_loss(trainer, original_loss, model, inputs, *args, **kwargs)
                 result = original_loss(model, inputs, *args, **kwargs)
                 if isinstance(inputs, dict):
                     for key in (
@@ -474,6 +608,8 @@ class AlignmentPlugin:
                 ):
                     logs = trainer.state.log_history[-1]
                 kl = logs.get("kl") or logs.get("objective/kl") or logs.get("train/kl")
+                if kl is None:
+                    kl = self._last_logps.get("kl")
                 batch_meta = {
                     "signal_source": self.signal_source,
                     "lang_ok": list(self.reward_manager.lang_ok),
@@ -483,6 +619,7 @@ class AlignmentPlugin:
                     "ref_logps": self._last_logps.get("ref_logps"),
                     "predicted_stages": list(self.reward_manager.predicted_stages),
                     "kl": kl,
+                    "log_ratio": self._last_logps.get("log_ratio"),
                     "governor": self.governor,
                 }
                 allowed = self.governor.apply_pre_update(
@@ -578,6 +715,8 @@ class AlignmentPlugin:
         nested = dict(extra.pop("extra", None) or {})
         nested["languages"] = langs
         nested.setdefault("blocked_steps", self.blocked_steps)
+        if self.target_gate_report is not None:
+            nested.setdefault("target_gate", dict(self.target_gate_report))
         extra.setdefault("language", ",".join(langs) if isinstance(langs, (list, tuple)) else langs)
         extra.setdefault("group_code", extra["language"])
         for key, value in self._last_uncertainty.items():
@@ -605,6 +744,10 @@ class AlignmentPlugin:
             self.tokenizer.save_pretrained(output_dir)
         write_policy_meta(output_dir, self.config.languages())
         self.write_card_and_snapshot(output_dir)
+        print(
+            f"[SafetyGovernor] {self.name}: signals={self.signal_source} blocked_steps={self.blocked_steps} "
+            f"gates_fired={list(self.governor.spec.fired)} last_uncertainty={self._last_uncertainty or None}"
+        )
         return output_dir
 
     def push_to_hub(self, repo_id: Optional[str] = None, token=None, private: bool = True, **kwargs):

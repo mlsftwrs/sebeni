@@ -1,0 +1,201 @@
+"""Issue 6: the SafetyGovernor gets real signals on every arm (SFT / DPO / APO / GRPO)."""
+
+from __future__ import annotations
+
+import contextlib
+import json
+from types import SimpleNamespace
+
+import pytest
+import torch
+
+from beni.core.srl.apo.apo import SebeniApo
+from beni.core.srl.config import MasterConfig
+from beni.core.srl.dpo.dpo import SebeniDpo
+from beni.core.srl.grpo.grpo import SebeniGrpo
+from beni.core.srl.sft.sft import SebeniSft
+
+
+class CharTokenizer:
+    """ids are code points < 256."""
+
+    eos_token = None
+    chat_template = None
+
+    def decode(self, ids, skip_special_tokens=True):
+        return "".join(chr(i) for i in ids)
+
+
+class TinyLM(torch.nn.Module):
+    """Logits are sharper while the 'adapter' is on, so π_θ ≠ π_ref."""
+
+    def __init__(self):
+        super().__init__()
+        torch.manual_seed(0)
+        self.emb = torch.nn.Embedding(256, 8)
+        self.head = torch.nn.Linear(8, 256)
+        self.adapter_on = True
+
+    def forward(self, input_ids, attention_mask=None):
+        logits = self.head(self.emb(input_ids))
+        return SimpleNamespace(logits=logits * (2.0 if self.adapter_on else 1.0))
+
+    @contextlib.contextmanager
+    def disable_adapter(self):
+        self.adapter_on = False
+        try:
+            yield
+        finally:
+            self.adapter_on = True
+
+
+def _target(lang: str = "bam") -> str:
+    return json.dumps({"text": "a", "lang": lang, "tokens": [{"surface": "a", "stage": 0, "analyses": []}]})
+
+
+def _ids(text: str):
+    return [ord(c) for c in text]
+
+
+def _sft_inputs(prompt: str, target: str):
+    ids = _ids(prompt + target)
+    labels = [-100] * len(prompt) + _ids(target)
+    return {
+        "input_ids": torch.tensor([ids]),
+        "attention_mask": torch.ones(1, len(ids), dtype=torch.long),
+        "labels": torch.tensor([labels]),
+    }
+
+
+def _wire(plugin_cls, compute_loss, **trainer_attrs):
+    mc = MasterConfig()
+    mc.data.languages = ["bam"]
+    plugin = plugin_cls(mc)
+    model = TinyLM()
+    model.train()
+    plugin.model = model
+    plugin.tokenizer = CharTokenizer()
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.1)
+    trainer = SimpleNamespace(
+        model=model,
+        optimizer=optimizer,
+        compute_loss=compute_loss,
+        state=SimpleNamespace(log_history=[], global_step=0),
+        **trainer_attrs,
+    )
+    plugin._wire_pre_update_hooks(trainer)
+    return plugin, trainer, model, optimizer
+
+
+def _lm_loss(model, inputs, return_outputs=False, **kwargs):
+    outputs = model(inputs["input_ids"], inputs.get("attention_mask"))
+    loss = outputs.logits.float().mean()
+    return (loss, outputs) if return_outputs else loss
+
+
+@pytest.mark.parametrize("cls, source", [(SebeniSft, "targets"), (SebeniDpo, "targets"), (SebeniApo, "targets"), (SebeniGrpo, "samples")])
+def test_signal_source_per_arm(cls, source):
+    assert cls.signal_source == source
+
+
+def test_sft_feeds_format_language_and_logps():
+    plugin, trainer, model, optimizer = _wire(SebeniSft, _lm_loss)
+    loss = trainer.compute_loss(model, _sft_inputs("PROMPT ", _target("bam")))
+    assert torch.is_tensor(loss) and loss.dim() == 0
+    rm = plugin.reward_manager
+    assert rm.format_scores == [1.0]
+    assert rm.lang_ok == [True]
+    assert plugin._last_logps["model_logps"] is not None
+    assert plugin._last_logps["ref_logps"] is not None
+    assert isinstance(plugin._last_logps["kl"], float)
+
+    loss.backward()
+    before = [p.detach().clone() for p in model.parameters()]
+    optimizer.step()
+    assert any(not torch.equal(o, n) for o, n in zip(before, model.parameters()))
+    assert "uncertainty_downweight" in plugin.governor.spec.fired
+    assert rm.format_scores == []  # cleared after the step
+
+
+def test_sft_wrong_language_target_blocks_the_step():
+    plugin, trainer, model, optimizer = _wire(SebeniSft, _lm_loss)
+    loss = trainer.compute_loss(model, _sft_inputs("PROMPT ", _target("dtm")))
+    loss.backward()
+    before = [p.detach().clone() for p in model.parameters()]
+    assert optimizer.step() is None
+    assert all(torch.equal(o, n) for o, n in zip(before, model.parameters()))
+    assert "language_mismatch_batch" in plugin.governor.spec.fired
+
+
+def test_sft_return_outputs_is_preserved():
+    plugin, trainer, model, _ = _wire(SebeniSft, _lm_loss)
+    loss, outputs = trainer.compute_loss(model, _sft_inputs("P ", _target()), return_outputs=True)
+    assert hasattr(outputs, "logits")
+
+
+@pytest.mark.parametrize("cls", [SebeniDpo, SebeniApo])
+def test_dpo_feeds_chosen_targets_and_log_ratio(cls):
+    metrics = {"train": {"rewards/chosen": [0.2], "rewards/rejected": [-0.1]}}
+    plugin, trainer, model, optimizer = _wire(cls, _lm_loss, _metrics=metrics, beta=0.1)
+    prompt, chosen, rejected = "P ", _target("bam"), "not json"
+    rows = [_ids(prompt + chosen), _ids(prompt + rejected)]
+    width = max(len(r) for r in rows)
+    input_ids = torch.tensor([r + [32] * (width - len(r)) for r in rows])
+    completion_mask = torch.tensor(
+        [[0] * len(prompt) + [1] * (len(r) - len(prompt)) + [0] * (width - len(r)) for r in rows]
+    )
+    trainer.compute_loss(model, {"input_ids": input_ids, "attention_mask": torch.ones_like(input_ids), "completion_mask": completion_mask})
+    rm = plugin.reward_manager
+    assert rm.format_scores == [1.0]  # chosen half only
+    assert rm.lang_ok == [True]
+    assert plugin._last_logps["log_ratio"] == pytest.approx((0.2 - 0.1) / (2 * 0.1))
+    assert plugin._last_logps["kl"] == pytest.approx((0.2 + 0.1) / (2 * 0.1))
+
+
+def test_dpo_kl_bound_blocks_the_step():
+    metrics = {"train": {"rewards/chosen": [5.0], "rewards/rejected": [-5.0]}}
+    plugin, trainer, model, optimizer = _wire(SebeniDpo, _lm_loss, _metrics=metrics, beta=0.1)
+    plugin.governor.spec.max_kl = 1.0
+    ids = torch.tensor([_ids("P " + _target()), _ids("P " + _target())])
+    mask = torch.tensor([[0, 0] + [1] * (ids.shape[1] - 2)] * 2)
+    loss = trainer.compute_loss(model, {"input_ids": ids, "attention_mask": torch.ones_like(ids), "completion_mask": mask})
+    loss.backward()
+    assert optimizer.step() is None
+    assert "kl_bound" in plugin.governor.spec.fired
+
+
+def test_gate_targets_drops_refused_rows():
+    plugin = SebeniSft(MasterConfig())
+    rows = [
+        {"target": _target("bam"), "lang": "bam"},
+        {"target": "not json", "lang": "bam"},
+        {"target": _target("dtm"), "lang": "bam"},
+        {"target": _target("bam,dtm"), "lang": "bam"},
+    ]
+    kept = plugin.gate_targets(rows, completion_key="target")
+    assert kept == rows[:1]
+    report = plugin.target_gate_report
+    assert report == {
+        "n_kept": 1,
+        "n_dropped": 3,
+        "format_invalid_target": 1,
+        "language_mismatch_target": 1,
+        "mixed_language_target": 1,
+    }
+    assert {"format_invalid_target", "language_mismatch_target", "mixed_language_target"} <= set(
+        plugin.governor.spec.fired
+    )
+
+
+def test_gate_targets_reads_chat_chosen():
+    plugin = SebeniDpo(MasterConfig())
+    rows = [{"chosen": [{"role": "assistant", "content": _target("dtm")}], "language": "bam"}]
+    assert plugin.gate_targets(rows, completion_key="chosen", lang_key="language") == []
+
+
+def test_gate_targets_off_when_safety_disabled():
+    mc = MasterConfig()
+    mc.safety.enabled = False
+    plugin = SebeniSft(mc)
+    rows = [{"target": "not json", "lang": "bam"}]
+    assert plugin.gate_targets(rows, completion_key="target") == rows
