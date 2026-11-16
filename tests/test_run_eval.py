@@ -84,3 +84,43 @@ def test_max_eval_rows_caps_decoding(eval_env, max_rows, expected):
     assert len(calls) == expected
     assert report["by_language"]["bam"]["n_scored"] == expected
     assert report["mer"] == 0.0
+
+
+def test_eval_source_jsonl_is_scored(eval_env, tmp_path):
+    """Issue 9: experiment.eval_source replaces the packaged test.json."""
+    import json
+
+    from beni.core.pipeline import load_eval_records, run_eval
+
+    path = tmp_path / "held.jsonl"
+    path.write_text(
+        "\n".join(json.dumps({"text": t, "lang": "bam"}) for t in ("x y", "z w")) + "\n",
+        encoding="utf-8",
+    )
+    eval_env.experiment.eval_source = str(path)
+    assert [r["text"] for r in load_eval_records(eval_env)] == ["x y", "z w"]
+    seen = []
+    run_eval(eval_env, generate=lambda text, _l: seen.append(text) or text)
+    assert seen == ["x y", "z w"]
+
+
+def test_eval_source_lang_text_json(eval_env, tmp_path):
+    import json
+
+    from beni.core.pipeline import load_eval_records
+
+    path = tmp_path / "held.json"
+    path.write_text(json.dumps({"bam": "first para\n\nsecond para"}), encoding="utf-8")
+    eval_env.experiment.eval_source = "held.json"
+    eval_env._config_file_dir = str(tmp_path)
+    rows = load_eval_records(eval_env)
+    assert [r["lang"] for r in rows] == ["bam", "bam"]
+    assert len(rows) == 2
+
+
+def test_eval_source_default_is_packaged_test_json(eval_env):
+    from beni.core.pipeline import load_eval_records
+
+    eval_env.experiment.eval_source = None
+    rows = load_eval_records(eval_env)
+    assert rows and all(r["lang"] == "bam" for r in rows)

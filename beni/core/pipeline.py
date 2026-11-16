@@ -97,15 +97,61 @@ def load_train_records(mc: MasterConfig) -> Dict[str, Any]:
     }
 
 
+def _resolve_source(mc: MasterConfig, source: Any) -> Any:
+    """Resolve a relative file path against the config file's directory when it exists there."""
+    items = source if isinstance(source, (list, tuple)) else [source]
+    base = getattr(mc, "_config_file_dir", None)
+    resolved = []
+    for item in items:
+        path = Path(str(item)).expanduser()
+        if not path.is_absolute() and not path.exists() and base and (Path(base) / path).exists():
+            path = Path(base) / path
+        resolved.append(str(path) if path.exists() else str(item))
+    return resolved if isinstance(source, (list, tuple)) else resolved[0]
+
+
+def _lang_text_json(path: str) -> Optional[Dict[str, str]]:
+    """Return the payload when ``path`` is a ``test.json``-style ``{lang: text}`` file."""
+    candidate = Path(path)
+    if candidate.suffix.lower() != ".json" or not candidate.is_file():
+        return None
+    try:
+        payload = json.loads(candidate.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if isinstance(payload, dict) and payload and all(isinstance(v, str) for v in payload.values()):
+        return payload
+    return None
+
+
 def load_eval_records(mc: MasterConfig) -> List[Dict[str, str]]:
-    """Held-out paragraphs from packaged ``test.json``, filtered to the run scope."""
-    from beni.data.datasets import SebeniDataLoader
+    """Held-out rows, filtered to the run scope.
+
+    Reads ``experiment.eval_source`` (a path, glob, list, or Hugging Face id,
+    like ``data.source``) when set, otherwise the packaged ``test.json``.
+    A ``.json`` file shaped like ``test.json`` (``{lang: text}``) is split into
+    paragraphs the same way.
+    """
+    from beni.core.language import Language
+    from beni.data.datasets import SebeniDataLoader, _split_paragraphs
 
     scope = _scope(mc)
     previous = mc.data.languages
     mc.data.languages = list(scope.languages)
     try:
-        return SebeniDataLoader(mc.data).load_sebeni(split="test")
+        loader = SebeniDataLoader(mc.data)
+        source = getattr(mc.experiment, "eval_source", None)
+        if not source:
+            return loader.load_sebeni(split="test")
+        source = _resolve_source(mc, source)
+        payload = _lang_text_json(source) if isinstance(source, str) else None
+        if payload is None:
+            return loader.load(source)
+        rows = []
+        for lang_key, blob in payload.items():
+            lang = Language.from_code(str(lang_key)).group_code
+            rows.extend({"text": para, "lang": lang} for para in _split_paragraphs(blob))
+        return rows
     finally:
         mc.data.languages = previous
 

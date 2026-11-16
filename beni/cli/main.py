@@ -372,10 +372,18 @@ def eval(
     config: Path = typer.Option(..., "-c", "--config"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
     lang: Optional[List[str]] = typer.Option(None, "--lang"),
+    eval_file: Optional[str] = typer.Option(
+        None,
+        "--eval-file",
+        help="Held-out rows to score (path, glob, or HF dataset id). Overrides experiment.eval_source; "
+        "default is the packaged test.json.",
+    ),
 ):
-    """Score held-out test.json per language; write ``{working_dir}/exp/eval.json``."""
+    """Score held-out rows per language; write ``{working_dir}/exp/eval.json``."""
     mc = _load_config(config, working_dir)
     mc.apply_cli_overrides(languages=lang)
+    if eval_file:
+        mc.experiment.eval_source = eval_file
     from beni.core.pipeline import run_eval
     from beni.core.srl.unified import SRLTrainer
 

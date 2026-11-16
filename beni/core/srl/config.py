@@ -565,6 +565,8 @@ class ExperimentConfig:
     preset: Optional[str] = None
     # Held-out test.json rows decoded per language by run_eval. None (or 0) scores every row.
     max_eval_rows: Optional[int] = None
+    # Held-out rows for run_eval: path, glob, list, or HF dataset id (like data.source). None = packaged test.json.
+    eval_source: Optional[Any] = None
 
 
 @dataclass
