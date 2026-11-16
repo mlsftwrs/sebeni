@@ -441,7 +441,7 @@ class DistillationConfig:
     enabled: bool = True
     backend: str = "algorithmic"
     provider: Optional[str] = None  # deprecated alias for backend
-    model: str = "gemini-3.7-flash"
+    model: str = cfg.DEFAULT_DISTIL_MODEL
     working_dir: Optional[str] = None
     batch_size: int = 10
     auto_update_baselines: bool = True

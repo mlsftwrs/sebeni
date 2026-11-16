@@ -79,7 +79,9 @@ EXP_DIR = WORKING_DIR / "exp"
 RUNTIME_DIR = WORKING_DIR / "runtime"
 
 # Default model configurations
-DEFAULT_MODEL = "gemini-2.5-flash"
+# The one default distillation (teacher) model for every entry point (#13).
+DEFAULT_DISTIL_MODEL = "gemini-2.5-flash"
+DEFAULT_MODEL = DEFAULT_DISTIL_MODEL
 DEFAULT_THRESHOLD = 0.5
 DEFAULT_BATCH_SIZE = 10
 TEMPERATURE = 0.7

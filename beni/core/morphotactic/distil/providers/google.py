@@ -15,7 +15,7 @@ class GoogleProvider(base.BaseProvider):
 
     def __init__(
             self, api_key=None, 
-            model="gemma-4-26b-a4b-it", language: str= None, 
+            model=cfg.DEFAULT_DISTIL_MODEL, language: str= None, 
             temperature: float =cfg.TEMPERATURE, cache_contents: Union[None, Dict]=None, 
             TTL=cfg.CACHE_TTL, vertex=False, project_id: str=None, region: str=None):
 

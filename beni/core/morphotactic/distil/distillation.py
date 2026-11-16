@@ -41,7 +41,7 @@ class Distiller(object):
         lang_code: str,
         provider: Optional[str] = None,
         backend: Optional[str] = None,
-        model: str = "gemma-4-26b-a4b-it",
+        model: str = cfg.DEFAULT_DISTIL_MODEL,
         api_key: Optional[str] = None,
         working_dir: Union[None, str] = None,
         vertex: Optional[bool] = None,

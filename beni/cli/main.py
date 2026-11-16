@@ -296,7 +296,7 @@ trainer:
 distillation:
   enabled: true
   backend: algorithmic     # algorithmic | gguf | google | openai | groq | together
-  model: gemini-2.5-flash
+  model: {cfg.DEFAULT_DISTIL_MODEL}
   # vertex: true           # ADC / Vertex AI; omit to auto-select when ADC is present
   tau: 0.5
   hitl: false
