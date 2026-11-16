@@ -317,3 +317,35 @@ def test_dpo_length_counts_rendered_conversation():
         "chosen": [{"role": "assistant", "content": "{}"}],
     }
     assert plugin._rendered_conversation(row, "chosen") == "<user>hi</s><assistant>{}</s>"
+
+
+def _ref():
+    return json.loads(_target("bam"))
+
+
+@pytest.mark.parametrize("cls, trainer_path, config_path", [
+    (SebeniSft, "trl.SFTTrainer", "trl.SFTConfig"),
+    (SebeniDpo, "trl.DPOTrainer", "trl.DPOConfig"),
+])
+def test_arm_train_applies_dataset_gates(cls, trainer_path, config_path, tmp_path):
+    from unittest.mock import MagicMock, patch
+
+    mc = MasterConfig()
+    mc.working_dir = str(tmp_path)
+    mc.apply_workdir()
+    mc.data.languages = ["bam"]
+    mc.data.eval_ratio = 0.0
+    plugin = cls(mc)
+    plugin.model = MagicMock()
+    plugin.tokenizer = None  # plain-text prompt layout; the TRL trainer is mocked
+    rows = [{"text": f"a {i}", "lang": "bam", "reference": _ref()} for i in range(3)]
+    trainer = MagicMock()
+    trainer.optimizer = None
+    with patch(trainer_path, return_value=trainer), patch(config_path), patch.object(
+        cls, "gate_targets", side_effect=lambda r, **k: r
+    ) as gate, patch.object(cls, "drop_overlength", side_effect=lambda r, **k: r) as drop, patch.object(
+        cls, "save_model"
+    ), patch("beni.data.datasets.build_dabax_reference", return_value=_ref()):
+        plugin.train(rows, project_name="t")
+    gate.assert_called_once()
+    drop.assert_called_once()
