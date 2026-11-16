@@ -32,11 +32,17 @@ class SebeniDpo(AlignmentPlugin):
             records, scheme_prompt=True, languages=self.config.languages()
         )
 
-    def _rendered_prompt(self, row: Dict[str, Any]) -> str:
-        prompt = row.get("prompt")
-        if isinstance(prompt, list) and self.tokenizer is not None and getattr(self.tokenizer, "chat_template", None):
-            return self.tokenizer.apply_chat_template(prompt, tokenize=False, add_generation_prompt=True)
-        return RewardManager.completion_text(prompt)
+    def _rendered_conversation(self, row: Dict[str, Any], answer_key: str) -> str:
+        """Prompt plus one answer, rendered with the chat template when the row is conversational."""
+        prompt, answer = row.get("prompt"), row.get(answer_key)
+        if (
+            isinstance(prompt, list)
+            and isinstance(answer, list)
+            and self.tokenizer is not None
+            and getattr(self.tokenizer, "chat_template", None)
+        ):
+            return self.tokenizer.apply_chat_template(prompt + answer, tokenize=False)
+        return RewardManager.completion_text(prompt) + RewardManager.completion_text(answer)
 
     def train(
         self,
@@ -61,11 +67,9 @@ class SebeniDpo(AlignmentPlugin):
             self.load_models()
         kept = self.drop_overlength(
             kept,
-            prompt_of=self._rendered_prompt,
-            answers_of=lambda row: [
-                RewardManager.completion_text(row.get("chosen")),
-                RewardManager.completion_text(row.get("rejected")),
-            ],
+            # Count the fully rendered conversation (template suffix included), as TRL tokenizes it.
+            prompt_of=lambda row: "",
+            answers_of=lambda row: [self._rendered_conversation(row, "chosen"), self._rendered_conversation(row, "rejected")],
             max_length=getattr(self.config.dpo, "max_length", None),
         )
         if len(kept) != len(rows):

@@ -301,3 +301,19 @@ def test_consecutive_blocked_steps_warn(capsys):
         optimizer.step()
     assert plugin.blocked_steps == 10
     assert "10 consecutive optimizer steps refused" in capsys.readouterr().out
+
+
+def test_dpo_length_counts_rendered_conversation():
+    class Tok:
+        chat_template = "x"
+
+        def apply_chat_template(self, messages, tokenize=False, add_generation_prompt=False):
+            return "".join(f"<{m['role']}>{m['content']}</s>" for m in messages)
+
+    plugin = SebeniDpo(MasterConfig())
+    plugin.tokenizer = Tok()
+    row = {
+        "prompt": [{"role": "user", "content": "hi"}],
+        "chosen": [{"role": "assistant", "content": "{}"}],
+    }
+    assert plugin._rendered_conversation(row, "chosen") == "<user>hi</s><assistant>{}</s>"
