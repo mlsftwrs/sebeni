@@ -567,6 +567,8 @@ class ExperimentConfig:
     max_eval_rows: Optional[int] = None
     # Held-out rows for run_eval: path, glob, list, or HF dataset id (like data.source). None = packaged test.json.
     eval_source: Optional[Any] = None
+    # Greedy decoding budget per held-out row (run_eval, sebeni eval / generate).
+    eval_max_new_tokens: int = 512
 
 
 @dataclass

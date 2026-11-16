@@ -212,20 +212,9 @@ class JaxPolicyPlugin(AlignmentPlugin):
         return float(loss), u
 
     def _prompt_text(self, text: str) -> str:
-        messages = [
-            {
-                "role": "system",
-                "content": self.data_loader._completion_ds(
-                    [{"text": "", "lang": self.config.data.default_lang}]
-                )[0]["prompt"][0]["content"],
-            },
-            {"role": "user", "content": text},
-        ]
-        if hasattr(self.tokenizer, "apply_chat_template"):
-            return self.tokenizer.apply_chat_template(
-                messages, tokenize=False, add_generation_prompt=True
-            )
-        return f"{messages[0]['content']}\n{text}\n"
+        from beni.core.srl.prompting import build_policy_prompt
+
+        return build_policy_prompt(text, self.tokenizer, self.config.languages())
 
     def _train_grpo(self, records):
         max_steps = max(1, int(self.config.trainer.max_steps))

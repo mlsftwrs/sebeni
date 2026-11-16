@@ -254,6 +254,55 @@ def _active_trainer(mc: MasterConfig):
     return mc.trainer
 
 
+def default_weights_dir(mc: MasterConfig) -> Path:
+    """Where the active arm saved its policy: its ``output_dir``, else ``{working_dir}/models``."""
+    block = _active_trainer(mc)
+    out = getattr(block, "output_dir", None) or getattr(mc.trainer, "output_dir", None)
+    if out:
+        return Path(out)
+    return Path(mc.working_dir or cfg.get_workdir().root) / "models"
+
+
+def _has_weights(path: Path) -> bool:
+    return path.is_dir() and any((path / name).is_file() for name in ("adapter_config.json", "config.json"))
+
+
+def resolve_policy_weights(mc: MasterConfig, weights: Optional[str] = None) -> Optional[str]:
+    """Trained weights to load: ``weights`` when given, else the arm's output dir if it holds any."""
+    if weights:
+        return str(weights)
+    default = default_weights_dir(mc)
+    return str(default) if _has_weights(default) else None
+
+
+def load_policy(mc: MasterConfig, weights: Optional[str] = None, require: bool = False):
+    """Build the arm's trainer and load the trained policy for eval / generate / push.
+
+    ``weights`` is a directory or Hub repo id; by default the arm's output
+    directory. When no trained weights are found, ``require=True`` raises
+    ``FileNotFoundError``; otherwise the base model is loaded and
+    ``trainer.loaded_weights`` stays ``None``.
+    """
+    from beni.core.srl.unified import SRLTrainer
+
+    if mc.working_dir:
+        cfg.set_working_dir(mc.working_dir)
+    # Same language list as training, so the system prompt matches.
+    mc.data.languages = list(_scope(mc).languages)
+    target = resolve_policy_weights(mc, weights)
+    if target is None and require:
+        raise FileNotFoundError(
+            f"No trained weights in {default_weights_dir(mc)} (no adapter_config.json or config.json). "
+            "Train first or pass --weights."
+        )
+    trainer = SRLTrainer(mc)
+    if target is None:
+        trainer.load_models()
+    else:
+        trainer.load_aligned_weights(target)
+    return trainer
+
+
 def run_distill(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
     """SAMPG once per language, then freeze G and D."""
     from beni.core.safety.governor import SafetyGovernor
@@ -395,8 +444,13 @@ def run_eval(
     records: Optional[List[Dict[str, Any]]] = None,
     generate: Optional[Callable[[str, str], str]] = None,
     policy: Any = None,
+    weights: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Score held-out test text. MER, MCS, and UWEC pool by morpheme or token count."""
+    """Score held-out test text. MER, MCS, and UWEC pool by morpheme or token count.
+
+    ``generate(text, lang)`` decodes one row; without it, ``policy.analyze``
+    is used. ``weights`` records which trained weights were scored.
+    """
     from beni.core.compute.helpers import mer_edit_counts, mcs_match_counts
     from beni.core.compute.metrics import MorphologyScorer
     from beni.core.compute.uwec import array_module
@@ -439,7 +493,7 @@ def run_eval(
     if decode is None and policy is not None:
 
         def _from_policy(text: str, _lang: str) -> str:
-            return policy.generate(text)
+            return policy.analyze(text)
 
         decode = _from_policy
 
@@ -601,6 +655,9 @@ def run_eval(
         "beta": scorer.beta,
         "eps": scorer.eps,
         "reference_model": ref_id,
+        "weights": weights,
+        "eval_source": str(mc.experiment.eval_source) if mc.experiment.eval_source else "packaged:test.json",
+        "max_eval_rows": cap,
         "tau": mc.distillation.tau,
     }
     out = cfg.get_workdir().exp / "eval.json"
@@ -640,6 +697,11 @@ def run_experiment(mc: MasterConfig) -> Dict[str, Any]:
     trainer = run_arm(mc, loaded["records"])
 
     def _generate(text: str, _lang: str) -> str:
-        return trainer.generate(text)
+        return trainer.analyze(text)
 
-    return run_eval(mc, generate=_generate, policy=getattr(trainer, "plugin", trainer))
+    return run_eval(
+        mc,
+        generate=_generate,
+        policy=getattr(trainer, "plugin", trainer),
+        weights=str(default_weights_dir(mc)),
+    )

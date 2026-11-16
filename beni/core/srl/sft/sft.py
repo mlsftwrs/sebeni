@@ -23,11 +23,15 @@ class SebeniSft(AlignmentPlugin):
     name = "sft"
 
     def extract_labels(self, records: List[Dict[str, Any]]) -> List[Dict[str, str]]:
-        """Build SFT rows from frozen resources. Skips empty analyses."""
-        from beni.core.srl.config import SRLGrpoPrompt
+        """Build SFT rows from frozen resources. Skips empty analyses.
+
+        The training text is :func:`beni.core.srl.prompting.build_policy_example`,
+        the same chat prompt GRPO / DPO train on and ``analyze`` decodes with.
+        """
+        from beni.core.srl.prompting import build_policy_example
         from beni.data.datasets import build_dabax_reference
 
-        prompt = SRLGrpoPrompt(languages=self.config.languages()).prompt()
+        languages = self.config.languages()
         accepted: List[Dict[str, str]] = []
         invalid: List[Dict[str, str]] = []
         for row in records or []:
@@ -43,7 +47,7 @@ class SebeniSft(AlignmentPlugin):
             completion = json.dumps(reference, ensure_ascii=False)
             accepted.append(
                 {
-                    "text": f"{prompt}\n\nUser: {text}\nAssistant: {completion}",
+                    "text": build_policy_example(text, completion, self.tokenizer, languages),
                     "lang": lang,
                     "completion": completion,
                 }
@@ -82,12 +86,11 @@ class SebeniSft(AlignmentPlugin):
         from trl import SFTConfig, SFTTrainer
 
         records = [data[i] for i in range(len(data))] if hasattr(data, "column_names") else list(data or [])
+        if self.model is None:
+            self.load_models()
         labeled = self.extract_labels(records)
         dataset = Dataset.from_list([{"text": row["text"]} for row in labeled])
         train_dataset, eval_dataset = self.split_eval(dataset, seed=self.config.sft.seed)
-
-        if self.model is None:
-            self.load_models()
 
         project_name = project_name or self.config.project_name
         sft_dict = {**self.config.sft.to_dict(), "dataset_text_field": "text"}

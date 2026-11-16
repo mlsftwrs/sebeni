@@ -372,6 +372,11 @@ def eval(
     config: Path = typer.Option(..., "-c", "--config"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
     lang: Optional[List[str]] = typer.Option(None, "--lang"),
+    weights: Optional[str] = typer.Option(
+        None,
+        "--weights",
+        help="Trained adapter/model directory or Hub repo id. Default: the arm's output dir ({working_dir}/models).",
+    ),
     eval_file: Optional[str] = typer.Option(
         None,
         "--eval-file",
@@ -379,32 +384,51 @@ def eval(
         "default is the packaged test.json.",
     ),
 ):
-    """Score held-out rows per language; write ``{working_dir}/exp/eval.json``."""
+    """Score the trained policy on held-out rows per language; write ``{working_dir}/exp/eval.json``.
+
+    Loads the trained weights (``--weights``, default the arm's output dir,
+    ``{working_dir}/models``) and decodes greedily with the training prompt.
+    Without trained weights it scores the base model and says so.
+    """
     mc = _load_config(config, working_dir)
     mc.apply_cli_overrides(languages=lang)
     if eval_file:
         mc.experiment.eval_source = eval_file
     from beni.core.pipeline import run_eval
-    from beni.core.srl.unified import SRLTrainer
 
-    trainer = None
-    try:
-        trainer = SRLTrainer(mc)
-        trainer.load_models()
-    except Exception:
-        trainer = None
-    generate = None
-    policy = None
-    if trainer is not None:
+    trainer = _load_policy(mc, weights, require=bool(weights))
 
-        def _generate(text: str, _lang: str) -> str:
-            return trainer.generate(text)
+    def _generate(text: str, _lang: str) -> str:
+        return trainer.analyze(text)
 
-        generate = _generate
-        policy = getattr(trainer, "plugin", trainer)
-    report = run_eval(mc, generate=generate, policy=policy)
+    report = run_eval(
+        mc,
+        generate=_generate,
+        policy=getattr(trainer, "plugin", trainer),
+        weights=trainer.loaded_weights,
+    )
     typer.echo(str(cfg.get_workdir().exp / "eval.json"))
     typer.echo(f"scope={report.get('scope')} phi={report.get('phi')}")
+
+
+def _load_policy(mc: MasterConfig, weights: Optional[str], require: bool):
+    """Load the trained policy for eval / push / generate, or exit with a clear error."""
+    from beni.core.pipeline import default_weights_dir, load_policy
+
+    try:
+        trainer = load_policy(mc, weights=weights, require=require)
+    except (FileNotFoundError, RuntimeError) as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    if trainer.loaded_weights:
+        typer.echo(f"Loaded trained weights: {trainer.loaded_weights}")
+    else:
+        typer.echo(
+            f"Warning: no trained weights in {default_weights_dir(mc)}; using the base model "
+            f"{mc.model.model_name}. Pass --weights to choose a checkpoint.",
+            err=True,
+        )
+    return trainer
 
 
 def _preset_yaml(name: str) -> Path:
@@ -503,13 +527,18 @@ def push(
     config: Path = typer.Option(..., "-c", "--config"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
     repo_id: Optional[str] = typer.Option(None, "--repo-id"),
+    weights: Optional[str] = typer.Option(
+        None,
+        "--weights",
+        help="Trained adapter/model directory or Hub repo id. Default: the arm's output dir ({working_dir}/models).",
+    ),
 ):
-    """Push ``output_dir`` to the Hub (requires model card + safety snapshot)."""
-    mc = _load_config(config, working_dir)
-    from beni.core.srl.unified import SRLTrainer
+    """Push the trained policy to the Hub (requires model card + safety snapshot).
 
-    trainer = SRLTrainer(mc)
-    trainer.load_models()
+    Refuses when no trained weights are found. A LoRA run pushes the adapter.
+    """
+    mc = _load_config(config, working_dir)
+    trainer = _load_policy(mc, weights, require=True)
     rid = repo_id or mc.trainer.hub_model_id
     trainer.push_to_hub(repo_id=rid, token=mc.trainer.hub_token, private=mc.trainer.hub_private_repo)
 
@@ -519,17 +548,29 @@ def generate(
     config: Path = typer.Option(..., "-c", "--config"),
     prompt: str = typer.Option(..., "--prompt"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
-    max_length: int = typer.Option(128, "--max-length"),
+    max_new_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-new-tokens",
+        "--max-length",
+        help="Decoding budget. Default: experiment.eval_max_new_tokens.",
+    ),
     lang: Optional[str] = typer.Option(None, "--lang", help="Expected JSON lang for R_lang (one row)."),
+    weights: Optional[str] = typer.Option(
+        None,
+        "--weights",
+        help="Trained adapter/model directory or Hub repo id. Default: the arm's output dir ({working_dir}/models).",
+    ),
 ):
-    """Generate from the saved policy, gated by SafetyGovernor (format / R_lang)."""
+    """Analyze one sentence with the trained policy, gated by SafetyGovernor (format / R_lang).
+
+    ``--prompt`` is the sentence; it is wrapped in the training prompt and
+    decoded greedily.
+    """
     mc = _load_config(config, working_dir)
-    from beni.core.srl.unified import SRLTrainer
     from beni.core.compute.rewards import RewardManager
 
-    trainer = SRLTrainer(mc)
-    trainer.load_models()
-    text = trainer.generate(prompt, max_length=max_length)
+    trainer = _load_policy(mc, weights, require=bool(weights))
+    text = trainer.analyze(prompt, max_new_tokens=max_new_tokens)
     rm = RewardManager(reward_config=mc.reward)
     fmt = rm.reward_format([text])
     expected = lang or (mc.languages()[0] if mc.languages() else "bam")

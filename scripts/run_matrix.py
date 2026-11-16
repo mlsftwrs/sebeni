@@ -246,23 +246,8 @@ def run_experiment_cell(
             trainer.model.eval()
 
         def _generate(text: str, _lang: str) -> str:
-            import torch
-            from beni.core.srl.config import SRLGrpoPrompt
-            system_prompt = SRLGrpoPrompt(languages=[_lang] if _lang else None).prompt()
-            tokenizer = getattr(trainer, "tokenizer", None)
-            with torch.inference_mode():
-                if tokenizer is not None and getattr(tokenizer, "chat_template", None):
-                    messages = [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": text},
-                    ]
-                    try:
-                        formatted = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-                        return trainer.generate(formatted, max_new_tokens=128)
-                    except Exception:
-                        pass
-                prompt = f"{system_prompt}\n\nUser: {text}\nAssistant:"
-                return trainer.generate(prompt, max_new_tokens=128)
+            # Same prompt as training, greedy, experiment.eval_max_new_tokens.
+            return trainer.analyze(text)
 
         eval_report = run_eval(mc, generate=_generate, policy=getattr(trainer, "plugin", trainer))
         result_row["phi"] = eval_report.get("phi")

@@ -138,6 +138,7 @@ class AlignmentPlugin:
         self.data_loader = DL(config=self.config.data)
         self._last_logps = {"model_logps": None, "ref_logps": None, "kl": None}
         self._last_uncertainty = {}
+        self.loaded_weights: Optional[str] = None
 
     def register_reward(self, name: str, reward_fn: Callable, weight: float = 1.0) -> None:
         """Register a user-defined custom reward function into the framework."""
@@ -234,8 +235,20 @@ class AlignmentPlugin:
                     param.requires_grad = False
             return model
 
-    def load_models(self, model_name: Optional[str] = None, device_map: str = "auto", remote_code: bool = True):
-        """Load policy causal LM, optional reference model, and tokenizer."""
+    def load_models(
+        self,
+        model_name: Optional[str] = None,
+        device_map: str = "auto",
+        remote_code: bool = True,
+        apply_peft: Optional[bool] = None,
+        tokenizer_name: Optional[str] = None,
+    ):
+        """Load policy causal LM, optional reference model, and tokenizer.
+
+        ``apply_peft=False`` skips the fresh LoRA wrap (used before loading a
+        trained adapter). ``tokenizer_name`` loads the tokenizer from another
+        path, e.g. the training output directory.
+        """
         model_name = model_name or self.config.model.model_name
         if self.config.model.load_in_4bit and self.config.model.load_in_8bit:
             raise ValueError("Choose only one quantization mode: load_in_4bit or load_in_8bit.")
@@ -295,7 +308,7 @@ class AlignmentPlugin:
         tok_kwargs = {"trust_remote_code": remote_code}
         if "MobileLLM" in model_name:
             tok_kwargs["use_fast"] = False
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, **tok_kwargs)
+        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name or model_name, **tok_kwargs)
         if self.tokenizer.eos_token is None:
             self.tokenizer.add_special_tokens({
                 "eos_token": "</s>",
@@ -306,7 +319,7 @@ class AlignmentPlugin:
             self.tokenizer.pad_token = self.tokenizer.eos_token
         _ensure_chat_template(self.tokenizer)
 
-        if self.config.model.use_peft:
+        if self.config.model.use_peft if apply_peft is None else apply_peft:
             self.model = self.apply_lora(self.model)
 
         if self.config.model.ref_model_name:
@@ -571,54 +584,52 @@ class AlignmentPlugin:
         self.tokenizer.push_to_hub(repo_id=repo_id, token=token, private=private, **kwargs)
 
     def load_aligned_weights(self, weights_path_or_repo: Union[str, Path]):
-        """Load trained LoRA adapter or fine-tuned model checkpoint for evaluation."""
-        import torch
-        from pathlib import Path
+        """Load trained weights for evaluation, generation, or push.
 
-        if self.model is None or self.tokenizer is None:
-            self.load_models()
-
-        target = Path(weights_path_or_repo)
+        ``weights_path_or_repo`` is a local directory or a Hub repo id holding
+        either a PEFT adapter (``adapter_config.json``) or a full checkpoint.
+        An adapter is attached to a freshly loaded base model (no new LoRA).
+        Raises ``RuntimeError`` when nothing loadable is found.
+        """
         target_str = str(weights_path_or_repo)
-
-        # Check for LoRA adapter
-        is_adapter = False
-        if target.is_dir() and (target / "adapter_config.json").is_file():
-            is_adapter = True
-        elif not target.exists():
-            # Could be a Hugging Face repo ID
+        target = Path(target_str).expanduser()
+        local = target.exists()
+        if local:
+            if not target.is_dir():
+                raise RuntimeError(f"Weights path is not a directory: {target}")
+            files = {p.name for p in target.iterdir()}
+            target_str = str(target)
+        else:
             try:
                 from huggingface_hub import HfApi
-                api = HfApi()
-                repo_files = api.list_repo_files(target_str)
-                if "adapter_config.json" in repo_files:
-                    is_adapter = True
-            except Exception:
-                pass
 
-        if is_adapter:
+                files = set(HfApi().list_repo_files(target_str))
+            except Exception as exc:
+                raise RuntimeError(
+                    f"Weights not found: {target_str} is neither a local directory nor a reachable Hub repo ({exc})"
+                ) from exc
+        tokenizer_source = target_str if "tokenizer_config.json" in files else None
+
+        if "adapter_config.json" in files:
             from peft import PeftModel
-            try:
-                if hasattr(self.model, "load_adapter"):
-                    self.model.load_adapter(target_str, adapter_name="default")
-                else:
-                    self.model = PeftModel.from_pretrained(self.model, target_str)
-            except Exception as e:
-                print(f"[Warning] Failed to load PeftModel adapter from {target_str}: {e}")
-        else:
-            from transformers import AutoModelForCausalLM
-            try:
-                device_map = "auto" if torch.cuda.is_available() else "cpu"
-                torch_dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
-                self.model = AutoModelForCausalLM.from_pretrained(
-                    target_str,
-                    device_map=device_map,
-                    torch_dtype=torch_dtype,
-                )
-            except Exception as e:
-                print(f"[Warning] Failed to load full model from {target_str}: {e}")
 
+            self.load_models(apply_peft=False, tokenizer_name=tokenizer_source)
+            try:
+                self.model = PeftModel.from_pretrained(self.model, target_str, is_trainable=False)
+            except Exception as exc:
+                raise RuntimeError(f"Failed to load the PEFT adapter from {target_str}: {exc}") from exc
+        elif "config.json" in files:
+            try:
+                self.load_models(model_name=target_str, apply_peft=False, tokenizer_name=tokenizer_source)
+            except Exception as exc:
+                raise RuntimeError(f"Failed to load the model checkpoint from {target_str}: {exc}") from exc
+        else:
+            raise RuntimeError(
+                f"No adapter_config.json or config.json in {target_str}; nothing to load."
+            )
+        self.hook_manager.model = self.model
         self.model.eval()
+        self.loaded_weights = target_str
         return self.model
 
     def generate(
@@ -631,7 +642,11 @@ class AlignmentPlugin:
         top_p: float = 0.95,
         **kwargs,
     ) -> str:
-        """Generate text from the policy model given a prompt, returning only new tokens."""
+        """Generate from a raw prompt string, returning only the new tokens.
+
+        ``temperature <= 0`` decodes greedily. Use :meth:`analyze` to decode a
+        sentence with the training prompt.
+        """
         if self.model is None or self.tokenizer is None:
             raise ValueError("Model and tokenizer must be loaded before generation.")
 
@@ -645,13 +660,13 @@ class AlignmentPlugin:
         inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
         input_len = inputs["input_ids"].shape[-1]
 
-        gen_kwargs = {
-            "temperature": temperature,
-            "top_k": top_k,
-            "top_p": top_p,
-            "do_sample": (temperature > 0.0),
-            **kwargs,
-        }
+        if temperature and temperature > 0.0:
+            gen_kwargs = {"do_sample": True, "temperature": temperature, "top_k": top_k, "top_p": top_p}
+        else:
+            gen_kwargs = {"do_sample": False}
+        if getattr(self.tokenizer, "pad_token_id", None) is not None:
+            gen_kwargs["pad_token_id"] = self.tokenizer.pad_token_id
+        gen_kwargs.update(kwargs)
         if max_length is not None:
             gen_kwargs["max_length"] = max_length
         else:
@@ -665,6 +680,29 @@ class AlignmentPlugin:
         # Strip prompt tokens so completion contains only generated content
         generated_ids = outputs[0][input_len:]
         return self.tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
+
+    def analyze(
+        self,
+        text: str,
+        languages: Optional[Sequence[str]] = None,
+        max_new_tokens: Optional[int] = None,
+    ) -> str:
+        """Decode the morphological JSON for one sentence, greedily, with the training prompt.
+
+        ``max_new_tokens`` defaults to ``experiment.eval_max_new_tokens``.
+        """
+        from beni.core.srl.prompting import build_policy_prompt, end_of_turn_ids, strip_end_of_turn
+
+        if self.tokenizer is None:
+            raise ValueError("Model and tokenizer must be loaded before generation.")
+        prompt = build_policy_prompt(text, self.tokenizer, languages or self.config.languages())
+        limit = max_new_tokens or int(getattr(self.config.experiment, "eval_max_new_tokens", 512) or 512)
+        extra = {}
+        stop_ids = end_of_turn_ids(self.tokenizer)
+        if stop_ids:
+            extra["eos_token_id"] = stop_ids
+        completion = self.generate(prompt, max_new_tokens=limit, temperature=0.0, **extra)
+        return strip_end_of_turn(completion, self.tokenizer)
 
     def token_probabilities(self, text: str):
         """Per-token π_θ and π_ref as probabilities. Forward pass may use Torch."""
