@@ -56,24 +56,35 @@ def emit_kveritas_metrics(report: Dict, step: int = 0) -> None:
             kv.emit_metric(f"{key}_{lang}", (row or {}).get(key), step=step)
 
 
-def maybe_kveritas_init(working_dir: Optional[Path] = None, disclosure: str = "open") -> None:
-    """Ensure K-Veritas session is initialized in working_dir or current directory."""
+def maybe_kveritas_init(
+    working_dir: Optional[Path] = None, disclosure: str = "open", local: bool = False
+) -> bool:
+    """Ensure a K-Veritas session exists in ``working_dir`` (or the cwd).
+
+    Returns False when ``kveritas init`` fails (e.g. the attestation server is
+    unreachable); True when a session exists or the binary is missing.
+    """
     import shutil
     import subprocess
 
     binary = shutil.which("kveritas")
     if not binary:
-        return
+        return True
     target_dir = Path(working_dir) if working_dir else Path.cwd()
     target_dir.mkdir(parents=True, exist_ok=True)
     if not (target_dir / ".kveritas").is_dir():
-        typer.echo(f"[kveritas] Initializing session in {target_dir} with disclosure={disclosure}")
+        mode = "local key" if local else "attestation server"
+        typer.echo(f"[kveritas] Initializing session in {target_dir} with disclosure={disclosure} ({mode})")
         cmd = [binary, "init"]
         if disclosure:
             cmd.extend(["--disclosure", disclosure])
+        if local:
+            cmd.append("--local")
         result = subprocess.run(cmd, cwd=str(target_dir), check=False)
         if result.returncode != 0:
             typer.echo(f"Warning: kveritas init exited {result.returncode}", err=True)
+            return False
+    return True
 
 
 def maybe_kveritas_seal(output: Path, working_dir: Optional[Path] = None, report: Optional[Dict] = None) -> None:
@@ -152,7 +163,16 @@ def _maybe_reexec_under_kveritas(mc: MasterConfig, config: Optional[Path], seal:
         typer.echo("Warning: kveritas not on PATH; running without K-Veritas.", err=True)
         return
     workdir = Path(mc.working_dir or cfg.get_workdir().root)
-    maybe_kveritas_init(workdir, disclosure=mc.experiment.kveritas_disclosure)
+    if not maybe_kveritas_init(
+        workdir, disclosure=mc.experiment.kveritas_disclosure, local=mc.experiment.kveritas_local
+    ):
+        typer.echo(
+            "Error: could not start a K-Veritas session, so the run would not be recorded. "
+            "Set experiment.kveritas_local: true to sign with a local key, fix the attestation "
+            "server, or rerun with --no-kveritas.",
+            err=True,
+        )
+        raise typer.Exit(code=1)
     report = workdir / "exp" / "report.pdf" if seal else None
     if report is not None:
         report.parent.mkdir(parents=True, exist_ok=True)

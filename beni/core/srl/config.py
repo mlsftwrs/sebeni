@@ -560,6 +560,8 @@ class ExperimentConfig:
     kveritas_seal: bool = False
     # `kveritas init --disclosure`: redacted | names | open.
     kveritas_disclosure: str = "open"
+    # `kveritas init --local`: sign with a local key, no attestation server.
+    kveritas_local: bool = False
     freeze_resources: bool = True
     # ``packaged`` reads dataset_300_samples.jsonl. ``raw`` keeps raw/*.txt for non-experiment train.
     dataset: str = "raw"

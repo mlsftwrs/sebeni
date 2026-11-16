@@ -66,8 +66,29 @@ def test_command_reexecs_once_under_kveritas(kv_config, argv, work):
     env = call_mock.call_args.kwargs["env"]
     assert env[kv.UNDER_KVERITAS_ENV] == "1" and env[kv.CALLER_CWD_ENV]
     assert call_mock.call_args.kwargs["cwd"] == str(wd)
-    init_mock.assert_called_once_with(wd, disclosure="names")
+    init_mock.assert_called_once_with(wd, disclosure="names", local=False)
     assert not any("sh" == part or "echo" in part for part in cmd)
+
+
+def test_failed_init_aborts_before_running(kv_config):
+    config, wd = kv_config
+    with patch("shutil.which", return_value="/usr/bin/kveritas"), patch("subprocess.call") as call_mock, patch(
+        "beni.cli.main.maybe_kveritas_init", return_value=False
+    ), patch("beni.core.pipeline.run_experiment") as work:
+        result = runner.invoke(app, ["exp", "-c", str(config), "-w", str(wd)])
+    assert result.exit_code == 1
+    assert "kveritas_local" in result.output
+    call_mock.assert_not_called()
+    work.assert_not_called()
+
+
+def test_local_init_passes_flag(tmp_path):
+    from beni.cli.main import maybe_kveritas_init
+
+    with patch("shutil.which", return_value="/usr/bin/kveritas"), patch("subprocess.run") as run_mock:
+        run_mock.return_value = MagicMock(returncode=0)
+        assert maybe_kveritas_init(tmp_path, disclosure="open", local=True) is True
+    assert run_mock.call_args.args[0] == ["/usr/bin/kveritas", "init", "--disclosure", "open", "--local"]
 
 
 def test_child_does_not_reexec(kv_config, monkeypatch):
