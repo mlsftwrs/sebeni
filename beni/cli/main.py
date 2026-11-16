@@ -7,11 +7,22 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import typer
+from typer.core import TyperGroup
 
 from beni.core.srl.config import MasterConfig
 from beni.utils import config as cfg
 
+class _RecordingGroup(TyperGroup):
+    """Keeps the exact invocation args, so a K-Veritas re-launch repeats them
+    whether the CLI came from ``sys.argv`` or ``app([...])`` / CliRunner."""
+
+    def parse_args(self, ctx, args):
+        ctx.meta["sebeni_argv"] = list(args)
+        return super().parse_args(ctx, args)
+
+
 app = typer.Typer(
+    cls=_RecordingGroup,
     add_completion=False,
     no_args_is_help=True,
     help="Sebeni — self-aware morphotactic generation for extremely low-resource languages.",
@@ -125,14 +136,15 @@ def maybe_kveritas_seal(output: Path, working_dir: Optional[Path] = None, report
         typer.echo(f"K-Veritas report sealed: {output}")
 
 
-def _kveritas_files(mc: MasterConfig, config: Optional[Path]) -> List[str]:
-    """Inputs hashed before and after the monitored run: config, train data, held-out data."""
+def _kveritas_files(mc: MasterConfig, config: Optional[Path], code: Optional[Path] = None) -> List[str]:
+    """Inputs hashed before and after the monitored run: code manifest, config, train data, held-out data."""
     from beni.core import kveritas as kv
 
     source = mc.data.source
     eval_source = mc.experiment.eval_source
     return kv.evidence_files(
         [
+            code,
             config,
             source if isinstance(source, (list, tuple)) else [source],
             eval_source if isinstance(eval_source, (list, tuple)) else [eval_source],
@@ -160,11 +172,22 @@ def _maybe_reexec_under_kveritas(
 
     if kv.under_kveritas() or not (mc.experiment.kveritas or seal):
         return
+    import click
+
+    try:
+        argv = click.get_current_context().meta.get("sebeni_argv")
+    except RuntimeError:
+        argv = None
+    if argv is None:
+        argv = sys.argv[1:]
     binary = shutil.which("kveritas")
     if not binary:
         typer.echo("Warning: kveritas not on PATH; running without K-Veritas.", err=True)
         return
     workdir = Path(mc.working_dir or cfg.get_workdir().root)
+    moved = kv.move_aside_sealed_session(workdir)
+    if moved is not None:
+        typer.echo(f"[kveritas] Previous session was sealed; moved it to {moved}")
     if not maybe_kveritas_init(
         workdir, disclosure=mc.experiment.kveritas_disclosure, local=mc.experiment.kveritas_local
     ):
@@ -192,11 +215,12 @@ def _maybe_reexec_under_kveritas(
                     err=True,
                 )
                 raise typer.Exit(code=1)
+    code_file = kv.code_manifest(workdir / "exp" / "sebeni_code.json")
     cmd = kv.kveritas_command(
-        binary, sys.argv[1:], seal=None if local_key else report, files=_kveritas_files(mc, config)
+        binary, argv, seal=None if local_key else report, files=_kveritas_files(mc, config, code_file)
     )
     typer.echo(f"[kveritas] Monitored run: {' '.join(cmd)}")
-    code = subprocess.call(cmd, cwd=str(workdir), env=kv.child_env())
+    code = kv.run_forwarding_signals(cmd, cwd=str(workdir), env=kv.child_env())
     if code == 0 and local_key is not None:
         code = subprocess.call(
             [binary, "seal", "--local-key", str(local_key), "-o", str(report.resolve())], cwd=str(workdir)
@@ -446,6 +470,8 @@ def train(
     # whose later run rewrote JSON files an earlier run produced (eval rewrites
     # exp/manifest.json and models/safety_snapshot.json).
     seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    if kveritas is False and kveritas_seal is None:
+        seal = False  # --no-kveritas opts out completely
     _maybe_reexec_under_kveritas(mc, config, seal=seal, report_name="report_train.pdf")
     from beni.core.pipeline import run_arm
 
@@ -507,6 +533,8 @@ def eval(
     if kveritas is not None:
         mc.experiment.kveritas = kveritas
     seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    if kveritas is False and kveritas_seal is None:
+        seal = False  # --no-kveritas opts out completely
     _maybe_reexec_under_kveritas(mc, config, seal=seal, report_name="report_eval.pdf")
     from beni.core.pipeline import run_eval
 
@@ -562,6 +590,8 @@ def _run_exp(
     preset: Optional[str] = None,
     algorithm: Optional[str] = None,
     lang: Optional[List[str]] = None,
+    kveritas: Optional[bool] = None,
+    kveritas_seal: Optional[bool] = None,
 ) -> None:
     cfg_path = _preset_yaml(preset) if preset else (config or _preset_yaml("multi13"))
     if not Path(cfg_path).is_file():
@@ -576,7 +606,12 @@ def _run_exp(
         mc.apply_cli_overrides(languages=lang)
     mc.experiment.dataset = "packaged"
     mc.data.source = None
-    _maybe_reexec_under_kveritas(mc, Path(cfg_path), seal=bool(mc.experiment.kveritas_seal))
+    if kveritas is not None:
+        mc.experiment.kveritas = kveritas
+    seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    if kveritas is False and kveritas_seal is None:
+        seal = False  # --no-kveritas opts out completely
+    _maybe_reexec_under_kveritas(mc, Path(cfg_path), seal=bool(seal))
     from beni.core.pipeline import run_experiment
 
     try:
@@ -609,10 +644,21 @@ def exp(
         "--lang",
         help="Scope override. Required in spirit for --preset single (default bam in the preset).",
     ),
+    kveritas: Optional[bool] = typer.Option(
+        None, "--kveritas/--no-kveritas", help="Run under `kveritas run`. Default: experiment.kveritas."
+    ),
+    kveritas_seal: Optional[bool] = typer.Option(
+        None,
+        "--kveritas-seal/--no-kveritas-seal",
+        help="Seal {working_dir}/exp/report.pdf after the run. Default: experiment.kveritas_seal.",
+    ),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
 ):
     """Distill, train one arm on the packaged experiment jsonl, then evaluate test.json."""
-    _run_exp(config, working_dir, preset=preset, algorithm=algorithm, lang=lang)
+    _run_exp(
+        config, working_dir, preset=preset, algorithm=algorithm, lang=lang,
+        kveritas=kveritas, kveritas_seal=kveritas_seal,
+    )
 
 
 @app.command("experiment")
@@ -626,10 +672,21 @@ def experiment(
     preset: Optional[str] = typer.Option(None, "--preset", help="multi13 or single."),
     algorithm: Optional[str] = typer.Option(None, "--algorithm", help="sft | grpo | dpo | apo."),
     lang: Optional[List[str]] = typer.Option(None, "--lang"),
+    kveritas: Optional[bool] = typer.Option(
+        None, "--kveritas/--no-kveritas", help="Run under `kveritas run`. Default: experiment.kveritas."
+    ),
+    kveritas_seal: Optional[bool] = typer.Option(
+        None,
+        "--kveritas-seal/--no-kveritas-seal",
+        help="Seal {working_dir}/exp/report.pdf after the run. Default: experiment.kveritas_seal.",
+    ),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
 ):
     """Alias of ``sebeni exp``."""
-    _run_exp(config, working_dir, preset=preset, algorithm=algorithm, lang=lang)
+    _run_exp(
+        config, working_dir, preset=preset, algorithm=algorithm, lang=lang,
+        kveritas=kveritas, kveritas_seal=kveritas_seal,
+    )
 
 
 @app.command()

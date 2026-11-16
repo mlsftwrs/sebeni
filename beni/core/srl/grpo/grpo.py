@@ -11,6 +11,7 @@ from beni.core.srl.config import (
 from beni.core.srl.plugin import AlignmentPlugin
 from beni.core.morphotactic.distil.distillation import Distiller
 from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
+from beni.core.kveritas import active as kv_active
 
 
 def _trl_default_num_generations() -> int:
@@ -221,7 +222,7 @@ class SebeniGrpo(AlignmentPlugin):
         reward_funcs = self.reward_manager.get_reward_functions()
 
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
-        if getattr(self.config.experiment, "kveritas", False):
+        if kv_active(self.config):
             from beni.core.srl.grpo.callbacks import KVeritasCallback
             callbacks.append(KVeritasCallback(reward_manager=self.reward_manager, config=self.config, eval_dataset=eval_dataset))
         if extra_callbacks:

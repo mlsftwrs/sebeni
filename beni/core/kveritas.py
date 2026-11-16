@@ -50,7 +50,9 @@ def _number(value: Any) -> Optional[str]:
 
 
 def _name(name: str) -> str:
-    return "".join(ch if (ch.isalnum() or ch in "_.-") else "_" for ch in str(name))
+    """A KV name: ``[A-Za-z][A-Za-z0-9_]*`` (other characters become ``_``)."""
+    cleaned = "".join(ch if (ch.isascii() and (ch.isalnum() or ch == "_")) else "_" for ch in str(name))
+    return cleaned if cleaned[:1].isalpha() else f"m_{cleaned}"
 
 
 def emit_metric(name: str, value: Any, step: Optional[int] = None) -> None:
@@ -115,6 +117,78 @@ def kveritas_command(
         cmd.append(f"--seal={Path(seal).resolve()}")
     cmd += ["--", python or sys.executable, "-m", "beni.cli.main", *argv]
     return cmd
+
+
+def code_manifest(path: Path) -> Path:
+    """Write sha256 of every file in the running ``beni`` package to ``path``.
+
+    Passed to ``kveritas run --files`` so the sealed report covers the code
+    that ran (the session root is the working dir, not the source tree).
+    """
+    import hashlib
+    import json
+
+    import beni
+
+    root = Path(beni.__file__).resolve().parent
+    files = {}
+    for item in sorted(root.rglob("*")):
+        if item.is_file() and "__pycache__" not in item.parts and item.suffix in {".py", ".yaml", ".yml", ".json", ".txt", ".gram", ".dict"}:
+            files[str(item.relative_to(root.parent))] = hashlib.sha256(item.read_bytes()).hexdigest()
+    aggregate = hashlib.sha256("".join(f"{k}:{v}\n" for k, v in files.items()).encode("utf-8")).hexdigest()
+    try:
+        from importlib.metadata import version
+
+        package_version = version("sebeni")
+    except Exception:
+        package_version = None
+    payload = {"package_root": str(root), "version": package_version, "sha256": aggregate, "files": files}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return path
+
+
+def move_aside_sealed_session(workdir: Path) -> Optional[Path]:
+    """A sealed session cannot take more runs; move it aside so a new one starts."""
+    import json
+    import time
+
+    session = Path(workdir) / ".kveritas"
+    try:
+        sealed = bool(json.loads((session / "session.json").read_text(encoding="utf-8")).get("sealed"))
+    except (OSError, ValueError, AttributeError):
+        return None
+    if not sealed:
+        return None
+    target = session.with_name(f".kveritas.sealed-{time.strftime('%Y%m%d-%H%M%S')}")
+    session.rename(target)
+    return target
+
+
+def run_forwarding_signals(cmd: List[str], cwd: str, env: Dict[str, str]) -> int:
+    """Run ``cmd`` and forward SIGINT / SIGTERM to it, so a stop reaches the monitored run."""
+    import signal
+    import subprocess
+
+    proc = subprocess.Popen(cmd, cwd=cwd, env=env)
+
+    def _forward(signum, _frame):
+        try:
+            proc.send_signal(signum)
+        except ProcessLookupError:
+            pass
+
+    previous = {}
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            previous[sig] = signal.signal(sig, _forward)
+        except ValueError:  # not in the main thread
+            pass
+    try:
+        return proc.wait()
+    finally:
+        for sig, handler in previous.items():
+            signal.signal(sig, handler)
 
 
 def child_env(caller_cwd: Optional[str] = None) -> Dict[str, str]:

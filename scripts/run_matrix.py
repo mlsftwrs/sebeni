@@ -64,6 +64,7 @@ def build_config(
     max_eval_rows: Optional[int] = None,
     kveritas_disclosure: str = "open",
     use_vllm: Optional[bool] = None,
+    kveritas_local_key: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Compose experiment configuration for a single matrix cell."""
     with open(base_config_path, "r", encoding="utf-8") as f:
@@ -162,6 +163,10 @@ def build_config(
     if max_eval_rows is not None:
         cfg["experiment"]["max_eval_rows"] = max_eval_rows
     cfg["experiment"]["kveritas_disclosure"] = kveritas_disclosure
+    if kveritas_local_key:
+        # Local signing (no attestation server): `kveritas init --local` + `seal --local-key`.
+        cfg["experiment"]["kveritas_local"] = True
+        cfg["experiment"]["kveritas_local_key"] = str(Path(kveritas_local_key).expanduser().resolve())
 
     return cfg
 
@@ -215,6 +220,10 @@ def run_experiment_cell(
     ]
     logger.info("Starting cell %s [%s]: %s", model_name, algo, " ".join(cmd))
     start_time = time.time()
+    # Never read a previous attempt's results or report for this cell.
+    for stale in ("exp/eval.json", "exp/report.pdf", "exp/report.pdf.kvbundle.zip", "kveritas_report.pdf",
+                  "kveritas_report.pdf.kvbundle.zip"):
+        (run_dir / stale).unlink(missing_ok=True)
     proc = subprocess.run(cmd, env=env, check=False)
     logger.info("Cell finished in %.1f seconds (exit %d)", time.time() - start_time, proc.returncode)
 
@@ -394,6 +403,12 @@ def main() -> None:
         help="Cap evaluation rows for fast trial/validation (e.g. 10).",
     )
     parser.add_argument(
+        "--kveritas-local-key",
+        type=str,
+        default=None,
+        help="Sign K-Veritas reports locally with this RSA private key (PEM) instead of the attestation server.",
+    )
+    parser.add_argument(
         "--kveritas-disclosure",
         type=str,
         default="open",
@@ -510,6 +525,7 @@ def main() -> None:
                 max_eval_rows=args.max_eval_rows,
                 kveritas_disclosure=args.kveritas_disclosure,
                 use_vllm=args.use_vllm,
+                kveritas_local_key=args.kveritas_local_key,
             )
 
             result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)

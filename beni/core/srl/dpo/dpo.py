@@ -10,6 +10,7 @@ from beni.core.compute.rewards import RewardManager
 from beni.core.srl.config import trl_config_kwargs
 from beni.core.srl.plugin import AlignmentPlugin
 from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
+from beni.core.kveritas import active as kv_active
 from beni.data.datasets import rank_group_to_preference
 
 
@@ -106,7 +107,7 @@ class SebeniDpo(AlignmentPlugin):
             )
         )
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
-        if getattr(self.config.experiment, "kveritas", False):
+        if kv_active(self.config):
             from beni.core.srl.grpo.callbacks import KVeritasCallback
             callbacks.append(KVeritasCallback(reward_manager=self.reward_manager, config=self.config, eval_dataset=eval_dataset))
         if extra_callbacks:

@@ -33,9 +33,10 @@ def _not_monitored(monkeypatch):
 
 
 def _patched(code: int = 0):
+    """(which, monitored-run launcher, init) patches; the launcher mock gets (cmd, cwd=, env=)."""
     return (
         patch("shutil.which", return_value="/usr/bin/kveritas"),
-        patch("subprocess.call", return_value=code),
+        patch("beni.core.kveritas.run_forwarding_signals", return_value=code),
         patch("beni.cli.main.maybe_kveritas_init"),
     )
 
@@ -60,9 +61,14 @@ def test_command_reexecs_once_under_kveritas(kv_config, argv, work, report):
     assert cmd[:2] == ["/usr/bin/kveritas", "run"]
     sep = cmd.index("--")
     assert cmd[sep + 2 : sep + 4] == ["-m", "beni.cli.main"]
+    # The child repeats exactly this invocation (not the host process's sys.argv).
+    assert cmd[sep + 4 :] == [*argv, "-c", str(config), "-w", str(wd)]
     assert f"--seal={(wd / 'exp' / report).resolve()}" in cmd[:sep]
     files = cmd[cmd.index("--files") + 1].split(",")
     assert str(config.resolve()) in files
+    code = wd / "exp" / "sebeni_code.json"
+    assert str(code.resolve()) in files
+    assert any(name.endswith("beni/core/kveritas.py") for name in json.loads(code.read_text())["files"])
     env = call_mock.call_args.kwargs["env"]
     assert env[kv.UNDER_KVERITAS_ENV] == "1" and env[kv.CALLER_CWD_ENV]
     assert call_mock.call_args.kwargs["cwd"] == str(wd)
@@ -72,7 +78,9 @@ def test_command_reexecs_once_under_kveritas(kv_config, argv, work, report):
 
 def test_failed_init_aborts_before_running(kv_config):
     config, wd = kv_config
-    with patch("shutil.which", return_value="/usr/bin/kveritas"), patch("subprocess.call") as call_mock, patch(
+    with patch("shutil.which", return_value="/usr/bin/kveritas"), patch(
+        "beni.core.kveritas.run_forwarding_signals"
+    ) as call_mock, patch(
         "beni.cli.main.maybe_kveritas_init", return_value=False
     ), patch("beni.core.pipeline.run_experiment") as work:
         result = runner.invoke(app, ["exp", "-c", str(config), "-w", str(wd)])
@@ -112,7 +120,7 @@ def test_monitored_exit_code_propagates(kv_config):
 
 def test_missing_binary_runs_unmonitored(kv_config):
     config, wd = kv_config
-    with patch("shutil.which", return_value=None), patch("subprocess.call") as call_mock, patch(
+    with patch("shutil.which", return_value=None), patch("beni.core.kveritas.run_forwarding_signals") as call_mock, patch(
         "beni.core.pipeline.run_experiment", return_value={}
     ) as work:
         result = runner.invoke(app, ["exp", "-c", str(config), "-w", str(wd)])
@@ -237,10 +245,10 @@ def test_local_mode_seals_with_configured_key(tmp_path):
         encoding="utf-8",
     )
     which, call, init = _patched()
-    with which, call as call_mock, init:
+    with which, call as call_mock, init, patch("subprocess.call", return_value=0) as seal_mock:
         result = runner.invoke(app, ["exp", "-c", str(config), "-w", str(wd)])
     assert result.exit_code == 0, result.output
-    run_cmd, seal_cmd = (c.args[0] for c in call_mock.call_args_list)
+    run_cmd, seal_cmd = call_mock.call_args.args[0], seal_mock.call_args.args[0]
     assert not any(part.startswith("--seal") for part in run_cmd)
     assert seal_cmd == ["/usr/bin/kveritas", "seal", "--local-key", str(key), "-o", str((wd / "exp" / "report.pdf").resolve())]
 
@@ -257,3 +265,96 @@ def test_local_mode_without_key_refuses(tmp_path):
         result = runner.invoke(app, ["exp", "-c", str(config), "-w", str(wd)])
     assert result.exit_code == 1 and "openssl genrsa" in result.output
     call_mock.assert_not_called()
+
+
+@pytest.mark.parametrize("command", ["exp", "eval", "train"])
+def test_no_kveritas_opts_out_of_sealing_too(kv_config, command):
+    config, wd = kv_config
+    which, call, init = _patched()
+    work = {"exp": "beni.core.pipeline.run_experiment", "eval": "beni.core.pipeline.load_policy", "train": "beni.core.pipeline.run_arm"}[command]
+    with which, call as call_mock, init, patch(work), patch("beni.core.pipeline.run_eval", return_value={}):
+        result = runner.invoke(app, [command, "-c", str(config), "-w", str(wd), "--no-kveritas"])
+    assert result.exit_code == 0, result.output
+    call_mock.assert_not_called()
+
+
+def test_sealed_session_is_moved_aside(tmp_path):
+    session = tmp_path / ".kveritas"
+    session.mkdir()
+    (session / "session.json").write_text(json.dumps({"sealed": True}), encoding="utf-8")
+    moved = kv.move_aside_sealed_session(tmp_path)
+    assert moved is not None and moved.name.startswith(".kveritas.sealed-") and not session.exists()
+    assert kv.move_aside_sealed_session(tmp_path) is None
+
+
+def test_kv_names_follow_the_grammar(capsys):
+    kv.emit_metric("eval.loss-x", 1.0, step=1)
+    kv.emit_metric("1st", 2.0, step=1)
+    assert capsys.readouterr().out.splitlines() == ["KV eval_loss_x=1 step=1", "KV m_1st=2 step=1"]
+
+
+def test_signals_are_forwarded(tmp_path):
+    import signal
+    import sys
+    import threading
+
+    script = tmp_path / "child.py"
+    marker = tmp_path / "got"
+    script.write_text(
+        "import signal, sys, time, pathlib\n"
+        f"signal.signal(signal.SIGTERM, lambda *a: (pathlib.Path({str(marker)!r}).write_text('x'), sys.exit(7)))\n"
+        "print('ready', flush=True)\n"
+        "time.sleep(30)\n",
+        encoding="utf-8",
+    )
+    import os
+
+    timer = threading.Timer(1.5, lambda: os.kill(os.getpid(), signal.SIGTERM))
+    timer.start()
+    code = kv.run_forwarding_signals([sys.executable, str(script)], cwd=str(tmp_path), env=dict(os.environ))
+    timer.cancel()
+    assert code == 7 and marker.exists()
+
+
+def test_seal_only_still_streams_step_metrics():
+    from beni.core.srl.config import MasterConfig
+
+    mc = MasterConfig()
+    mc.experiment.kveritas = False
+    assert kv.active(mc) is False
+    import os
+
+    os.environ[kv.UNDER_KVERITAS_ENV] = "1"
+    try:
+        assert kv.active(mc) is True  # monitored child (e.g. seal-only) attaches the KV callback
+    finally:
+        del os.environ[kv.UNDER_KVERITAS_ENV]
+
+
+def test_run_matrix_cell_ignores_stale_results(tmp_path):
+    from scripts.run_matrix import run_experiment_cell
+
+    run_dir = tmp_path / "cell"
+    (run_dir / "exp").mkdir(parents=True)
+    (run_dir / "exp" / "eval.json").write_text(json.dumps({"phi": 0.9}), encoding="utf-8")
+    (run_dir / "exp" / "report.pdf").write_bytes(b"old")
+    cfg = {"model": {"model_name": "m"}, "algorithm": "sft", "experiment": {}}
+    with patch("scripts.run_matrix.subprocess.run", return_value=MagicMock(returncode=1)):
+        row = run_experiment_cell(cfg, run_dir)
+    assert row["status"] == "FAILED: exit 1" and row["phi"] is None
+    assert not (run_dir / "kveritas_report.pdf").exists()
+
+
+def test_build_config_local_key(tmp_path):
+    import yaml
+
+    from scripts.run_matrix import build_config
+
+    base = tmp_path / "base.yaml"
+    base.write_text(yaml.safe_dump({"model": {}, "trainer": {}, "distillation": {}, "experiment": {}}), encoding="utf-8")
+    cfg = build_config(
+        base, {"id": "m", "slug": "m"}, "sft", "MULTI13", 1, "x", "global", False, "algorithmic",
+        tmp_path, kveritas_local_key=str(tmp_path / "k.pem"),
+    )
+    assert cfg["experiment"]["kveritas_local"] is True
+    assert cfg["experiment"]["kveritas_local_key"] == str((tmp_path / "k.pem").resolve())
