@@ -803,6 +803,8 @@ class AlignmentPlugin:
             self.tokenizer.save_pretrained(output_dir)
         write_policy_meta(output_dir, self.config.languages())
         self.write_card_and_snapshot(output_dir)
+        # The policy in memory now matches these files; push and eval refer to them.
+        self.weights_dir = str(output_dir)
         print(
             f"[SafetyGovernor] {self.name}: signals={self.signal_source} blocked_steps={self.blocked_steps} "
             f"gates_fired={list(self.governor.spec.fired)} last_uncertainty={self._last_uncertainty or None}"
@@ -818,7 +820,7 @@ class AlignmentPlugin:
         write_card: bool = False,
         **kwargs,
     ):
-        """Push the policy to the Hub. Refuses without a model card and an eval safety snapshot.
+        """Upload the checked weights directory to the Hub. Refuses without a card and a matching eval snapshot.
 
         ``output_dir`` is the directory of the weights being pushed (default:
         the loaded weights, else the trainer ``output_dir``). Nothing is
@@ -847,8 +849,18 @@ class AlignmentPlugin:
                 "Run `sebeni eval` first (writes safety_snapshot.json with eval metrics), "
                 "and pass --write-card if README.md is missing."
             )
-        self.model.push_to_hub(repo_id=repo_id, token=token, private=private, **kwargs)
-        self.tokenizer.push_to_hub(repo_id=repo_id, token=token, private=private, **kwargs)
+        # Upload exactly the directory the gate checked (weights, tokenizer, card,
+        # snapshot), not whatever model happens to be in memory.
+        from huggingface_hub import HfApi
+
+        api = HfApi(token=token)
+        api.create_repo(repo_id=repo_id, private=private, exist_ok=True)
+        api.upload_folder(
+            folder_path=str(directory),
+            repo_id=repo_id,
+            ignore_patterns=["checkpoint-*", "checkpoint-*/**", "runs/**", "*.pt", "*.pth"],
+            **kwargs,
+        )
 
     def push_after_train(self, block) -> None:
         """Honour ``<arm>.push_to_hub: true`` at the end of training.

@@ -109,6 +109,9 @@ class SebeniSft(AlignmentPlugin):
 
         project_name = project_name or self.config.project_name
         sft_dict = self.config.sft.to_dict()
+        # Hub uploads go through the SafetyGovernor (push_after_train / sebeni push), never
+        # through HF Trainer's own checkpoint pushes, which would bypass the gate.
+        sft_dict["push_to_hub"] = False
         if eval_dataset is not None:
             if "eval_strategy" not in sft_dict or not sft_dict["eval_strategy"]:
                 sft_dict["eval_strategy"] = "steps"

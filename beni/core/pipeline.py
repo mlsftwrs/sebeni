@@ -480,7 +480,7 @@ def run_eval(
     from beni.core.compute.metrics import MorphologyScorer
     from beni.core.compute.uwec import array_module
     from beni.core.morphotactic.dabax import get_dabax
-    from beni.core.safety.governor import SafetyGovernor
+    from beni.core.safety.governor import SafetyGovernor, weights_fingerprint
 
     try:
         import jax.numpy as jnp  # type: ignore
@@ -713,7 +713,7 @@ def run_eval(
             training = {}
     gov = SafetyGovernor(mc.safety.to_spec(tau=mc.distillation.tau, kl_beta=mc.trainer.beta))
     gov.record_snapshot(
-        phi=report["phi"] or 0.0,
+        phi=report["phi"],
         tau=mc.distillation.tau,
         mer=report["mer"],
         mcs=report["mcs"],
@@ -725,6 +725,7 @@ def run_eval(
             "by_language": by_language,
             "uwec": report["uwec"],
             "weights": weights,
+            "weights_sha256": weights_fingerprint(snapshot_dir) if snapshot_dir != cfg.get_workdir().exp else None,
             "training": training,
         },
     )

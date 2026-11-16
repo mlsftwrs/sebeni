@@ -277,7 +277,34 @@ class SafetyGovernor:
             if data.get("phi") is None or (data.get("mer") is None and data.get("mcs") is None):
                 self._fire("missing_eval_metrics")
                 return False
+            # The eval must have scored exactly these weight files.
+            recorded = data.get("weights_sha256")
+            if not recorded or recorded != weights_fingerprint(output_dir):
+                self._fire("snapshot_weights_mismatch")
+                return False
         return True
+
+
+WEIGHT_PATTERNS = ("adapter_model*.safetensors", "adapter_model*.bin", "model*.safetensors", "pytorch_model*.bin")
+
+
+def weights_fingerprint(directory: Union[str, Path]) -> Optional[str]:
+    """sha256 over the weight files in ``directory`` (names and bytes); None when there are none."""
+    import hashlib
+
+    root = Path(directory)
+    if not root.is_dir():
+        return None
+    files = sorted({p for pattern in WEIGHT_PATTERNS for p in root.glob(pattern) if p.is_file()})
+    if not files:
+        return None
+    digest = hashlib.sha256()
+    for path in files:
+        digest.update(path.name.encode("utf-8") + b"\0")
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1 << 20), b""):
+                digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _mean_log_ratio(model_logps, ref_logps, beta: float) -> float:

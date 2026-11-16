@@ -77,6 +77,9 @@ class SebeniDpo(AlignmentPlugin):
 
         project_name = project_name or self.config.project_name
         dpo_dict = self.config.dpo.to_dict()
+        # Hub uploads go through the SafetyGovernor (push_after_train / sebeni push), never
+        # through HF Trainer's own checkpoint pushes, which would bypass the gate.
+        dpo_dict["push_to_hub"] = False
         if eval_dataset is not None:
             if "eval_strategy" not in dpo_dict or not dpo_dict["eval_strategy"]:
                 dpo_dict["eval_strategy"] = "steps"

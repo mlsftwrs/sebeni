@@ -149,6 +149,9 @@ class SebeniGrpo(AlignmentPlugin):
 
         project_name = project_name or self.config.project_name
         grpo_dict = self.config.trainer.to_dict()
+        # Hub uploads go through the SafetyGovernor (push_after_train / sebeni push), never
+        # through HF Trainer's own checkpoint pushes, which would bypass the gate.
+        grpo_dict["push_to_hub"] = False
 
         model_name_lower = (self.config.model.model_name or "").lower()
         is_gemma4 = "gemma-4" in model_name_lower or "gemma4" in model_name_lower

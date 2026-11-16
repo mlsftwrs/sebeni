@@ -129,7 +129,13 @@ class TestSafetyGovernor:
         gov.write_snapshot(tmp_path)
         # A training-only snapshot (no MER/MCS) is not enough (issue 5).
         assert gov.allow_hub_push(tmp_path) is False
-        gov.record_snapshot(phi=0.7, tau=0.5, mer=0.3, mcs=0.6, checkpoint_id="baseline_v1")
+        from beni.core.safety.governor import weights_fingerprint
+
+        (tmp_path / "adapter_model.safetensors").write_bytes(b"w")
+        gov.record_snapshot(
+            phi=0.7, tau=0.5, mer=0.3, mcs=0.6, checkpoint_id="baseline_v1",
+            extra={"weights_sha256": weights_fingerprint(tmp_path)},
+        )
         gov.write_snapshot(tmp_path)
         assert gov.allow_hub_push(tmp_path) is True
 
