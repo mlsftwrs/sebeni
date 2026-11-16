@@ -33,6 +33,11 @@ class RewardManager:
         self.scorer = scorer or MorphologyScorer()
         self.working_dir = Path(working_dir) if working_dir else cfg.get_workdir().root
         self.format_scores: List[float] = []
+        # Per-completion language identity for the SafetyGovernor: True (declared
+        # lang matches the row), False (mismatch or mixed), None (no JSON lang).
+        self.lang_ok: List[Optional[bool]] = []
+        self.mixed_language: List[bool] = []
+        self._observed_batch: Optional[int] = None
         self.total_reward: float = 0.0
         self.predicted_stages: List[List[Any]] = []
         self.custom_rewards: Dict[str, Tuple[Callable, float]] = {}
@@ -65,6 +70,9 @@ class RewardManager:
 
     def clear(self) -> None:
         self.format_scores.clear()
+        self.lang_ok.clear()
+        self.mixed_language.clear()
+        self._observed_batch = None
         self.total_reward = 0.0
         self.predicted_stages.clear()
         self.recent_rewards.clear()
@@ -267,11 +275,50 @@ class RewardManager:
                 sentences.append(Sentence(text="", tokens=[]))
         return sentences
 
+    _LANG_FIELD = re.compile(r'"lang(?:uage)?"\s*:\s*"([^"]*)"')
+
+    @classmethod
+    def language_identity(cls, completion: Any, expected: Optional[str]) -> Tuple[Optional[bool], bool]:
+        """Return ``(ok, mixed)`` for one completion.
+
+        ``mixed`` is True when the completion declares more than one language
+        (several ``lang`` fields, or one listing several codes). ``ok`` is None
+        when no language is declared, else True iff it is exactly ``expected``.
+        """
+        from beni.core.language import Language
+
+        raw = cls.completion_text(completion)
+        declared = set()
+        for value in cls._LANG_FIELD.findall(raw):
+            for code in re.split(r"[,;/|+\s]+", value.strip().lower()):
+                if code:
+                    declared.add(Language.from_code(code).group_code)
+        if not declared:
+            return None, False
+        mixed = len(declared) > 1
+        if mixed:
+            return False, True
+        want = Language.from_code(expected).group_code if expected else ""
+        return (bool(want) and declared == {want}), False
+
+    def observe_language(self, completions: List[Any], language: Optional[List[str]] = None) -> None:
+        """Record per-completion language identity for the governor (once per batch)."""
+        if self._observed_batch == id(completions):
+            return
+        self._observed_batch = id(completions)
+        langs = list(language) if language else [""] * len(completions)
+        for completion, lang in zip(completions, langs):
+            ok, mixed = self.language_identity(completion, lang)
+            self.lang_ok.append(ok)
+            self.mixed_language.append(mixed)
+
     def reward_format(self, 
         completions: List[str], 
         language: Optional[List[str]] = None, **kwargs) -> List[float]:
         """R_format: Valid JSON structure with a 'tokens' list."""
 
+        if language:
+            self.observe_language(completions, language)
         scores = []
         
         for text in completions:
@@ -388,21 +435,16 @@ class RewardManager:
         **kwargs,
     ) -> List[float]:
         """R_lang: language identity. Mixed or mismatched JSON ``lang`` scores 0."""
-        from beni.core.language import Language
-
         scores = []
         langs = language or [""] * len(completions)
         weight = getattr(self.config, "lang_weight", 0.1)
 
+        if language:
+            self.observe_language(completions, language)
         for text, lang in zip(completions, langs):
             parsed = self.extract_json(text)
-            expected = Language.from_code(lang).group_code if lang else ""
-            got = str(parsed.get("lang", "") or "").strip().lower()
-            if not parsed or not expected or not got:
-                score = 0.0
-            else:
-                got_group = Language.from_code(got).group_code
-                score = weight if got_group == expected else 0.0
+            ok, _mixed = self.language_identity(text, lang)
+            score = weight if (parsed and ok) else 0.0
             scores.append(score)
             self.total_reward += score
 

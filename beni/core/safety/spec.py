@@ -20,8 +20,9 @@ class SafetySpec:
     require_language : bool
         Completions must declare a language identity matching **that row**.
     refuse_mixed_language : bool
-        Reject a completion whose JSON ``lang`` does not match its row's group
-        code. Mixed-language **datasets** (one language per row) are allowed;
+        Refuse updates driven by completions that declare more than one
+        language (several ``lang`` fields, or one listing several codes).
+        Mixed-language **datasets** (one language per row) are allowed;
         mixing languages inside a single completion is not.
     tau : float
         SAMPG morphological integrity threshold Φ.

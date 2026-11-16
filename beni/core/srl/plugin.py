@@ -165,6 +165,9 @@ class AlignmentPlugin:
         self.loaded_weights: Optional[str] = None
         # Optimizer steps the SafetyGovernor refused (θ unchanged for those steps).
         self.blocked_steps = 0
+        # What the governor's per-item signals describe: the policy's own
+        # completions ("samples", GRPO) or the training targets ("targets").
+        self.signal_source = "samples"
         # Languages named in the training system prompt (read from POLICY_META next to loaded weights).
         self.prompt_languages: Optional[List[str]] = None
 
@@ -472,6 +475,9 @@ class AlignmentPlugin:
                     logs = trainer.state.log_history[-1]
                 kl = logs.get("kl") or logs.get("objective/kl") or logs.get("train/kl")
                 batch_meta = {
+                    "signal_source": self.signal_source,
+                    "lang_ok": list(self.reward_manager.lang_ok),
+                    "mixed_language": list(self.reward_manager.mixed_language),
                     "format_scores": list(self.reward_manager.format_scores),
                     "model_logps": self._last_logps.get("model_logps"),
                     "ref_logps": self._last_logps.get("ref_logps"),

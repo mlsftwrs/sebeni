@@ -136,20 +136,50 @@ class SafetyGovernor:
         return PromoteDecision(True, "phi_improved", phi, phi_prime, parseable, False)
 
     def allow_policy_update(self, batch_meta: Dict[str, Any]) -> bool:
-        """Return False when the batch must not update θ (format-invalid, KL bound)."""
+        """Return False when the batch must not update θ.
+
+        ``batch_meta["signal_source"]`` says what the per-item signals describe:
+
+        - ``"samples"`` (GRPO): the policy's own completions. Bad completions are
+          pushed down by their reward, so the batch is refused only when **no**
+          completion is good (all format-invalid, none in the right language,
+          or every language-declaring completion mixes languages).
+        - ``"targets"`` (SFT labels, DPO/APO chosen answers): the gradient pulls
+          θ towards them, so **any** invalid, wrong-language or mixed target
+          refuses the batch.
+
+        Per-item signals: ``format_scores`` (0.0 = invalid), ``lang_ok``
+        (True / False / None = no language declared), ``mixed_language``.
+        A legacy boolean ``language_ok`` is still honoured. ``kl`` is checked
+        against ``max_kl``.
+        """
         if not self.spec.enabled:
             return True
+        strict = batch_meta.get("signal_source") == "targets"
+
+        def _refuse(flags: List[bool]) -> bool:
+            return bool(flags) and (any(flags) if strict else all(flags))
 
         format_scores = batch_meta.get("format_scores") or []
-        if self.spec.format_invalid_blocks_update and format_scores:
-            avg = sum(format_scores) / len(format_scores)
-            if avg == 0.0:
-                self._fire("format_invalid_batch")
+        if self.spec.format_invalid_blocks_update and _refuse([float(s) == 0.0 for s in format_scores]):
+            self._fire("format_invalid_batch")
+            return False
+
+        if self.spec.require_language:
+            known = [ok for ok in (batch_meta.get("lang_ok") or []) if ok is not None]
+            if batch_meta.get("language_ok") is False or _refuse([not ok for ok in known]):
+                self._fire("language_mismatch_batch")
                 return False
 
-        if self.spec.require_language and batch_meta.get("language_ok") is False:
-            self._fire("language_mismatch_batch")
-            return False
+        if self.spec.refuse_mixed_language:
+            declared = [
+                bool(mixed)
+                for mixed, ok in zip(batch_meta.get("mixed_language") or [], batch_meta.get("lang_ok") or [])
+                if ok is not None
+            ]
+            if _refuse(declared):
+                self._fire("mixed_language_batch")
+                return False
 
         kl = batch_meta.get("kl")
         if self.spec.max_kl is not None and kl is not None and float(kl) > self.spec.max_kl:
@@ -167,10 +197,11 @@ class SafetyGovernor:
             True if the optimizer step may proceed.
         """
         allowed = self.allow_policy_update(batch_meta)
-        if not allowed and model is not None:
-            for param in model.parameters():
-                if param.grad is not None:
-                    param.grad.zero_()
+        if not allowed:
+            if model is not None:
+                for param in model.parameters():
+                    if param.grad is not None:
+                        param.grad.zero_()
             return False
 
         if not self.spec.enabled or model is None:
