@@ -17,10 +17,12 @@ END_OF_TURN_MARKERS = ("<|im_end|>", "<|eot_id|>", "<end_of_turn>", "<|end|>", "
 
 
 def system_prompt(languages: Optional[Sequence[str]] = None) -> str:
-    """The SRL system prompt naming the run's languages."""
+    """The SRL system prompt naming the run's languages (scope aliases such as ``multi13`` expanded)."""
+    from beni.core.language import resolve_scope
     from beni.core.srl.config import SRLGrpoPrompt
 
-    return SRLGrpoPrompt(languages=list(languages) if languages else None).prompt()
+    codes = list(resolve_scope(list(languages)).languages) if languages else None
+    return SRLGrpoPrompt(languages=codes).prompt()
 
 
 def policy_messages(text: str, languages: Optional[Sequence[str]] = None) -> List[Dict[str, str]]:
@@ -58,11 +60,25 @@ def build_policy_example(
     tokenizer: Any = None,
     languages: Optional[Sequence[str]] = None,
 ) -> str:
-    """Full SFT training text: :func:`build_policy_prompt` followed by the answer."""
+    """Full SFT training text: exactly :func:`build_policy_prompt`, the answer, then the end of turn.
+
+    The prompt is an exact prefix, so templates that inject text before the
+    final assistant message (e.g. empty think blocks) cannot teach the policy
+    output that decoding never prompts for. A leading BOS rendered by the
+    template is dropped, because the SFT tokenizer adds its own.
+    """
+    prompt = build_policy_prompt(text, tokenizer, languages)
+    suffix = ""
     if _has_template(tokenizer):
         messages = policy_messages(text, languages) + [{"role": "assistant", "content": completion}]
-        return tokenizer.apply_chat_template(messages, tokenize=False)
-    return build_policy_prompt(text, None, languages) + completion
+        full = tokenizer.apply_chat_template(messages, tokenize=False)
+        index = full.rfind(completion)
+        if index != -1:
+            suffix = full[index + len(completion):]
+        bos = getattr(tokenizer, "bos_token", None)
+        if isinstance(bos, str) and bos and prompt.startswith(bos):
+            prompt = prompt[len(bos):]
+    return prompt + completion + suffix
 
 
 def end_of_turn_ids(tokenizer: Any) -> List[int]:

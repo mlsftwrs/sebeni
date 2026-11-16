@@ -90,6 +90,64 @@ def test_analyze_decodes_greedily_with_training_prompt():
     assert kwargs["temperature"] == 0.0
     assert kwargs["max_new_tokens"] == 33
     assert kwargs["eos_token_id"] == [0, 7]
+    assert kwargs["add_special_tokens"] is False
+
+
+def test_analyze_uses_training_languages_from_weights(tmp_path):
+    from beni.core.srl.plugin import write_policy_meta
+
+    (tmp_path / "adapter_config.json").write_text("{}", encoding="utf-8")
+    write_policy_meta(tmp_path, ["bam", "mku"])
+    mc = MasterConfig()
+    mc.data.languages = ["bam"]  # e.g. sebeni eval --lang bam on a two-language policy
+    plugin = AlignmentPlugin(mc)
+
+    def fake_load(**kwargs):
+        plugin.model = MagicMock()
+        plugin.tokenizer = ChatTokenizer()
+
+    with patch.object(AlignmentPlugin, "load_models", side_effect=fake_load), patch(
+        "peft.PeftModel.from_pretrained", return_value=MagicMock()
+    ):
+        plugin.load_aligned_weights(tmp_path)
+    assert plugin.prompt_languages == ["bam", "mku"]
+    with patch.object(AlignmentPlugin, "generate", return_value="{}") as gen:
+        plugin.analyze("muso")
+    assert gen.call_args.args[0] == build_policy_prompt("muso", plugin.tokenizer, ["bam", "mku"])
+
+
+def test_save_model_writes_policy_meta(tmp_path):
+    mc = MasterConfig()
+    mc.data.languages = ["bam", "mku"]
+    plugin = AlignmentPlugin(mc)
+    with patch.object(AlignmentPlugin, "write_card_and_snapshot"):
+        plugin.save_model(tmp_path)
+    meta = json.loads((tmp_path / "sebeni_policy.json").read_text(encoding="utf-8"))
+    assert meta["prompt_languages"] == ["bam", "mku"]
+
+
+def test_scope_alias_expands_in_system_prompt():
+    from beni.core.language import resolve_scope
+    from beni.core.srl.prompting import system_prompt
+
+    assert system_prompt(["multi13"]) == system_prompt(resolve_scope("multi13").languages)
+
+
+def test_sft_example_prefix_survives_template_injection():
+    class ThinkTokenizer(ChatTokenizer):
+        bos_token = "<s>"
+        chat_template = (
+            "<s>{% for m in messages %}{% if loop.last and m['role'] == 'assistant' %}"
+            "<|im_start|>assistant\n<think></think>{{ m['content'] }}<|im_end|>\n"
+            "{% else %}<|im_start|>{{ m['role'] }}\n{{ m['content'] }}<|im_end|>\n{% endif %}{% endfor %}"
+            "{% if add_generation_prompt %}<|im_start|>assistant\n{% endif %}"
+        )
+
+    tok = ThinkTokenizer()
+    prompt = build_policy_prompt("muso", tok, ["bam"])
+    example = build_policy_example("muso", "{}", tok, ["bam"])
+    assert example == prompt[len("<s>"):] + "{}<|im_end|>\n"
+    assert "<think>" not in example
 
 
 def test_generate_greedy_passes_no_sampling_args():
@@ -153,7 +211,7 @@ def test_load_empty_dir_raises(tmp_path):
 
 
 def test_load_unreachable_repo_raises(tmp_path):
-    with patch("huggingface_hub.HfApi.list_repo_files", side_effect=OSError("offline")):
+    with patch("huggingface_hub.snapshot_download", side_effect=OSError("offline")):
         with pytest.raises(RuntimeError, match="neither a local directory"):
             AlignmentPlugin(MasterConfig()).load_aligned_weights("org/missing-model")
 

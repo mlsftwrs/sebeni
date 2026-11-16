@@ -58,6 +58,30 @@ def _ensure_chat_template(tokenizer):
 
 _TRAINER_BLOCKS = ("trainer", "sft", "dpo", "apo")
 
+# Written next to saved weights: the language list the training prompt named.
+POLICY_META = "sebeni_policy.json"
+
+
+def write_policy_meta(output_dir: Union[str, Path], languages: Sequence[str]) -> Path:
+    import json
+
+    path = Path(output_dir) / POLICY_META
+    path.write_text(json.dumps({"prompt_languages": list(languages)}, indent=2), encoding="utf-8")
+    return path
+
+
+def _read_policy_languages(weights_dir: Path) -> Optional[List[str]]:
+    import json
+
+    path = Path(weights_dir) / POLICY_META
+    if not path.is_file():
+        return None
+    try:
+        langs = json.loads(path.read_text(encoding="utf-8")).get("prompt_languages")
+    except (OSError, ValueError, AttributeError):
+        return None
+    return [str(x) for x in langs] if isinstance(langs, list) and langs else None
+
 
 def _active_block(config):
     """Trainer block of the active arm (``trainer`` for grpo; ``sft`` / ``dpo`` / ``apo`` otherwise)."""
@@ -139,6 +163,8 @@ class AlignmentPlugin:
         self._last_logps = {"model_logps": None, "ref_logps": None, "kl": None}
         self._last_uncertainty = {}
         self.loaded_weights: Optional[str] = None
+        # Languages named in the training system prompt (read from POLICY_META next to loaded weights).
+        self.prompt_languages: Optional[List[str]] = None
 
     def register_reward(self, name: str, reward_fn: Callable, weight: float = 1.0) -> None:
         """Register a user-defined custom reward function into the framework."""
@@ -561,6 +587,7 @@ class AlignmentPlugin:
             self.model.save_pretrained(output_dir)
         if self.tokenizer is not None:
             self.tokenizer.save_pretrained(output_dir)
+        write_policy_meta(output_dir, self.config.languages())
         self.write_card_and_snapshot(output_dir)
         return output_dir
 
@@ -591,23 +618,22 @@ class AlignmentPlugin:
         An adapter is attached to a freshly loaded base model (no new LoRA).
         Raises ``RuntimeError`` when nothing loadable is found.
         """
-        target_str = str(weights_path_or_repo)
-        target = Path(target_str).expanduser()
-        local = target.exists()
-        if local:
-            if not target.is_dir():
-                raise RuntimeError(f"Weights path is not a directory: {target}")
-            files = {p.name for p in target.iterdir()}
-            target_str = str(target)
-        else:
+        label = str(weights_path_or_repo)
+        target = Path(label).expanduser()
+        if not target.exists():
+            # Hub repo id: resolve to the local snapshot (uses the cache, works with HF_HUB_OFFLINE).
             try:
-                from huggingface_hub import HfApi
+                from huggingface_hub import snapshot_download
 
-                files = set(HfApi().list_repo_files(target_str))
+                target = Path(snapshot_download(label))
             except Exception as exc:
                 raise RuntimeError(
-                    f"Weights not found: {target_str} is neither a local directory nor a reachable Hub repo ({exc})"
+                    f"Weights not found: {label} is neither a local directory nor a reachable Hub repo ({exc})"
                 ) from exc
+        if not target.is_dir():
+            raise RuntimeError(f"Weights path is not a directory: {target}")
+        files = {p.name for p in target.iterdir()}
+        target_str = str(target)
         tokenizer_source = target_str if "tokenizer_config.json" in files else None
 
         if "adapter_config.json" in files:
@@ -629,7 +655,8 @@ class AlignmentPlugin:
             )
         self.hook_manager.model = self.model
         self.model.eval()
-        self.loaded_weights = target_str
+        self.loaded_weights = label if not Path(label).expanduser().exists() else target_str
+        self.prompt_languages = _read_policy_languages(target)
         return self.model
 
     def generate(
@@ -657,7 +684,8 @@ class AlignmentPlugin:
                 device = next(self.model.parameters()).device
             except Exception:
                 device = "cpu"
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
+        add_special = kwargs.pop("add_special_tokens", True)
+        inputs = self.tokenizer(prompt, return_tensors="pt", add_special_tokens=add_special).to(device)
         input_len = inputs["input_ids"].shape[-1]
 
         if temperature and temperature > 0.0:
@@ -695,12 +723,16 @@ class AlignmentPlugin:
 
         if self.tokenizer is None:
             raise ValueError("Model and tokenizer must be loaded before generation.")
-        prompt = build_policy_prompt(text, self.tokenizer, languages or self.config.languages())
+        prompt = build_policy_prompt(
+            text, self.tokenizer, languages or self.prompt_languages or self.config.languages()
+        )
         limit = max_new_tokens or int(getattr(self.config.experiment, "eval_max_new_tokens", 512) or 512)
         extra = {}
         stop_ids = end_of_turn_ids(self.tokenizer)
         if stop_ids:
             extra["eos_token_id"] = stop_ids
+        # A rendered chat template already carries any BOS; TRL GRPO/DPO tokenize it the same way.
+        extra["add_special_tokens"] = not getattr(self.tokenizer, "chat_template", None)
         completion = self.generate(prompt, max_new_tokens=limit, temperature=0.0, **extra)
         return strip_end_of_turn(completion, self.tokenizer)
 

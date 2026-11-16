@@ -417,8 +417,8 @@ def _load_policy(mc: MasterConfig, weights: Optional[str], require: bool):
 
     try:
         trainer = load_policy(mc, weights=weights, require=require)
-    except (FileNotFoundError, RuntimeError) as exc:
-        typer.echo(f"Error: {exc}", err=True)
+    except (OSError, RuntimeError) as exc:
+        typer.echo(f"Error: could not load the policy: {exc}", err=True)
         raise typer.Exit(code=1) from exc
     if trainer.loaded_weights:
         typer.echo(f"Loaded trained weights: {trainer.loaded_weights}")

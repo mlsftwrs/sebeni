@@ -395,5 +395,8 @@ class JaxPolicyPlugin(AlignmentPlugin):
         output.mkdir(parents=True, exist_ok=True)
         self.model.save_pretrained(output, params=self.params)
         self.tokenizer.save_pretrained(output)
+        from beni.core.srl.plugin import write_policy_meta
+
+        write_policy_meta(output, self.config.languages())
         self.write_card_and_snapshot(output)
         return output
