@@ -14,7 +14,7 @@
 #   local  (default) `kveritas init --local`, signed with a throwaway RSA key in SMOKE_ROOT/keys
 #   server the config as is (attestation server)
 #   off    experiment.kveritas / kveritas_seal set to false
-# A sealed exp/report.pdf is checked with `kveritas verify`.
+# Each sealed report (exp: exp/report.pdf; train/eval: exp/report_{train,eval}.pdf) is checked with `kveritas verify`.
 # Checks pipeline mechanics only: TinyStories is an English story model.
 set -euo pipefail
 
@@ -94,16 +94,24 @@ PY
 )"
   kvstatus=""
   if [[ "${KVERITAS_MODE}" != "off" ]]; then
-    if [[ -f "${wd}/exp/report.pdf" ]] && command -v kveritas >/dev/null; then
-      runs="$(kveritas verify "${wd}/exp/report.pdf" 2>&1 | awk '/^Runs:/ {print $2}')"
-      if kveritas verify "${wd}/exp/report.pdf" >/dev/null 2>&1; then
-        kvstatus=" kveritas=verified runs=${runs}"
+    # exp seals one report; the train -> eval flow seals one per command.
+    case "${arm}" in
+      sft|grpo) reports=(report_train.pdf report_eval.pdf) ;;
+      *) reports=(report.pdf) ;;
+    esac
+    for report in "${reports[@]}"; do
+      path="${wd}/exp/${report}"
+      if [[ -f "${path}" ]] && command -v kveritas >/dev/null; then
+        runs="$(kveritas verify "${path}" 2>&1 | awk '/^Runs:/ {print $2}')"
+        if kveritas verify "${path}" >/dev/null 2>&1; then
+          kvstatus+=" ${report%.pdf}=verified(runs=${runs})"
+        else
+          kvstatus+=" ${report%.pdf}=VERIFY_FAILED"; status=FAILED
+        fi
       else
-        kvstatus=" kveritas=VERIFY_FAILED"; status=FAILED
+        kvstatus+=" ${report%.pdf}=MISSING"; status=FAILED
       fi
-    else
-      kvstatus=" kveritas=NO_REPORT"; status=FAILED
-    fi
+    done
   fi
   RESULT[${arm}]="${status} ${secs}s ${metrics}${kvstatus}"
   echo "[smoke] ${arm}: ${RESULT[${arm}]}"

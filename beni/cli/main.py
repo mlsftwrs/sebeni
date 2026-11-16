@@ -142,7 +142,9 @@ def _kveritas_files(mc: MasterConfig, config: Optional[Path]) -> List[str]:
     )
 
 
-def _maybe_reexec_under_kveritas(mc: MasterConfig, config: Optional[Path], seal: bool) -> None:
+def _maybe_reexec_under_kveritas(
+    mc: MasterConfig, config: Optional[Path], seal: bool, report_name: str = "report.pdf"
+) -> None:
     """Re-run this command once as the monitored subprocess of ``kveritas run``.
 
     No-op inside the monitored child, when K-Veritas is off, or when the
@@ -173,7 +175,7 @@ def _maybe_reexec_under_kveritas(mc: MasterConfig, config: Optional[Path], seal:
             err=True,
         )
         raise typer.Exit(code=1)
-    report = workdir / "exp" / "report.pdf" if seal else None
+    report = workdir / "exp" / report_name if seal else None
     local_key = None
     if report is not None:
         report.parent.mkdir(parents=True, exist_ok=True)
@@ -381,8 +383,8 @@ def train(
     kveritas_seal: Optional[bool] = typer.Option(
         None,
         "--kveritas-seal/--no-kveritas-seal",
-        help="Run under `kveritas run --seal` and write {working_dir}/exp/report.pdf. Off by default for train "
-        "(sealing closes the session; `sebeni eval` seals train + eval).",
+        help="Run under `kveritas run --seal` and write {working_dir}/exp/report_train.pdf. "
+        "Default: experiment.kveritas_seal.",
     ),
     eval_ratio: Optional[float] = typer.Option(
         None, "--eval-ratio", help="Fraction of user dataset held out for evaluation (default: 0.1)."
@@ -440,9 +442,11 @@ def train(
         use_vllm=use_vllm,
         vllm_gpu_memory_utilization=vllm_gpu_memory_utilization,
     )
-    # Sealing closes the session, so a standalone train seals only on request;
-    # a following `sebeni eval` (experiment.kveritas_seal) seals train + eval together.
-    _maybe_reexec_under_kveritas(mc, config, seal=bool(kveritas_seal))
+    # Each command seals its own one-run session: K-Veritas refuses to seal a session
+    # whose later run rewrote JSON files an earlier run produced (eval rewrites
+    # exp/manifest.json and models/safety_snapshot.json).
+    seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    _maybe_reexec_under_kveritas(mc, config, seal=seal, report_name="report_train.pdf")
     from beni.core.pipeline import run_arm
 
     run_arm(mc)
@@ -487,7 +491,7 @@ def eval(
     kveritas_seal: Optional[bool] = typer.Option(
         None,
         "--kveritas-seal/--no-kveritas-seal",
-        help="Run under `kveritas run --seal` and write {working_dir}/exp/report.pdf. Default: experiment.kveritas_seal.",
+        help="Run under `kveritas run --seal` and write {working_dir}/exp/report_eval.pdf. Default: experiment.kveritas_seal.",
     ),
 ):
     """Score the trained policy on held-out rows per language; write ``{working_dir}/exp/eval.json``.
@@ -503,7 +507,7 @@ def eval(
     if kveritas is not None:
         mc.experiment.kveritas = kveritas
     seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
-    _maybe_reexec_under_kveritas(mc, config, seal=seal)
+    _maybe_reexec_under_kveritas(mc, config, seal=seal, report_name="report_eval.pdf")
     from beni.core.pipeline import run_eval
 
     trainer = _load_policy(mc, weights, require=bool(weights))

@@ -41,14 +41,14 @@ def _patched(code: int = 0):
 
 
 @pytest.mark.parametrize(
-    "argv, work",
+    "argv, work, report",
     [
-        (["exp", "--algorithm", "sft"], "beni.core.pipeline.run_experiment"),
-        (["train", "--algorithm", "sft", "--kveritas-seal"], "beni.core.pipeline.run_arm"),
-        (["eval"], "beni.core.pipeline.load_policy"),
+        (["exp", "--algorithm", "sft"], "beni.core.pipeline.run_experiment", "report.pdf"),
+        (["train", "--algorithm", "sft"], "beni.core.pipeline.run_arm", "report_train.pdf"),
+        (["eval"], "beni.core.pipeline.load_policy", "report_eval.pdf"),
     ],
 )
-def test_command_reexecs_once_under_kveritas(kv_config, argv, work):
+def test_command_reexecs_once_under_kveritas(kv_config, argv, work, report):
     config, wd = kv_config
     which, call, init = _patched()
     with which, call as call_mock, init as init_mock, patch(work) as work_mock:
@@ -60,7 +60,7 @@ def test_command_reexecs_once_under_kveritas(kv_config, argv, work):
     assert cmd[:2] == ["/usr/bin/kveritas", "run"]
     sep = cmd.index("--")
     assert cmd[sep + 2 : sep + 4] == ["-m", "beni.cli.main"]
-    assert f"--seal={(wd / 'exp' / 'report.pdf').resolve()}" in cmd[:sep]
+    assert f"--seal={(wd / 'exp' / report).resolve()}" in cmd[:sep]
     files = cmd[cmd.index("--files") + 1].split(",")
     assert str(config.resolve()) in files
     env = call_mock.call_args.kwargs["env"]
@@ -122,12 +122,11 @@ def test_missing_binary_runs_unmonitored(kv_config):
     assert "kveritas not on PATH" in result.output
 
 
-def test_train_does_not_seal_unless_asked(kv_config):
-    """Config kveritas_seal does not seal a train run: that would close the session before eval."""
+def test_train_no_seal_flag_overrides_config(kv_config):
     config, wd = kv_config
     which, call, init = _patched()
     with which, call as call_mock, init, patch("beni.core.pipeline.run_arm"):
-        runner.invoke(app, ["train", "-c", str(config), "-w", str(wd)])
+        runner.invoke(app, ["train", "-c", str(config), "-w", str(wd), "--no-kveritas-seal"])
     assert not any(part.startswith("--seal") for part in call_mock.call_args.args[0])
 
 
