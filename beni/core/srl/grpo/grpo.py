@@ -13,13 +13,25 @@ from beni.core.morphotactic.distil.distillation import Distiller
 from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
 
 
+def _trl_default_num_generations() -> int:
+    """TRL's own ``num_generations`` default, used when the config leaves it unset."""
+    import dataclasses
+
+    for f in dataclasses.fields(GRPOConfig):
+        if f.name == "num_generations" and isinstance(f.default, int):
+            return f.default
+    return 8
+
+
 def _guard_eval_batch(grpo_dict: Dict[str, Any]) -> None:
     """Round ``per_device_eval_batch_size`` up so TRL's eval groups divide evenly.
 
     TRL requires ``per_device_eval_batch_size * world_size`` to be divisible by
     ``num_generations_eval or num_generations`` whenever evaluation runs.
     """
-    num_gen = int(grpo_dict.get("num_generations_eval") or grpo_dict.get("num_generations") or 4)
+    num_gen = int(
+        grpo_dict.get("num_generations_eval") or grpo_dict.get("num_generations") or _trl_default_num_generations()
+    )
     world = max(1, int(os.environ.get("WORLD_SIZE", "1") or 1))
     current = max(1, int(grpo_dict.get("per_device_eval_batch_size") or 1))
     if (current * world) % num_gen == 0:
@@ -183,7 +195,7 @@ class SebeniGrpo(AlignmentPlugin):
             _guard_eval_batch(grpo_dict)
 
         # Guard: effective batch size must be divisible by num_generations for GRPO group advantage calculation
-        num_gen = grpo_dict.get("num_generations", 4) or 4
+        num_gen = grpo_dict.get("num_generations") or _trl_default_num_generations()
         per_dev_bs = grpo_dict.get("per_device_train_batch_size", 1) or 1
         grad_accum = grpo_dict.get("gradient_accumulation_steps", 1) or 1
         if (per_dev_bs * grad_accum) % num_gen != 0:

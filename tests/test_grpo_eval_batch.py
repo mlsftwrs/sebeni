@@ -61,3 +61,12 @@ def test_real_grpo_config_builds_with_eval_split(mock_trainer_cls, _card, tmp_pa
     kwargs = mock_trainer_cls.call_args.kwargs
     assert kwargs.get("eval_dataset") is not None
     assert kwargs["args"].per_device_eval_batch_size == 4
+
+
+def test_guard_uses_trl_default_when_num_generations_unset(monkeypatch):
+    from beni.core.srl.grpo.grpo import _trl_default_num_generations
+
+    monkeypatch.delenv("WORLD_SIZE", raising=False)
+    grpo_dict = {"per_device_eval_batch_size": 1}
+    _guard_eval_batch(grpo_dict)
+    assert grpo_dict["per_device_eval_batch_size"] == _trl_default_num_generations()
