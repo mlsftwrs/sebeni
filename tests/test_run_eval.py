@@ -134,3 +134,25 @@ def test_negative_max_eval_rows_is_rejected(eval_env):
     eval_env.experiment.max_eval_rows = -1
     with pytest.raises(ValueError):
         run_eval(eval_env, records=_rows("a b"), generate=lambda t, _l: t)
+
+
+def test_single_record_json_is_not_lang_text(tmp_path):
+    import json
+
+    from beni.core.pipeline import _lang_text_json
+
+    path = tmp_path / "one.json"
+    path.write_text(json.dumps({"text": "a b", "lang": "bam"}), encoding="utf-8")
+    assert _lang_text_json(str(path)) is None
+
+
+def test_relative_glob_resolves_against_config_dir(eval_env, tmp_path, monkeypatch):
+    from beni.core.pipeline import load_eval_records
+
+    held = tmp_path / "cfgdir" / "held"
+    held.mkdir(parents=True)
+    (held / "part1.jsonl").write_text('{"text": "a b", "lang": "bam"}\n', encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    eval_env._config_file_dir = str(tmp_path / "cfgdir")
+    eval_env.experiment.eval_source = "held/*.jsonl"
+    assert [r["text"] for r in load_eval_records(eval_env)] == ["a b"]

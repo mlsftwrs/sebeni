@@ -104,6 +104,14 @@ def _resolve_source(mc: MasterConfig, source: Any) -> Any:
     resolved = []
     for item in items:
         path = Path(str(item)).expanduser()
+        if any(ch in str(item) for ch in "*?["):
+            # Glob: prefer matches next to the config file when the cwd has none.
+            import glob as _glob
+
+            if not path.is_absolute() and not _glob.glob(str(path)) and base and _glob.glob(str(Path(base) / path)):
+                path = Path(base) / path
+            resolved.append(str(path))
+            continue
         if not path.is_absolute() and not path.exists() and base and (Path(base) / path).exists():
             path = Path(base) / path
         resolved.append(str(path) if path.exists() else str(item))
@@ -119,7 +127,13 @@ def _lang_text_json(path: str) -> Optional[Dict[str, str]]:
         payload = json.loads(candidate.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return None
-    if isinstance(payload, dict) and payload and all(isinstance(v, str) for v in payload.values()):
+    record_keys = {"text", "lang", "language", "reference", "tokens", "prompt"}
+    if (
+        isinstance(payload, dict)
+        and payload
+        and all(isinstance(v, str) for v in payload.values())
+        and not record_keys.intersection(str(k).lower() for k in payload)
+    ):
         return payload
     return None
 
@@ -130,7 +144,9 @@ def load_eval_records(mc: MasterConfig) -> List[Dict[str, str]]:
     Reads ``experiment.eval_source`` (a path, glob, list, or Hugging Face id,
     like ``data.source``) when set, otherwise the packaged ``test.json``.
     A ``.json`` file shaped like ``test.json`` (``{lang: text}``) is split into
-    paragraphs the same way.
+    paragraphs the same way. Relative paths and globs resolve against the
+    config file's directory when nothing matches from the current directory.
+    A Hugging Face id is read with ``data.hf_split`` (default ``train``).
     """
     from beni.core.language import Language
     from beni.data.datasets import SebeniDataLoader, _split_paragraphs
