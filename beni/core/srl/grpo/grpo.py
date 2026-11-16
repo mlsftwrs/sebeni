@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict, List, Optional, Union
 
 from datasets import Dataset
@@ -10,6 +11,27 @@ from beni.core.srl.config import (
 from beni.core.srl.plugin import AlignmentPlugin
 from beni.core.morphotactic.distil.distillation import Distiller
 from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
+
+
+def _guard_eval_batch(grpo_dict: Dict[str, Any]) -> None:
+    """Round ``per_device_eval_batch_size`` up so TRL's eval groups divide evenly.
+
+    TRL requires ``per_device_eval_batch_size * world_size`` to be divisible by
+    ``num_generations_eval or num_generations`` whenever evaluation runs.
+    """
+    num_gen = int(grpo_dict.get("num_generations_eval") or grpo_dict.get("num_generations") or 4)
+    world = max(1, int(os.environ.get("WORLD_SIZE", "1") or 1))
+    current = max(1, int(grpo_dict.get("per_device_eval_batch_size") or 1))
+    if (current * world) % num_gen == 0:
+        return
+    adjusted = current
+    while (adjusted * world) % num_gen != 0:
+        adjusted += 1
+    print(
+        f"[GRPO Guard] Adjusted per_device_eval_batch_size from {current} to {adjusted} "
+        f"so the global eval batch ({adjusted} x {world}) is divisible by num_generations ({num_gen})."
+    )
+    grpo_dict["per_device_eval_batch_size"] = adjusted
 
 
 class SebeniGrpo(AlignmentPlugin):
@@ -177,7 +199,9 @@ class SebeniGrpo(AlignmentPlugin):
                 grpo_dict["eval_steps"] = max(1, max_st // 10) if max_st else max(1, grpo_dict.get("logging_steps", 10))
 
         if "per_device_eval_batch_size" not in grpo_dict or not grpo_dict["per_device_eval_batch_size"]:
-            grpo_dict["per_device_eval_batch_size"] = min(int(grpo_dict.get("per_device_train_batch_size", 1) or 1), 1)
+            grpo_dict["per_device_eval_batch_size"] = 1
+        if eval_dataset is not None:
+            _guard_eval_batch(grpo_dict)
 
         # Guard: effective batch size must be divisible by num_generations for GRPO group advantage calculation
         num_gen = grpo_dict.get("num_generations", 4) or 4
