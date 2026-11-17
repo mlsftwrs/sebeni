@@ -668,7 +668,7 @@ def exp(
     ),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
 ):
-    """Distill, train one arm on the packaged experiment jsonl, then evaluate test.json."""
+    """Distill, train one arm (on data.source, else the packaged experiment jsonl), then evaluate."""
     _run_exp(
         config, working_dir, preset=preset, algorithm=algorithm, lang=lang,
         kveritas=kveritas, kveritas_seal=kveritas_seal,
