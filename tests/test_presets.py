@@ -20,8 +20,12 @@ def test_unknown_preset_exits_2(tmp_path):
 
 
 def test_package_data_lists_presets():
-    import tomllib
     from pathlib import Path
+
+    try:
+        import tomllib
+    except ImportError:  # Python 3.10
+        import tomli as tomllib  # type: ignore
 
     data = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
     assert "data/presets/*.yaml" in data["tool"]["setuptools"]["package-data"]["beni"]

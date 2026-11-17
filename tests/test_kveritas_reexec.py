@@ -358,3 +358,10 @@ def test_build_config_local_key(tmp_path):
     )
     assert cfg["experiment"]["kveritas_local"] is True
     assert cfg["experiment"]["kveritas_local_key"] == str((tmp_path / "k.pem").resolve())
+
+
+def test_code_manifest_records_running_version(tmp_path):
+    import beni
+
+    data = json.loads(kv.code_manifest(tmp_path / "code.json").read_text(encoding="utf-8"))
+    assert data["version"] == beni.__version__  # not a stale installed copy's metadata

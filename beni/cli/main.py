@@ -629,7 +629,7 @@ def _run_exp(
 
     try:
         report = run_experiment(mc)
-    except RuntimeError as exc:
+    except (RuntimeError, ValueError) as exc:  # e.g. empty split, test.json as train source
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=1) from exc
     del report  # Φ / MER / MCS / UWEC are claimed by run_eval (KV claim lines)

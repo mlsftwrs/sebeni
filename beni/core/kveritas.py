@@ -136,13 +136,8 @@ def code_manifest(path: Path) -> Path:
         if item.is_file() and "__pycache__" not in item.parts and item.suffix in {".py", ".yaml", ".yml", ".json", ".txt", ".gram", ".dict"}:
             files[str(item.relative_to(root.parent))] = hashlib.sha256(item.read_bytes()).hexdigest()
     aggregate = hashlib.sha256("".join(f"{k}:{v}\n" for k, v in files.items()).encode("utf-8")).hexdigest()
-    try:
-        from importlib.metadata import version
-
-        package_version = version("sebeni")
-    except Exception:
-        package_version = None
-    payload = {"package_root": str(root), "version": package_version, "sha256": aggregate, "files": files}
+    # beni.__version__ prefers a source checkout over a stale installed copy (#12).
+    payload = {"package_root": str(root), "version": getattr(beni, "__version__", None), "sha256": aggregate, "files": files}
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return path

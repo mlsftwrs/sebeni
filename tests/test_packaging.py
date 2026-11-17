@@ -1,7 +1,11 @@
 """Issue 12: pyproject.toml is the single source of version and dependencies."""
 
-import tomllib
 from pathlib import Path
+
+try:
+    import tomllib
+except ImportError:  # Python 3.10
+    import tomli as tomllib  # type: ignore
 
 import beni
 

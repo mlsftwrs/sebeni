@@ -39,8 +39,13 @@ def test_config_without_source_uses_packaged(tmp_path):
     assert seen["source"] is None and seen["dataset"] == "packaged"
 
 
-def test_preset_ignores_source(tmp_path):
-    seen = _run(["--preset", "single", "-w", str(tmp_path / "run")])
+def test_preset_ignores_source(tmp_path, monkeypatch):
+    """A preset never trains on data.source, even if its YAML sets one."""
+    presets = tmp_path / "presets"
+    presets.mkdir()
+    (presets / "mine.yaml").write_text("data:\n  source: /some/train.jsonl\n  languages: [bam]\n", encoding="utf-8")
+    monkeypatch.setattr("beni.cli.main.PRESETS_DIR", presets)
+    seen = _run(["--preset", "mine", "-w", str(tmp_path / "run")])
     assert seen["source"] is None and seen["dataset"] == "packaged"
 
 
