@@ -615,8 +615,10 @@ def _run_exp(
         mc.algorithm = algorithm.strip().lower()
     if lang:
         mc.apply_cli_overrides(languages=lang)
-    mc.experiment.dataset = "packaged"
-    mc.data.source = None
+    if preset:
+        mc.data.source = None  # presets train on the packaged experiment jsonl
+    if not mc.data.source:
+        mc.experiment.dataset = "packaged"
     if kveritas is not None:
         mc.experiment.kveritas = kveritas
     seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
@@ -640,7 +642,8 @@ def exp(
         None,
         "-c",
         "--config",
-        help="YAML MasterConfig. Defaults to the MULTI13 preset. data.source is ignored.",
+        help="YAML MasterConfig. Defaults to the MULTI13 preset. Trains on data.source when set, "
+        "else on the packaged dataset_300_samples.jsonl.",
     ),
     preset: Optional[str] = typer.Option(
         None,
@@ -678,7 +681,8 @@ def experiment(
         None,
         "-c",
         "--config",
-        help="YAML MasterConfig. Defaults to the MULTI13 preset. data.source is ignored.",
+        help="YAML MasterConfig. Defaults to the MULTI13 preset. Trains on data.source when set, "
+        "else on the packaged dataset_300_samples.jsonl.",
     ),
     preset: Optional[str] = typer.Option(None, "--preset", help="multi13 or single."),
     algorithm: Optional[str] = typer.Option(None, "--algorithm", help="sft | grpo | dpo | apo."),

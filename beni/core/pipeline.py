@@ -743,12 +743,24 @@ def _macro(by_language: Dict[str, Dict[str, Any]], key: str) -> Optional[float]:
 
 
 def run_experiment(mc: MasterConfig) -> Dict[str, Any]:
-    """Distill, train one arm, then evaluate. The experiment train set is the packaged jsonl."""
-    mc.experiment.dataset = "packaged"
-    mc.data.source = None
+    """Distill, train one arm, then evaluate.
+
+    Trains on ``data.source`` when the config sets it, else on the packaged
+    ``dataset_300_samples.jsonl``. The train file and row count are printed.
+    """
+    if not mc.data.source:
+        mc.experiment.dataset = "packaged"
     loaded = load_train_records(mc)
+    source = loaded.get("source") or "packaged:dataset_300_samples.jsonl"
+    counts = loaded.get("counts") or {}
+    print(
+        f"[exp] train data: {source} ({len(loaded['records'])} rows; "
+        + ", ".join(f"{lang}={n}" for lang, n in sorted(counts.items()))
+        + ")",
+        flush=True,
+    )
     if not loaded["records"]:
-        raise RuntimeError("Experiment train split is empty (dataset_300_samples.jsonl).")
+        raise RuntimeError(f"Experiment train split is empty ({source}).")
     run_distill(mc, loaded["records"])
     trainer = run_arm(mc, loaded["records"])
 

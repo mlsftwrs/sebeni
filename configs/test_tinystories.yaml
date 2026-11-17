@@ -58,20 +58,20 @@ sft:
 
 dpo:
   learning_rate: 1.0e-5
-  per_device_train_batch_size: 2
+  per_device_train_batch_size: 1   # 2 x 2048-token sequences (chosen + rejected) fit a 6 GB GPU
   max_steps: 3
   max_prompt_length: 1024
-  max_length: 1536       # 4 x 2048-token sequences OOM a 6 GB GPU; longer rows are dropped (#24)
+  max_length: 2048       # exp trains on the 8-row fixture (#11); longer rows are dropped (#24)
   use_cpu: false
   bf16: false
   report_to: none
 
 apo:
   learning_rate: 1.0e-5
-  per_device_train_batch_size: 2
+  per_device_train_batch_size: 1   # 2 x 2048-token sequences (chosen + rejected) fit a 6 GB GPU
   max_steps: 3
   max_prompt_length: 1024
-  max_length: 1536       # 4 x 2048-token sequences OOM a 6 GB GPU; longer rows are dropped (#24)
+  max_length: 2048       # exp trains on the 8-row fixture (#11); longer rows are dropped (#24)
   use_cpu: false
   bf16: false
   report_to: none
