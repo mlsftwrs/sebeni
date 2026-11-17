@@ -239,7 +239,7 @@ def default_config_yaml(langs: List[str], working_dir: str) -> str:
     default = codes[0]
     langs_yaml = "[" + ", ".join(codes) + "]"
     slug = "multi13" if resolved.label == "MULTI13" else "-".join(codes)
-    return f"""# Sebeni MasterConfig — https://seben.robotsmali.org/docs
+    return f"""# Sebeni MasterConfig — https://mlsftwrs.github.io/sebeni
 # working_dir is relocatable: CLI -w and SEBENI_HOME / SEBENI_WORKING_DIR also apply.
 # Distillation runs once, then one arm (sft | grpo | dpo | apo) reads frozen G/D.
 # Tune trainer/model hyperparams below or via `sebeni train --lr ...`.

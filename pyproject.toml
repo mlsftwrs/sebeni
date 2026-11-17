@@ -85,7 +85,7 @@ gui = [
 
 [project.urls]
 Homepage = "https://seben.robotsmali.org"
-Documentation = "https://seben.robotsmali.org/docs"
+Documentation = "https://mlsftwrs.github.io/sebeni"
 Repository = "https://github.com/mlsftwrs/sebeni"
 "Hugging Face" = "https://huggingface.co/mlsftwrs"
 

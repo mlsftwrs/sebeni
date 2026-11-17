@@ -45,17 +45,85 @@ register_algorithm("my_gc", MyPlugin)  # YAML algorithm: my_gc
       show_root_heading: true
       heading_level: 2
 
+## Arms
+
+| YAML `algorithm` | Class |
+| --- | --- |
+| `sft` | `SebeniSft` |
+| `grpo` | `SebeniGrpo` |
+| `dpo` | `SebeniDpo` |
+| `apo` | `SebeniApo` (subclass of `SebeniDpo`) |
+| `grpo` / `dpo` / `apo` + `trainer.framework: jax` | `JaxPolicyPlugin` |
+
+All arms share `AlignmentPlugin`: `load_models`, `load_aligned_weights`,
+`generate`, `analyze` (greedy decode of one sentence with the training
+prompt, as `sebeni eval` / `generate` use), `token_probabilities`,
+`save_model`, `push_to_hub`, `register_reward`, `register_hook`.
+
+::: beni.core.srl.plugin.AlignmentPlugin
+    options:
+      members:
+        - load_models
+        - load_aligned_weights
+        - generate
+        - analyze
+        - token_probabilities
+        - save_model
+        - push_to_hub
+        - register_reward
+        - register_hook
+      show_root_heading: true
+      heading_level: 3
+      show_if_no_docstring: true
+
+::: beni.core.srl.sft.sft.SebeniSft
+    options:
+      members: []
+      show_root_heading: true
+      heading_level: 3
+
+::: beni.core.srl.grpo.grpo.SebeniGrpo
+    options:
+      members: []
+      show_root_heading: true
+      heading_level: 3
+
+::: beni.core.srl.dpo.dpo.SebeniDpo
+    options:
+      members: []
+      show_root_heading: true
+      heading_level: 3
+
+::: beni.core.srl.apo.apo.SebeniApo
+    options:
+      members: []
+      show_root_heading: true
+      heading_level: 3
+
+::: beni.core.srl.jax.policy.JaxPolicyPlugin
+    options:
+      members: []
+      show_root_heading: true
+      heading_level: 3
+
+## SAMPG helpers
+
+::: beni.core.srl.algorithm1.distill_language
+    options:
+      show_root_heading: true
+      heading_level: 3
+
 ::: beni.core.srl.algorithm1.maybe_distill_languages
     options:
       show_root_heading: true
-      heading_level: 2
+      heading_level: 3
 
 ::: beni.core.srl.algorithm1.maybe_distill_batch
     options:
       show_root_heading: true
-      heading_level: 2
+      heading_level: 3
 
 ::: beni.core.srl.algorithm1.group_texts_by_language
     options:
       show_root_heading: true
-      heading_level: 2
+      heading_level: 3

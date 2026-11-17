@@ -1,5 +1,5 @@
 # Multilingual GRPO — one language identity per row, shared policy θ
-# Docs: https://seben.robotsmali.org/docs/sampg/
+# Docs: https://mlsftwrs.github.io/sebeni/sampg/
 
 project_name: sebeni-manding-grpo
 algorithm: grpo

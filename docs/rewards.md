@@ -6,69 +6,141 @@ Shared \(\pi_{rf}\) for every algorithm:
 R_{\mathrm{total}} = \omega_m R_{\mathrm{morph}} + \omega_r R_{\mathrm{rule}} + \omega_f R_{\mathrm{format}} + \omega_l R_{\mathrm{lang}}
 \]
 
-Sebeni defaults (YAML `reward:`): morph **0.4**, rule **0.4**, format **0.1**,
-lang **0.1** — they sum to **1.0**. GRPO stays **outcome-level** on the
-completion; token stages are process signal. Daba itself is the verifiable
-reward — no separate reward model.
+Dataclass and `sebeni init` defaults (YAML `reward:`): morph **0.4**, rule
+**0.4**, format **0.1**, lang **0.1**. The packaged preset `beni/data/presets/multi13.yaml`
+(what `sebeni exp` loads with no `-c`) overrides them to morph **0.3**, rule **0.3**,
+format **0.2**, lang **0.2**. Both sum to **1.0**. GRPO stays
+**outcome-level** on the completion; token stages are process signal. Daba
+itself is the verifiable reward — no separate reward model.
 
 ## Metrics
 
-**Phi** — mean `stage_to_phi` on tokens. Analyzed stages (0–5) → 1.0;
-borrowing EMPR / stage 6 → `empr` (default 0.5); unknown → 0. Trigger Distiller
-if corpus/batch Φ < τ (0.5).
+| Metric | Direction | Pooling |
+| --- | --- | --- |
+| Φ | higher is better | top-level `phi` is a **macro** mean over languages |
+| MER | cost, lower is better | micro over morphemes |
+| MCS | match fraction, **higher is better** | micro over tokens |
+| UWEC | cost, lower is better | micro over tokens |
 
-**MER** — held-out morpheme edit rate \((S_m+D_m+I_m)/N_m\). \(N_m\) is the
-reference morpheme count. The reported value for a language or MULTI13 is one
-micro-average over every morpheme in that scope. Lower is better.
+**Phi** — mean `stage_to_phi` over tokens:
 
-**MCS (reward)** — fraction of tokens whose predicted `stage` equals Daba's
-stage. Training rewards still use this match fraction.
+| Stage | Contribution |
+| --- | --- |
+| \(0 \le x < 6\) | 1.0 |
+| 6 (EMPR, borrowing) | `empr` (default 0.5) |
+| \(> 6\) | `eps` (≈ 0) |
+| −1 (unknown) | 0.0 |
+| Non-numeric label | 1.0 |
 
-**MCS (report)** — the mismatch cost \(1 -\) that fraction, so MER, MCS, and
-UWEC are all quantities to minimize. Unpaired tokens count as mismatches.
+A completion token with no `"stage"` key is read as −1. Distiller runs when a
+language's train-split Φ < τ (0.5).
+
+**MER** — morpheme edit rate \((S_m+D_m+I_m)/N_m\) from a Levenshtein
+traceback. \(N_m\) is the reference morpheme count. The reported value for a
+language or MULTI13 is one micro-average over every morpheme in that scope.
+Eval compares the **first** DabaX sentence of the reference parse with the
+first sentence of the hypothesis. A row whose reference has no morphemes is
+skipped (not decoded, kept out of the pools) and counted in `n_skipped`, so
+MER never becomes `inf`.
+
+**MCS** — morphosyntactic consistency score:
+
+\[
+\mathrm{MCS} = \frac{1}{\max(|T_{pred}|, |T_{ref}|)} \sum_{i=1}^{\min(|T_{pred}|, |T_{ref}|)} \mathbb{I}\big(\mathrm{Stage}_{pred}(w_i) = \mathrm{Stage}_{ref}(w_i)\big)
+\]
+
+Tokens are paired **by index** (no alignment); unpaired tokens are not
+matches. `eval.json` reports this match fraction, and training rewards use the
+same quantity. `helpers.mcs_mismatch` (\(1-\mathrm{MCS}\)) is an optional
+helper; the pipeline does not use it. A model that omits `"stage"` gets −1 on
+every token, so its MCS collapses toward 0 even when MER is good.
 
 **UWEC** — post-training cost
-\(I(\mathrm{Stage}_{pred}\neq-1)+\beta\left|\log\frac{\pi^\mathcal{A}_\theta+\varepsilon}{\pi_{\mathrm{ref}}+\varepsilon}\right|\),
+
+\[
+\mathrm{UWEC} = \frac{1}{|W|}\sum_{i} \Big( \mathbb{I}(\mathrm{Stage}_{pred}(w_i)\neq-1) + \beta\left|\log\frac{\pi_\theta(w_i)+\varepsilon}{\pi_{\mathrm{ref}}(w_i)+\varepsilon}\right| \Big)
+\]
+
 token-mean over the scope. It is not a training gradient coefficient. Torch or
-Flax may produce the token probabilities; the cost reduction is NumPy or JAX.
+Flax may produce the token probabilities; the reduction is NumPy or JAX.
+
+!!! note "UWEC null / NaN handling"
+    - LM token count ≠ morphological token count → every morphological token
+      gets the mean sequence probability.
+    - Non-finite probabilities are replaced by 1. All-non-positive inputs are
+      treated as log-probabilities and exponentiated.
+    - If the mean is still non-finite, eval retries with uniform probabilities,
+      so UWEC becomes the pure stage indicator for that sentence.
+    - With no `ref_model` and no PEFT adapter to disable, \(\pi_{ref}=\pi_\theta\)
+      and the log term is 0.
+    - `uwec` is `null` only when no sentence was scored. Older published
+      eval files with `uwec: null` predate the uniform fallback.
 
 The training distrust term \(U\) used to scale gradients stays separate
-(`jax_uncertainty_scale` / SafetyGovernor). Evaluation logs MER, MCS, and UWEC
-on `{working_dir}/exp/eval.json` as `model`, `algorithm`, `scope`.
+(SafetyGovernor, see [Safety](safety.md)).
+
+## `eval.json`
+
+`{working_dir}/exp/eval.json`:
+
+| Level | Fields |
+| --- | --- |
+| top | `model`, `algorithm`, `scope`, `languages`, `phi`, `mer`, `mcs`, `uwec`, `n_morphemes`, `n_tokens`, `n_scored`, `n_skipped`, `beta`, `eps`, `reference_model`, `weights`, `eval_source`, `max_eval_rows`, `tau`, `by_language` |
+| `by_language.{lang}` | `phi`, `mer`, `mcs`, `uwec`, `n_sentences`, `n_scored`, `n_skipped`, `n_morphemes`, `n_tokens`, `checkpoint_id`, `language`, `scope` |
+
+- `n_sentences` counts parsed **reference** sentences in the sample; `n_scored`
+  counts decoded rows that were scored; `n_skipped` counts rows whose reference
+  has no morphemes.
+- Per-language `phi` is computed on the decoded hypotheses' stages (the
+  model's own claimed stages when it emits JSON). With nothing decoded it falls
+  back to the reference Φ over the evaluated rows.
+- `checkpoint_id` names the **G/D** checkpoint, not the policy:
+  `baseline_vN` (promoted), `baseline` (workdir copy of the packaged files,
+  never promoted), `packaged`, or `none`.
+- A completion that is not a JSON object with `tokens` is DabaX-parsed as raw
+  text, and those DabaX stages are scored. That can inflate MCS.
+- `sebeni eval` scores the **trained** weights: `--weights PATH|REPO`
+  (default: the arm's output dir, `{working_dir}/models`). A LoRA adapter is
+  attached to a fresh base model, a full checkpoint is loaded directly, and a
+  Hub repo id resolves through the local Hugging Face cache. Without trained
+  weights, eval warns and scores the base model (`weights: null`).
+- Decoding is **greedy** with the **same prompt as training** (system prompt +
+  chat template; ChatML fallback when the tokenizer has none), up to
+  `experiment.eval_max_new_tokens` (default 512) new tokens, stopping at end of
+  turn. The training prompt's languages are saved next to the weights in
+  `sebeni_policy.json` and reused, so `eval --lang` only filters rows.
+- Rows come from `experiment.eval_source` (or `eval --eval-file`), else the
+  packaged `test.json`. `experiment.max_eval_rows` caps the rows decoded per
+  language; the default `null` (or `0`) scores every held-out row.
 
 ## Rewards
 
-| Term | Weight | Meaning |
+| Term | Default weight | Computation |
 | --- | --- | --- |
-| \(R_{morph}\) | 0.4 | Annotation quality vs DabaX \(y^*\): MCS, clipped MER quality, and lemma overlap |
-| \(R_{rule}\) | 0.4 | Text Φ under active **G**, **D**, plus lexical/POS agreement with \(y^*\) |
-| \(R_{format}\) | 0.1 | Valid **JSON** object with a `tokens` list |
-| \(R_{lang}\) | 0.1 | JSON `lang` matches **that row**'s group |
+| \(R_{morph}\) | 0.4 | \(\omega_m \cdot \frac{1}{3}\big(\mathrm{MCS} + \mathrm{clip}(1-\mathrm{MER}, 0, 1) + \text{lemma overlap}\big)\) against the DabaX reference \(y^*\). 0 when either side has no tokens. |
+| \(R_{rule}\) | 0.4 | \(\omega_r \cdot 0.5\,\big(\text{consistency} + \text{lemma overlap with } y^*\big)\). Consistency scores the **claimed** analysis against DabaX's parse of the prompt sentence (or the reference column): a token at the same position earns its Φ weight (`stage_to_phi`) only if surface, stage, and first analysis (form + POS) match; the sum is divided by \(\max(\lvert T_{pred}\rvert, \lvert T_{ref}\rvert)\). The completion's `"text"` is never re-parsed, so echoing the input earns nothing. 0 when either side has no tokens. |
+| \(R_{format}\) | 0.1 | \(\omega_f\) if the completion yields a JSON object with a `tokens` list, else 0 |
+| \(R_{lang}\) | 0.1 | \(\omega_l\) if the JSON `lang` resolves to **that row**'s group code, else 0. A completion declaring several languages (mixed) scores 0. |
 
-### Rule-encoded extras
+JSON is extracted leniently: direct parse, then fenced ```` ```json ```` blocks,
+then the first balanced `{…}` object.
 
-\(R_{rule}\) checks finite-state transitions in **G**. A suffix without a valid
-preceding stem is a penalty.
+`RewardManager.compute_rewards` (used by the JAX path) returns the
+`format`, `morph`, `rule`, `lang`, and `total` score lists for a batch.
 
-| Parameter | Meaning |
-| --- | --- |
-| \(\rho\) positional | `:n: [ :v: :n: ]` (verb nominalized as noun) → \(\rho=+1.0\). Nominalizing suffix on a non-verbal stem with no rule in \(G'\) → \(\rho=-1.0\). |
-| \(\lambda\) lexical | `\lx` + `\ps` in **D** → 1.0. `\va` / `\fa` variant correctly tagged → 0.8. Phonologically plausible but missing lemma → −0.5. |
-| \(\nu\) valence | If a verb is `\vl` transitive in **D**, the window must contain an object marker; mismatch lowers that completion's GRPO advantage \(A_i\). |
-
-### Format / self-awareness
-
-Predicted `stage` matching Daba is rewarded; claiming `stage=1` when Daba says
-−1 is penalized. Sebeni encodes this as JSON schema validity plus MCS when a
-reference parse exists.
+There are no positional / valence / lexical (ρ, ν, λ) rule terms, no explicit
+penalty for claiming a stage Daba rejects (that only lowers MCS inside
+\(R_{morph}\)), and no length or insertion penalty.
 
 ```json
 {"text": "aw ka ne labato.", "lang": "bam", "tokens": [{"surface": "aw", "stage": 1, "analyses": []}]}
 ```
 
-Invalid JSON, missing `tokens`, or a `lang` that is not this row's group
-scores 0 for the corresponding term (and can block the policy update — see
-[Safety](safety.md)).
+Invalid JSON, missing `tokens`, or a mismatched `lang` scores 0 for the
+corresponding term. For GRPO, the format gate blocks a policy update only when
+every completion since the last optimizer step has \(R_{format} = 0\); SFT,
+DPO, and APO refuse the step when any training target is invalid — see
+[Safety](safety.md).
 
 ## YAML
 

@@ -7,6 +7,10 @@ docstrings, `beni.*` imports.
 - Do not introduce a second config library or rename public APIs.
 - Public functions and protocols get numpy-style docstrings (mkdocstrings).
 - When editing a file, fix only the touched region. No repo-wide reformat.
+- Slow end-to-end tests: `SEBENI_RUN_SLOW=1 pytest -m slow tests/integration`.
+  `scripts/smoke_tinystories.sh [arms]` runs `configs/test_tinystories.yaml`
+  (env `KVERITAS_MODE=local|server|off`, `SEBENI_FORCE_CPU=1`, `SMOKE_ROOT`,
+  `PYTHON`).
 - **Ruff**: `format` + `check`, Python 3.10, double quotes, line length 100.
   Run it on new/changed files. Optional `[dev]` extra.
 
@@ -24,4 +28,4 @@ mkdocs serve
 The docs site uses the terminal MkDocs theme (`docs/stylesheets/terminal.css`):
 JetBrains Mono, `cli-dark` / `cli-light` palettes, and a typewriter prompt on
 the home page. Keep MathJax (`javascripts/mathjax.js`) for the metric pages.
-Public URL: [seben.robotsmali.org/docs](https://seben.robotsmali.org/docs).
+Public URL: [mlsftwrs.github.io/sebeni](https://mlsftwrs.github.io/sebeni).

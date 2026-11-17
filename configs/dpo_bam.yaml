@@ -1,5 +1,5 @@
 # DPO policy-update plugin on the same SAMPG loop
-# Docs: https://seben.robotsmali.org/docs/hyperparams/
+# Docs: https://mlsftwrs.github.io/sebeni/hyperparams/
 project_name: sebeni-bam-dpo
 algorithm: dpo
 # working_dir: ./runs/bam-dpo-001
