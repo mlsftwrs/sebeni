@@ -400,35 +400,72 @@ class RewardManager:
         return scores
 
     def reward_rule(
-        self, prompts: List[Dict[str, Any]], completions: List[str], 
+        self, prompts: List[Dict[str, Any]], completions: List[str],
         language: Optional[List[str]] = None, reference=None, **kwargs) -> List[float]:
+        """R_rule: morphotactic adherence of the *claimed* analysis to DabaX's parse of the prompt.
 
-        """R_rule: POS/valence adherence via Phi & MCS against the reference."""
+        Each claimed token earns the reference token's Φ weight
+        (``stage_to_phi``) only when its surface and stage match the reference
+        token at the same position; the mean runs over max(len(pred), len(ref)).
+        This is averaged with the lemma overlap. The completion's own ``text``
+        is never re-parsed, so copying the input sentence earns nothing by
+        itself (#16). Without a reference column, the prompt's user sentence
+        is parsed with DabaX.
+        """
+        from beni.core.compute.helpers import stage_to_phi
+
         predicted = self.completions_to_sentences(completions)
-        reference_sentences = self._parse_references(prompts, reference=reference)
         langs = language or [""] * len(completions)
+        reference_sentences = self._parse_references(prompts or [{}] * len(completions), reference=reference)
+        if reference is None:
+            reference_sentences = [
+                ref if ref.tokens else self._parse_prompt_sentence(prompt, lang)
+                for ref, prompt, lang in zip(reference_sentences, prompts or [{}] * len(completions), langs)
+            ]
 
         scores = []
-        for i, (pred_sent, ref_sent, lang) in enumerate(zip(predicted, reference_sentences, langs)):
-            try:
-                daba_x = self._dabax(lang)
-                pred_loaded = daba_x.loader(pred_sent.text) if pred_sent.text else []
-            except Exception:
-                pred_loaded = []
-            pred_sent = pred_loaded[0] if pred_loaded else pred_sent
-
-            phi_score = self.scorer.phi(pred_sent)
+        for pred_sent, ref_sent in zip(predicted, reference_sentences):
+            pred_tokens = list(pred_sent.tokens or [])
+            ref_tokens = list(ref_sent.tokens or [])
+            if not pred_tokens or not ref_tokens:
+                scores.append(0.0)
+                continue
+            consistent = sum(
+                stage_to_phi(ref.stage)
+                for pred, ref in zip(pred_tokens, ref_tokens)
+                if str(pred.surface) == str(ref.surface) and str(pred.stage) == str(ref.stage)
+            ) / max(len(pred_tokens), len(ref_tokens))
             lexical_score = self._lemma_overlap(pred_sent, ref_sent)
 
-            score = self.config.rule_weight * 0.5 * (phi_score + lexical_score)
+            score = self.config.rule_weight * 0.5 * (consistent + lexical_score)
             scores.append(score)
 
             self.total_reward += score
-            self.predicted_stages.append([t.stage for t in pred_sent.tokens])
+            self.predicted_stages.append([t.stage for t in pred_tokens])
 
         if scores:
             self.recent_rewards["reward_rule"] = float(sum(scores) / len(scores))
         return scores
+
+    def _parse_prompt_sentence(self, prompt: Any, lang: str) -> Sentence:
+        """DabaX parse of the user sentence in a chat prompt (empty Sentence on failure)."""
+        text = ""
+        if isinstance(prompt, list):
+            for message in reversed(prompt):
+                if isinstance(message, dict) and message.get("role") == "user":
+                    text = str(message.get("content") or "")
+                    break
+        elif isinstance(prompt, dict):
+            text = str(prompt.get("content") or "") if prompt.get("role") == "user" else ""
+        elif isinstance(prompt, str):
+            text = prompt
+        if not text:
+            return Sentence(text="", tokens=[])
+        try:
+            parsed = self._dabax(lang).loader(text) or []
+        except Exception:
+            parsed = []
+        return parsed[0] if parsed else Sentence(text=text, tokens=[])
 
     @staticmethod
     def _parse_references(prompts: List[Dict[str, Any]], reference=None) -> List[Sentence]:

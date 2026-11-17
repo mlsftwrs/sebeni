@@ -40,3 +40,44 @@ def test_compute_rewards_returns_all_keys():
         assert len(out[key]) == 2, key
     assert all(score > 0 for score in out["format"])
     assert all(score > 0 for score in out["rule"])
+
+
+def _analysis(text, tokens):
+    return json.dumps({"text": text, "lang": "bam", "tokens": tokens})
+
+
+def _tok(surface, stage=0, form=None):
+    return {"surface": surface, "stage": stage, "analyses": [{"form": form or surface, "ps": ["n"], "gloss": "", "morphemes": []}]}
+
+
+def test_rule_reward_does_not_pay_for_echoing_the_input():
+    """Issue 16: copying the sentence into "text" with empty / garbage tokens scores below a correct analysis."""
+    rm = RewardManager(reward_config=RewardConfig())
+    reference = [json.loads(_analysis("muso ka taa", [_tok("muso"), _tok("ka", 0), _tok("taa", 1)]))]
+    correct = _analysis("muso ka taa", [_tok("muso"), _tok("ka", 0), _tok("taa", 1)])
+    echo_empty = _analysis("muso ka taa", [])
+    echo_garbage = _analysis("muso ka taa", [_tok("x", -1), _tok("y", -1)])
+    dabax = MagicMock()
+    dabax.loader.side_effect = lambda text: []  # the old code re-parsed "text"; must not matter now
+    with patch.object(RewardManager, "_dabax", return_value=dabax):
+        good, empty, garbage = (
+            rm.reward_rule(prompts=[{}], completions=[c], language=["bam"], reference=reference)[0]
+            for c in (correct, echo_empty, echo_garbage)
+        )
+    assert good > 0
+    assert empty == 0.0 and garbage == 0.0
+    dabax.loader.assert_not_called()
+
+
+def test_rule_reward_parses_prompt_when_no_reference():
+    from beni.core import Sentence, Token
+
+    rm = RewardManager(reward_config=RewardConfig())
+    ref = Sentence(text="muso", lang="bam", tokens=[Token(surface="muso", stage=0)])
+    dabax = MagicMock()
+    dabax.loader.return_value = [ref]
+    prompt = [{"role": "system", "content": "sys"}, {"role": "user", "content": "muso"}]
+    with patch.object(RewardManager, "_dabax", return_value=dabax):
+        score = rm.reward_rule(prompts=[prompt], completions=[_analysis("muso", [_tok("muso")])], language=["bam"])
+    dabax.loader.assert_called_once_with("muso")
+    assert score[0] > 0
