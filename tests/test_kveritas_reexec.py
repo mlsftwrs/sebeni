@@ -365,3 +365,12 @@ def test_code_manifest_records_running_version(tmp_path):
 
     data = json.loads(kv.code_manifest(tmp_path / "code.json").read_text(encoding="utf-8"))
     assert data["version"] == beni.__version__  # not a stale installed copy's metadata
+
+
+def test_sealed_session_collision_same_second(tmp_path):
+    for expected in (".kveritas.sealed-", "-1"):
+        session = tmp_path / ".kveritas"
+        session.mkdir()
+        (session / "session.json").write_text(json.dumps({"sealed": True}), encoding="utf-8")
+        moved = kv.move_aside_sealed_session(tmp_path)
+        assert moved is not None and expected in moved.name and not session.exists()

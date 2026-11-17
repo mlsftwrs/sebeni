@@ -157,3 +157,22 @@ def test_hooked_step_passes_language_signals():
     assert optimizer.step() is None
     assert all(torch.equal(o, n) for o, n in zip(before, model.parameters()))
     assert "language_mismatch_batch" in plugin.governor.spec.fired
+
+
+def test_observe_language_does_not_skip_distinct_batches_with_same_first_item():
+    rm = RewardManager()
+    b1 = [_json("bam"), _json("bam")]
+    rm.observe_language(b1, language=["bam", "bam"])
+    assert rm.lang_ok == [True, True]
+    rm.clear()
+    # Even if list id is reused and first element matches, second element differs.
+    b1[1] = _json("dtm")
+    rm.observe_language(b1, language=["bam", "bam"])
+    assert rm.lang_ok == [True, False]
+
+
+def test_mixed_language_refused_without_lang_ok():
+    gov = _gov(require_language=False, refuse_mixed_language=True)
+    meta = {"signal_source": "targets", "format_scores": [0.1], "mixed_language": [True]}
+    assert gov.allow_policy_update(meta) is False
+    assert "mixed_language_batch" in gov.spec.fired

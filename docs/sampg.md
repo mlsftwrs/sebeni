@@ -53,9 +53,9 @@ Daba assigns a **stage** to each token:
 
 | Stage | Meaning | Contribution to Φ |
 | --- | --- | --- |
-| \(0 \le x < 6\) | Fully matched / analyzed | 1.0 |
-| 6 (EMPR) | Validated loanword / borrowing | `empr` (default 0.5) |
-| \(> 6\) | Other | `eps` (≈ 0) |
+| Analyzed (`0 .. max`, non-EMPR) | Fully matched / analyzed | 1.0 |
+| EMPR (grammar borrowing stage: 6 in `bam`, 4 in the other 12 baselines; or `gloss == "EMPR"`) | Validated loanword / borrowing | `empr` (default 0.5) |
+| Above grammar EMPR stage | Other | `eps` (≈ 0) |
 | −1 | Unrecognized | 0.0 |
 
 Non-numeric stage labels count 1.0. Φ is the mean token score. If **Φ < τ**

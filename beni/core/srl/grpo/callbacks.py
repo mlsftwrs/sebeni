@@ -237,7 +237,7 @@ class KVeritasCallback(TrainerCallback):
                     text_val = ""
                     lang_val = ""
                     if isinstance(row, dict) or hasattr(row, "get"):
-                        text_val = row.get("text") or ""
+                        text_val = row.get("raw_text") or row.get("text") or ""
                         if not text_val:
                             p = row.get("prompt")
                             if isinstance(p, list):
@@ -247,10 +247,9 @@ class KVeritasCallback(TrainerCallback):
                                         break
                                 if not text_val and p and isinstance(p[-1], dict):
                                     text_val = p[-1].get("content", "")
-                            elif isinstance(p, str):
-                                text_val = p
                         lang_val = row.get("lang") or row.get("language") or ""
-                    eval_records.append({"text": text_val, "lang": lang_val})
+                    if text_val:
+                        eval_records.append({"text": text_val, "lang": lang_val})
 
                 if eval_records:
                     report = run_eval(self.config, eval_records, record=False)

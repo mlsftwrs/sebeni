@@ -12,9 +12,9 @@ import beni
 PYPROJECT = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
 
 
-def test_version_is_0_2_0_everywhere():
-    assert PYPROJECT["project"]["version"] == "0.2.0"
-    assert beni.__version__ == "0.2.0"  # a checkout wins over any stale installed copy
+def test_version_is_0_2_1_everywhere():
+    assert PYPROJECT["project"]["version"] == "0.2.1"
+    assert beni.__version__ == "0.2.1"  # a checkout wins over any stale installed copy
     assert not Path("setup.cfg").exists()
 
 

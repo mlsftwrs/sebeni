@@ -26,13 +26,13 @@ itself is the verifiable reward — no separate reward model.
 
 | Stage | Contribution |
 | --- | --- |
-| \(0 \le x < 6\) | 1.0 |
-| 6 (EMPR, borrowing) | `empr` (default 0.5) |
-| \(> 6\) | `eps` (≈ 0) |
+| Analyzed (`0 .. max`, non-EMPR) | 1.0 |
+| EMPR (grammar borrowing stage: 6 in `bam`, 4 in the other 12 baselines; or `gloss == "EMPR"`) | `empr` (default 0.5) |
+| Above grammar EMPR stage | `eps` (≈ 0) |
 | −1 (unknown) | 0.0 |
 | Non-numeric label | 1.0 |
 
-A completion token with no `"stage"` key is read as −1. Distiller runs when a
+During **training** (`R_morph` / `R_rule`), a completion token with no `"stage"` key is read as −1. During **held-out evaluation** (`sebeni eval` / `run_eval`), any LLM-emitted `"stage"` is discarded and DabaX recomputes each predicted token's stage from its surface. Distiller runs when a
 language's train-split Φ < τ (0.5).
 
 **MER** — morpheme edit rate \((S_m+D_m+I_m)/N_m\) from a Levenshtein
@@ -52,8 +52,9 @@ MER never becomes `inf`.
 Tokens are paired **by index** (no alignment); unpaired tokens are not
 matches. `eval.json` reports this match fraction, and training rewards use the
 same quantity. `helpers.mcs_mismatch` (\(1-\mathrm{MCS}\)) is an optional
-helper; the pipeline does not use it. A model that omits `"stage"` gets −1 on
-every token, so its MCS collapses toward 0 even when MER is good.
+helper; the pipeline does not use it. In training rewards (`R_morph`), omitting
+`"stage"` yields −1 on every token; in held-out evaluation (`run_eval`),
+DabaX computes the token stages regardless of what `"stage"` the LLM emitted.
 
 **UWEC** — post-training cost
 
@@ -91,9 +92,11 @@ The training distrust term \(U\) used to scale gradients stays separate
 - `n_sentences` counts parsed **reference** sentences in the sample; `n_scored`
   counts decoded rows that were scored; `n_skipped` counts rows whose reference
   has no morphemes.
-- Per-language `phi` is computed on the decoded hypotheses' stages (the
-  model's own claimed stages when it emits JSON). With nothing decoded it falls
-  back to the reference Φ over the evaluated rows.
+- Per-language `phi` is computed on the decoded hypotheses' stages: for JSON
+  completions, LLM-emitted `"stage"` values are discarded and `DabaX` computes
+  each token's stage on the predicted surfaces (keeping JSON `analyses` for
+  MER). With nothing decoded it falls back to the reference Φ over the
+  evaluated rows.
 - `checkpoint_id` names the **G/D** checkpoint, not the policy:
   `baseline_vN` (promoted), `baseline` (workdir copy of the packaged files,
   never promoted), `packaged`, or `none`.

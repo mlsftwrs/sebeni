@@ -56,6 +56,7 @@ class SebeniSft(AlignmentPlugin):
                     "prompt": prompt,
                     "completion": answer,
                     "text": prompt + answer,
+                    "raw_text": text,
                     "lang": lang,
                     "target": target,
                 }
@@ -105,7 +106,17 @@ class SebeniSft(AlignmentPlugin):
         if self.model is None:
             self.load_models()
         labeled = self.extract_labels(records)
-        dataset = Dataset.from_list([{"prompt": row["prompt"], "completion": row["completion"]} for row in labeled])
+        dataset = Dataset.from_list(
+            [
+                {
+                    "prompt": row["prompt"],
+                    "completion": row["completion"],
+                    "raw_text": row.get("raw_text", ""),
+                    "lang": row.get("lang", ""),
+                }
+                for row in labeled
+            ]
+        )
         train_dataset, eval_dataset = self.split_eval(dataset, seed=self.config.sft.seed)
 
         project_name = project_name or self.config.project_name

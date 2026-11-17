@@ -119,7 +119,7 @@ pattern :n: [ :n: :v: ] | :n: [ :n: :v: ]
 pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
 pattern :n: [ :n: :v: :n: ] | :n: [ :n: :v: :n: ]
 
-# --- LOANWORDS / NON-MAMARA FILTER (STAGE 6 = EMPR / LOANWORDS) ---
+# --- LOANWORDS / NON-MAMARA FILTER (STAGE 4 = EMPR / LOANWORDS) ---
 section loanwords
 
 # Filter non-Mamara orthographic sequences, invalid consonants, or loanword patterns (French/Arabic borrowings)

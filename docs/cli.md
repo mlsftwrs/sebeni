@@ -38,7 +38,7 @@ weights are 0.1/0.4/0.4/0.1 (format/morph/rule/lang), the preset's are
 | `sebeni eval` | Held-out Φ / MER / MCS / UWEC of the trained weights on packaged `test.json` (or `experiment.eval_source`) → `{working_dir}/exp/eval.json` | `-c`, `-w`, `--lang`, `--weights`, `--eval-file`, `--kveritas/--no-kveritas`, `--kveritas-seal` |
 | `sebeni wordfreq` | Surfaces / lemmas / morphemes / stages per language | `-c`, `-w`, `--lang` |
 | `sebeni generate` | Analyse one sentence with the trained weights; warn on `R_format` / `R_lang` | `-c`, `--prompt`, `--lang`, `--weights`, `--max-new-tokens` (alias `--max-length`; default `experiment.eval_max_new_tokens`, 512) |
-| `sebeni push` | Hub upload of the trained weights (default the arm's output dir); needs an eval snapshot for those weights | `-c`, `-w`, `--repo-id` (else `trainer.hub_model_id`), `--weights`, `--write-card` |
+| `sebeni push` | Hub upload of the trained weights (default the arm's output dir); needs an eval snapshot for those weights | `-c`, `-w`, `--repo-id` (else active arm / `trainer.hub_model_id`), `--weights`, `--write-card` |
 
 `--lang multi13` or `--lang all` selects the 13 canonical group codes.
 `--lang bam` is one language. `--lang bam,mku` is a comma-separated list.

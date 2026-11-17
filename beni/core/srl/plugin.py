@@ -165,6 +165,7 @@ class AlignmentPlugin:
         self.hook_manager = PreUpdateHookManager(model=None)
         self.data_loader = DL(config=self.config.data)
         self._last_logps = {"model_logps": None, "ref_logps": None, "kl": None, "log_ratio": None}
+        self._step_logps: List[Dict[str, Any]] = []
         self.target_gate_report: Optional[Dict[str, int]] = None
         self._last_uncertainty = {}
         self.loaded_weights: Optional[str] = None
@@ -606,11 +607,40 @@ class AlignmentPlugin:
                     ref = self._target_logps(base, forward, labels)
         if ref is None or ref.shape != policy.shape:
             return
-        self._last_logps = {
+        entry = {
             "model_logps": policy,
             "ref_logps": ref,
             "kl": float((policy - ref).mean().item()),
             "log_ratio": None,
+        }
+        self._record_microbatch_logps(entry)
+
+    def _record_microbatch_logps(self, entry: Dict[str, Any]) -> None:
+        """Record one microbatch's log-ratio entry so gradient accumulation aggregates all microbatches."""
+        self._last_logps = dict(entry)
+        self._step_logps.append(dict(entry))
+
+    def _aggregated_step_logps(self) -> Dict[str, Any]:
+        """Aggregate log-ratios collected across microbatches since the last optimizer step."""
+        if not self._step_logps:
+            return dict(self._last_logps)
+        if len(self._step_logps) == 1:
+            return dict(self._step_logps[0])
+
+        def _combine_tensors(items):
+            if not items:
+                return None
+            if all(torch.is_tensor(x) for x in items):
+                return torch.cat([x.detach().reshape(-1) for x in items])
+            return items[-1]
+
+        kls = [float(e["kl"]) for e in self._step_logps if e.get("kl") is not None]
+        lrs = [float(e["log_ratio"]) for e in self._step_logps if e.get("log_ratio") is not None]
+        return {
+            "model_logps": _combine_tensors([e.get("model_logps") for e in self._step_logps if e.get("model_logps") is not None]),
+            "ref_logps": _combine_tensors([e.get("ref_logps") for e in self._step_logps if e.get("ref_logps") is not None]),
+            "kl": (sum(kls) / len(kls)) if kls else None,
+            "log_ratio": (sum(lrs) / len(lrs)) if lrs else None,
         }
 
     def _capture_dpo_log_ratio(self, trainer, n_chosen: float = 1.0, n_rejected: float = 1.0) -> None:
@@ -629,7 +659,7 @@ class AlignmentPlugin:
         per_token_c = abs(float(chosen[-1])) / (beta * max(float(n_chosen), 1.0))
         per_token_r = abs(float(rejected[-1])) / (beta * max(float(n_rejected), 1.0))
         drift = (per_token_c + per_token_r) / 2.0
-        self._last_logps = {"model_logps": None, "ref_logps": None, "log_ratio": drift, "kl": drift}
+        self._record_microbatch_logps({"model_logps": None, "ref_logps": None, "log_ratio": drift, "kl": drift})
 
     def _wire_pre_update_hooks(self, trainer) -> None:
         """Attach SafetyGovernor + logps capture around optimizer.step / compute_loss."""
@@ -669,6 +699,7 @@ class AlignmentPlugin:
                     return self._targets_loss(trainer, original_loss, model, inputs, *args, **kwargs)
                 result = original_loss(model, inputs, *args, **kwargs)
                 if isinstance(inputs, dict):
+                    model_val = None
                     for key in (
                         "old_per_token_logps",
                         "sampling_per_token_logps",
@@ -676,11 +707,18 @@ class AlignmentPlugin:
                     ):
                         value = inputs.get(key)
                         if value is not None:
-                            self._last_logps["model_logps"] = value
+                            model_val = value
                             break
                     ref_value = inputs.get("ref_per_token_logps")
-                    if ref_value is not None:
-                        self._last_logps["ref_logps"] = ref_value
+                    if model_val is not None or ref_value is not None:
+                        self._record_microbatch_logps(
+                            {
+                                "model_logps": model_val,
+                                "ref_logps": ref_value,
+                                "kl": None,
+                                "log_ratio": None,
+                            }
+                        )
                 return result
 
             trainer.compute_loss = capturing_loss
@@ -697,19 +735,20 @@ class AlignmentPlugin:
                     and trainer.state.log_history
                 ):
                     logs = trainer.state.log_history[-1]
+                step_logps = self._aggregated_step_logps()
                 kl = logs.get("kl") or logs.get("objective/kl") or logs.get("train/kl")
                 if kl is None:
-                    kl = self._last_logps.get("kl")
+                    kl = step_logps.get("kl")
                 batch_meta = {
                     "signal_source": self.signal_source,
                     "lang_ok": list(self.reward_manager.lang_ok),
                     "mixed_language": list(self.reward_manager.mixed_language),
                     "format_scores": list(self.reward_manager.format_scores),
-                    "model_logps": self._last_logps.get("model_logps"),
-                    "ref_logps": self._last_logps.get("ref_logps"),
+                    "model_logps": step_logps.get("model_logps"),
+                    "ref_logps": step_logps.get("ref_logps"),
                     "predicted_stages": list(self.reward_manager.predicted_stages),
                     "kl": kl,
-                    "log_ratio": self._last_logps.get("log_ratio"),
+                    "log_ratio": step_logps.get("log_ratio"),
                     "governor": self.governor,
                 }
                 allowed = self.governor.apply_pre_update(
@@ -732,6 +771,7 @@ class AlignmentPlugin:
                 self.hook_manager(batch_meta)
                 self.reward_manager.clear()
                 # Signals are per step: never let a stale log-ratio reach the next step's gates.
+                self._step_logps.clear()
                 self._last_logps = {"model_logps": None, "ref_logps": None, "kl": None, "log_ratio": None}
                 if not allowed:
                     # Zeroed gradients are not enough: AdamW momentum and decoupled
