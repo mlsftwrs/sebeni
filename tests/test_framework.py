@@ -348,7 +348,8 @@ class TestAdjustedPipeline:
         assert "\\lx foo" in proposal.dict_text
         assert proposal.phi_prime == 1.0
 
-    def test_algorithmic_scratch_phi_improves(self, tmp_path):
+    def test_algorithmic_scratch_bootstrap_promotes_without_stub_phi(self, tmp_path):
+        """Issue 15: stubs no longer raise Φ′; a scratch bootstrap still promotes via the parse gate."""
         pytest.importorskip("daba.mparser")
         with patch.object(
             Distiller, "_valid_language", return_value={"language": "Z", "group_code": "zzz"}
@@ -363,8 +364,12 @@ class TestAdjustedPipeline:
             phi = distiller.phi_on_texts(["foobarqux"])
             proposal = distiller.propose(["foobarqux"], current_phi=phi)
         assert proposal is not None
-        assert proposal.parseable
-        assert proposal.phi_prime > phi
+        assert proposal.parseable and proposal.first_create
+        assert proposal.phi_prime == phi  # auto: stubs are scored as unanalysed
+        decision = SafetyGovernor(SafetySpec()).allow_promote(
+            proposal.phi, proposal.phi_prime, parseable=True, first_create=True, language_ok=proposal.language_ok
+        )
+        assert decision.allowed and decision.reason == "first_create"
 
     def test_remove_is_alias_of_delete(self):
         gram = "keep |\nbroken |\n"
