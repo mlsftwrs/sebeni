@@ -391,6 +391,13 @@ def main() -> None:
         help="Distillation provider backend (default: google).",
     )
     parser.add_argument(
+        "--base-config",
+        type=Path,
+        default=None,
+        help="Base MasterConfig for every cell (default: configs/matrix/base_multi13.yaml). "
+        "Read only; never modified.",
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=Path("experiments/matrix"),
@@ -444,7 +451,10 @@ def main() -> None:
     os.environ["GOOGLE_LOCATION"] = args.location
 
     repo_root = Path(__file__).resolve().parent.parent
-    base_config_path = repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    base_config_path = Path(args.base_config) if args.base_config else repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    if not base_config_path.is_file():
+        parser.error(f"--base-config not found: {base_config_path}")
+    logger.info("Base config: %s", base_config_path)
     catalog_path = repo_root / "configs" / "matrix" / "models.json"
 
     catalog = load_model_catalog(catalog_path)
