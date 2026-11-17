@@ -30,19 +30,12 @@ class GoogleProvider(base.BaseProvider):
         self.ttl = TTL
         self._client = self.initialize()
 
-        if cache_contents is None:
-            try:
-                from beni.core.morphotactic.distil import DistilSysPrompt
-                lang_meta = cfg.get_language_metadata(self.language) if self.language else None
-                cache_contents = DistilSysPrompt.get_cache_contents(language_meta=lang_meta)
-            except Exception as e:
-                logger.debug("Could not auto-generate cache contents: %s", e)
-                cache_contents = None
-
+        # No network side effects at construction: the context cache is created
+        # lazily (Distiller -> set_cache_contents) unless contents are passed here.
+        self.cache = None
         if self.vertex and (not self.region or str(self.region).strip().lower() in ("global", "multi-region")):
-            self.cache = None
             logger.info("Vertex AI global location selected (%s); using system instruction for distillation.", self.model)
-        else:
+        elif cache_contents is not None:
             self.cache = self.__get_cache(contents=cache_contents)
         self._cache_created_at = 0
 
@@ -191,8 +184,14 @@ class GoogleProvider(base.BaseProvider):
             "response_mime_type": "application/json",
             "response_schema": DistilOutput.model_json_schema(),
         }
+        contents = prompt
         if self.cache is not None:
+            # Gemini rejects system_instruction together with cached_content, and the
+            # cache holds only G/D. The delta / bootstrap instructions change per call,
+            # so they travel in the request contents (#14).
             config_kwargs["cached_content"] = self.cache.name
+            if sys_instruct:
+                contents = [f"SYSTEM INSTRUCTIONS:\n{sys_instruct}", prompt]
         elif sys_instruct:
             config_kwargs["system_instruction"] = sys_instruct
         config = genai.types.GenerateContentConfig(**config_kwargs)
@@ -203,11 +202,11 @@ class GoogleProvider(base.BaseProvider):
             with console.status(f"[bold blue]Generating distillation response from model:{self.model}...", spinner="dots"):
                 response = self._client.models.generate_content(
                     model=self.model, 
-                    contents=prompt, 
+                    contents=contents, 
                     config=config
                 )
         else:
-            response = self._client.models.generate_content(model=self.model, contents=prompt, config=config)
+            response = self._client.models.generate_content(model=self.model, contents=contents, config=config)
         
         if(isinstance(response, str)):
             try:
