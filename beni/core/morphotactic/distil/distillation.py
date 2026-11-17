@@ -224,7 +224,26 @@ class Distiller(object):
                 logger.debug("DabaX.loader failed: %s", exc)
         if not sentences:
             return 0.0
-        return float(MorphologyScorer().phi_corpus(sentences)["avg"])
+        return float(MorphologyScorer().phi_corpus(self.neutralize_stubs(sentences))["avg"])
+
+    AUTO_GLOSS_PREFIX = "auto:"
+
+    @classmethod
+    def neutralize_stubs(cls, sentences):
+        """Score algorithmic ``\\ps x`` / ``\\ge auto:`` stub lookups as unanalysed (stage -1).
+
+        ``_algorithmic_dict`` adds a stub entry for every miss, which makes the
+        word parse at a lookup stage. Counting that as analysed would raise Φ′
+        by construction and promote a dictionary with no linguistic content (#15).
+        """
+        for sentence in sentences:
+            for token in getattr(sentence, "tokens", None) or []:
+                analyses = list(getattr(token, "analyses", None) or [])
+                if analyses and all(
+                    str(getattr(a, "gloss", "") or "").startswith(cls.AUTO_GLOSS_PREFIX) for a in analyses
+                ):
+                    token.stage = -1
+        return sentences
 
     def files_parseable(self, gram, ldict, sample: str = "a") -> bool:
         """First-create / candidate gate: DabaX can load the files."""

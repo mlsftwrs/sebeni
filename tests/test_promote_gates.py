@@ -84,3 +84,41 @@ def test_candidate_mer_real_parse_identical_is_zero(tmp_path):
     )
     assert mer == 0.0
     assert distiller.dict_language_ok(ldict.read_text(encoding="utf-8")) is True
+
+
+def test_stub_only_candidate_does_not_raise_phi(tmp_path):
+    """Issue 15: \\ps x / auto: stubs alone cannot make Φ′ > Φ."""
+    from beni.core import Analysis, Sentence, Token
+
+    distiller = Distiller(lang_code="bam", backend="algorithmic", working_dir=str(tmp_path))
+
+    def loader_for(stubbed: bool):
+        def loader(text):
+            tokens = [
+                Token(surface="muso", stage=0, analyses=[Analysis(form="muso", ps=["n"], gloss="woman")]),
+                Token(
+                    surface="zzq",
+                    stage=0 if stubbed else -1,
+                    analyses=[Analysis(form="zzq", ps=["x"], gloss="auto:zzq")] if stubbed else [],
+                ),
+            ]
+            return [Sentence(text=text, lang="bam", tokens=tokens)]
+
+        return loader
+
+    current = MagicMock(loader=loader_for(False))
+    candidate = MagicMock(loader=loader_for(True))
+    with patch.object(Distiller, "_load_dabax", side_effect=[current, candidate]):
+        phi = distiller.phi_on_texts(["muso zzq"], gram="g", ldict="d")
+        phi_prime = distiller.phi_on_texts(["muso zzq"], gram="G", ldict="D")
+    assert phi_prime == phi
+    decision = SafetyGovernor(SafetySpec()).allow_promote(phi, phi_prime, parseable=True, first_create=False)
+    assert decision.allowed is False and decision.reason == "phi_not_improved"
+
+
+def test_real_analysis_still_counts():
+    from beni.core import Analysis, Sentence, Token
+
+    token = Token(surface="muso", stage=0, analyses=[Analysis(form="muso", ps=["n"], gloss="woman"), Analysis(form="muso", ps=["x"], gloss="auto:muso")])
+    Distiller.neutralize_stubs([Sentence(text="muso", lang="bam", tokens=[token])])
+    assert token.stage == 0
