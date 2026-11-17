@@ -81,3 +81,22 @@ def test_rule_reward_parses_prompt_when_no_reference():
         score = rm.reward_rule(prompts=[prompt], completions=[_analysis("muso", [_tok("muso")])], language=["bam"])
     dabax.loader.assert_called_once_with("muso")
     assert score[0] > 0
+
+
+def test_rule_reward_does_not_pay_for_trivial_stage_zero_split():
+    """Review follow-up (#16): splitting the prompt into words at stage 0 with made-up analyses earns less."""
+    rm = RewardManager(reward_config=RewardConfig())
+    ref_tokens = [
+        {"surface": "muso", "stage": 0, "analyses": [{"form": "muso", "ps": ["n"], "gloss": "woman", "morphemes": []}]},
+        {"surface": "ye", "stage": 0, "analyses": [{"form": "ye", "ps": ["pm"], "gloss": "PFV.TR", "morphemes": []}]},
+        {"surface": "taa", "stage": 0, "analyses": [{"form": "taa", "ps": ["v"], "gloss": "go", "morphemes": []}]},
+    ]
+    reference = [{"text": "muso ye taa", "lang": "bam", "tokens": ref_tokens}]
+    correct = _analysis("muso ye taa", ref_tokens)
+    trivial = _analysis(
+        "muso ye taa",
+        [{"surface": w, "stage": 0, "analyses": [{"form": w, "ps": ["x"], "gloss": "", "morphemes": []}]} for w in ("muso", "ye", "taa")],
+    )
+    good = rm.reward_rule(prompts=[{}], completions=[correct], language=["bam"], reference=reference)[0]
+    gamed = rm.reward_rule(prompts=[{}], completions=[trivial], language=["bam"], reference=reference)[0]
+    assert gamed < 0.75 * good

@@ -405,8 +405,8 @@ class RewardManager:
         """R_rule: morphotactic adherence of the *claimed* analysis to DabaX's parse of the prompt.
 
         Each claimed token earns the reference token's Φ weight
-        (``stage_to_phi``) only when its surface and stage match the reference
-        token at the same position; the mean runs over max(len(pred), len(ref)).
+        (``stage_to_phi``) only when its surface, stage, and first analysis
+        (form + part of speech) match the reference token at the same position; the mean runs over max(len(pred), len(ref)).
         This is averaged with the lemma overlap. The completion's own ``text``
         is never re-parsed, so copying the input sentence earns nothing by
         itself (#16). Without a reference column, the prompt's user sentence
@@ -433,7 +433,9 @@ class RewardManager:
             consistent = sum(
                 stage_to_phi(ref.stage)
                 for pred, ref in zip(pred_tokens, ref_tokens)
-                if str(pred.surface) == str(ref.surface) and str(pred.stage) == str(ref.stage)
+                if str(pred.surface) == str(ref.surface)
+                and str(pred.stage) == str(ref.stage)
+                and self._analysis_matches(pred, ref)
             ) / max(len(pred_tokens), len(ref_tokens))
             lexical_score = self._lemma_overlap(pred_sent, ref_sent)
 
@@ -446,6 +448,25 @@ class RewardManager:
         if scores:
             self.recent_rewards["reward_rule"] = float(sum(scores) / len(scores))
         return scores
+
+    @staticmethod
+    def _analysis_matches(pred: Any, ref: Any) -> bool:
+        """The claimed first analysis is one of the reference analyses (same form, overlapping POS)."""
+        pred_analyses = list(getattr(pred, "analyses", None) or [])
+        ref_analyses = list(getattr(ref, "analyses", None) or [])
+        if not ref_analyses:
+            return True  # nothing to compare against; surface + stage already matched
+        if not pred_analyses:
+            return False
+        claimed = pred_analyses[0]
+        claimed_ps = {str(p) for p in (claimed.ps or [])}
+        for option in ref_analyses:
+            if str(option.form) != str(claimed.form):
+                continue
+            option_ps = {str(p) for p in (option.ps or [])}
+            if not option_ps or claimed_ps & option_ps:
+                return True
+        return False
 
     def _parse_prompt_sentence(self, prompt: Any, lang: str) -> Sentence:
         """DabaX parse of the user sentence in a chat prompt (empty Sentence on failure)."""
