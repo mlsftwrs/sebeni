@@ -122,3 +122,21 @@ def test_real_analysis_still_counts():
     token = Token(surface="muso", stage=0, analyses=[Analysis(form="muso", ps=["n"], gloss="woman"), Analysis(form="muso", ps=["x"], gloss="auto:muso")])
     Distiller.neutralize_stubs([Sentence(text="muso", lang="bam", tokens=[token])])
     assert token.stage == 0
+
+
+def test_scratch_stub_promotes_once_then_needs_real_improvement(tmp_path):
+    """Review follow-up (#15): the scratch marker survives algorithmic promotes; only the first is a first-create."""
+    pytest.importorskip("daba.mparser")
+    from beni.core.srl.algorithm1 import maybe_distill_batch
+
+    with patch.object(Distiller, "_valid_language", return_value={"language": "Z", "group_code": "zzz"}), patch(
+        "beni.core.morphotactic.distil.distillation.cfg.resolve_packaged_baseline_dir", return_value=None
+    ):
+        d = Distiller(lang_code="zzz", backend="algorithmic", working_dir=str(tmp_path))
+        d.handle_baselines()
+        gov = SafetyGovernor()
+        first = maybe_distill_batch(["foobarqux"], d, gov, 0.5)
+        second = maybe_distill_batch(["lorem ipsum"], d, gov, 0.5)
+        assert first.allowed and first.reason == "first_create"
+        assert not second.allowed and second.reason == "phi_not_improved"
+        assert d.collect_misses(["foobarqux"]) == ["foobarqux"]  # stubbed words stay visible as misses

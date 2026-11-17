@@ -291,7 +291,8 @@ class Distiller(object):
             except Exception as exc:
                 logger.debug("DabaX miss collection failed: %s", exc)
                 continue
-            for sentence in sentences:
+            # Stub-only lookups (auto:) are still misses: an LLM backend should replace them.
+            for sentence in self.neutralize_stubs(sentences):
                 for token in sentence.tokens:
                     try:
                         unknown = int(token.stage) == -1
@@ -383,8 +384,12 @@ class Distiller(object):
         self.dict_path = state["dict"] if state["dict"] else self.dict_path
         # Scratch stubs use the parse gate. A copied packaged baseline is not a
         # first create: the first promoted checkpoint still requires Φ′ > Φ.
-        first_create = self.is_scratch()
-        bootstrap = first_create
+        # The bootstrap prompt is used while the grammar is still a scratch stub, but
+        # the parse-only "first create" gate applies only until a baseline_vN exists:
+        # the scratch marker survives algorithmic promotes, which otherwise passed the
+        # parse gate on every batch with Φ′ = Φ (#15).
+        bootstrap = self.is_scratch()
+        first_create = bootstrap and self.is_first_create()
 
         current_gram = Path(self.gram_path)
         current_dict = Path(self.dict_path)
@@ -488,7 +493,7 @@ class Distiller(object):
             batch, adjusted_gram, adjusted_dict, fallback=0.0
         )
         mer = None
-        if not (first_create or bootstrap):
+        if not first_create:
             mer = self._candidate_mer(batch, current_gram, current_dict, adjusted_gram, adjusted_dict)
 
         return DistillProposal(
@@ -497,7 +502,7 @@ class Distiller(object):
             phi=phi,
             phi_prime=phi_prime,
             parseable=parseable,
-            first_create=first_create or bootstrap,
+            first_create=first_create,
             language_ok=self.dict_language_ok(adjusted_dict, current_dict_text),
             mer=mer,
         )
