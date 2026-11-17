@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sebeni"
-version = "0.1.2"
+version = "0.2.0"
 description = "Self-aware morphotactic pattern generation toolkit for extremely low-resource languages"
 readme = "README.md"
 license = { text = "MIT" }
@@ -34,8 +34,6 @@ dependencies = [
     "pytrie",
     "attrdict3",
     "regex",
-    "torchao>=0.16.0",
-    "bitsandbytes"
 ]
 
 [project.optional-dependencies]
@@ -48,6 +46,9 @@ train = [
     "accelerate",
     "vllm",
     "trackio",
+    # Quantised loading / optimisers: only training needs them (#12).
+    "torchao>=0.16.0",
+    "bitsandbytes",
 ]
 wandb = [
     "wandb",
