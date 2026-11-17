@@ -108,6 +108,7 @@ beni = [
     "data/raw/*",
     "data/test.json",
     "data/exp.yaml",
+    "data/presets/*.yaml",
     "core/hub/templates/*",
 ]
 

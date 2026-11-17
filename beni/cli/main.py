@@ -573,15 +573,19 @@ def _load_policy(mc: MasterConfig, weights: Optional[str], require: bool):
     return trainer
 
 
+PRESETS_DIR = Path(__file__).resolve().parents[1] / "data" / "presets"
+
+
+def available_presets() -> List[str]:
+    return sorted(p.stem for p in PRESETS_DIR.glob("*.yaml"))
+
+
 def _preset_yaml(name: str) -> Path:
+    """Packaged preset ``beni/data/presets/<name>.yaml`` (``all`` is ``multi13``)."""
     token = str(name or "multi13").strip().lower()
     if token in {"all", "multi13"}:
         token = "multi13"
-    root = Path(__file__).resolve().parents[2] / "configs" / "presets" / f"{token}.yaml"
-    if root.is_file():
-        return root
-    packaged = Path(__file__).resolve().parents[1] / "data" / "presets" / f"{token}.yaml"
-    return packaged if packaged.is_file() else root
+    return PRESETS_DIR / f"{token}.yaml"
 
 
 def _run_exp(
@@ -593,6 +597,13 @@ def _run_exp(
     kveritas: Optional[bool] = None,
     kveritas_seal: Optional[bool] = None,
 ) -> None:
+    if preset and not _preset_yaml(preset).is_file():
+        typer.echo(
+            f"Unknown preset {preset!r}. Available: {', '.join(available_presets()) or 'none'} "
+            f"(in {PRESETS_DIR}).",
+            err=True,
+        )
+        raise typer.Exit(code=2)
     cfg_path = _preset_yaml(preset) if preset else (config or _preset_yaml("multi13"))
     if not Path(cfg_path).is_file():
         cfg_path = config or _packaged_exp_yaml()

@@ -1,4 +1,4 @@
-# Alias of configs/presets/multi13.yaml.
+# Alias of beni/data/presets/multi13.yaml.
 # `sebeni exp` trains on dataset_300_samples.jsonl and evaluates on test.json.
 
 preset: multi13

@@ -21,6 +21,6 @@ def test_all_defaults_are_the_constant():
 
 
 def test_shipped_presets_match():
-    for path in ("configs/exp.yaml", "beni/data/exp.yaml", "configs/presets/multi13.yaml", "configs/presets/single.yaml"):
+    for path in ("configs/exp.yaml", "beni/data/exp.yaml", "beni/data/presets/multi13.yaml", "beni/data/presets/single.yaml"):
         data = yaml.safe_load(open(path, encoding="utf-8"))
         assert data["distillation"]["model"] == cfg.DEFAULT_DISTIL_MODEL, path
