@@ -172,11 +172,16 @@ class SafetyGovernor:
                 return False
 
         if self.spec.refuse_mixed_language:
-            declared = [
-                bool(mixed)
-                for mixed, ok in zip(batch_meta.get("mixed_language") or [], batch_meta.get("lang_ok") or [])
-                if ok is not None
-            ]
+            mixed_flags = list(batch_meta.get("mixed_language") or [])
+            lang_flags = list(batch_meta.get("lang_ok") or [])
+            if lang_flags:
+                declared = [
+                    bool(mixed)
+                    for mixed, ok in zip(mixed_flags, lang_flags)
+                    if ok is not None
+                ]
+            else:
+                declared = [bool(mixed) for mixed in mixed_flags]
             if _refuse(declared):
                 self._fire("mixed_language_batch")
                 return False

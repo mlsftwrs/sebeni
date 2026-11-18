@@ -726,12 +726,17 @@ def push(
     """
     mc = _load_config(config, working_dir)
     trainer = _load_policy(mc, weights, require=True)
-    rid = repo_id or mc.trainer.hub_model_id
+    from beni.core.pipeline import _active_trainer
+
+    arm_cfg = _active_trainer(mc)
+    rid = repo_id or getattr(arm_cfg, "hub_model_id", None) or mc.trainer.hub_model_id
+    token = getattr(arm_cfg, "hub_token", None) or mc.trainer.hub_token
+    private = getattr(arm_cfg, "hub_private_repo", mc.trainer.hub_private_repo)
     try:
         trainer.push_to_hub(
             repo_id=rid,
-            token=mc.trainer.hub_token,
-            private=mc.trainer.hub_private_repo,
+            token=token,
+            private=private,
             output_dir=trainer.weights_dir,
             write_card=write_card,
         )

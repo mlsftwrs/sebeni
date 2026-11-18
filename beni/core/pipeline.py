@@ -430,6 +430,99 @@ def run_arm(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None):
     return trainer
 
 
+def _clear_empr_gloss(token) -> None:
+    """Remove any LLM-hallucinated EMPR gloss when DabaX did not classify the token as EMPR."""
+    def _scrub_morphemes(items):
+        for morph in items or []:
+            if str(getattr(morph, "gloss", "") or "").strip().upper() == "EMPR":
+                morph.gloss = ""
+            _scrub_morphemes(getattr(morph, "morphemes", None))
+
+    for analysis in getattr(token, "analyses", None) or []:
+        if str(getattr(analysis, "gloss", "") or "").strip().upper() == "EMPR":
+            analysis.gloss = ""
+        _scrub_morphemes(getattr(analysis, "morphemes", None))
+
+
+def _assign_daba_stage(token, daba_tokens) -> None:
+    """Apply DabaX-computed stage (and EMPR gloss if borrowing) onto ``token``."""
+    from beni.core import Analysis
+    from beni.core.compute.helpers import is_empr_token
+
+    if not daba_tokens:
+        token.stage = -1
+        _clear_empr_gloss(token)
+        return
+    if len(daba_tokens) == 1:
+        daba_tok = daba_tokens[0]
+        token.stage = daba_tok.stage
+        if is_empr_token(daba_tok):
+            if not is_empr_token(token):
+                token.analyses.append(Analysis(form=token.surface, ps=[], gloss="EMPR", morphemes=[]))
+        else:
+            _clear_empr_gloss(token)
+        return
+    stages = []
+    for dt in daba_tokens:
+        try:
+            st = int(dt.stage)
+        except (TypeError, ValueError):
+            st = 0
+        if st < 0:
+            token.stage = -1
+            _clear_empr_gloss(token)
+            return
+        stages.append(st)
+    token.stage = max(stages) if stages else -1
+    if any(is_empr_token(dt) for dt in daba_tokens):
+        if not is_empr_token(token):
+            token.analyses.append(Analysis(form=token.surface, ps=[], gloss="EMPR", morphemes=[]))
+    else:
+        _clear_empr_gloss(token)
+
+
+def _recompute_daba_stages(sent, dabax, lang: str):
+    """Discard any LLM-emitted token stage and compute Daba stages via ``dabax``."""
+    from beni.core.language import Language
+
+    group = Language.from_code(lang or "bam").group_code
+    sent.lang = group
+    sent.language = Language.from_code(group)
+    tokens = list(getattr(sent, "tokens", None) or [])
+    if not tokens:
+        return sent
+
+    for tok in tokens:
+        tok.stage = -1
+
+    surfaces = [str(getattr(tok, "surface", "") or "").strip() for tok in tokens]
+    if all(surfaces):
+        try:
+            parsed = dabax.loader(" ".join(surfaces)) or []
+        except Exception:
+            parsed = []
+        daba_tokens = [dt for s in parsed for dt in (getattr(s, "tokens", None) or [])]
+        if len(daba_tokens) == len(tokens) and all(
+            str(getattr(dt, "surface", "") or "").strip().lower() == surf.lower()
+            for dt, surf in zip(daba_tokens, surfaces)
+        ):
+            for tok, dt in zip(tokens, daba_tokens):
+                _assign_daba_stage(tok, [dt])
+            return sent
+
+    for tok, surf in zip(tokens, surfaces):
+        if not surf:
+            tok.stage = -1
+            continue
+        try:
+            parsed = dabax.loader(surf) or []
+        except Exception:
+            parsed = []
+        daba_tokens = [dt for s in parsed for dt in (getattr(s, "tokens", None) or [])]
+        _assign_daba_stage(tok, daba_tokens)
+    return sent
+
+
 def _finite_uwec(stages, pi_theta, pi_ref, *, beta: float, eps: float):
     """Token-mean Uncertainty Weighted Error Cost and the token count.
 
@@ -581,26 +674,14 @@ def run_eval(
                 if not completion:
                     continue
                 hyp_sentences = []
-                # Attempt structured JSON parsing first
-                clean = completion.strip()
-                if clean.startswith("```json"):
-                    clean = clean[7:]
-                if clean.startswith("```"):
-                    clean = clean[3:]
-                if clean.endswith("```"):
-                    clean = clean[:-3]
-                clean = clean.strip()
-                if clean.startswith("{") and clean.endswith("}"):
-                    try:
-                        import json as _json
-                        data = _json.loads(clean)
-                        if isinstance(data, dict) and "tokens" in data:
-                            from beni.core.compute.rewards import RewardManager
-                            sent = RewardManager.parse_json_to_sentence(data, text=text)
-                            if sent and sent.tokens:
-                                hyp_sentences = [sent]
-                    except Exception:
-                        pass
+                # Attempt structured JSON parsing first; discard any LLM-emitted stage
+                # and compute Daba stages via DabaX on the predicted token surfaces.
+                from beni.core.compute.rewards import RewardManager
+                data = RewardManager.extract_json(completion)
+                if isinstance(data, dict) and isinstance(data.get("tokens"), list):
+                    sent = RewardManager.parse_json_to_sentence(data, text=text)
+                    if sent and sent.tokens:
+                        hyp_sentences = [_recompute_daba_stages(sent, dabax, group)]
                 if not hyp_sentences:
                     try:
                         hyp_sentences = dabax.loader(completion) or []

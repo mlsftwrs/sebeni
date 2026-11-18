@@ -37,7 +37,7 @@ class RewardManager:
         # lang matches the row), False (mismatch or mixed), None (no JSON lang).
         self.lang_ok: List[Optional[bool]] = []
         self.mixed_language: List[bool] = []
-        self._observed_batch: Optional[Tuple[int, int, int]] = None
+        self._observed_batch: Optional[Tuple[int, int, Tuple[str, ...]]] = None
         self.total_reward: float = 0.0
         self.predicted_stages: List[List[Any]] = []
         self.custom_rewards: Dict[str, Tuple[Callable, float]] = {}
@@ -338,12 +338,13 @@ class RewardManager:
     def observe_language(self, completions: List[Any], language: Optional[List[str]] = None) -> None:
         """Record per-completion language identity for the governor (once per batch)."""
         # TRL calls every reward function with the same list for one batch; key on
-        # identity plus content so a reused id() for a later batch is not skipped.
-        key = (id(completions), len(completions), hash(self.completion_text(completions[0])) if completions else 0)
+        # content hash and languages so a reused id() for a later batch is never skipped.
+        langs = list(language) if language else [""] * len(completions)
+        texts_hash = hash(tuple(self.completion_text(c) for c in completions)) if completions else 0
+        key = (len(completions), texts_hash, tuple(str(x) for x in langs))
         if self._observed_batch == key:
             return
         self._observed_batch = key
-        langs = list(language) if language else [""] * len(completions)
         for completion, lang in zip(completions, langs):
             ok, mixed = self.language_identity(completion, lang)
             self.lang_ok.append(ok)
@@ -424,14 +425,21 @@ class RewardManager:
             ]
 
         scores = []
-        for pred_sent, ref_sent in zip(predicted, reference_sentences):
+        for pred_sent, ref_sent, lang in zip(predicted, reference_sentences, langs):
             pred_tokens = list(pred_sent.tokens or [])
             ref_tokens = list(ref_sent.tokens or [])
             if not pred_tokens or not ref_tokens:
                 scores.append(0.0)
                 continue
+            row_lang = lang or getattr(ref_sent, "lang", None)
             consistent = sum(
-                stage_to_phi(ref.stage)
+                stage_to_phi(
+                    ref.stage,
+                    empr=self.scorer.empr,
+                    eps=self.scorer.eps,
+                    lang=row_lang,
+                    token=ref,
+                )
                 for pred, ref in zip(pred_tokens, ref_tokens)
                 if str(pred.surface) == str(ref.surface)
                 and str(pred.stage) == str(ref.stage)

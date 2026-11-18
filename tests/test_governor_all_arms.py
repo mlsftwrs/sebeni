@@ -349,3 +349,44 @@ def test_arm_train_applies_dataset_gates(cls, trainer_path, config_path, tmp_pat
         plugin.train(rows, project_name="t")
     gate.assert_called_once()
     drop.assert_called_once()
+
+
+def test_grad_accum_aggregates_log_ratios_across_microbatches():
+    metrics = {"train": {"rewards/chosen": [0.2], "rewards/rejected": [-0.2]}}
+    plugin, trainer, model, optimizer = _wire(SebeniDpo, _lm_loss, _metrics=metrics, beta=0.1)
+    ids = torch.tensor([_ids("P " + _target()), _ids("P " + _target())])
+    mask = torch.tensor([[0, 0] + [1] * (ids.shape[1] - 2)] * 2)
+    batch = {"input_ids": ids, "attention_mask": torch.ones_like(ids), "completion_mask": mask}
+
+    l1 = trainer.compute_loss(model, batch)
+    first_kl = plugin._last_logps["kl"]
+    metrics["train"]["rewards/chosen"].append(1.8)
+    metrics["train"]["rewards/rejected"].append(-1.8)
+    l2 = trainer.compute_loss(model, batch)
+    second_kl = plugin._last_logps["kl"]
+    assert second_kl > first_kl
+
+    (l1 + l2).backward()
+    seen = {}
+    plugin.register_hook(lambda _m, _r, meta: seen.update(meta))
+    optimizer.step()
+    assert seen["kl"] == pytest.approx((first_kl + second_kl) / 2.0)
+    assert plugin._step_logps == []
+
+
+def test_kveritas_callback_on_evaluate_uses_sft_raw_text_and_skips_chatml():
+    from unittest.mock import patch
+
+    from beni.core.srl.grpo.callbacks import KVeritasCallback
+
+    mc = MasterConfig()
+    mc.data.languages = ["bam"]
+    eval_ds = [
+        {"prompt": "<|im_start|>system\n...\n<|im_start|>user\nmuso\n", "completion": "{}", "raw_text": "muso", "lang": "bam"},
+        {"prompt": "<|im_start|>system\n...\n<|im_start|>user\njunk\n", "completion": "{}"},
+    ]
+    cb = KVeritasCallback(config=mc, eval_dataset=eval_ds)
+    state = SimpleNamespace(global_step=1)
+    with patch("beni.core.pipeline.run_eval", return_value={"phi": 0.5}) as mock_eval:
+        cb.on_evaluate(args=None, state=state, control=None, metrics={})
+    mock_eval.assert_called_once_with(mc, [{"text": "muso", "lang": "bam"}], record=False)

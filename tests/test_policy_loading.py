@@ -351,3 +351,22 @@ def test_push_refusal_exits_cleanly_and_passes_write_card(workdir):
     assert "sebeni eval" in result.output
     kwargs = trainer.push_to_hub.call_args.kwargs
     assert kwargs["write_card"] is True and kwargs["output_dir"] == str(wd / "models")
+
+
+def test_push_uses_active_arm_hub_config(tmp_path):
+    wd = tmp_path / "run"
+    config = tmp_path / "sft.yaml"
+    config.write_text(
+        f"algorithm: sft\nworking_dir: {wd}\ndata:\n  languages: [bam]\n"
+        "sft:\n  hub_model_id: org/sft-model\n  hub_token: sft-tok\n  hub_private_repo: false\n",
+        encoding="utf-8",
+    )
+    _with_adapter(wd)
+    trainer = _fake_trainer()
+    with patch("beni.core.srl.unified.SRLTrainer", return_value=trainer):
+        result = runner.invoke(app, ["push", "-c", str(config), "-w", str(wd)])
+    assert result.exit_code == 0, result.output
+    kwargs = trainer.push_to_hub.call_args.kwargs
+    assert kwargs["repo_id"] == "org/sft-model"
+    assert kwargs["token"] == "sft-tok"
+    assert kwargs["private"] is False

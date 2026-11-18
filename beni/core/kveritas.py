@@ -155,7 +155,12 @@ def move_aside_sealed_session(workdir: Path) -> Optional[Path]:
         return None
     if not sealed:
         return None
-    target = session.with_name(f".kveritas.sealed-{time.strftime('%Y%m%d-%H%M%S')}")
+    stamp = time.strftime("%Y%m%d-%H%M%S")
+    target = session.with_name(f".kveritas.sealed-{stamp}")
+    suffix = 1
+    while target.exists():
+        target = session.with_name(f".kveritas.sealed-{stamp}-{suffix}")
+        suffix += 1
     session.rename(target)
     return target
 

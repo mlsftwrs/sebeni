@@ -156,3 +156,134 @@ def test_relative_glob_resolves_against_config_dir(eval_env, tmp_path, monkeypat
     eval_env._config_file_dir = str(tmp_path / "cfgdir")
     eval_env.experiment.eval_source = "held/*.jsonl"
     assert [r["text"] for r in load_eval_records(eval_env)] == ["a b"]
+
+
+def test_run_eval_discards_llm_stage_and_computes_daba_stage(tmp_path):
+    """LLM-emitted stage in JSON completions is ignored; DabaX computes token stages."""
+    import json
+
+    from beni.core import Analysis, Sentence, Token
+    from beni.core.pipeline import run_eval
+    from beni.core.srl.config import MasterConfig
+
+    mc = MasterConfig()
+    mc.working_dir = str(tmp_path)
+    mc.apply_workdir(cli_path=tmp_path)
+    mc.data.languages = ["dtm"]
+
+    def fake_loader(text: str):
+        tokens = []
+        for word in text.split():
+            if word == "known":
+                tokens.append(Token(surface=word, stage=0, analyses=[Analysis(form="known", ps=["n"])]))
+            elif word == "wax":
+                tokens.append(Token(surface=word, stage=4, analyses=[Analysis(form="wax", ps=[], gloss="EMPR")]))
+            else:
+                tokens.append(Token(surface=word, stage=-1, analyses=[]))
+        return [Sentence(text=text, lang="dtm", tokens=tokens)]
+
+    dabax = MagicMock()
+    dabax.loader.side_effect = fake_loader
+
+    # LLM claims stage=0 for everything (even unknown & EMPR), wrapped in code fence.
+    completion = (
+        "```json\n"
+        + json.dumps(
+            {
+                "text": "known wax",
+                "lang": "dtm",
+                "tokens": [
+                    {"surface": "known", "stage": 0, "analyses": [{"form": "known", "ps": ["n"], "morphemes": []}]},
+                    {"surface": "bogus", "stage": 0, "analyses": [{"form": "bogus", "ps": ["n"], "morphemes": []}]},
+                ],
+            }
+        )
+        + "\n```"
+    )
+    with patch("beni.core.morphotactic.dabax.get_dabax", return_value=dabax), patch(
+        "beni.core.morphotactic.dabax.resolve_baseline_files", return_value=(None, None, "ck")
+    ):
+        report = run_eval(
+            mc,
+            records=[{"text": "known wax", "lang": "dtm"}],
+            generate=lambda _t, _l: completion,
+        )
+    # Daba stages for ["known", "bogus"] are [0, -1] vs ref [0, 4]:
+    # Phi = (1.0 + 0.0) / 2 = 0.5; MCS = 1/2 = 0.5; MER = 1/2 = 0.5 (from JSON analyses).
+    assert report["phi"] == pytest.approx(0.5)
+    assert report["mcs"] == pytest.approx(0.5)
+    assert report["mer"] == pytest.approx(0.5)
+
+
+def test_run_eval_daba_stage_propagates_empr_for_dtm(tmp_path):
+    """When LLM emits JSON for a borrowing word in dtm, Daba computes stage 4 (EMPR) -> phi 0.5."""
+    import json
+
+    from beni.core import Analysis, Sentence, Token
+    from beni.core.pipeline import run_eval
+    from beni.core.srl.config import MasterConfig
+
+    mc = MasterConfig()
+    mc.working_dir = str(tmp_path)
+    mc.apply_workdir(cli_path=tmp_path)
+    mc.data.languages = ["dtm"]
+
+    dabax = MagicMock()
+    dabax.loader.side_effect = lambda text: [
+        Sentence(
+            text=text,
+            lang="dtm",
+            tokens=[Token(surface=w, stage=4, analyses=[Analysis(form=w, ps=[], gloss="EMPR")]) for w in text.split()],
+        )
+    ]
+    completion = json.dumps(
+        {
+            "text": "wax",
+            "lang": "dtm",
+            "tokens": [{"surface": "wax", "stage": 0, "analyses": [{"form": "wax", "ps": ["n"], "morphemes": []}]}],
+        }
+    )
+    with patch("beni.core.morphotactic.dabax.get_dabax", return_value=dabax), patch(
+        "beni.core.morphotactic.dabax.resolve_baseline_files", return_value=(None, None, "ck")
+    ):
+        report = run_eval(mc, records=[{"text": "wax", "lang": "dtm"}], generate=lambda _t, _l: completion)
+    assert report["phi"] == pytest.approx(0.5)
+    assert report["mcs"] == pytest.approx(1.0)
+
+
+def test_run_eval_ignores_hallucinated_empr_gloss_on_native_word(tmp_path):
+    """DabaX's classification wins over an LLM-hallucinated gloss='EMPR' on a native word."""
+    import json
+
+    from beni.core import Analysis, Sentence, Token
+    from beni.core.pipeline import run_eval
+    from beni.core.srl.config import MasterConfig
+
+    mc = MasterConfig()
+    mc.working_dir = str(tmp_path)
+    mc.apply_workdir(cli_path=tmp_path)
+    mc.data.languages = ["bam"]
+
+    dabax = MagicMock()
+    dabax.loader.side_effect = lambda text: [
+        Sentence(
+            text=text,
+            lang="bam",
+            tokens=[Token(surface=w, stage=0, analyses=[Analysis(form=w, ps=["n"])]) for w in text.split()],
+        )
+    ]
+    completion = json.dumps(
+        {
+            "text": "muso",
+            "lang": "bam",
+            "tokens": [
+                {"surface": "muso", "stage": 6, "analyses": [{"form": "muso", "ps": ["n"], "gloss": "EMPR", "morphemes": []}]}
+            ],
+        }
+    )
+    with patch("beni.core.morphotactic.dabax.get_dabax", return_value=dabax), patch(
+        "beni.core.morphotactic.dabax.resolve_baseline_files", return_value=(None, None, "ck")
+    ):
+        report = run_eval(mc, records=[{"text": "muso", "lang": "bam"}], generate=lambda _t, _l: completion)
+    assert report["phi"] == pytest.approx(1.0)
+    assert report["mcs"] == pytest.approx(1.0)
