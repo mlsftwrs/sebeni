@@ -25,7 +25,8 @@ languages. One run is three stages:
 
 1. Distill grammar **G** and dictionary **D** once per language, then freeze them.
 2. Train **one** arm — SFT, GRPO, DPO, or APO — against that checkpoint.
-3. Score held-out **MER**, **MCS**, and **UWEC**. All three are costs to minimize.
+3. Score held-out **MER**, **MCS**, and **UWEC**. MER and UWEC are costs to
+   minimize; MCS is a stage-match fraction to maximize.
 
 Completions are morphological JSON (`tokens`), not a chatbot.
 
@@ -38,7 +39,7 @@ sebeni --help
 [Get started](getting-started.md){ .md-button }
 [Run an experiment](experiments.md){ .md-button }
 
-Public docs: [https://seben.robotsmali.org/docs](https://seben.robotsmali.org/docs).
+Public docs: [mlsftwrs.github.io/sebeni](https://mlsftwrs.github.io/sebeni).
 Project home: [seben.robotsmali.org](https://seben.robotsmali.org).
 Code: [github.com/mlsftwrs/sebeni](https://github.com/mlsftwrs/sebeni).
 Hub: [huggingface.co/mlsftwrs](https://huggingface.co/mlsftwrs).
@@ -63,3 +64,4 @@ Maninka group code is **mku** (not `mlq`). In the experiment jsonl only,
 3. [Use cases](use-cases.md) — ten recipes with your own jsonl
 4. [SAMPG](sampg.md) — distill once, train one arm, evaluate
 5. [Rewards](rewards.md) — MER, MCS, UWEC, and training rewards
+

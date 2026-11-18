@@ -10,6 +10,7 @@ recursive-include beni/data/baselines *
 recursive-include beni/data/raw *
 include beni/data/test.json
 include beni/data/exp.yaml
+recursive-include beni/data/presets *.yaml
 include docs/assets/*
 global-exclude *.old
 global-exclude *.backup

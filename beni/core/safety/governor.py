@@ -136,20 +136,55 @@ class SafetyGovernor:
         return PromoteDecision(True, "phi_improved", phi, phi_prime, parseable, False)
 
     def allow_policy_update(self, batch_meta: Dict[str, Any]) -> bool:
-        """Return False when the batch must not update θ (format-invalid, KL bound)."""
+        """Return False when the batch must not update θ.
+
+        ``batch_meta["signal_source"]`` says what the per-item signals describe:
+
+        - ``"samples"`` (GRPO): the policy's own completions. Bad completions are
+          pushed down by their reward, so the batch is refused only when **no**
+          completion is good (all format-invalid, none in the right language,
+          or every language-declaring completion mixes languages).
+        - ``"targets"`` (SFT labels, DPO/APO chosen answers): the gradient pulls
+          θ towards them, so **any** invalid, wrong-language or mixed target
+          refuses the batch.
+
+        Per-item signals: ``format_scores`` (0.0 = invalid), ``lang_ok``
+        (True / False / None = no language declared), ``mixed_language``.
+        A legacy boolean ``language_ok`` is still honoured. ``kl`` is checked
+        against ``max_kl``.
+        """
         if not self.spec.enabled:
             return True
+        strict = batch_meta.get("signal_source") == "targets"
+
+        def _refuse(flags: List[bool]) -> bool:
+            return bool(flags) and (any(flags) if strict else all(flags))
 
         format_scores = batch_meta.get("format_scores") or []
-        if self.spec.format_invalid_blocks_update and format_scores:
-            avg = sum(format_scores) / len(format_scores)
-            if avg == 0.0:
-                self._fire("format_invalid_batch")
+        if self.spec.format_invalid_blocks_update and _refuse([float(s) == 0.0 for s in format_scores]):
+            self._fire("format_invalid_batch")
+            return False
+
+        if self.spec.require_language:
+            known = [ok for ok in (batch_meta.get("lang_ok") or []) if ok is not None]
+            if batch_meta.get("language_ok") is False or _refuse([not ok for ok in known]):
+                self._fire("language_mismatch_batch")
                 return False
 
-        if self.spec.require_language and batch_meta.get("language_ok") is False:
-            self._fire("language_mismatch_batch")
-            return False
+        if self.spec.refuse_mixed_language:
+            mixed_flags = list(batch_meta.get("mixed_language") or [])
+            lang_flags = list(batch_meta.get("lang_ok") or [])
+            if lang_flags:
+                declared = [
+                    bool(mixed)
+                    for mixed, ok in zip(mixed_flags, lang_flags)
+                    if ok is not None
+                ]
+            else:
+                declared = [bool(mixed) for mixed in mixed_flags]
+            if _refuse(declared):
+                self._fire("mixed_language_batch")
+                return False
 
         kl = batch_meta.get("kl")
         if self.spec.max_kl is not None and kl is not None and float(kl) > self.spec.max_kl:
@@ -167,10 +202,11 @@ class SafetyGovernor:
             True if the optimizer step may proceed.
         """
         allowed = self.allow_policy_update(batch_meta)
-        if not allowed and model is not None:
-            for param in model.parameters():
-                if param.grad is not None:
-                    param.grad.zero_()
+        if not allowed:
+            if model is not None:
+                for param in model.parameters():
+                    if param.grad is not None:
+                        param.grad.zero_()
             return False
 
         if not self.spec.enabled or model is None:
@@ -190,10 +226,15 @@ class SafetyGovernor:
         if u is None:
             model_logps = batch_meta.get("model_logps")
             ref_logps = batch_meta.get("ref_logps")
-            if model_logps is None or ref_logps is None:
+            log_ratio = batch_meta.get("log_ratio")
+            if model_logps is not None and ref_logps is not None:
+                u_kl = _mean_log_ratio(model_logps, ref_logps, self.spec.kl_beta)
+            elif log_ratio is not None:
+                # Pre-aggregated mean log(π_θ / π_ref), e.g. from DPO's logged rewards.
+                u_kl = self.spec.kl_beta * float(log_ratio)
+            else:
                 return 1.0
             indicator = _mean_stage_indicator(batch_meta.get("predicted_stages"))
-            u_kl = _mean_log_ratio(model_logps, ref_logps, self.spec.kl_beta)
             u = indicator + u_kl
             batch_meta["u_indicator"] = indicator
             batch_meta["u_kl"] = u_kl
@@ -216,7 +257,12 @@ class SafetyGovernor:
         return self.snapshot.write(Path(directory) / self.SNAPSHOT_NAME)
 
     def allow_hub_push(self, output_dir: Union[str, Path]) -> bool:
-        """Refuse Hub upload without a model card and a recorded safety snapshot."""
+        """Refuse Hub upload without a model card and an eval safety snapshot on disk.
+
+        Both files must be in ``output_dir`` (the weights being pushed). With
+        ``require_eval_metrics`` the snapshot must carry Φ and MER or MCS,
+        i.e. it was written by ``sebeni eval`` / ``run_eval`` for these weights.
+        """
         output_dir = Path(output_dir)
         if not self.spec.enabled:
             return True
@@ -225,10 +271,45 @@ class SafetyGovernor:
         if self.spec.require_model_card and not card.exists():
             self._fire("missing_model_card")
             return False
-        if self.spec.require_safety_snapshot and not snap.exists() and self.snapshot is None:
+        if self.spec.require_safety_snapshot and not snap.exists():
             self._fire("missing_safety_snapshot")
             return False
+        if self.spec.require_eval_metrics:
+            try:
+                data = json.loads(snap.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                data = {}
+            if data.get("phi") is None or (data.get("mer") is None and data.get("mcs") is None):
+                self._fire("missing_eval_metrics")
+                return False
+            # The eval must have scored exactly these weight files.
+            recorded = data.get("weights_sha256")
+            if not recorded or recorded != weights_fingerprint(output_dir):
+                self._fire("snapshot_weights_mismatch")
+                return False
         return True
+
+
+WEIGHT_PATTERNS = ("adapter_model*.safetensors", "adapter_model*.bin", "model*.safetensors", "pytorch_model*.bin")
+
+
+def weights_fingerprint(directory: Union[str, Path]) -> Optional[str]:
+    """sha256 over the weight files in ``directory`` (names and bytes); None when there are none."""
+    import hashlib
+
+    root = Path(directory)
+    if not root.is_dir():
+        return None
+    files = sorted({p for pattern in WEIGHT_PATTERNS for p in root.glob(pattern) if p.is_file()})
+    if not files:
+        return None
+    digest = hashlib.sha256()
+    for path in files:
+        digest.update(path.name.encode("utf-8") + b"\0")
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1 << 20), b""):
+                digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _mean_log_ratio(model_logps, ref_logps, beta: float) -> float:

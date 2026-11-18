@@ -1,9 +1,10 @@
+import functools
 import re
 import warnings
 import xml.etree.ElementTree as ET
 from importlib import metadata
 from pathlib import Path
-from typing import Dict, Optional, Union, List, Tuple
+from typing import Dict, FrozenSet, Optional, Union, List, Tuple
 from xml.dom import minidom
 from beni.utils import config as cfg
 from beni.core.language import Language
@@ -362,6 +363,11 @@ class DabaX(object):
     def __str__(self):
         return f"{__name__} - {self.lang} \n - {self.tokenizer} \n - {self.dictf} \n - {self.gramf}"
 
+    @property
+    def empr_stages(self) -> FrozenSet[int]:
+        """Stage numbers in this grammar that assign ``EMPR`` borrowing analyses."""
+        return empr_stages_for_lang(self.lang, gram_path=self.gramf)
+
 
 _DABAX_CACHE: Dict[tuple, "DabaX"] = {}
 
@@ -413,3 +419,76 @@ def clear_dabax_cache(lang: Optional[str] = None) -> None:
     group = Language.from_code(lang).group_code
     for key in [item for item in _DABAX_CACHE if item[0] == group]:
         _DABAX_CACHE.pop(key, None)
+
+
+_STAGE_PARSE_RE = re.compile(r"^\s*stage\s+(-?\d+)\b.*\bparse\s+([A-Za-z0-9_.-]+)")
+_SECTION_RE = re.compile(r"^\s*section\s+([A-Za-z0-9_.-]+)")
+_EMPR_RULE_RE = re.compile(r"::\s*EMPR\b", re.IGNORECASE)
+
+
+def parse_empr_stages(gram_text: str) -> FrozenSet[int]:
+    """Extract stage numbers whose grammar section defines ``::EMPR`` borrowing rules."""
+    empr_sections = set()
+    stage_sections: List[Tuple[int, str]] = []
+    current_section: Optional[str] = None
+    for raw_line in (gram_text or "").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        sec_match = _SECTION_RE.match(line)
+        if sec_match:
+            current_section = sec_match.group(1)
+            continue
+        if current_section and _EMPR_RULE_RE.search(line):
+            empr_sections.add(current_section)
+            continue
+        stage_match = _STAGE_PARSE_RE.match(line)
+        if stage_match:
+            stage_sections.append((int(stage_match.group(1)), stage_match.group(2)))
+    return frozenset(stage for stage, sec in stage_sections if sec in empr_sections)
+
+
+@functools.lru_cache(maxsize=64)
+def _cached_empr_stages(path_str: str, mtime_ns: int) -> FrozenSet[int]:
+    del mtime_ns
+    try:
+        text = Path(path_str).read_text(encoding="utf-8")
+    except OSError:
+        return frozenset()
+    return parse_empr_stages(text)
+
+
+def empr_stages_for_lang(
+    lang: Optional[str] = None,
+    gram_path: Optional[Union[str, Path]] = None,
+    working_dir=None,
+) -> FrozenSet[int]:
+    """Return the EMPR borrowing stage number(s) for ``lang`` or ``gram_path``.
+
+    Bambara (``bam``) places ``nonbamana`` at stage 6, while the other 12
+    packaged baseline grammars place borrowing filters at stage 4. Falls back
+    to ``{6}`` if no ``.gram`` file or ``::EMPR`` stage is found.
+    """
+    candidates: List[Path] = []
+    if gram_path is not None:
+        try:
+            candidates.append(Path(gram_path))
+        except TypeError:
+            pass
+    if lang:
+        group = Language.from_code(str(lang)).group_code
+        resolved_gram, _, _ = resolve_baseline_files(group, working_dir=working_dir)
+        if resolved_gram is not None:
+            candidates.append(Path(resolved_gram))
+        packaged = cfg.resolve_packaged_baseline_dir(group)
+        if packaged:
+            candidates.append(packaged / "baseline.gram")
+    for candidate in candidates:
+        try:
+            if candidate.is_file():
+                stages = _cached_empr_stages(str(candidate.resolve()), candidate.stat().st_mtime_ns)
+                if stages:
+                    return stages
+        except OSError:
+            continue
+    return frozenset({6})

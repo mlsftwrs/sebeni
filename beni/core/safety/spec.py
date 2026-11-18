@@ -20,8 +20,9 @@ class SafetySpec:
     require_language : bool
         Completions must declare a language identity matching **that row**.
     refuse_mixed_language : bool
-        Reject a completion whose JSON ``lang`` does not match its row's group
-        code. Mixed-language **datasets** (one language per row) are allowed;
+        Refuse updates driven by completions that declare more than one
+        language (several ``lang`` fields, or one listing several codes).
+        Mixed-language **datasets** (one language per row) are allowed;
         mixing languages inside a single completion is not.
     tau : float
         SAMPG morphological integrity threshold Φ.
@@ -40,7 +41,10 @@ class SafetySpec:
     require_model_card : bool
         Hub push requires a generated README model card.
     require_safety_snapshot : bool
-        Hub push requires a recorded eval snapshot (Φ, τ, checkpoint id).
+        Hub push requires ``safety_snapshot.json`` next to the pushed weights.
+    require_eval_metrics : bool
+        That snapshot must come from ``sebeni eval`` (Φ plus MER or MCS), not
+        only from training.
     """
 
     enabled: bool = True
@@ -55,6 +59,7 @@ class SafetySpec:
     max_kl: Optional[float] = None
     require_model_card: bool = True
     require_safety_snapshot: bool = True
+    require_eval_metrics: bool = True
     fired: List[str] = field(default_factory=list)
 
     def reset_fired(self) -> None:

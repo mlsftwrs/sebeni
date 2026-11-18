@@ -37,18 +37,22 @@ class MorphologyScorer:
         Compute Phi (Morphological Integrity Score)
         Score Structure:
             - stage < 0 : 0.0 Non-Language tokens
-            - 0 <= stage < 6: 1.0  (analyzed)
-            - stage == 6: empr (Empirical / Emprunt/borrowing foreign token)
-            - stage > 6: eps (fallback value)
+            - EMPR borrowing (gloss == "EMPR" or grammar's EMPR stage, e.g. 6 in bam, 4 in other baselines): empr
+            - analyzed stages (0 <= stage <= max_stage, non-EMPR): 1.0
+            - stage > max_stage: eps (fallback value)
             - non-numeric parser labels: 1.0
         """
         from beni.core.compute.helpers import stage_to_phi
         tokens = sentence.tokens if isinstance(sentence, Sentence) else sentence
-        
-        if(not tokens):
+        lang = sentence.lang if isinstance(sentence, Sentence) else None
+
+        if not tokens:
             return 0.0
-        
-        scores = [stage_to_phi(t.stage) for t in tokens]
+
+        scores = [
+            stage_to_phi(t.stage, empr=self.empr, eps=self.eps, lang=lang, token=t)
+            for t in tokens
+        ]
         return sum(scores) / len(scores)
 
     def phi_corpus(self, sentences: List[Sentence]) -> Dict[str, float]:

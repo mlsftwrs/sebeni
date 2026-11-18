@@ -64,6 +64,7 @@ def build_config(
     max_eval_rows: Optional[int] = None,
     kveritas_disclosure: str = "open",
     use_vllm: Optional[bool] = None,
+    kveritas_local_key: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Compose experiment configuration for a single matrix cell."""
     with open(base_config_path, "r", encoding="utf-8") as f:
@@ -156,13 +157,16 @@ def build_config(
     # Experiment & Evaluation invariant
     cfg.setdefault("experiment", {})
     cfg["experiment"]["dataset"] = "packaged"
-    cfg["experiment"]["eval_file"] = "test.json"
     cfg["experiment"]["scope"] = scope
     cfg["experiment"]["kveritas"] = True
     cfg["experiment"]["kveritas_seal"] = True
     if max_eval_rows is not None:
         cfg["experiment"]["max_eval_rows"] = max_eval_rows
     cfg["experiment"]["kveritas_disclosure"] = kveritas_disclosure
+    if kveritas_local_key:
+        # Local signing (no attestation server): `kveritas init --local` + `seal --local-key`.
+        cfg["experiment"]["kveritas_local"] = True
+        cfg["experiment"]["kveritas_local_key"] = str(Path(kveritas_local_key).expanduser().resolve())
 
     return cfg
 
@@ -201,94 +205,53 @@ def run_experiment_cell(
         result_row["status"] = "DRY_RUN"
         return result_row
 
-    # Import internal Sebeni modules
-    from beni.cli.main import maybe_kveritas_init, maybe_kveritas_seal, emit_kveritas_metrics
-    from beni.core.srl.config import MasterConfig
-    from beni.core.pipeline import run_distill, run_arm, run_eval
-    from beni.data.datasets import assert_train_source
-
-    # Enforce evaluation dataset invariant
-    assert_train_source(Path("beni/data/raw/dataset_300_samples.jsonl"))
-
-    logger.info("Starting experiment %s with %s (500 steps, eval=beni.data/test.json)...", model_name, algo)
-    mc = MasterConfig.from_dict(cfg_data)
-    mc.apply_workdir(run_dir)
-    active_steps = cfg_data.get(algo, {}).get("max_steps") or cfg_data.get("trainer", {}).get("max_steps", 10)
-    mc.apply_cli_overrides(max_steps=active_steps)
-
-    # 1. K-Veritas Init with open disclosure
-    disclosure = cfg_data.get("experiment", {}).get("kveritas_disclosure", "open")
-    maybe_kveritas_init(run_dir, disclosure=disclosure)
-
-    # 2. Morphotactic Distillation (if not already cached)
-    logger.info("Executing distillation step with teacher %s (Vertex AI, %s)...", mc.distillation.model, mc.distillation.location)
-    try:
-        run_distill(mc)
-    except Exception as exc:
-        logger.warning("Distillation note: %s. Continuing with cached/algorithmic baselines.", exc)
-
-    # 3. Post-Training Arm
-    active_trainer = getattr(mc, mc.algorithm if mc.algorithm in ("sft", "dpo", "apo") else "trainer")
-    logger.info("Running post-training arm: %s for %d steps...", algo, active_trainer.max_steps)
+    # One `sebeni exp` subprocess per cell. With experiment.kveritas / kveritas_seal on
+    # (set by build_config), that command runs itself under `kveritas run --seal`,
+    # so each cell gets one monitored run covering distill, train and eval, and a
+    # sealed {run_dir}/exp/report.pdf.
+    repo_root = Path(__file__).resolve().parents[1]
+    env = dict(os.environ)
+    env["PYTHONPATH"] = os.pathsep.join(p for p in (str(repo_root), env.get("PYTHONPATH", "")) if p)
+    cmd = [
+        sys.executable, "-m", "beni.cli.main", "exp",
+        "-c", str(cfg_path.resolve()),
+        "-w", str(run_dir.resolve()),
+        "--algorithm", algo,
+    ]
+    logger.info("Starting cell %s [%s]: %s", model_name, algo, " ".join(cmd))
     start_time = time.time()
-    try:
-        trainer = run_arm(mc)
-        elapsed = time.time() - start_time
-        logger.info("Training completed in %.1f seconds", elapsed)
-    except Exception as exc:
-        logger.error("Training failed: %s", exc)
-        result_row["status"] = f"FAILED: {exc}"
-        return result_row
+    # Never read a previous attempt's results or report for this cell.
+    for stale in ("exp/eval.json", "exp/report.pdf", "exp/report.pdf.kvbundle.zip", "kveritas_report.pdf",
+                  "kveritas_report.pdf.kvbundle.zip"):
+        (run_dir / stale).unlink(missing_ok=True)
+    proc = subprocess.run(cmd, env=env, check=False)
+    logger.info("Cell finished in %.1f seconds (exit %d)", time.time() - start_time, proc.returncode)
 
-    # 4. Evaluation on held-out beni.data/test.json using post-trained policy
-    logger.info("Scoring post-trained model evaluation on held-out split beni.data/test.json...")
-    try:
-        if hasattr(trainer, "model") and trainer.model is not None:
-            trainer.model.eval()
-
-        def _generate(text: str, _lang: str) -> str:
-            import torch
-            from beni.core.srl.config import SRLGrpoPrompt
-            system_prompt = SRLGrpoPrompt(languages=[_lang] if _lang else None).prompt()
-            tokenizer = getattr(trainer, "tokenizer", None)
-            with torch.inference_mode():
-                if tokenizer is not None and getattr(tokenizer, "chat_template", None):
-                    messages = [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": text},
-                    ]
-                    try:
-                        formatted = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-                        return trainer.generate(formatted, max_new_tokens=128)
-                    except Exception:
-                        pass
-                prompt = f"{system_prompt}\n\nUser: {text}\nAssistant:"
-                return trainer.generate(prompt, max_new_tokens=128)
-
-        eval_report = run_eval(mc, generate=_generate, policy=getattr(trainer, "plugin", trainer))
-        result_row["phi"] = eval_report.get("phi")
-        result_row["mer"] = eval_report.get("mer")
-        result_row["mcs"] = eval_report.get("mcs")
-        result_row["uwec"] = eval_report.get("uwec")
-        result_row["eval_report"] = eval_report
+    eval_path = run_dir / "exp" / "eval.json"
+    eval_report: Dict[str, Any] = {}
+    if eval_path.is_file():
+        try:
+            eval_report = json.loads(eval_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            logger.error("Unreadable %s: %s", eval_path, exc)
+    for key in ("phi", "mer", "mcs", "uwec"):
+        result_row[key] = eval_report.get(key)
+    result_row["eval_report"] = eval_report
+    if proc.returncode != 0:
+        result_row["status"] = f"FAILED: exit {proc.returncode}"
+    elif not eval_report:
+        result_row["status"] = "EVAL_FAILED: no exp/eval.json"
+    else:
         result_row["status"] = "COMPLETED"
-        logger.info(
-            "Evaluation complete: Phi=%.4f MER=%.2f MCS=%.4f UWEC=%.4f",
-            result_row["phi"] or 0.0,
-            result_row["mer"] or 0.0,
-            result_row["mcs"] or 0.0,
-            result_row["uwec"] or 0.0,
-        )
-    except Exception as exc:
-        logger.error("Evaluation failed: %s", exc)
-        eval_report = {}
-        result_row["status"] = f"EVAL_FAILED: {exc}"
 
-    # 5. K-Veritas Sealing
-    report_pdf = run_dir / "kveritas_report.pdf"
-    logger.info("Sealing K-Veritas cryptographic verification report...")
-    maybe_kveritas_seal(report_pdf, working_dir=run_dir, report=eval_report)
-
+    # Keep the historical location used by the push scripts.
+    sealed = run_dir / "exp" / "report.pdf"
+    if sealed.is_file():
+        shutil.copy2(sealed, run_dir / "kveritas_report.pdf")
+        bundle = sealed.with_name(sealed.name + ".kvbundle.zip")
+        if bundle.is_file():
+            shutil.copy2(bundle, run_dir / "kveritas_report.pdf.kvbundle.zip")
+        result_row["kveritas_report"] = str(run_dir / "kveritas_report.pdf")
     return result_row
 
 
@@ -428,6 +391,13 @@ def main() -> None:
         help="Distillation provider backend (default: google).",
     )
     parser.add_argument(
+        "--base-config",
+        type=Path,
+        default=None,
+        help="Base MasterConfig for every cell (default: configs/matrix/base_multi13.yaml). "
+        "Read only; never modified.",
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=Path("experiments/matrix"),
@@ -438,6 +408,12 @@ def main() -> None:
         type=int,
         default=None,
         help="Cap evaluation rows for fast trial/validation (e.g. 10).",
+    )
+    parser.add_argument(
+        "--kveritas-local-key",
+        type=str,
+        default=None,
+        help="Sign K-Veritas reports locally with this RSA private key (PEM) instead of the attestation server.",
     )
     parser.add_argument(
         "--kveritas-disclosure",
@@ -475,7 +451,10 @@ def main() -> None:
     os.environ["GOOGLE_LOCATION"] = args.location
 
     repo_root = Path(__file__).resolve().parent.parent
-    base_config_path = repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    base_config_path = Path(args.base_config) if args.base_config else repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    if not base_config_path.is_file():
+        parser.error(f"--base-config not found: {base_config_path}")
+    logger.info("Base config: %s", base_config_path)
     catalog_path = repo_root / "configs" / "matrix" / "models.json"
 
     catalog = load_model_catalog(catalog_path)
@@ -556,6 +535,7 @@ def main() -> None:
                 max_eval_rows=args.max_eval_rows,
                 kveritas_disclosure=args.kveritas_disclosure,
                 use_vllm=args.use_vllm,
+                kveritas_local_key=args.kveritas_local_key,
             )
 
             result = run_experiment_cell(cfg_data, run_dir, dry_run=args.dry_run)

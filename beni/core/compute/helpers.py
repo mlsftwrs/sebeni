@@ -1,6 +1,6 @@
 
 import numpy as np
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Collection, FrozenSet, List, Optional, Tuple, Union
 from beni.core import Token
 
 
@@ -117,34 +117,78 @@ def to_morpheme_list(source: Union[Token, List[str]]) ->List[str]:
         return source.best_morphemes()
     return list(source)
 
-def stage_to_phi(stage: Union[int, str], empr: float= 0.5, eps: float= 1e-8) -> float:
-    """ Map stage value to phi score. """
+def is_empr_token(token: Any) -> bool:
+    """Return True when any analysis on ``token`` carries the ``EMPR`` borrowing gloss."""
+    for analysis in getattr(token, "analyses", None) or []:
+        if str(getattr(analysis, "gloss", "") or "").strip().upper() == "EMPR":
+            return True
+        for morph in getattr(analysis, "morphemes", None) or []:
+            if str(getattr(morph, "gloss", "") or "").strip().upper() == "EMPR":
+                return True
+    return False
 
+
+def _resolve_empr_stages(
+    empr_stages: Optional[Collection[int]] = None,
+    lang: Optional[str] = None,
+) -> FrozenSet[int]:
+    if empr_stages is not None:
+        return frozenset(int(s) for s in empr_stages)
+    if lang:
+        from beni.core.morphotactic.dabax import empr_stages_for_lang
+
+        return empr_stages_for_lang(lang)
+    return frozenset({6})
+
+
+def stage_to_phi(
+    stage: Union[int, str],
+    empr: float = 0.5,
+    eps: float = 1e-8,
+    *,
+    empr_stages: Optional[Collection[int]] = None,
+    lang: Optional[str] = None,
+    token: Any = None,
+) -> float:
+    """Map morphological stage (or EMPR borrowing token) to its Φ contribution."""
     if isinstance(stage, str):
         try:
             stage = int(stage)
         except (ValueError, TypeError):
+            if token is not None and is_empr_token(token):
+                return float(empr)
             return 1.0
 
     if stage < 0:
         return 0.0
-    elif stage < 6:
-        return 1.0
-    elif stage == 6:
-        return empr
-    else:
-        return eps
+    if token is not None and is_empr_token(token):
+        return float(empr)
+    stages = _resolve_empr_stages(empr_stages, lang)
+    if stage in stages:
+        return float(empr)
+    if stages and stage > max(stages):
+        return float(eps)
+    return 1.0
 
-def recognized_word(stage: Union[int, str]) -> bool:
-    """ Check if a word is recognized by the dictionary """
-    
+
+def recognized_word(
+    stage: Union[int, str],
+    *,
+    empr_stages: Optional[Collection[int]] = None,
+    lang: Optional[str] = None,
+    token: Any = None,
+) -> bool:
+    """Check if a word is recognized by the dictionary/grammar (not unanalyzed or EMPR)."""
+    if token is not None and is_empr_token(token):
+        return False
+
     if isinstance(stage, str):
         try:
             stage = int(stage)
-            if (stage >= 0 and stage < 4) or stage == 5:
-                return True
-            return False
         except (ValueError, TypeError):
             return True
 
-    return (stage >= 0 and stage < 4) or stage == 5
+    if stage < 0:
+        return False
+    stages = _resolve_empr_stages(empr_stages, lang)
+    return stage not in stages and (not stages or stage <= max(stages))

@@ -1,5 +1,5 @@
 # Sebeni MasterConfig example (Bambara / GRPO)
-# Docs: https://seben.robotsmali.org/docs/hyperparams/
+# Docs: https://mlsftwrs.github.io/sebeni/hyperparams/
 
 project_name: sebeni-bam-grpo
 algorithm: grpo

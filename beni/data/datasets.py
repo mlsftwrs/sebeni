@@ -415,13 +415,12 @@ class SebeniDataLoader:
         return self._completion_ds(ds)
 
     def _completion_ds(self, ds: Any = None) -> Dataset:
-        from beni.core.srl.config import SRLGrpoPrompt
+        from beni.core.srl.prompting import policy_messages
         dataset = {"prompt": [], "language": [], "reference": []}
 
         langs = list(self.config.languages or [])
         if not langs and self.config.default_lang:
             langs = [self.config.default_lang]
-        prompt = SRLGrpoPrompt(languages=langs).prompt()
         items = ds if ds is not None else self.records
 
         for item in items:
@@ -440,12 +439,7 @@ class SebeniDataLoader:
             if not isinstance(reference, dict) or not isinstance(reference.get("tokens"), list):
                 reference = {}
 
-            messages = [
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": text}
-            ]
-
-            dataset["prompt"].append(messages)
+            dataset["prompt"].append(policy_messages(text, langs))
             dataset["language"].append(lang)
             dataset["reference"].append(reference)
 
@@ -472,9 +466,9 @@ def rank_group_to_preference(
     Each record may supply ``chosen``/``rejected`` directly, or ``completions`` plus
     ``scores`` (higher is better). Offline DPO/APO still come from ranking those groups.
     """
-    from beni.core.srl.config import SRLGrpoPrompt
+    from beni.core.srl.prompting import system_prompt
 
-    system = SRLGrpoPrompt(languages=list(languages) if languages else None).prompt() if scheme_prompt else ""
+    system = system_prompt(languages) if scheme_prompt else ""
     rows = {"prompt": [], "chosen": [], "rejected": [], "language": []}
     for item in records or []:
         if not isinstance(item, dict):
