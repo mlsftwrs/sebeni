@@ -1,8 +1,11 @@
-# Dogon morphotactic patterns
+# Dogon (Toro So / Tomo Kan, dtm) morphotactic patterns
+# version 2026.11.23 — revised from beni/data/raw/dtm.txt & test.json
+# Note: unconstrained single-letter suffixes (-i, -a, -u, -l, -r, -y, -t, -g, -m, -n)
+# removed to eliminate stage 0/1 phantom splits on unparsed stems.
 
 # macro definitions
-macro   @vow@            [aeiouɛɔ]
-macro   @cons@           [bcɗfghjklmnɲŋprstwwyz]
+macro   @vow@            <re>.*[aeiouɛɔ]</re>
+macro   @cons@           <re>.*[bcɗfghjklmnɲŋprstwyz]</re>
 macro   @syl@            [^aeiouɛɔ]*(?P<V>[aeiouɛɔ])(?P=V)?([^aeiouɛɔ]+(?=([^aeiouɛɔ]|$)))?
 
 # processing instructions
@@ -20,86 +23,74 @@ stage 2 add parallel parse reduplication
 stage 2 apply lookup
 return if parsed
 stage 3 add parallel decompose pos_composition
+stage 3 apply lookup
 return if parsed
 stage 4 apply firstmatch parse nondogon
 return if parsed
 
-# --- NOUN INFLECTION (Noun Class Suffixes and Pluralization) ---
+# --- NOUN INFLECTION (Plural & Definite Enclitics) ---
 section noun_inflection
+# Plural suffixes attested in dtm.txt & test.json:
+# -nw / -w (inɛnw, inɛw), -be / -mbe (human plural: gɔbe, bɛrɛbe, paŋabe, yagabe), -ge (inanimate plural)
+pattern :n/adj/prn: [ {|nw}:: ] | :n/adj/prn: [ :n/adj/prn: :mrph:PL ]
+pattern :n/adj/prn: [ {@vow@|w}:: ] | :n/adj/prn: [ :n/adj/prn: :mrph:PL ]
+pattern :n/adj/prn: [ {|be}:: ] | :n/adj/prn: [ :n/adj/prn: :mrph:PL.HUM ]
+pattern :n/adj/prn: [ {|mbe}:: ] | :n/adj/prn: [ :n/adj/prn: :mrph:PL.HUM ]
+pattern :n/adj: [ {|ge}:: ] | :n/adj: [ :n/adj: :mrph:PL.INAN ]
 
-# Plural Noun Classes (-w, -be, -nw)
-pattern :n: [ {|w}:: ] | :n: [ :n: :mrph:PL ]
-pattern :n: [ {|be}:: ] | :n: [ :n: :mrph:PL.REL ]
-pattern :n: [ {|nw}:: ] | :n: [ :n: :mrph:PL.ALT ]
+# Definite / determiner enclitics (-gɔ, -gɔbe, -nɛ)
+pattern :n: [ {|gɔ}:: ] | :n: [ :n: :mrph:DEF ]
+pattern :n: [ {|gɔbe}:: ] | :n: [ :n: :mrph:DEF.PL ]
 
-# Singular Noun Class (often implicit)
-
-# Diminutive (-i, -ii)
-pattern :n: [ {|i}:: ] | :n: [ :n: :mrph:DIM ]
-pattern :n: [ {|ii}:: ] | :n: [ :n: :mrph:DIM.ALT ]
-
-# --- VERBAL INFLECTION (Aspect, Voice, & Tense Markers) ---
+# --- VERBAL INFLECTION (TAM & Subject Agreement) ---
 section verb_inflection
-
-# Active Voice Suffixes
-pattern :v: [ {|i}:: ] | :v: [ :v: :mrph:PFV ]
-pattern :v: [ {|l}:: ] | :v: [ :v: :mrph:PFV.NEG ]
-pattern :v: [ {|a}:: ] | :v: [ :v: :mrph:IPFV ]
+# Attested Dogon verbal suffixes:
+# -jɛ PROG/IPFV (dɛnɛjɛ), -bɛin / -bɛ IPFV, -lɔ / -lu / -le NEG (dɛnɛɛlɔn)
+# -dɔ / -ndɔ FUT/HAB, -nɛ PFV/REL, -ɲu / -nyu PFV.3PL, -aa PFV, -wi / -wo
+pattern :v: [ {|jɛ}:: ] | :v: [ :v: :mrph:PROG ]
+pattern :v: [ {|bɛin}:: ] | :v: [ :v: :mrph:IPFV ]
+pattern :v: [ {|lɔ}:: ] | :v: [ :v: :mrph:NEG ]
+pattern :v: [ {|lɔn}:: ] | :v: [ :v: :mrph:NEG ]
+pattern :v: [ {|lu}:: ] | :v: [ :v: :mrph:PFV.NEG ]
 pattern :v: [ {|le}:: ] | :v: [ :v: :mrph:IPFV.NEG ]
-pattern :v: [ {|u}:: ] | :v: [ :v: :mrph:IMP ]
-pattern :v: [ {|do}:: ] | :v: [ :v: :mrph:FUT ]
-pattern :v: [ {|j}:: ] | :v: [ :v: :mrph:PROG ]
+pattern :v: [ {|dɔ}:: ] | :v: [ :v: :mrph:FUT ]
+pattern :v: [ {|ndɔ}:: ] | :v: [ :v: :mrph:FUT ]
+pattern :v: [ {|nɛ}:: ] | :v: [ :v: :mrph:PFV ]
+pattern :v: [ {|ɲu}:: ] | :v: [ :v: :mrph:PFV.3PL ]
+pattern :v: [ {|aa}:: ] | :v: [ :v: :mrph:PFV.ALT ]
 
-# Enclitic Verb Forms
-pattern :v: [ {|m}:: ] | :v: [ :v: :mrph:PFV.1SG ]
-pattern :v: [ {|u}:: ] | :v: [ :v: :mrph:PFV.2SG ]
-pattern :v: [ {|w}:: ] | :v: [ :v: :mrph:PFV.1PL ]
-pattern :v: [ {|be}:: ] | :v: [ :v: :mrph:PFV.2PL ]
-pattern :v: [ {|w}:: ] | :v: [ :v: :mrph:PFV.3PL ]
-
-# --- VERBAL DERIVATION (Derivational Extensions) ---
+# --- VERBAL DERIVATION (Extensions) ---
 section verbal_derivation
+# -mɔ CAUS, -rɛ INST, -yɛ MPASS, -tɛ REVR
+pattern :v: [ {|mɔ}:: ] | :v: [ :v: :mrph:CAUS ]
+pattern :v: [ {|rɛ}:: ] | :v: [ :v: :mrph:INST ]
+pattern :v: [ {|yɛ}:: ] | :v: [ :v: :mrph:MPASS ]
+pattern :v: [ {|tɛ}:: ] | :v: [ :v: :mrph:REVR ]
 
-# Extensions: Causative, Instrumental, Medio-passive, Reversive
-pattern :v: [ {|m}:: ] | :v: [ :v: :mrph:CAUS ]
-pattern :v: [ {|r}:: ] | :v: [ :v: :mrph:INST ]
-pattern :v: [ {|y}:: ] | :v: [ :v: :mrph:MPASS ]
-pattern :v: [ {|t}:: ] | :v: [ :v: :mrph:REVR ]
-
-# Complex & Stacked Extensions
-pattern :v: [ {|m|r}:: ] | :v: [ :v: :mrph:CAUS :mrph:INST ]
-pattern :v: [ {|y|m}:: ] | :v: [ :v: :mrph:MPASS :mrph:CAUS ]
-pattern :v: [ {|t|r}:: ] | :v: [ :v: :mrph:REVR :mrph:INST ]
-
-# --- NOMINAL DERIVATION (Agentive & Abstract Derivations) ---
+# --- NOMINAL DERIVATION ---
 section nominal_derivation
-
-# Agentive & Abstract Suffixes
-pattern :n: [ {|n}:: ] | :n: [ :v: :mrph:AG.SG ]
-pattern :n: [ {|nw}:: ] | :n: [ :v: :mrph:AG.PL ]
-pattern :n: [ {|u}:: ] | :n: [ :v: :mrph:NMLZ ]
-pattern :n: [ {|g}:: ] | :n: [ :n: :mrph:GENT ]
-pattern :n: [ {|w}:: ] | :n: [ :n: :mrph:GENT.PL ]
-pattern :n: [ {|ya}:: ] | :n: [ :n: :mrph:ABSTR ]
+# -ya ABSTR, -nɛ AG/NMLZ, -kɔ / -gɔ GENT
+pattern :n/adj: [ {|ya}:: ] | :n: [ :n/adj: :mrph:ABSTR ]
+pattern :n: [ {|nɛ}:: ] | :n: [ :v: :mrph:NMLZ ]
+pattern :n: [ {|nɔ}:: ] | :n: [ :v: :mrph:AG.SG ]
 
 # --- REDUPLICATION ---
 section reduplication
-
 pattern :v: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :v: [ :v: :v: ]
 pattern :adj: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :adj: ]
 pattern :n: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :n: [ :n: :n: ]
+pattern :adv: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :adv: [ :adv: :: :adv: ]
 
-# --- POS COMPOSITION (Noun-Noun, Noun-Adj Compounding) ---
+# --- POS COMPOSITION ---
 section pos_composition
-
-# Two-word composites
 pattern :n: [ :n: :n: ] | :n: [ :n: :n: ]
 pattern :n: [ :n: :adj: ] | :n: [ :n: :adj: ]
 pattern :n: [ :v: :n: ] | :n: [ :v: :n: ]
 pattern :n: [ :n: :v: ] | :n: [ :n: :v: ]
+pattern :n: [ :n.prop: :n: ] | :n: [ :n.prop: :n: ]
+pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
 
-# --- NON-DOGON FILTER ---
+# --- NON-DOGON FILTER (STAGE 4 = EMPR; 'wax' -> stage 4) ---
 section nondogon
-
-# Filter forms ending with non-Dogon orthographic sequences or invalid cluster characters
-pattern <re>.*[qxzvvwxQXZVWX].*</re>:: | ::EMPR
+# Filter non-Dogon orthographic characters (q, x, v, z are foreign to Dogon; keeps ε/ԑ/ɔ/ͻ homoglyphs)
+pattern <re>.*[qxvzQXVZ].*</re>:: | ::EMPR

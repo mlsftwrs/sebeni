@@ -153,6 +153,8 @@ class DataConfig:
     # In-training hold-out carved from the train data. eval_rows (a row count) wins over eval_ratio.
     eval_ratio: float = 0.1
     eval_rows: Optional[int] = None
+    normalize_homoglyphs: bool = True
+    filter_corpus_noise: bool = False
 
     def __post_init__(self) -> None:
         from beni.core.language import parse_lang_codes

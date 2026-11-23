@@ -1,9 +1,11 @@
-# Bomu (BMQ) morphotactic patterns
+# Bomu (Bwamu, bmq) morphotactic patterns
+# version 2026.11.23 — revised from beni/data/raw/bmq.txt & test.json
+
 # macro definitions
-macro   @v@             <re>[aoeuiɔɛãẽĩõũɛ̃ɔ̃]</re>
-macro   @nasal-v@       <re>[ãẽĩõũɛ̃ɔ̃]</re>
-macro   @nonnasal-v@    <re>[aoeuiɔɛ]</re>
-macro   @cons@          <re>[bcdfghjklmnprstvwyzɓɲŋ]</re>
+macro   @v@             <re>.*[aoeuiɔɛãẽĩõũɛ̃ɔ̃]</re>
+macro   @nasal-v@       <re>.*([ãẽĩõũɛ̃ɔ̃]|[aoeuiɔɛ]n)</re>
+macro   @nonnasal-v@    <re>.*[aoeuiɔɛ]</re>
+macro   @cons@          <re>.*[bcdfghjklmnprstvwyzɓɲŋ]</re>
 macro   @syl@           [^aoeuiɔɛãẽĩõũɛ̃ɔ̃]*(?P<V>[aoeuiɔɛãẽĩõũɛ̃ɔ̃])(?P=V)?(n(?=([^aoeuiɔɛãẽĩõũɛ̃ɔ̃]|$)))?
 
 # processing instructions
@@ -15,8 +17,7 @@ stage 0 apply lookup
 return if parsed
 stage 1 add sequential parse n_v_derivation
 stage 1 add parallel parse n_derivation
-stage 1 add parallel parse v_vq_derivation
-stage 1 add parallel parse vq_derivation
+stage 1 add parallel parse v_derivation
 stage 1 add parallel parse num_derivation
 stage 1 apply lookup
 return if parsed
@@ -24,68 +25,68 @@ stage 2 add parallel parse reduplication
 stage 2 apply lookup
 return if parsed
 stage 3 add parallel decompose pos_composition
+stage 3 apply lookup
 return if parsed
 stage 4 apply firstmatch parse nonbomu
 return if parsed
 
-#for sentence
+# --- INFLECTION (Noun Class & Plural Markers) ---
 section inflection
-# nominal inflection
-# -pɛɛ PL (human/animate)
+# Plural markers attested in bmq.txt & test.json:
+# -pɛɛ (human/animate plural: nupɛɛ, dapɛɛ), -nu / -bee / -be (general/class plurals: deeɓenu, sɛnnu, vesirobe, werobe)
+# -robe (agent/nominal plural: toosɛrobe), -ɓe (human plural)
 pattern :n/adj/prn/n.prop: [ {|pɛɛ}:: ] | :n/adj/prn/n.prop: [:n/adj/prn/n.prop: :mrph:PL.HUM]
-# -nu / -bee PL (inanimate)
+pattern :n/adj/prn/n.prop: [ {|ɓe}:: ] | :n/adj/prn/n.prop: [:n/adj/prn/n.prop: :mrph:PL.HUM]
 pattern :n/adj/prn/n.prop: [ {|nu}:: ] | :n/adj/prn/n.prop: [:n/adj/prn/n.prop: :mrph:PL]
 pattern :n/adj/prn/n.prop: [ {|bee}:: ] | :n/adj/prn/n.prop: [:n/adj/prn/n.prop: :mrph:PL]
+pattern :n/adj/prn/n.prop: [ {|be}:: ] | :n/adj/prn/n.prop: [:n/adj/prn/n.prop: :mrph:PL]
+pattern :n/adj/prn/n.prop: [ {|robe}:: ] | :n/adj/prn/n.prop: [:n/adj/prn/n.prop: :mrph:PL]
 
-# derivative forms we need to consider even if we have them in dictionary
+# Singular / class & focus suffixes (-yo, -siyo, -le, -wa)
+pattern :n: [ {|siyo}:: ] | :n: [:n: :mrph:SG.CL]
+pattern :n: [ {|yo}:: ] | :n: [:n: :mrph:SG.CL]
+pattern :n/v: [ {|le}:: ] | :n/v: [:n/v: :mrph:DEF]
+
+# --- COMMON DERIVATION ---
 section common_derivation
-# -yamu / -mu ABSTR (e.g., huwarayamu, yiramu)
+# Abstract nouns: -yamu / -mu / -ya (e.g., huwarayamu, yiramu, banmu, dediya)
 pattern :n/adj/v: [ {|yamu}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
 pattern :n/adj/v: [ {|mu}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
-# -ba AUGM
+pattern :n/adj/v: [ {|ya}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
+# Diminutive / Augmentative
 pattern :n/adj: [ {|ba}:: ] | :n/adj: [:n/adj: :mrph:AUGM]
-# -nin DIM
 pattern :n/adj: [ {|nin}:: ] | :n/adj: [:n/adj: :mrph:DIM]
 
-# common nominal/verbal derivation (locatives/relational)
+# --- RELATIONAL / LOCATIVE CLITICS ---
 section n_v_derivation
-pattern :n/n.prop: [ {|ka}:: ] | :n/n.prop: [:n/n.prop: :mrph:GENT]
+# Locative / relational suffixes (-la, -na, -ra)
 pattern :n/n.prop: [ {@nasal-v@|na}:: ] | :n/n.prop: [:n/n.prop: :mrph:LOC]
 pattern :n/n.prop: [ {@nonnasal-v@|la}:: ] | :n/n.prop: [:n/n.prop: :mrph:LOC]
+pattern :n/n.prop: [ {|ra}:: ] | :n/n.prop: [:n/n.prop: :mrph:LOC]
 
-# nominal derivation
+# --- NOMINAL DERIVATION ---
 section n_derivation
-pattern :n: [ {@nasal-v@|nama}:: ] | :n: [ :n: :mrph:STAT]
-pattern :n: [ {@nonnasal-v@|lama}:: ] | :n: [ :n: :mrph:STAT]
+# -ma COM / -ntan PRIV / -re / -ɛnɛ
 pattern :n: [ {|ma}:: ] | :n: [ :n: :mrph:COM]
 pattern :adj/n: [ {|ntan}:: ] | :adj/n: [ :n: :mrph:PRIV]
-pattern :adj/n: [ {|bali}:: ] | :adj/n: [ :n: :mrph:PRIV]
+pattern :n: [ {|re}:: ] | :n: [ :n/v: :mrph:NMLZ]
 
-# verbal/vq derivation
-section v_vq_derivation
-pattern :n: [ {@nasal-v@|nan}:: ] | :n: [ :v: :mrph:INSTR]
-pattern :n: [ {@nonnasal-v@|lan}:: ] | :n: [ :v: :mrph:INSTR]
-pattern :n: [ {@nasal-v@|ni}:: ] | :n: [ :v: :mrph:NMLZ]
-pattern :n: [ {@nonnasal-v@|li}:: ] | :n: [ :v: :mrph:NMLZ]
-pattern :n: [ {|baga}:: ] | :n: [ :v: :mrph:AG.OCC]
-pattern :n: [ {|baa}:: ] | :n: [ :v: :mrph:AG.OCC]
-pattern :n: [ {|baga|nci}:: ] | :n: [ :v: :mrph:AG.OCC :mrph:AG.EX]
-pattern :n: [ {|baa|nci}:: ] | :n: [ :v: :mrph:AG.OCC :mrph:AG.EX]
+# --- VERBAL DERIVATION & ASPECT ---
+section v_derivation
+# Verbal extensions & TAM (-ni, -na, -ra, -wa, -wan, -nya)
+pattern :v: [ {|ni}:: ] | :v: [ :v: :mrph:TR]
+pattern :v: [ {|na}:: ] | :v: [ :v: :mrph:PFV]
+pattern :v: [ {|ra}:: ] | :v: [ :v: :mrph:PFV.ALT]
+pattern :v: [ {|wa}:: ] | :v: [ :v: :mrph:IPFV]
+pattern :v: [ {|wan}:: ] | :v: [ :v: :mrph:PROG]
+pattern :n: [ {|niya}:: ] | :n: [ :v: :mrph:NMLZ]
 
-# vq derivation
-section vq_derivation
-pattern :vq: [ {|ya}:: ] | :n/v: [ :vq: :mrph:DEQU]
-pattern :adj: [ {|man}:: ] | :adj: [ :vq: :mrph:ADJ]
-
-# numeral derivation
+# --- NUMERAL DERIVATION ---
 section num_derivation
-pattern :num: [ {@nasal-v@|na}:: ] | :num: [ :num: :mrph:DISTR]
-pattern :num: [ {@nonnasal-v@|la}:: ] | :num: [ :num: :mrph:DISTR]
-pattern :num: [ {@nasal-v@|nan}:: ] | :num: [ :num: :mrph:ORD]
-pattern :num: [ {<re>[0-9]+</re>|nan}:: ] | :num: [ :num: :mrph:ORD]
-pattern :num: [ {@nonnasal-v@|lan}:: ] | :num: [ :num: :mrph:ORD]
+pattern :num: [ {|na}:: ] | :num: [ :num: :mrph:ORD]
+pattern :num: [ {|la}:: ] | :num: [ :num: :mrph:DISTR]
 
-## reduplication
+# --- REDUPLICATION ---
 section reduplication
 pattern :v: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :v: [ :v: :v: ]
 pattern :adj: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :adj: ]
@@ -94,54 +95,22 @@ pattern :v: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :v: [ :v: :: :v
 pattern :adj: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :: :adj: ]
 pattern :num: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :num: [ :num: :: :num: ]
 
-## composition
-# general part-of-speech composition patterns
+# --- POS COMPOSITION (Compounds & Hyphenated Forms) ---
 section pos_composition
-
-# Determiners (Noun Classes / Definite Articles: lo, li, ho)
-pattern :n: [ lo:dtm: :n: ] | :n: [ lo:dtm:ART :n: ]
-pattern :n: [ li:dtm: :n: ] | :n: [ li:dtm:ART :n: ]
-pattern :n: [ ho:dtm: :n: ] | :n: [ ho:dtm:ART :n: ]
-
-# Possessive Pronouns (ɓa, a, nɛ, mu)
-pattern :n: [ ɓa:prn: :n: ] | :n: [ ɓa:prn:POSS :n: ]
-pattern :n: [ a:prn: :n: ] | :n: [ a:prn:POSS :n: ]
-pattern :n: [ nɛ:prn: :n: ] | :n: [ nɛ:prn:POSS :n: ]
-pattern :n: [ mu:prn: :n: ] | :n: [ mu:prn:POSS :n: ]
-
-# two-words composites
-# n.prop + n = n   ex: Malitun
+# Attested hyphenated compounds (e.g., ho-senu, sere-inso, li-wure)
+pattern :n: [ :n/dtm/prn: :n: ] | :n: [ :n/dtm/prn: :n: ]
 pattern :n: [ :n.prop: :n: ] | :n: [ :n.prop: :n: ]
-# v/n + n = n
 pattern :n: [ :n/v: :n: ] | :n: [ :n/v: :n: ]
-# n + v = n/v
 pattern :n/v: [ :n: :v: ] | :n/v: [ :n: :v: ]
-# n + adj/num = n
 pattern :n: [ :n: :adj/num: ] | :n: [ :n: :adj/num: ]
-# dtm + v = n
 pattern :n: [ :dtm: :v: ] | :n: [ :dtm: :v: ]
-
-# three-words composites
-# n + adj/pp/num + n = n
 pattern :n: [ :n: :adj/pp/num: :n: ] | :n: [ :n: :adj/pp/num: :n: ]
-# dtm/n + v + n = n
 pattern :n: [ :dtm/n: :v: :n: ] | :n: [ :dtm/n: :v: :n: ]
-# n+n+n = n
 pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
-
-# v+mrph+n  ex: huwarayamu
 pattern :n: [ :v: yamu:mrph: ] | :n: [ :v: :mrph:ABSTR ]
 pattern :n: [ :v: mu:mrph: ] | :n: [ :v: :mrph:ABSTR ]
 
-# four-words composites
-pattern :n: [ :n: :pp: :n: :n: ] | :n: [ :n: :pp: :n: :n: ]
-pattern :n: [ :n: :pp: :adj: :n: ] | :n: [ :n: :pp: :adj: :n: ]
-
-# orthographically unlikely to be bomu words
+# --- NON-BOMU FILTER (STAGE 4 = EMPR) ---
 section nonbomu
-# forms ending with nonfinal consonants
-pattern <re>.+[bcdfghjklmnprstvwyzɓɲŋ]$</re>:: | ::EMPR
-# forms with symbols out of bomu alphabet
-pattern <re>.*[qxçäëïüâêîôûéùàøðþ]</re>:: | ::EMPR
-# two different vowels in sequence
-pattern <re>.*(?P<v>[aoeuiɔɛ])(?!(?P=v))(?=[aoeuiɔɛ]).*</re>:: | ::EMPR
+# Characters outside Bomu orthography (allows a-z excl q,x + ɓ ɛ ɔ ɲ ŋ + tonal/nasal vowels & homoglyph ε/ԑ)
+pattern <re>.*[qxQXçäëïöüâêîôûùàøðþ].*</re>:: | ::EMPR

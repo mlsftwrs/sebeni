@@ -1,10 +1,9 @@
-# Fula (Fulfulde) morphotactic patterns
+# Fula (Maasina Fulfulde, ful) morphotactic patterns
+# version 2026.11.23 — revised from beni/data/raw/ful.txt & test.json
 
 # macro definitions
-macro   @vow@            [aeiouyooeeaauu]
-macro   @cons@           [ɓɗƴɲŋɓcɗfghjklmnɲŋprstwwyz]
-macro   @implosive@      [ɓɗƴ]
-macro   @prenasal@       (mb|nd|ŋg|nj)
+macro   @vow@            <re>.*[aeiouy]</re>
+macro   @cons@           <re>.*[ɓɗƴɲŋbcdfghjklmnprstwy]</re>
 macro   @syl@            [^aeiouy]*(?P<V>[aeiouy])(?P=V)?([^aeiouy]+(?=([^aeiouy]|$)))?
 
 # processing instructions
@@ -22,62 +21,80 @@ stage 2 add parallel parse reduplication
 stage 2 apply lookup
 return if parsed
 stage 3 add parallel decompose pos_composition
+stage 3 apply lookup
 return if parsed
 stage 4 apply firstmatch parse nonfula
 return if parsed
 
-# --- NOUN INFLECTION (Noun Class Suffixes) ---
+# --- NOUN INFLECTION (Full Noun Class Suffixes) ---
 section noun_inflection
+# Plural classes (-ɓe, -en, -ɗe, -ɗi, -ji, -ooji, -eeji, -aaji, -uuji, -iiji, -le, -kon, -koy)
+pattern :n/adj/ptcp: [ {|ɓe}:: ] | :n/adj/ptcp: [ :n/adj/ptcp: :mrph:PL.HUM ]
+pattern :n/adj/n.prop: [ {|en}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:PL.REL ]
+pattern :n/adj: [ {|ɗe}:: ] | :n/adj: [ :n/adj: :mrph:PL.INAN ]
+pattern :n/adj: [ {|ɗi}:: ] | :n/adj: [ :n/adj: :mrph:PL.NONHUM ]
+pattern :n/adj: [ {|ooji}:: ] | :n/adj: [ :n/adj: :mrph:PL.CL ]
+pattern :n/adj: [ {|eeji}:: ] | :n/adj: [ :n/adj: :mrph:PL.CL ]
+pattern :n/adj: [ {|aaji}:: ] | :n/adj: [ :n/adj: :mrph:PL.CL ]
+pattern :n/adj: [ {|uuji}:: ] | :n/adj: [ :n/adj: :mrph:PL.CL ]
+pattern :n/adj: [ {|iiji}:: ] | :n/adj: [ :n/adj: :mrph:PL.CL ]
+pattern :n/adj: [ {|ji}:: ] | :n/adj: [ :n/adj: :mrph:PL.CL ]
+pattern :n/adj: [ {|le}:: ] | :n/adj: [ :n/adj: :mrph:PL.CL ]
+pattern :n/adj: [ {|kon}:: ] | :n/adj: [ :n/adj: :mrph:DIM.PL ]
+pattern :n/adj: [ {|koy}:: ] | :n/adj: [ :n/adj: :mrph:DIM.PL ]
 
-# Plural Noun Classes (-ɓe, -en, -ɗe, -ɗi)
-pattern :n: [ {|ɓe}:: ] | :n: [ :n: :mrph:PL.HUM ]
-pattern :n: [ {|en}:: ] | :n: [ :n: :mrph:PL.REL ]
-pattern :n: [ {|ɗe}:: ] | :n: [ :n: :mrph:PL.INAN ]
-pattern :n: [ {|ɗi}:: ] | :n: [ :n: :mrph:PL.NONHUM ]
-
-# Singular Noun Classes (-ɗo, -ngol, -nde, -ngal, -ngo, -ko, -kal, -ɗum, -oo, -ri, -ɗam)
-pattern :n: [ {|ɗo}:: ] | :n: [ :n: :mrph:SG.HUM ]
+# Singular classes (-ɗo, -jo, -ngol, -nde, -ngal, -ngo, -ko, -kal, -ɗum, -ri, -re, -ru, -ɗam, -wal, -wol, -ki, -ku, -hi)
+pattern :n/adj/ptcp: [ {|ɗo}:: ] | :n/adj/ptcp: [ :n/adj/ptcp: :mrph:SG.HUM ]
+pattern :n/adj: [ {|jo}:: ] | :n/adj: [ :n/adj: :mrph:SG.HUM ]
 pattern :n: [ {|ngol}:: ] | :n: [ :n: :mrph:SG.CL ]
 pattern :n: [ {|nde}:: ] | :n: [ :n: :mrph:SG.CL ]
 pattern :n: [ {|ngal}:: ] | :n: [ :n: :mrph:SG.CL ]
 pattern :n: [ {|ngo}:: ] | :n: [ :n: :mrph:SG.CL ]
 pattern :n: [ {|ko}:: ] | :n: [ :n: :mrph:SG.CL ]
 pattern :n: [ {|kal}:: ] | :n: [ :n: :mrph:DIM.SG ]
-pattern :n: [ {|ɗum}:: ] | :n: [ :n: :mrph:NEUT ]
-pattern :n: [ {|oo}:: ] | :n: [ :n: :mrph:SG.DEM ]
+pattern :n/adj: [ {|ɗum}:: ] | :n/adj: [ :n/adj: :mrph:NEUT ]
 pattern :n: [ {|ri}:: ] | :n: [ :n: :mrph:SG.CL ]
+pattern :n: [ {|re}:: ] | :n: [ :n: :mrph:SG.CL ]
+pattern :n: [ {|ru}:: ] | :n: [ :n: :mrph:SG.CL ]
 pattern :n: [ {|ɗam}:: ] | :n: [ :n: :mrph:MASS.LIQ ]
+pattern :n: [ {|wal}:: ] | :n: [ :n: :mrph:SG.CL ]
+pattern :n: [ {|wol}:: ] | :n: [ :n: :mrph:SG.CL ]
+pattern :n: [ {|ki}:: ] | :n: [ :n: :mrph:SG.CL ]
+pattern :n: [ {|ku}:: ] | :n: [ :n: :mrph:SG.CL ]
 
-# --- VERBAL INFLECTION (Aspect, Voice, & Tense Markers) ---
+# --- VERBAL INFLECTION (Active / Middle / Passive + Enclitics) ---
 section verb_inflection
-
-# Active Voice Suffixes
+# Active voice
 pattern :v: [ {|ii}:: ] | :v: [ :v: :mrph:PFV.ACT ]
 pattern :v: [ {|aayi}:: ] | :v: [ :v: :mrph:PFV.NEG ]
 pattern :v: [ {|ay}:: ] | :v: [ :v: :mrph:IPFV.ACT ]
 pattern :v: [ {|ata}:: ] | :v: [ :v: :mrph:IPFV.NEG ]
-pattern :v: [ {|u}:: ] | :v: [ :v: :mrph:IMP ]
+pattern :v: [ {|ataa}:: ] | :v: [ :v: :mrph:IPFV.NEG ]
 pattern :v: [ {|an}:: ] | :v: [ :v: :mrph:FUT.ACT ]
+pattern :v: [ {|de}:: ] | :n: [ :v: :mrph:INF ]
 pattern :v: [ {|ee}:: ] | :v: [ :v: :mrph:SUBJ.PASS ]
 
-# Middle / Passive Voice Inflections
+# Middle / Passive voice
 pattern :v: [ {|iima}:: ] | :v: [ :v: :mrph:PFV.MID ]
 pattern :v: [ {|aama}:: ] | :v: [ :v: :mrph:PFV.PASS ]
 pattern :v: [ {|oto}:: ] | :v: [ :v: :mrph:IPFV.MID ]
-pattern :v: [ {|ate}:: ] | :v: [ :v: :mrph:IPFV.PASS ]
+pattern :v: [ {|otoo}:: ] | :v: [ :v: :mrph:IPFV.MID ]
+pattern :v: [ {|ataako}:: ] | :v: [ :v: :mrph:IPFV.MID.NEG ]
 pattern :v: [ {|ake}:: ] | :v: [ :v: :mrph:PFV.MID.ALT ]
+pattern :v: [ {|ate}:: ] | :v: [ :v: :mrph:IPFV.PASS ]
 pattern :v: [ {|ete}:: ] | :v: [ :v: :mrph:IPFV.PASS.ALT ]
 
-# Relative & Subject Enclitic Verb Forms
+# Subject enclitics (hyphenated forms heavily attested in ful.txt: -mi, -ɗaa, -ɗen, -ɗon)
+pattern :v: [ {|-mi}:: ] | :v: [ :v: :mrph:1SG ]
+pattern :v: [ {|-ɗaa}:: ] | :v: [ :v: :mrph:2SG ]
+pattern :v: [ {|-ɗen}:: ] | :v: [ :v: :mrph:1PL.INCL ]
+pattern :v: [ {|-ɗon}:: ] | :v: [ :v: :mrph:2PL ]
 pattern :v: [ {|uu-mi}:: ] | :v: [ :v: :mrph:PFV.1SG ]
 pattern :v: [ {|ee-mi}:: ] | :v: [ :v: :mrph:IPFV.1SG ]
-pattern :v: [ {|o-ɗaa}:: ] | :v: [ :v: :mrph:SUBJ.2SG ]
-pattern :v: [ {|u-ɗon}:: ] | :v: [ :v: :mrph:PFV.2PL ]
 
-# --- VERBAL DERIVATION (Derivational Extensions) ---
+# --- VERBAL DERIVATION (Extensions & Participles) ---
 section verbal_derivation
-
-# Extension Extensions: Causative, Instrumental, Middle/Locative, Reversive, Distant
+# Extensions: Causative, Instrumental, Middle/Locative, Reversive, Distant, Associative, Benefactive
 pattern :v: [ {|in}:: ] | :v: [ :v: :mrph:CAUS ]
 pattern :v: [ {|ir}:: ] | :v: [ :v: :mrph:INST ]
 pattern :v: [ {|or}:: ] | :v: [ :v: :mrph:MID.LOC ]
@@ -85,20 +102,26 @@ pattern :v: [ {|it}:: ] | :v: [ :v: :mrph:RETR ]
 pattern :v: [ {|oy}:: ] | :v: [ :v: :mrph:DIST ]
 pattern :v: [ {|id}:: ] | :v: [ :v: :mrph:ASSOC ]
 pattern :v: [ {|an}:: ] | :v: [ :v: :mrph:BEN ]
-pattern :v: [ {|iiɗo}:: ] | :ptcp: [ :v: :mrph:PTCP.PFV ]
-pattern :v: [ {|oowo}:: ] | :ptcp: [ :v: :mrph:PTCP.IPFV ]
 
-# Complex & Stacked Extensions
+# Participles (singular & plural)
+pattern :v/ptcp: [ {|iiɗo}:: ] | :ptcp: [ :v: :mrph:PTCP.PFV.SG ]
+pattern :v/ptcp: [ {|iiɓe}:: ] | :ptcp: [ :v: :mrph:PTCP.PFV.PL ]
+pattern :v/ptcp: [ {|aaɗo}:: ] | :ptcp: [ :v: :mrph:PTCP.PASS.SG ]
+pattern :v/ptcp: [ {|aaɓe}:: ] | :ptcp: [ :v: :mrph:PTCP.PASS.PL ]
+pattern :v/ptcp: [ {|otooɗo}:: ] | :ptcp: [ :v: :mrph:PTCP.MID.SG ]
+pattern :v/ptcp: [ {|otooɓe}:: ] | :ptcp: [ :v: :mrph:PTCP.MID.PL ]
+pattern :v/ptcp: [ {|oowo}:: ] | :ptcp: [ :v: :mrph:PTCP.IPFV.SG ]
+pattern :v/ptcp: [ {|ooɓe}:: ] | :ptcp: [ :v: :mrph:PTCP.IPFV.PL ]
+
+# Stacked extensions
 pattern :v: [ {|in|ir}:: ] | :v: [ :v: :mrph:CAUS :mrph:INST ]
 pattern :v: [ {|intin}:: ] | :v: [ :v: :mrph:CAUS.INTNS ]
 pattern :v: [ {|it|ir}:: ] | :v: [ :v: :mrph:RETR :mrph:INST ]
 pattern :v: [ {|id|or}:: ] | :v: [ :v: :mrph:ASSOC :mrph:MID.LOC ]
-pattern :v: [ {|or|iy}:: ] | :v: [ :v: :mrph:MID.LOC :mrph:DIST ]
+pattern :v: [ {|or|oy}:: ] | :v: [ :v: :mrph:MID.LOC :mrph:DIST ]
 
-# --- NOMINAL DERIVATION (Agentive & Abstract Derivations) ---
+# --- NOMINAL DERIVATION ---
 section nominal_derivation
-
-# Agentive & Abstract Suffixes
 pattern :n: [ {|oowo}:: ] | :n: [ :v: :mrph:AG.SG ]
 pattern :n: [ {|ooɓe}:: ] | :n: [ :v: :mrph:AG.PL ]
 pattern :n: [ {|aŋke}:: ] | :n: [ :n: :mrph:GENT ]
@@ -106,34 +129,30 @@ pattern :n: [ {|anke}:: ] | :n: [ :n: :mrph:GENT.ALT ]
 pattern :n: [ {|ankooɓe}:: ] | :n: [ :n: :mrph:GENT.PL ]
 pattern :n: [ {|ankaagal}:: ] | :n: [ :n: :mrph:ABSTR ]
 pattern :n: [ {|aaku}:: ] | :n: [ :n: :mrph:ABSTR ]
+pattern :n: [ {|aagu}:: ] | :n: [ :n: :mrph:ABSTR ]
 pattern :n: [ {|ere}:: ] | :n: [ :v: :mrph:NMLZ ]
 pattern :n: [ {|oore}:: ] | :n: [ :v: :mrph:NMLZ.ALT ]
 pattern :n: [ {|agol}:: ] | :n: [ :v: :mrph:INF ]
+pattern :n: [ {|ugol}:: ] | :n: [ :v: :mrph:INF ]
 
 # --- REDUPLICATION ---
 section reduplication
-
 pattern :v: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :v: [ :v: :v: ]
 pattern :adj: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :adj: ]
 pattern :v: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :v: [ :v: :: :v: ]
 pattern :n: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :n: [ :n: :: :n: ]
 
-# --- POS COMPOSITION (Noun-Noun, Noun-Adj Compounding) ---
+# --- POS COMPOSITION ---
 section pos_composition
-
-# Two-word composites
 pattern :n: [ :n: :n: ] | :n: [ :n: :n: ]
 pattern :n: [ :n: :adj: ] | :n: [ :n: :adj: ]
 pattern :n: [ :v: :n: ] | :n: [ :v: :n: ]
 pattern :n: [ :n: :v: ] | :n: [ :n: :v: ]
-
-# Three-word composites
+pattern :n: [ :n.prop: :n: ] | :n: [ :n.prop: :n: ]
 pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
 pattern :n: [ :n: :adj: :n: ] | :n: [ :n: :adj: :n: ]
 
-# --- NON-FULA FILTER ---
+# --- NON-FULA FILTER (STAGE 4 = EMPR) ---
 section nonfula
-
-# Filter forms ending with non-Fula orthographic sequences or invalid cluster characters
-pattern <re>.*[qxzvvwxQXZVWX].*</re>:: | ::EMPR
-pattern <re>.*(?P<v>[aeiouy])(?!(?P=v))(?=[aeiouy]).*</re>:: | ::EMPR
+# Filter characters absent from standard Fulfulde orthography (q, x, v, z are foreign)
+pattern <re>.*[qxzvQXZVçäëïöüâêîôûéèùàøðþ].*</re>:: | ::EMPR

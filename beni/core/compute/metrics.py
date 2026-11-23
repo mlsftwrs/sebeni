@@ -63,6 +63,35 @@ class MorphologyScorer:
             'avg': float(np.mean(list(mapping.values()))) if mapping else 0.0
         }
 
+    def strict_parsed_rate(self, sentence: Union[Sentence, List[Token]]) -> float:
+        """Fraction of tokens backed by a non-EMPR, non-``auto:`` glossed parse."""
+        from beni.core.compute.helpers import is_empr_token
+
+        tokens = sentence.tokens if isinstance(sentence, Sentence) else sentence
+        if not tokens:
+            return 0.0
+
+        def _has_leaf_gloss(obj) -> bool:
+            morphemes = getattr(obj, "morphemes", None) or ()
+            if morphemes:
+                return all(_has_leaf_gloss(m) for m in morphemes)
+            gl = str(getattr(obj, "gloss", "") or "").strip()
+            return bool(gl) and not gl.startswith("auto:")
+
+        ok = 0
+        for tok in tokens:
+            st = str(getattr(tok, "stage", "-1"))
+            if st == "-1":
+                continue
+            if st == "tokenizer":
+                ok += 1
+                continue
+            if is_empr_token(tok):
+                continue
+            if any(_has_leaf_gloss(a) for a in (getattr(tok, "analyses", None) or ())):
+                ok += 1
+        return ok / len(tokens)
+
     def mer(self, ref_tokens, hyp_tokens) -> float:
         """
         Compute Morpheme Error Rate.

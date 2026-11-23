@@ -1,10 +1,11 @@
-# Bozo (Seben-Bozo) morphotactic patterns
-# macro definitions
-macro   @v@             <re>[aoeuiɔɛãẽĩõũɛ̃ɔ̃]</re>
-macro   @nasal-v@       <re>[ãẽĩõũɛ̃ɔ̃]</re>
-macro   @nonnasal-v@    <re>[aoeuiɔɛ]</re>
-macro   @cons@          <re>[bcdfghjklmɲŋprstvwyzɓ]</re>
-macro   @boz-cons@      [bcdfghjklmɲŋprstvwyzɓ]
+# Bozo (Seben-Bozo, boz) morphotactic patterns
+# version 2026.11.23 — revised from beni/data/raw/boz.txt & test.json
+
+# macro definitions (fixed: leading .* so multi-char stems match)
+macro   @v@             <re>.*[aoeuiɔɛãẽĩõũɛ̃ɔ̃]</re>
+macro   @nasal-v@       <re>.*([ãẽĩõũɛ̃ɔ̃]|[aoeuiɔɛ]n)</re>
+macro   @nonnasal-v@    <re>.*[aoeuiɔɛ]</re>
+macro   @cons@          <re>.*[bcdfghjklmɲŋprstvwyzɓ]</re>
 macro   @syl@           [^aoeuiɔɛãẽĩõũɛ̃ɔ̃]*(?P<V>[aoeuiɔɛãẽĩõũɛ̃ɔ̃])(?P=V)?(n(?=([^aoeuiɔɛãẽĩõũɛ̃ɔ̃]|$)))?
 
 # processing instructions
@@ -17,8 +18,7 @@ stage 0 apply lookup
 return if parsed
 stage 1 add sequential parse n_v_derivation
 stage 1 add parallel parse n_derivation
-stage 1 add parallel parse v_vq_derivation
-stage 1 add parallel parse vq_derivation
+stage 1 add parallel parse v_derivation
 stage 1 add parallel parse num_derivation
 stage 1 apply lookup
 return if parsed
@@ -26,80 +26,68 @@ stage 2 add parallel parse reduplication
 stage 2 apply lookup
 return if parsed
 stage 3 add parallel decompose pos_composition
+stage 3 apply lookup
 return if parsed
 stage 4 apply firstmatch parse nonbozo
 return if parsed
 
-#for sentence
+# --- INFLECTION ---
 section inflection
-# nominal inflection
-# -ye PL (general plural marker for nouns, adjectives, pronouns, determiners)
+# -ye / -yee PL (general plural marker: hageye, tɛmɛsagoye, jamanaye, sɛwɛye)
 pattern :n/adj/dtm/prn/ptcp/n.prop/num: [ {|ye}:: ] | :n/adj/dtm/prn/ptcp/n.prop/num: [:n/adj/dtm/prn/ptcp/n.prop/num: :mrph:PL]
-# Definite articles: gu (singular), guye (plural)
+pattern :n/adj/dtm/prn/ptcp/n.prop/num: [ {|yee}:: ] | :n/adj/dtm/prn/ptcp/n.prop/num: [:n/adj/dtm/prn/ptcp/n.prop/num: :mrph:PL]
+# Definite articles: -gu (singular), -guye (plural)
 pattern :n: [ {|gu}:: ] | :n: [:n: :mrph:DEF.SG]
 pattern :n: [ {|guye}:: ] | :n: [:n: :mrph:DEF.PL]
 
-# participles
+# --- PARTICIPLES ---
 section participles
-# -tį PRES.PTCP (e.g., xeeletį, jyɛtį)
+# -tį PRES.PTCP (xeeletį, jyɛtį)
 pattern :v/ptcp: [ {|tį}:: ] | :ptcp: [ :v: :mrph:PTCP.PRES]
-# -na PST.PTCP (e.g., saana, xalina, payina, paadina)
-pattern :v/ptcp: [ {@nasal-v@|na}:: ] | :ptcp: [ :v: :mrph:PTCP.PST]
-pattern :v/ptcp: [ {@nonnasal-v@|na}:: ] | :ptcp: [ :v: :mrph:PTCP.PST]
+# -na PST.PTCP (saana, xalina, payina)
+pattern :v/ptcp: [ {|na}:: ] | :ptcp: [ :v: :mrph:PTCP.PST]
 
-# derivative forms we need to consider even if we have them in dictionary
+# --- COMMON DERIVATION ---
 section common_derivation
-# -ya ABSTR / DEQU (e.g., mɛnɛya, Peresidanya, Minisiriya, Haadamajwɔnya)
+# -ya / -yaa ABSTR (mɛnɛya, Peresidanya, Minisiriya, hinituuya)
 pattern :n/adj/ptcp/v: [ {|ya}:: ] | :n: [:n/adj/ptcp/v: :mrph:ABSTR]
-# -ba AUGM
+pattern :n/adj/ptcp/v: [ {|yaa}:: ] | :n: [:n/adj/ptcp/v: :mrph:ABSTR]
+# -ba AUGM / -nin DIM
 pattern :n/adj/ptcp: [ {|ba}:: ] | :n/adj/ptcp: [:n/adj/ptcp: :mrph:AUGM]
-# -nin DIM
 pattern :ptcp/n/adj: [ {|nin}:: ] | :ptcp/n/adj: [:ptcp/n/adj: :mrph:DIM]
 
-# common nominal/verbal derivation (locatives/relational)
+# --- RELATIONAL / LOCATIVE ---
 section n_v_derivation
 pattern :n/n.prop: [ {|la}:: ] | :n/n.prop: [:n/n.prop: :mrph:LOC]
 pattern :n/n.prop: [ {|na}:: ] | :n/n.prop: [:n/n.prop: :mrph:LOC]
 
-# nominal derivation
+# --- NOMINAL DERIVATION ---
 section n_derivation
-# -jwɔn / -wɔn human/relational derivational suffix (e.g., haadamajwɔn, kaxɔjwɔn, xaranjwįn)
+# -jwɔn / -wɔn human/relational (haadamajwɔn, kaxɔjwɔn, syennkwɔ, jamanakwɔn)
 pattern :n: [ {|jwɔn}:: ] | :n: [:n: :mrph:HUM]
 pattern :n: [ {|wɔn}:: ] | :n: [:n: :mrph:HUM]
-# -tɔmɔ head/chief (e.g., depitetɔmɔ, senatɔmɔ, minisiritɔmɔ)
+pattern :n: [ {|kwɔn}:: ] | :n: [:n: :mrph:HUM]
+# -tɔmɔ head/chief, -xolo assembly, -baana manner/concept
 pattern :n: [ {|tɔmɔ}:: ] | :n: [:n: :mrph:HEAD]
-# -xolo assembly/group/tribunal (e.g., depitexolo, senatxolo, sariyajanxolo)
 pattern :n: [ {|xolo}:: ] | :n: [:n: :mrph:GROUP]
-# -baana concept/manner (e.g., welenbaana, sɛwɛbaana)
 pattern :n: [ {|baana}:: ] | :n: [:n: :mrph:CONCEPT]
-# -ma PRIV
-pattern :adj/n: [ {|ma}:: ] | :adj/n: [:n: :mrph:PRIV]
+pattern :n: [ {|ma}:: ] | :adj/n: [:n: :mrph:PRIV]
 
-# verbal/vq derivation
-section v_vq_derivation
-# -ni transitivizer/causative (e.g., gwo -> gwoni, munani)
-pattern :n: [ {@nasal-v@|ni}:: ] | :n: [ :v: :mrph:TR]
-pattern :n: [ {@nonnasal-v@|ni}:: ] | :n: [ :v: :mrph:TR]
-# -ya intransitivizer/adjectivizer (e.g., xolo -> xiliya, sire -> sireya)
+# --- VERBAL DERIVATION ---
+section v_derivation
+# -ni TR/CAUS, -ya INTR/DEADJ, -baga/-baa AG.OCC
+pattern :v: [ {|ni}:: ] | :v: [ :v: :mrph:TR]
 pattern :v: [ {|ya}:: ] | :v: [ :v: :mrph:INTR]
 pattern :adj: [ {|ya}:: ] | :v: [ :adj: :mrph:DEADJ]
-# -baga / -baa agent/occupational
 pattern :n: [ {|baga}:: ] | :n: [ :v: :mrph:AG.OCC]
 pattern :n: [ {|baa}:: ] | :n: [ :v: :mrph:AG.OCC]
 
-# vq derivation
-section vq_derivation
-pattern :vq: [ {|ya}:: ] | :n/v: [ :vq: :mrph:DEQU]
-pattern :adj: [ {|man}:: ] | :adj: [ :vq: :mrph:ADJ]
-
-# numeral derivation
+# --- NUMERAL DERIVATION ---
 section num_derivation
-# -na ORD (e.g., pendena, siyaana, naaranna, kyɛrimana)
-pattern :num: [ {@nasal-v@|na}:: ] | :num: [ :num: :mrph:ORD]
-pattern :num: [ {@nonnasal-v@|na}:: ] | :num: [ :num: :mrph:ORD]
+pattern :num: [ {|na}:: ] | :num: [ :num: :mrph:ORD]
 pattern :num: [ {<re>[0-9]+</re>|na}:: ] | :num: [ :num: :mrph:ORD]
 
-## reduplication
+# --- REDUPLICATION ---
 section reduplication
 pattern :v: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :v: [ :v: :v: ]
 pattern :adj: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :adj: ]
@@ -108,55 +96,28 @@ pattern :v: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :v: [ :v: :: :v
 pattern :adj: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :: :adj: ]
 pattern :num: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :num: [ :num: :: :num: ]
 
-## composition
-# general part-of-speech composition patterns
+# --- POS COMPOSITION ---
 section pos_composition
-
-# two-words composites
-# n.prop + n = n   ex: Malijamana
 pattern :n: [ :n.prop: :n: ] | :n: [ :n.prop: :n: ]
-# v/n + n = n   ex: xaranjwįn, haadamajwɔn, kaxɔjwɔn, sariyajan
 pattern :n: [ :n/v: :n: ] | :n: [ :n/v: :n: ]
-# n + v = n/v   ex: liwukun, naanbaa
 pattern :n/v: [ :n: :v: ] | :n/v: [ :n: :v: ]
-# n + adj/num = n   ex: jye lema, namu xalu
 pattern :n: [ :n: :adj/num: ] | :n: [ :n: :adj/num: ]
-# dtm + v = n
 pattern :n: [ :dtm: :v: ] | :n: [ :dtm: :v: ]
-# pp + n = n
 pattern :n: [ :pp: :n: ] | :n: [ :pp: :n: ]
-
-# three-words composites
-# n + adj/pp/num + n = n
 pattern :n: [ :n: :adj/pp/num: :n: ] | :n: [ :n: :adj/pp/num: :n: ]
-# dtm/n + v + n = n
 pattern :n: [ :dtm/n: :v: :n: ] | :n: [ :dtm/n: :v: :n: ]
-# n + pp + v = n/v   ex: laa-la-kama, suu-pa-lee
 pattern :n/v: [ :n: :pp: :v: ] | :n/v: [ :n: :pp: :v: ]
-# n+n+n = n    ex: sariyananjan, sɛgɛsɛgɛsariyajan
 pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
-
-# v+mrph+n  ex: mɛnɛya, Peresidanya
 pattern :n: [ :v: ya:mrph: ] | :n: [ :v: :mrph:ABSTR ]
 pattern :n: [ :v: ni:mrph: ] | :n: [ :v: :mrph:TR ]
 pattern :n: [ :n: ba:mrph: :n: ] | :n: [ :n: :mrph:AUGM :n: ]
-
-# v+mrph+v
 pattern :v: [ :v: ni:mrph: :v: ] | :v: [ :v: :mrph:TR :v: ]
-pattern :n: [ :v: ka:pm: :v: ] | :n: [ :v: kà:pm:INF :v: ]
-
-# four-words composites
-# n + pp + n + n = n
+pattern :n: [ :v: ka:pm: :v: ] | :n: [ :v: kà:pm:INF :v: ]
 pattern :n: [ :n: :pp: :n: :n: ] | :n: [ :n: :pp: :n: :n: ]
-# n + pp + adj + n = n
 pattern :n: [ :n: :pp: :adj: :n: ] | :n: [ :n: :pp: :adj: :n: ]
-# n+v+v+n
 pattern :n: [ :n: :v: :v: :n: ] | :n: [ :n: :v: :v: :n: ]
 
-# orthographically unlikely to be bozo words
-# for NEW orthography, with no tones marked
+# --- NON-BOZO FILTER (STAGE 4 = EMPR) ---
 section nonbozo
-# forms with symbols out of bozo alphabet (Bozo uses: a b c d e f g h i j k l m n ɲ ŋ o ɔ p r s t u v w y z ɓ ã ẽ ĩ õ ũ ɛ̃ ɔ̃)
-pattern <re>.*[qxçäëïüâêîôûéùàøðþ].*</re>:: | ::EMPR
-# two different vowels in sequence (Bozo uses single vowels or nasal vowels, not diphthongs)
-pattern <re>.*(?P<v>[aoeuiɔɛ])(?!(?P=v))(?=[aoeuiɔɛ]).*</re>:: | ::EMPR
+# Characters outside Bozo orthography (allows tonal vowels, nasal vowels, ɲ, ŋ, ɔ, ɛ, ɓ, ʃ)
+pattern <re>.*[qvxQVXçäëïöüâêîôûùøðþ].*</re>:: | ::EMPR

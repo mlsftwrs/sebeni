@@ -105,6 +105,14 @@ def _daba_modules():
     return mparser, ntgloss
 
 
+def _is_parsed_gloss(gloss) -> bool:
+    """Return True when a Daba gloss (or every leaf morpheme) carries a non-empty gloss."""
+    morphemes = getattr(gloss, "morphemes", None) or ()
+    if morphemes:
+        return all(_is_parsed_gloss(m) for m in morphemes)
+    return bool(str(getattr(gloss, "gloss", "") or "").strip())
+
+
 class DabaX(object):
     """Daba processor wrapping CLI ``mparser`` (no Wx)."""
 
@@ -120,16 +128,22 @@ class DabaX(object):
         tokenizer="default",
         runtime_dir: Optional[Union[str, Path]] = None,
         process: bool = False,
+        strict_parse: bool = True,
+        normalize_homoglyphs: bool = True,
     ):
         """Set up a Daba processor.
 
         If ``process`` is True, load baselines from the working dir (Distiller
         checkpoints) rather than packaged ``beni/data/baselines``.
+        If ``strict_parse`` is True, unglossed non-EMPR splits (phantom parses
+        from ``daba.newmorph``) are demoted to stage ``"-1"``.
         """
         identity = Language.from_code(str(lang)) if lang else Language.from_code("bam")
         self.lang = identity.group_code
         self.text = text
         self.tokenize_type = tokenizer
+        self.strict_parse = bool(strict_parse)
+        self.normalize_homoglyphs = bool(normalize_homoglyphs)
         self.runtime_dir = Path(runtime_dir) if runtime_dir else cfg.get_workdir().runtime
         self.runtime_dir.mkdir(parents=True, exist_ok=True)
 
@@ -182,6 +196,10 @@ class DabaX(object):
 
     def text_processor(self, text: str, eos: str='</s>', newline: str='\n'):
         """ Process Text """
+        if self.normalize_homoglyphs:
+            from beni.utils.normalize import normalize_homoglyphs
+
+            text = normalize_homoglyphs(text)
         text = self.__ensure_eos(text, eos=eos, newline=newline)
         texts = [t.strip() for t in text.split(eos) if t.strip()]
         mp = self.mparser()
@@ -237,6 +255,20 @@ class DabaX(object):
         """
 
         token, stage, glosses = token_data
+        if self.strict_parse:
+            st_str = str(stage)
+            if st_str not in ("-1", "tokenizer"):
+                try:
+                    is_nonneg = int(st_str) >= 0
+                except (TypeError, ValueError):
+                    is_nonneg = False
+                if is_nonneg:
+                    has_empr = any(
+                        str(getattr(g, "gloss", "") or "").strip().upper() == "EMPR"
+                        for g in glosses
+                    )
+                    if not has_empr and not any(_is_parsed_gloss(g) for g in glosses):
+                        stage = "-1"
 
         return {"token": token, "stage": stage, "analyses": [self.unwrap_gloss(g) for g in glosses]}
 
@@ -372,11 +404,25 @@ class DabaX(object):
 _DABAX_CACHE: Dict[tuple, "DabaX"] = {}
 
 
-def _dabax_cache_key(group: str, gram, ldict, runtime) -> tuple:
+def _dabax_cache_key(
+    group: str,
+    gram,
+    ldict,
+    runtime,
+    strict_parse: bool = True,
+    normalize_homoglyphs: bool = True,
+) -> tuple:
     def _norm(path):
         return str(Path(path)) if path is not None else None
 
-    return (group, _norm(gram), _norm(ldict), _norm(runtime))
+    return (
+        group,
+        _norm(gram),
+        _norm(ldict),
+        _norm(runtime),
+        bool(strict_parse),
+        bool(normalize_homoglyphs),
+    )
 
 
 def get_dabax(
@@ -387,6 +433,8 @@ def get_dabax(
     process: bool = True,
     runtime_dir: Optional[Union[str, Path]] = None,
     working_dir=None,
+    strict_parse: bool = True,
+    normalize_homoglyphs: bool = True,
 ) -> "DabaX":
     """Return a DabaX that already loaded this language's current G and D.
 
@@ -400,12 +448,18 @@ def get_dabax(
         resolved_gram, resolved_dict, _ = resolve_baseline_files(group, working_dir)
         gram = gram or resolved_gram
         ldict = ldict or resolved_dict
-    key = _dabax_cache_key(group, gram, ldict, runtime)
+    key = _dabax_cache_key(group, gram, ldict, runtime, strict_parse, normalize_homoglyphs)
     cached = _DABAX_CACHE.get(key)
     if cached is not None:
         return cached
     instance = DabaX(
-        group, gram=gram, ldict=ldict, process=process, runtime_dir=runtime
+        group,
+        gram=gram,
+        ldict=ldict,
+        process=process,
+        runtime_dir=runtime,
+        strict_parse=strict_parse,
+        normalize_homoglyphs=normalize_homoglyphs,
     )
     _DABAX_CACHE[key] = instance
     return instance

@@ -358,6 +358,15 @@ class SebeniDataLoader:
         text = str(text).strip() if self.config.strip_text else str(text)
         if self.config.skip_empty and not text: 
             return None
+        if getattr(self.config, "filter_corpus_noise", False):
+            from beni.utils.normalize import is_clean_corpus_line
+
+            if not is_clean_corpus_line(text):
+                return None
+        if getattr(self.config, "normalize_homoglyphs", True):
+            from beni.utils.normalize import normalize_homoglyphs
+
+            text = normalize_homoglyphs(text)
         return text[: self.config.max_text_len] if self.config.max_text_len else text
 
     def _append(self, text: Any, lang: Optional[str], source: Optional[Any] = None, lineno: Optional[int] = None) -> bool:
