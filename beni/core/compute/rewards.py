@@ -33,6 +33,11 @@ class RewardManager:
         self.scorer = scorer or MorphologyScorer()
         self.working_dir = Path(working_dir) if working_dir else cfg.get_workdir().root
         self.format_scores: List[float] = []
+        # Per-completion language identity for the SafetyGovernor: True (declared
+        # lang matches the row), False (mismatch or mixed), None (no JSON lang).
+        self.lang_ok: List[Optional[bool]] = []
+        self.mixed_language: List[bool] = []
+        self._observed_batch: Optional[Tuple[int, int, Tuple[str, ...]]] = None
         self.total_reward: float = 0.0
         self.predicted_stages: List[List[Any]] = []
         self.custom_rewards: Dict[str, Tuple[Callable, float]] = {}
@@ -65,6 +70,9 @@ class RewardManager:
 
     def clear(self) -> None:
         self.format_scores.clear()
+        self.lang_ok.clear()
+        self.mixed_language.clear()
+        self._observed_batch = None
         self.total_reward = 0.0
         self.predicted_stages.clear()
         self.recent_rewards.clear()
@@ -267,11 +275,88 @@ class RewardManager:
                 sentences.append(Sentence(text="", tokens=[]))
         return sentences
 
+    _LANG_FIELD = re.compile(r'"lang(?:uage)?"\s*:\s*"([^"]*)"')
+
+    @classmethod
+    def language_identity(
+        cls,
+        completion: Any,
+        expected: Optional[str],
+        allowed: Optional[Any] = None,
+    ) -> Tuple[Optional[bool], bool]:
+        """Return ``(ok, mixed)`` for one completion.
+
+        ``mixed`` is True when the completion declares more than one language
+        (several ``lang`` fields, or one listing several codes). ``ok`` is None
+        when no language is declared, else True iff it is exactly ``expected``
+        (or, when ``expected`` is unknown, one of the ``allowed`` codes).
+        """
+        from beni.core.language import Language
+
+        raw = cls.completion_text(completion)
+        declared = set()
+        for value in cls._LANG_FIELD.findall(raw):
+            for code in re.split(r"[,;/|+\s]+", value.strip().lower()):
+                if code:
+                    declared.add(Language.from_code(code).group_code)
+        if not declared:
+            return None, False
+        mixed = len(declared) > 1
+        if mixed:
+            return False, True
+        if not expected and allowed:
+            scope = {Language.from_code(str(code)).group_code for code in allowed}
+            return declared <= scope, False
+        want = Language.from_code(expected).group_code if expected else ""
+        return (bool(want) and declared == {want}), False
+
+    @classmethod
+    def target_valid(cls, completion: Any) -> bool:
+        """R_format validity: a JSON object with a ``tokens`` list."""
+        parsed = cls.extract_json(completion)
+        return bool(parsed and isinstance(parsed.get("tokens"), list))
+
+    def observe_targets(self, completions: List[Any], allowed: Optional[Any] = None) -> None:
+        """Record governor signals for training targets (SFT labels, DPO chosen).
+
+        Unlike the reward functions this adds nothing to the reward totals:
+        ``format_scores`` get 1.0 / 0.0 validity, ``lang_ok`` / ``mixed_language``
+        check the declared language against the run scope, and parsed stages
+        feed the uncertainty indicator.
+        """
+        for completion in completions:
+            valid = self.target_valid(completion)
+            self.format_scores.append(1.0 if valid else 0.0)
+            ok, mixed = self.language_identity(completion, None, allowed=allowed)
+            self.lang_ok.append(ok)
+            self.mixed_language.append(mixed)
+            if valid:
+                parsed = self.extract_json(completion)
+                sent = self.parse_json_to_sentence(parsed, parsed.get("text", ""))
+                self.predicted_stages.append([t.stage for t in sent.tokens])
+
+    def observe_language(self, completions: List[Any], language: Optional[List[str]] = None) -> None:
+        """Record per-completion language identity for the governor (once per batch)."""
+        # TRL calls every reward function with the same list for one batch; key on
+        # content hash and languages so a reused id() for a later batch is never skipped.
+        langs = list(language) if language else [""] * len(completions)
+        texts_hash = hash(tuple(self.completion_text(c) for c in completions)) if completions else 0
+        key = (len(completions), texts_hash, tuple(str(x) for x in langs))
+        if self._observed_batch == key:
+            return
+        self._observed_batch = key
+        for completion, lang in zip(completions, langs):
+            ok, mixed = self.language_identity(completion, lang)
+            self.lang_ok.append(ok)
+            self.mixed_language.append(mixed)
+
     def reward_format(self, 
         completions: List[str], 
         language: Optional[List[str]] = None, **kwargs) -> List[float]:
         """R_format: Valid JSON structure with a 'tokens' list."""
 
+        if language:
+            self.observe_language(completions, language)
         scores = []
         
         for text in completions:
@@ -316,35 +401,100 @@ class RewardManager:
         return scores
 
     def reward_rule(
-        self, prompts: List[Dict[str, Any]], completions: List[str], 
+        self, prompts: List[Dict[str, Any]], completions: List[str],
         language: Optional[List[str]] = None, reference=None, **kwargs) -> List[float]:
+        """R_rule: morphotactic adherence of the *claimed* analysis to DabaX's parse of the prompt.
 
-        """R_rule: POS/valence adherence via Phi & MCS against the reference."""
+        Each claimed token earns the reference token's Φ weight
+        (``stage_to_phi``) only when its surface, stage, and first analysis
+        (form + part of speech) match the reference token at the same position; the mean runs over max(len(pred), len(ref)).
+        This is averaged with the lemma overlap. The completion's own ``text``
+        is never re-parsed, so copying the input sentence earns nothing by
+        itself (#16). Without a reference column, the prompt's user sentence
+        is parsed with DabaX.
+        """
+        from beni.core.compute.helpers import stage_to_phi
+
         predicted = self.completions_to_sentences(completions)
-        reference_sentences = self._parse_references(prompts, reference=reference)
         langs = language or [""] * len(completions)
+        reference_sentences = self._parse_references(prompts or [{}] * len(completions), reference=reference)
+        if reference is None:
+            reference_sentences = [
+                ref if ref.tokens else self._parse_prompt_sentence(prompt, lang)
+                for ref, prompt, lang in zip(reference_sentences, prompts or [{}] * len(completions), langs)
+            ]
 
         scores = []
-        for i, (pred_sent, ref_sent, lang) in enumerate(zip(predicted, reference_sentences, langs)):
-            try:
-                daba_x = self._dabax(lang)
-                pred_loaded = daba_x.loader(pred_sent.text) if pred_sent.text else []
-            except Exception:
-                pred_loaded = []
-            pred_sent = pred_loaded[0] if pred_loaded else pred_sent
-
-            phi_score = self.scorer.phi(pred_sent)
+        for pred_sent, ref_sent, lang in zip(predicted, reference_sentences, langs):
+            pred_tokens = list(pred_sent.tokens or [])
+            ref_tokens = list(ref_sent.tokens or [])
+            if not pred_tokens or not ref_tokens:
+                scores.append(0.0)
+                continue
+            row_lang = lang or getattr(ref_sent, "lang", None)
+            consistent = sum(
+                stage_to_phi(
+                    ref.stage,
+                    empr=self.scorer.empr,
+                    eps=self.scorer.eps,
+                    lang=row_lang,
+                    token=ref,
+                )
+                for pred, ref in zip(pred_tokens, ref_tokens)
+                if str(pred.surface) == str(ref.surface)
+                and str(pred.stage) == str(ref.stage)
+                and self._analysis_matches(pred, ref)
+            ) / max(len(pred_tokens), len(ref_tokens))
             lexical_score = self._lemma_overlap(pred_sent, ref_sent)
 
-            score = self.config.rule_weight * 0.5 * (phi_score + lexical_score)
+            score = self.config.rule_weight * 0.5 * (consistent + lexical_score)
             scores.append(score)
 
             self.total_reward += score
-            self.predicted_stages.append([t.stage for t in pred_sent.tokens])
+            self.predicted_stages.append([t.stage for t in pred_tokens])
 
         if scores:
             self.recent_rewards["reward_rule"] = float(sum(scores) / len(scores))
         return scores
+
+    @staticmethod
+    def _analysis_matches(pred: Any, ref: Any) -> bool:
+        """The claimed first analysis is one of the reference analyses (same form, overlapping POS)."""
+        pred_analyses = list(getattr(pred, "analyses", None) or [])
+        ref_analyses = list(getattr(ref, "analyses", None) or [])
+        if not ref_analyses:
+            return True  # nothing to compare against; surface + stage already matched
+        if not pred_analyses:
+            return False
+        claimed = pred_analyses[0]
+        claimed_ps = {str(p) for p in (claimed.ps or [])}
+        for option in ref_analyses:
+            if str(option.form) != str(claimed.form):
+                continue
+            option_ps = {str(p) for p in (option.ps or [])}
+            if not option_ps or claimed_ps & option_ps:
+                return True
+        return False
+
+    def _parse_prompt_sentence(self, prompt: Any, lang: str) -> Sentence:
+        """DabaX parse of the user sentence in a chat prompt (empty Sentence on failure)."""
+        text = ""
+        if isinstance(prompt, list):
+            for message in reversed(prompt):
+                if isinstance(message, dict) and message.get("role") == "user":
+                    text = str(message.get("content") or "")
+                    break
+        elif isinstance(prompt, dict):
+            text = str(prompt.get("content") or "") if prompt.get("role") == "user" else ""
+        elif isinstance(prompt, str):
+            text = prompt
+        if not text:
+            return Sentence(text="", tokens=[])
+        try:
+            parsed = self._dabax(lang).loader(text) or []
+        except Exception:
+            parsed = []
+        return parsed[0] if parsed else Sentence(text=text, tokens=[])
 
     @staticmethod
     def _parse_references(prompts: List[Dict[str, Any]], reference=None) -> List[Sentence]:
@@ -388,21 +538,16 @@ class RewardManager:
         **kwargs,
     ) -> List[float]:
         """R_lang: language identity. Mixed or mismatched JSON ``lang`` scores 0."""
-        from beni.core.language import Language
-
         scores = []
         langs = language or [""] * len(completions)
         weight = getattr(self.config, "lang_weight", 0.1)
 
+        if language:
+            self.observe_language(completions, language)
         for text, lang in zip(completions, langs):
             parsed = self.extract_json(text)
-            expected = Language.from_code(lang).group_code if lang else ""
-            got = str(parsed.get("lang", "") or "").strip().lower()
-            if not parsed or not expected or not got:
-                score = 0.0
-            else:
-                got_group = Language.from_code(got).group_code
-                score = weight if got_group == expected else 0.0
+            ok, _mixed = self.language_identity(text, lang)
+            score = weight if (parsed and ok) else 0.0
             scores.append(score)
             self.total_reward += score
 
@@ -423,7 +568,7 @@ class RewardManager:
             completions, language=languages, reference=reference, prompts=prompts
         )
         rule_scores = self.reward_rule(
-            completions, prompts=prompts, language=languages, reference=reference
+            prompts=prompts, completions=completions, language=languages, reference=reference
         )
         lang_scores = self.reward_lang(completions, language=languages) if getattr(
             self.config, "enable_lang_reward", False) else [0.0] * len(completions)

@@ -1,6 +1,6 @@
 site_name: "sebeni@docs:~$"
 site_description: Self-aware morphotactic generation toolkit for extremely low-resource languages
-site_url: https://seben.robotsmali.org/docs/
+site_url: https://mlsftwrs.github.io/sebeni/
 site_author: RobotsMali
 repo_url: https://github.com/mlsftwrs/sebeni
 repo_name: mlsftwrs/sebeni
@@ -113,9 +113,11 @@ nav:
       - Hyperparameters: hyperparams.md
       - Wordfreq: wordfreq.md
       - Hub: hub.md
+      - Matrix and cloud runs: scripts.md
       - Contributing: contributing.md
       - API:
           - Overview: api/index.md
+          - Pipeline: api/pipeline.md
           - SRL: api/srl.md
           - Safety: api/safety.md
           - Compute: api/compute.md

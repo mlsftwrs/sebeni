@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict, List, Optional, Union
 
 from datasets import Dataset
@@ -10,6 +11,40 @@ from beni.core.srl.config import (
 from beni.core.srl.plugin import AlignmentPlugin
 from beni.core.morphotactic.distil.distillation import Distiller
 from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
+from beni.core.kveritas import active as kv_active
+
+
+def _trl_default_num_generations() -> int:
+    """TRL's own ``num_generations`` default, used when the config leaves it unset."""
+    import dataclasses
+
+    for f in dataclasses.fields(GRPOConfig):
+        if f.name == "num_generations" and isinstance(f.default, int):
+            return f.default
+    return 8
+
+
+def _guard_eval_batch(grpo_dict: Dict[str, Any]) -> None:
+    """Round ``per_device_eval_batch_size`` up so TRL's eval groups divide evenly.
+
+    TRL requires ``per_device_eval_batch_size * world_size`` to be divisible by
+    ``num_generations_eval or num_generations`` whenever evaluation runs.
+    """
+    num_gen = int(
+        grpo_dict.get("num_generations_eval") or grpo_dict.get("num_generations") or _trl_default_num_generations()
+    )
+    world = max(1, int(os.environ.get("WORLD_SIZE", "1") or 1))
+    current = max(1, int(grpo_dict.get("per_device_eval_batch_size") or 1))
+    if (current * world) % num_gen == 0:
+        return
+    adjusted = current
+    while (adjusted * world) % num_gen != 0:
+        adjusted += 1
+    print(
+        f"[GRPO Guard] Adjusted per_device_eval_batch_size from {current} to {adjusted} "
+        f"so the global eval batch ({adjusted} x {world}) is divisible by num_generations ({num_gen})."
+    )
+    grpo_dict["per_device_eval_batch_size"] = adjusted
 
 
 class SebeniGrpo(AlignmentPlugin):
@@ -108,34 +143,16 @@ class SebeniGrpo(AlignmentPlugin):
         else:
             dataset = data
 
-        train_dataset = dataset
-        eval_dataset = None
-        eval_ratio = getattr(self.config.data, "eval_ratio", 0.0) or 0.0
-        max_eval = getattr(self.config.experiment, "max_eval_rows", None)
-        if (eval_ratio > 0.0 or (max_eval and max_eval > 0)) and hasattr(dataset, "train_test_split") and len(dataset) > 1:
-            n_samples = len(dataset)
-            if max_eval is not None and max_eval > 0:
-                target_test = min(int(max_eval), max(1, n_samples - 1))
-                if n_samples > 2 and target_test >= n_samples:
-                    target_test = max(1, n_samples // 2)
-                test_size = target_test
-            else:
-                test_size = eval_ratio
-
-            split = dataset.train_test_split(test_size=test_size, seed=self.config.trainer.seed)
-            train_dataset = split["train"]
-            eval_dataset = split["test"]
-            if max_eval is not None and max_eval > 0 and len(eval_dataset) > max_eval:
-                if hasattr(eval_dataset, "select"):
-                    eval_dataset = eval_dataset.select(range(max_eval))
-                else:
-                    eval_dataset = eval_dataset[:max_eval]
+        train_dataset, eval_dataset = self.split_eval(dataset, seed=self.config.trainer.seed)
 
         if self.model is None:
             self.load_models()
 
         project_name = project_name or self.config.project_name
         grpo_dict = self.config.trainer.to_dict()
+        # Hub uploads go through the SafetyGovernor (push_after_train / sebeni push), never
+        # through HF Trainer's own checkpoint pushes, which would bypass the gate.
+        grpo_dict["push_to_hub"] = False
 
         model_name_lower = (self.config.model.model_name or "").lower()
         is_gemma4 = "gemma-4" in model_name_lower or "gemma4" in model_name_lower
@@ -177,10 +194,12 @@ class SebeniGrpo(AlignmentPlugin):
                 grpo_dict["eval_steps"] = max(1, max_st // 10) if max_st else max(1, grpo_dict.get("logging_steps", 10))
 
         if "per_device_eval_batch_size" not in grpo_dict or not grpo_dict["per_device_eval_batch_size"]:
-            grpo_dict["per_device_eval_batch_size"] = min(int(grpo_dict.get("per_device_train_batch_size", 1) or 1), 1)
+            grpo_dict["per_device_eval_batch_size"] = 1
+        if eval_dataset is not None:
+            _guard_eval_batch(grpo_dict)
 
         # Guard: effective batch size must be divisible by num_generations for GRPO group advantage calculation
-        num_gen = grpo_dict.get("num_generations", 4) or 4
+        num_gen = grpo_dict.get("num_generations") or _trl_default_num_generations()
         per_dev_bs = grpo_dict.get("per_device_train_batch_size", 1) or 1
         grad_accum = grpo_dict.get("gradient_accumulation_steps", 1) or 1
         if (per_dev_bs * grad_accum) % num_gen != 0:
@@ -203,7 +222,7 @@ class SebeniGrpo(AlignmentPlugin):
         reward_funcs = self.reward_manager.get_reward_functions()
 
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
-        if getattr(self.config.experiment, "kveritas", False):
+        if kv_active(self.config):
             from beni.core.srl.grpo.callbacks import KVeritasCallback
             callbacks.append(KVeritasCallback(reward_manager=self.reward_manager, config=self.config, eval_dataset=eval_dataset))
         if extra_callbacks:
@@ -235,12 +254,7 @@ class SebeniGrpo(AlignmentPlugin):
         train_result = self.trainer.train()
         self.save_model(self.config.trainer.output_dir)
 
-        if self.config.trainer.push_to_hub:
-            self.push_to_hub(
-                repo_id=self.config.trainer.hub_model_id,
-                token=self.config.trainer.hub_token,
-                private=self.config.trainer.hub_private_repo,
-            )
+        self.push_after_train(self.config.trainer)
 
         self._finish_trackio()
         return train_result

@@ -7,12 +7,12 @@ no stable inspect signature and broke the API pages). Commands:
 | --- | --- |
 | `sebeni init` | Write `config.yaml` + workdir (`--lang` repeatable) |
 | `sebeni train` | SAMPG + policy-update plugin; `--lr`, `--lora-r`, … |
-| `sebeni exp` | Packaged multilingual train + eval (`experiment` alias) |
+| `sebeni exp` | Multilingual train + eval on `data.source` or the packaged data (`experiment` alias) |
 | `sebeni distill` | Distiller only |
-| `sebeni eval` | Φ per language → `exp/eval.json` |
+| `sebeni eval` | Φ, MER, MCS, UWEC of the trained weights (`--weights`) per language and pooled → `exp/eval.json` |
 | `sebeni wordfreq` | Surfaces / lemmas / morphemes / stages |
-| `sebeni generate` | Policy decode + R_format / R_lang warnings |
-| `sebeni push` | Hub upload (card + snapshot required) |
+| `sebeni generate` | Trained-policy decode (`--weights`, `--max-new-tokens`) + R_format / R_lang warnings |
+| `sebeni push` | Hub upload of the trained weights (card + eval snapshot for those weights required) |
 
 ```bash
 sebeni init --lang bam --lang mku -w ./runs/manding-001
@@ -26,5 +26,12 @@ sebeni train --help
     options:
       show_root_heading: true
       heading_level: 2
+
+!!! note
+    `sebeni eval`, `generate`, and `push` load the trained weights from
+    `--weights` (default the arm's output dir, `{working_dir}/models`): a LoRA
+    adapter is attached to a fresh base model, a full checkpoint is loaded
+    directly. Without trained weights `eval` scores the base model with a
+    warning and `push` refuses.
 
 See [CLI and config](../cli.md) and [Use cases](../use-cases.md).

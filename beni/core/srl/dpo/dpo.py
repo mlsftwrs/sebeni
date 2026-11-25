@@ -6,9 +6,11 @@ from typing import Any, Dict, List, Optional, Union
 
 from datasets import Dataset
 
+from beni.core.compute.rewards import RewardManager
 from beni.core.srl.config import trl_config_kwargs
 from beni.core.srl.plugin import AlignmentPlugin
 from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
+from beni.core.kveritas import active as kv_active
 from beni.data.datasets import rank_group_to_preference
 
 
@@ -16,6 +18,7 @@ class SebeniDpo(AlignmentPlugin):
     """TRL DPOTrainer. Preference pairs are built from frozen grammar and dictionary."""
 
     name = "dpo"
+    signal_source = "targets"
 
     def _preference_dataset(self, data: Union[List[Dict[str, Any]], Dataset]) -> Dataset:
         if isinstance(data, Dataset):
@@ -30,6 +33,18 @@ class SebeniDpo(AlignmentPlugin):
             records, scheme_prompt=True, languages=self.config.languages()
         )
 
+    def _rendered_conversation(self, row: Dict[str, Any], answer_key: str) -> str:
+        """Prompt plus one answer, rendered with the chat template when the row is conversational."""
+        prompt, answer = row.get("prompt"), row.get(answer_key)
+        if (
+            isinstance(prompt, list)
+            and isinstance(answer, list)
+            and self.tokenizer is not None
+            and getattr(self.tokenizer, "chat_template", None)
+        ):
+            return self.tokenizer.apply_chat_template(prompt + answer, tokenize=False)
+        return RewardManager.completion_text(prompt) + RewardManager.completion_text(answer)
+
     def train(
         self,
         data,
@@ -43,34 +58,33 @@ class SebeniDpo(AlignmentPlugin):
             [data[i] for i in range(len(data))] if isinstance(data, Dataset) else data
         )
         dataset = self._preference_dataset(self._preference_records)
-        train_dataset = dataset
-        eval_dataset = None
-        eval_ratio = getattr(self.config.data, "eval_ratio", 0.0) or 0.0
-        max_eval = getattr(self.config.experiment, "max_eval_rows", None)
-        if (eval_ratio > 0.0 or (max_eval and max_eval > 0)) and hasattr(dataset, "train_test_split") and len(dataset) > 1:
-            n_samples = len(dataset)
-            if max_eval is not None and max_eval > 0:
-                target_test = min(int(max_eval), max(1, n_samples - 1))
-                if n_samples > 2 and target_test >= n_samples:
-                    target_test = max(1, n_samples // 2)
-                test_size = target_test
-            else:
-                test_size = eval_ratio
-
-            split = dataset.train_test_split(test_size=test_size, seed=self.config.dpo.seed)
-            train_dataset = split["train"]
-            eval_dataset = split["test"]
-            if max_eval is not None and max_eval > 0 and len(eval_dataset) > max_eval:
-                if hasattr(eval_dataset, "select"):
-                    eval_dataset = eval_dataset.select(range(max_eval))
-                else:
-                    eval_dataset = eval_dataset[:max_eval]
+        # SafetyGovernor: the gradient pulls θ towards "chosen", so refuse invalid,
+        # wrong-language or mixed-language chosen answers before training.
+        rows = [dataset[i] for i in range(len(dataset))]
+        kept = self.gate_targets(rows, completion_key="chosen", lang_key="language")
+        if not kept:
+            raise RuntimeError(f"SafetyGovernor refused every preference pair: {self.target_gate_report}")
+        if self.model is None:
+            self.load_models()
+        kept = self.drop_overlength(
+            kept,
+            # Count the fully rendered conversation (template suffix included), as TRL tokenizes it.
+            prompt_of=lambda row: "",
+            answers_of=lambda row: [self._rendered_conversation(row, "chosen"), self._rendered_conversation(row, "rejected")],
+            max_length=getattr(self.config.dpo, "max_length", None),
+        )
+        if len(kept) != len(rows):
+            dataset = Dataset.from_list(kept)
+        train_dataset, eval_dataset = self.split_eval(dataset, seed=self.config.dpo.seed)
 
         if self.model is None:
             self.load_models()
 
         project_name = project_name or self.config.project_name
         dpo_dict = self.config.dpo.to_dict()
+        # Hub uploads go through the SafetyGovernor (push_after_train / sebeni push), never
+        # through HF Trainer's own checkpoint pushes, which would bypass the gate.
+        dpo_dict["push_to_hub"] = False
         if eval_dataset is not None:
             if "eval_strategy" not in dpo_dict or not dpo_dict["eval_strategy"]:
                 dpo_dict["eval_strategy"] = "steps"
@@ -93,7 +107,7 @@ class SebeniDpo(AlignmentPlugin):
             )
         )
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
-        if getattr(self.config.experiment, "kveritas", False):
+        if kv_active(self.config):
             from beni.core.srl.grpo.callbacks import KVeritasCallback
             callbacks.append(KVeritasCallback(reward_manager=self.reward_manager, config=self.config, eval_dataset=eval_dataset))
         if extra_callbacks:
@@ -116,11 +130,6 @@ class SebeniDpo(AlignmentPlugin):
         print("Starting Sebeni DPO Training Loop...")
         result = self.trainer.train()
         self.save_model(self.config.dpo.output_dir or self.config.trainer.output_dir)
-        if self.config.dpo.push_to_hub:
-            self.push_to_hub(
-                repo_id=self.config.dpo.hub_model_id,
-                token=self.config.dpo.hub_token,
-                private=self.config.dpo.hub_private_repo,
-            )
+        self.push_after_train(self.config.dpo)
         self._finish_trackio()
         return result

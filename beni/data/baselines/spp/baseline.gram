@@ -1,9 +1,11 @@
-# Seynara (SPP) morphotactic patterns
+# Seynara / Supyire Senufo (spp) morphotactic patterns
+# version 2026.11.23 — revised from beni/data/raw/spp.txt & test.json
+# Fixes: removed Bambara/Songhay copy-paste (-kayna, -ndi, -man); fixed nonSPP so tonal vowels are NOT EMPR!
+
 # macro definitions
-macro   @v@             <re>[aoeuiɛɔͻ]</re>
-macro   @cons@          <re>[bcdfghjklmɲŋprstwy]</re>
-macro   @spp-cons@      [bcdfghjklmɲŋprstwy]
-macro   @syl@           [^aoeuiɛɔͻ]*(?P<V>[aoeuiɛɔͻ])(?P=V)?
+macro   @v@             <re>.*[aoeuiɛɔàáâèéêìíîòóôùúû]</re>
+macro   @cons@          <re>.*[bcdfghjklmɲŋprstwy]</re>
+macro   @syl@           [^aoeuiɛɔ]*(?P<V>[aoeuiɛɔ])(?P=V)?
 
 # processing instructions
 plan
@@ -14,8 +16,7 @@ stage 0 apply lookup
 return if parsed
 stage 1 add sequential parse n_v_derivation
 stage 1 add parallel parse n_derivation
-stage 1 add parallel parse v_vq_derivation
-stage 1 add parallel parse vq_derivation
+stage 1 add parallel parse v_derivation
 stage 1 add parallel parse num_derivation
 stage 1 apply lookup
 return if parsed
@@ -23,137 +24,93 @@ stage 2 add parallel parse reduplication
 stage 2 apply lookup
 return if parsed
 stage 3 add parallel decompose pos_composition
+stage 3 apply lookup
 return if parsed
 stage 4 apply firstmatch parse nonSPP
 return if parsed
 
-#for sentence
+# --- INFLECTION (Senufo Noun Class Suffixes & Nasal Proclitics) ---
 section inflection
-# nominal inflection
-# Plural markers: -bi, -yi, -wi, -pyi (e.g., sindikabii, kilifeeti, kɔngɛrɛwi, fanhapyi)
-pattern :n/adj/prn/n.prop/num: [ {|bi}:: ] | :n/adj/prn/n.prop/num: [:n/adj/prn/n.prop/num: :mrph:PL]
-pattern :n/adj/prn/n.prop/num: [ {|yi}:: ] | :n/adj/prn/n.prop/num: [:n/adj/prn/n.prop/num: :mrph:PL]
-pattern :n/adj/prn/n.prop/num: [ {|wi}:: ] | :n/adj/prn/n.prop/num: [:n/adj/prn/n.prop/num: :mrph:PL]
-pattern :n/adj/prn/n.prop/num: [ {|pyi}:: ] | :n/adj/prn/n.prop/num: [:n/adj/prn/n.prop/num: :mrph:PL]
+# Human / Animate classes: -ŋi / -ŋɔ (sg), -bi / -bii / -pi / -pyi (pl)
+pattern :n/adj/prn/n.prop: [ {|ŋi}:: ] | :n/adj/prn/n.prop: [ :n/adj/prn/n.prop: :mrph:DEF.CL1 ]
+pattern :n/adj/prn/n.prop: [ {|ŋɔ}:: ] | :n/adj/prn/n.prop: [ :n/adj/prn/n.prop: :mrph:DEF.CL1 ]
+pattern :n/adj/prn/n.prop: [ {|bii}:: ] | :n/adj/prn/n.prop: [ :n/adj/prn/n.prop: :mrph:PL.CL2 ]
+pattern :n/adj/prn/n.prop: [ {|bi}:: ] | :n/adj/prn/n.prop: [ :n/adj/prn/n.prop: :mrph:PL.CL2 ]
+pattern :n/adj/prn/n.prop: [ {|pyi}:: ] | :n/adj/prn/n.prop: [ :n/adj/prn/n.prop: :mrph:PL.CL2 ]
+pattern :n/adj/prn/n.prop: [ {|pi}:: ] | :n/adj/prn/n.prop: [ :n/adj/prn/n.prop: :mrph:PL.CL2 ]
 
-# derivative forms we need to consider even if we have them in dictionary
+# Non-human / Collective classes: -gi/-ge/-gɔ/-ki/-ke/-kɔ (sg), -yi/-yee (pl), -li/-le/-ri/-re (sg), -ni (sg), -mu/-mi (mass)
+pattern :n/adj: [ {|gi}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL3 ]
+pattern :n/adj: [ {|ge}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL3 ]
+pattern :n/adj: [ {|gɔ}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL3 ]
+pattern :n/adj: [ {|ki}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL3 ]
+pattern :n/adj: [ {|ke}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL3 ]
+pattern :n/adj: [ {|kɔ}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL3 ]
+pattern :n/adj: [ {|yi}:: ] | :n/adj: [ :n/adj: :mrph:PL.CL4 ]
+pattern :n/adj: [ {|wi}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL ]
+pattern :n/adj: [ {|li}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL5 ]
+pattern :n/adj: [ {|le}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL5 ]
+pattern :n/adj: [ {|ri}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL5 ]
+pattern :n/adj: [ {|re}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL5 ]
+pattern :n/adj: [ {|ni}:: ] | :n/adj: [ :n/adj: :mrph:DEF.CL ]
+pattern :n/adj: [ {|mu}:: ] | :n/adj: [ :n/adj: :mrph:MASS.LIQ ]
+pattern :n/adj: [ {|mi}:: ] | :n/adj: [ :n/adj: :mrph:MASS.LIQ ]
+
+# Hyphenated proclitics (n-, m-, ɲ-, ŋ-)
+pattern :v/n: [ {n-|}:: ] | :v/n: [ :mrph:SERIAL :v/n: ]
+pattern :v/n: [ {m-|}:: ] | :v/n: [ :mrph:SERIAL :v/n: ]
+
+# --- COMMON DERIVATION (Institutional & Legal) ---
 section common_derivation
-# Abstract / Institutional suffixes: -wi, -li, -gi, -ma, -ŋa, -ri
-pattern :n/adj/v: [ {|wi}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
-pattern :n/adj/v: [ {|li}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
-pattern :n/adj/v: [ {|gi}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
-pattern :n/adj/v: [ {|ma}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
-pattern :n/adj/v: [ {|ŋa}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
-pattern :n/adj/v: [ {|ri}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
+pattern :n/adj/v: [ {|gbagi}:: ] | :n: [ :n/adj/v: :mrph:INST ]
+pattern :n/adj/v: [ {|gbagɔhɔ}:: ] | :n: [ :n/adj/v: :mrph:INST ]
+pattern :n/adj/v: [ {|gbagbɔhɔ}:: ] | :n: [ :n/adj/v: :mrph:INST ]
+pattern :n/adj/v: [ {|gbɔhɔ}:: ] | :n: [ :n/adj/v: :mrph:INST ]
+pattern :n/adj/v: [ {|bile}:: ] | :n: [ :n/adj/v: :mrph:ART.LAW ]
+pattern :n/adj/v: [ {|ɲungɔ}:: ] | :n: [ :n/adj/v: :mrph:DIV ]
 
-# Legal / Institutional specific derivations
-# -gbagi / -gbagɔhɔ / -gbagbɔhɔ (Court / Chamber / Assembly, e.g., depitegbagi, sariyagbagɔhɔ, kirikɔngbagbɔhɔ)
-pattern :n/adj/v: [ {|gbagi}:: ] | :n: [:n/adj/v: :mrph:INST]
-pattern :n/adj/v: [ {|gbagɔhɔ}:: ] | :n: [:n/adj/v: :mrph:INST]
-pattern :n/adj/v: [ {|gbagbɔhɔ}:: ] | :n: [:n/adj/v: :mrph:INST]
-# -bile (Article of law, e.g., sariyabile)
-pattern :n/adj/v: [ {|bile}:: ] | :n: [:n/adj/v: :mrph:ART.LAW]
-# -ɲungɔ (Chapter / Title / Division, e.g., kaɲungɔ)
-pattern :n/adj/v: [ {|ɲungɔ}:: ] | :n: [:n/adj/v: :mrph:DIV]
-
-# common nominal/verbal derivation (locatives/relational)
+# --- RELATIONAL CLITICS ---
 section n_v_derivation
-# Postpositions acting as relational clitics
-pattern :n/n.prop: [ {|na}:: ] | :n/n.prop: [:n/n.prop: :mrph:LOC]
-pattern :n/n.prop: [ {|maa}:: ] | :n/n.prop: [:n/n.prop: :mrph:DAT]
-pattern :n/n.prop: [ {|cɛ}:: ] | :n/n.prop: [:n/n.prop: :mrph:BEN]
-pattern :n/n.prop: [ {|ɲɛ}:: ] | :n/n.prop: [:n/n.prop: :mrph:GEN]
-pattern :n/n.prop: [ {|li}:: ] | :n/n.prop: [:n/n.prop: :mrph:GEN]
+pattern :n/n.prop: [ {|maa}:: ] | :n/n.prop: [ :n/n.prop: :mrph:DAT ]
+pattern :n/n.prop: [ {|cɛ}:: ] | :n/n.prop: [ :n/n.prop: :mrph:BEN ]
 
-# nominal derivation
+# --- NOMINAL DERIVATION ---
 section n_derivation
-# Agent / Occupation: -kɔn, -nyɔ
-pattern :n: [ {|kɔn}:: ] | :n: [ :v/n: :mrph:AG]
-pattern :n: [ {|nyɔ}:: ] | :n: [ :v/n: :mrph:AG]
-# Augmentative: -ba
-pattern :n/adj: [ {|ba}:: ] | :n/adj: [:n/adj: :mrph:AUGM]
-# Diminutive: -kayna
-pattern :n/adj: [ {|kayna}:: ] | :n/adj: [:n/adj: :mrph:DIM]
+# Agent / Owner (-feebi, -fɛɛ, -foowi, -fo, -kɔn, -nyɔ)
+pattern :n: [ {|feebi}:: ] | :n: [ :v/n: :mrph:AG.PL ]
+pattern :n: [ {|fɛɛ}:: ] | :n: [ :v/n: :mrph:AG.PL ]
+pattern :n: [ {|foowi}:: ] | :n: [ :v/n: :mrph:OWNER.SG ]
+pattern :n: [ {|kɔn}:: ] | :n: [ :v/n: :mrph:AG ]
+pattern :n: [ {|nyɔ}:: ] | :n: [ :v/n: :mrph:AG ]
 
-# verbal/vq derivation
-section v_vq_derivation
-# Causative: -ndi, -in, -an
-pattern :v: [ {|ndi}:: ] | :v: [ :v: :mrph:CAUS]
-pattern :v: [ {|in}:: ] | :v: [ :v: :mrph:CAUS]
-pattern :v: [ {|an}:: ] | :v: [ :v: :mrph:INTR]
-# Nominalizer: -li, -gi
-pattern :n: [ {|li}:: ] | :n: [ :v: :mrph:NMLZ]
-pattern :n: [ {|gi}:: ] | :n: [ :v: :mrph:NMLZ]
+# --- VERBAL DERIVATION ---
+section v_derivation
+# Verbal noun / resultative / suffixal extensions
+pattern :v: [ {|gɛ}:: ] | :v: [ :v: :mrph:CAUS ]
+pattern :n: [ {|nki}:: ] | :n: [ :v: :mrph:NMLZ ]
 
-# vq derivation
-section vq_derivation
-pattern :vq: [ {|ya}:: ] | :n/v: [ :vq: :mrph:DEQU]
-pattern :adj: [ {|man}:: ] | :adj: [ :vq: :mrph:ADJ]
-
-# numeral derivation
+# --- NUMERAL DERIVATION ---
 section num_derivation
-pattern :num: [ {|wi}:: ] | :num: [ :num: :mrph:DISTR]
+pattern :num: [ {|wi}:: ] | :num: [ :num: :mrph:DISTR ]
 
-## reduplication
+# --- REDUPLICATION ---
 section reduplication
 pattern :v: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :v: [ :v: :v: ]
 pattern :adj: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :adj: ]
-pattern :num: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :num: [ :num: :num: ]
 pattern :v: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :v: [ :v: :: :v: ]
-pattern :adj: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :: :adj: ]
-pattern :num: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :num: [ :num: :: :num: ]
+pattern :n: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :n: [ :n: :: :n: ]
 
-## composition
-# general part-of-speech composition patterns
+# --- POS COMPOSITION ---
 section pos_composition
-
-# two-words composites
-# n.prop + n = n   ex: Mali taari
 pattern :n: [ :n.prop: :n: ] | :n: [ :n.prop: :n: ]
-# v/n + n = n   ex: sariyagbagɔhɔ, fanhasariyavɛna, depitegbagi
 pattern :n: [ :n/v: :n: ] | :n: [ :n/v: :n: ]
-# n + v = n/v
 pattern :n/v: [ :n: :v: ] | :n/v: [ :n: :v: ]
-# n + adj/num = n
 pattern :n: [ :n: :adj/num: ] | :n: [ :n: :adj/num: ]
-# dtm + v = n
-pattern :n: [ :dtm: :v: ] | :n: [ :dtm: :v: ]
-# pp + n = n
 pattern :n: [ :pp: :n: ] | :n: [ :pp: :n: ]
-
-# three-words composites
-# n + adj/pp/num + n = n
 pattern :n: [ :n: :adj/pp/num: :n: ] | :n: [ :n: :adj/pp/num: :n: ]
-# dtm/n + v + n = n
-pattern :n: [ :dtm/n: :v: :n: ] | :n: [ :dtm/n: :v: :n: ]
-# n + pp + v = n/v
-pattern :n/v: [ :n: :pp: :v: ] | :n/v: [ :n: :pp: :v: ]
-# n+n+n = n
 pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
 
-# v+mrph+n  ex: sariyagbagɔhɔ, kirikɔngbagbɔhɔ
-pattern :n: [ :v: gbagɔhɔ:mrph: :n: ] | :n: [ :v: :mrph:INST :n: ]
-pattern :n: [ :v: gbagbɔhɔ:mrph: :n: ] | :n: [ :v: :mrph:INST :n: ]
-pattern :n: [ :v: gbagi:mrph: :n: ] | :n: [ :v: :mrph:INST :n: ]
-pattern :n: [ :v: bile:mrph: :n: ] | :n: [ :v: :mrph:ART.LAW :n: ]
-pattern :n: [ :v: ɲungɔ:mrph: :n: ] | :n: [ :v: :mrph:DIV :n: ]
-
-# v+mrph+v
-pattern :v: [ :v: ndi:mrph: :v: ] | :v: [ :v: :mrph:CAUS :v: ]
-pattern :v: [ :v: an:mrph: :v: ] | :v: [ :v: :mrph:INTR :v: ]
-
-# four-words composites
-# n + pp + n + n = n
-pattern :n: [ :n: :pp: :n: :n: ] | :n: [ :n: :pp: :n: :n: ]
-# n + pp + adj + n = n
-pattern :n: [ :n: :pp: :adj: :n: ] | :n: [ :n: :pp: :adj: :n: ]
-# n+v+v+n
-pattern :n: [ :n: :v: :v: :n: ] | :n: [ :n: :v: :v: :n: ]
-
-# orthographically unlikely to be seynara words
-# for NEW orthography, with no tones marked
+# --- NON-SUPYIRE FILTER (STAGE 4 = EMPR) ---
 section nonSPP
-# forms with symbols out of seynara alphabet
-pattern <re>.*[qxçäëïüâêîôûéùàøðþ].*</re>:: | ::EMPR
-# two different vowels in sequence (no diphthongs in standard Seynara)
-pattern <re>.*(?P<v>[aoeuiɛɔͻ])(?!(?P=v))(?=[aoeuiɛɔͻ]).*</re>:: | ::EMPR
+# Allows tonal vowels (à á â è é ê ì í î ò ó ô ù ú û), ʼ, ɔ, ɛ, ɲ, ŋ and homoglyphs (ͻ, ԑ)
+pattern <re>.*[qxQXɓɗƴçäëïöüøðþ].*</re>:: | ::EMPR

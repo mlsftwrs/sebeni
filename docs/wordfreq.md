@@ -30,6 +30,8 @@ into paragraphs/lines, assigns language from `data.languages`, `--lang`, or a
 filename stem such as `bam.txt`, and runs DabaX. Unlabelled files use
 `data.default_lang`. `data.source` is a compatibility fallback when
 `wordfreq.raw_inputs` is unset; otherwise packaged `beni/data/raw` is used.
+Relative paths resolve against the config file's directory. Files are read
+with `data.encoding` (default `utf-8-sig`).
 
 ```
 sebeni wordfreq -c config.yaml

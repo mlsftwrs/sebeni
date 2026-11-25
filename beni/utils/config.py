@@ -67,7 +67,8 @@ BASE_DIR = Path(__file__).parent.parent
 DEFAULT_WORKING_DIR = Path.home() / ".sebeni"
 DATA_DIR = BASE_DIR / "data"
 
-# Packaged Maninka resources live under baselines/mlq/; metadata group_code is mku.
+# Packaged Maninka resources live under baselines/mku/ (group code mku). The mku -> mlq
+# alias is a legacy fallback for older checkouts that still ship baselines/mlq/.
 PACKAGED_BASELINE_ALIASES = {"mku": "mlq"}
 
 WORKING_DIR = DEFAULT_WORKING_DIR
@@ -78,7 +79,9 @@ EXP_DIR = WORKING_DIR / "exp"
 RUNTIME_DIR = WORKING_DIR / "runtime"
 
 # Default model configurations
-DEFAULT_MODEL = "gemini-2.5-flash"
+# The one default distillation (teacher) model for every entry point (#13).
+DEFAULT_DISTIL_MODEL = "gemini-2.5-flash"
+DEFAULT_MODEL = DEFAULT_DISTIL_MODEL
 DEFAULT_THRESHOLD = 0.5
 DEFAULT_BATCH_SIZE = 10
 TEMPERATURE = 0.7
@@ -223,7 +226,7 @@ def resolve_working_dir(
 def resolve_packaged_baseline_dir(code: str) -> Optional[Path]:
     """Return the packaged baseline directory for a language/group code.
 
-    MKU (group) aliases to on-disk ``baselines/mlq/``.
+    Maninka resolves to ``baselines/mku/``; ``baselines/mlq/`` is only a legacy fallback.
     """
     needle = str(code or "").strip().lower()
     group = get_group_code(needle) or needle

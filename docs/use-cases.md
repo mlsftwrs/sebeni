@@ -7,15 +7,21 @@ Language codes: [Languages](languages.md). Zero-data-prep run:
 
 ## 1. Batteries-included multilingual (`sebeni exp`)
 
-Edit `configs/exp.yaml` (model, hyperparams, `report_to`) and run on packaged
-raw / test splits — no jsonl to prepare.
+Without `-c`, `sebeni exp` loads the packaged `beni/data/presets/multi13.yaml`.
+To change the model, hyperparams, or `report_to`, copy a config
+(`beni/data/presets/multi13.yaml` or `configs/exp.yaml`), edit it, and pass
+`-c`. Runs on packaged train / test splits — no jsonl to prepare. If the `-c`
+config sets `data.source`, `sebeni exp` trains on that instead; it prints the
+train data it uses (`[exp] train data: …`).
 
 ```bash
 sebeni exp -c configs/exp.yaml -w ./runs/exp-001
 ```
 
-Expect: `{working_dir}/exp/eval.json` with MER, MCS, and UWEC, frozen G/D under
-`data/resources/{lang}/`, policy under `models/`, Trackio (or wandb). Details:
+Expect: `{working_dir}/exp/eval.json` with Φ, MER, MCS, and UWEC, G/D under
+`data/baselines/{lang}/` with a frozen snapshot in `data/resources/{lang}/`,
+policy under `models/`, Trackio (or wandb). By default every held-out row per
+language is scored; set `experiment.max_eval_rows` to cap it. Details:
 [Experiments](experiments.md).
 
 ## 2. Bambara GRPO
@@ -62,7 +68,11 @@ distillation:
 ```
 
 Expect: `{working_dir}/data/baselines/bam/baseline_vN.{gram,dict}`,
-policy under `models/`, `exp/eval.json` with Φ, `exp/wordfreq/bam/`.
+policy under `models/`, `exp/eval.json` with Φ / MER / MCS / UWEC on packaged
+`test.json`, `exp/wordfreq/bam/`.
+
+`sebeni eval` decodes with the weights `train` saved to `models/` (override
+with `--weights`).
 
 ## 3. Multilingual Manding (one policy, many G/D)
 
@@ -84,7 +94,9 @@ sebeni generate -c ./runs/manding/config.yaml \
 ```
 
 See `configs/grpo_multilang.yaml`. `R_lang` is 0 if the JSON `lang` does not
-match **that row** (Maninka must be `mku`, not `mlq`, unless you rely on
+match **that row** or declares several languages; with
+`safety.require_language` / `refuse_mixed_language` (default on) the governor
+also refuses updates on wrong- or mixed-language output (Maninka must be `mku`, not `mlq`, unless you rely on
 alias resolution — prefer `mku`).
 
 ## 4. Language with no packaged grammar (scratch bootstrap)
@@ -126,21 +138,28 @@ Records may be `{text, lang, chosen, rejected}` or
 
 ## 6. Eval / wordfreq without training
 
-Point `data.source` at a held-out split for eval. Set `wordfreq.raw_inputs` for
-the raw-text frequency pipeline and run without a
-policy step:
+`sebeni eval` scores packaged `beni/data/test.json` (filtered to `--lang`)
+unless `experiment.eval_source` or `--eval-file` points at other held-out rows
+(path, glob, list, or HF dataset id, like `data.source`); `data.source` itself
+is not used for eval.
+Set `wordfreq.raw_inputs` for the raw-text frequency pipeline and run without
+a policy step:
 
 ```bash
 sebeni eval -c config.yaml --lang bam --lang mku
 sebeni wordfreq -c config.yaml
 ```
 
-`exp/eval.json` contains `phi`, `by_language`, `n_sentences`. Compare MER/MCS
-when you have IGT references (`MorphologyScorer.mer` / `.mcs`).
+`exp/eval.json` contains top-level `phi`, `mer`, `mcs`, `uwec`, `tau`, and
+`by_language`; each language entry has `n_sentences`, `n_scored` and
+`n_skipped`. Without trained weights, `sebeni eval` warns and scores the base
+model (`weights: null`).
+`exp/wordfreq/wordfreq.json` indexes the per-language wordfreq reports.
 
 ## 7. Publish a Hub model
 
-After a successful `train` (card + `safety_snapshot.json` required):
+After a successful `train` and `eval` (`eval` writes `safety_snapshot.json`
+next to the weights it scored, `models/` by default):
 
 ```bash
 huggingface-cli login    # write token for mlsftwrs
@@ -148,6 +167,12 @@ sebeni push -c config.yaml --repo-id mlsftwrs/sebeni-bam-grpo
 ```
 
 Org transfer and tokens: [Hub](hub.md).
+
+!!! note
+    `sebeni push` refuses unless `README.md` and a `safety_snapshot.json`
+    written by `sebeni eval` for exactly the pushed weight files sit next to
+    them; nothing is auto-written. `push --write-card` re-renders `README.md`
+    from the eval snapshot.
 
 ## 8. CPU smoke test (CI / laptop)
 

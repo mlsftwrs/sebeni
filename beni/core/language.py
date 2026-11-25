@@ -139,8 +139,8 @@ class Language:
     def from_code(cls, code: str) -> "Language":
         """Build a Language from an ISO or Sebeni group/variant code.
 
-        Maninka metadata uses group_code ``mku`` while packaged baselines live
-        under ``baselines/mlq/``; both codes resolve to the same group.
+        Maninka: ``mlq`` and ``mku`` both resolve to group code ``mku``, whose
+        packaged baselines live under ``baselines/mku/``.
         """
         needle = str(code or "").strip().lower() or "bam"
         meta = cfg.get_language_metadata(needle)

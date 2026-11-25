@@ -72,36 +72,17 @@ def recompute_cell_eval(
 ) -> Dict[str, Any]:
     """Load post-trained weights and evaluate on held-out test.json."""
     from beni.core.pipeline import run_eval
-    from beni.core.srl.config import SRLGrpoPrompt
     from beni.core.srl.unified import SRLTrainer
 
     logger.info("Initializing SRLTrainer for post-alignment evaluation...")
     trainer = SRLTrainer(mc)
-    trainer.load_models()
 
     logger.info("Loading aligned weights from: %s", weights_source)
     trainer.load_aligned_weights(weights_source)
-    if hasattr(trainer, "model") and trainer.model is not None:
-        trainer.model.eval()
 
-    tokenizer = getattr(trainer, "tokenizer", None)
-
-    def _generate(text: str, lang: str) -> str:
-        import torch
-        system_prompt = SRLGrpoPrompt(languages=[lang] if lang else None).prompt()
-        with torch.inference_mode():
-            if tokenizer is not None and getattr(tokenizer, "chat_template", None):
-                messages = [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": text},
-                ]
-                try:
-                    formatted = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-                    return trainer.generate(formatted, max_new_tokens=128)
-                except Exception:
-                    pass
-            prompt = f"{system_prompt}\n\nUser: {text}\nAssistant:"
-            return trainer.generate(prompt, max_new_tokens=128)
+    def _generate(text: str, _lang: str) -> str:
+        # Same prompt as training, greedy, experiment.eval_max_new_tokens.
+        return trainer.analyze(text)
 
     # Set evaluation cap
     mc.experiment.max_eval_rows = max_eval_rows
@@ -111,6 +92,7 @@ def recompute_cell_eval(
         mc,
         generate=_generate,
         policy=getattr(trainer, "plugin", trainer),
+        weights=str(weights_source),
     )
     return eval_report
 

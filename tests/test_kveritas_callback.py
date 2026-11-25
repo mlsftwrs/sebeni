@@ -49,8 +49,8 @@ class TestKVeritasCallback(unittest.TestCase):
             emit_kveritas_line("reward_total", 1.25, step=10)
         output = [line for line in buf.getvalue().strip().split("\n") if line]
         self.assertEqual(len(output), 2)
-        self.assertEqual(output[0], "KVERITAS_METRIC name=phi value=0.85231 step=10")
-        self.assertEqual(output[1], "KVERITAS_METRIC name=reward_total value=1.25 step=10")
+        self.assertEqual(output[0], "KV phi=0.85231 step=10")
+        self.assertEqual(output[1], "KV reward_total=1.25 step=10")
 
     def test_callback_on_log_rewards(self):
         reward_manager = MagicMock()
@@ -70,7 +70,7 @@ class TestKVeritasCallback(unittest.TestCase):
             callback.on_log(args=None, state=state, control=None, logs={"loss": 0.123})
 
         output = [line for line in buf.getvalue().strip().split("\n") if line]
-        output_metrics = {line.split()[1].split("=")[1]: float(line.split()[2].split("=")[1]) for line in output}
+        output_metrics = {line.split()[1].split("=")[0]: float(line.split()[1].split("=")[1]) for line in output}
         self.assertIn("reward_total", output_metrics)
         self.assertAlmostEqual(output_metrics["reward_total"], 2.5)
         self.assertAlmostEqual(output_metrics["reward_format"], 0.5)
@@ -89,7 +89,7 @@ class TestKVeritasCallback(unittest.TestCase):
             callback.on_evaluate(args=None, state=state, control=None, metrics={"eval/loss": 0.45, "eval_phi": 0.78})
 
         output = [line for line in buf.getvalue().strip().split("\n") if line]
-        output_metrics = {line.split()[1].split("=")[1]: float(line.split()[2].split("=")[1]) for line in output}
+        output_metrics = {line.split()[1].split("=")[0]: float(line.split()[1].split("=")[1]) for line in output}
         self.assertIn("eval_loss", output_metrics)
         self.assertAlmostEqual(output_metrics["eval_loss"], 0.45)
         self.assertIn("eval_phi", output_metrics)

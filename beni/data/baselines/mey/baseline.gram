@@ -1,136 +1,121 @@
-# Hassaniya morphotactic patterns
+# Hassaniya Arabic (mey) morphotactic patterns
+# version 2026.11.23 — ground-up Semitic rewrite replacing legacy Fula copy-paste
+# Covers both Mali Latin orthography (test.json, hsy jsonl) and academic transcription (mey.txt, mey dict)
 
 # macro definitions
-macro   @vow@            [aeiouxuoeoaauuəʌ]
-macro   @cons@           [bcdefghjklmnpqrstvwxyzʕḍʑḥʂɣϪš]
-macro   @syl@            [^aeiouxuoeoaauuəʌ]*(?P<V>[aeiouxuoeoaauuəʌ])(?P=V)?([^aeiouxuoeoaauuəʌ]+(?=([^aeiouxuoeoaauuəʌ]|$)))?
+macro   @vow@            <re>.*[aeiouăəāīū]</re>
+macro   @cons@           <re>.*[bcdfghjklmnpqrstvwxyzḍḥṣṭẓšɣɤʕ]</re>
+macro   @syl@            [^aeiouăəāīū]*(?P<V>[aeiouăəāīū])(?P=V)?
 
 # processing instructions
 plan
 for token:
-stage 0 add parallel parse noun_inflection
-stage 0 add parallel parse verb_inflection
+stage 0 add parallel parse proclitics_and_articles
+stage 0 add parallel parse nominal_inflection
+stage 0 add parallel parse pronominal_enclitics
 stage 0 apply lookup
 return if parsed
-stage 1 add sequential parse verbal_derivation
-stage 1 add parallel parse nominal_derivation
+stage 1 add sequential parse verbal_inflection
+stage 1 add parallel parse derivational_patterns
 stage 1 apply lookup
 return if parsed
 stage 2 add parallel parse reduplication
 stage 2 apply lookup
 return if parsed
 stage 3 add parallel decompose pos_composition
+stage 3 apply lookup
 return if parsed
 stage 4 apply firstmatch parse nonhassaniya
 return if parsed
 
-# --- NOUN INFLECTION (Noun Class Suffixes) ---
-section noun_inflection
+# --- PROCLITICS & DEFINITE ARTICLE (al-, əl-, il-, l-, wo-, bi-, li-, fi-, vi-) ---
+section proclitics_and_articles
+# Definite article proclitics (attached or hyphenated: əlhuquug, əlwajibat, albarleman, əl-mudiir, il-kull)
+pattern :n/adj: [ {əl|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
+pattern :n/adj: [ {al|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
+pattern :n/adj: [ {il|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
+pattern :n/adj: [ {әl|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
+pattern :n/adj: [ {əl-|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
+pattern :n/adj: [ {әl-|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
+pattern :n/adj: [ {al-|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
+pattern :n/adj: [ {il-|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
+pattern :n/adj: [ {l-|}:: ] | :n/adj: [ :mrph:DEF :n/adj: ]
 
-# Plural Noun Classes (-be, -en, -de, -di)
-pattern :n: [ {|be}:: ] | :n: [ :n: :mrph:PL.HUM ]
-pattern :n: [ {|en}:: ] | :n: [ :n: :mrph:PL.REL ]
-pattern :n: [ {|de}:: ] | :n: [ :n: :mrph:PL.INAN ]
-pattern :n: [ {|di}:: ] | :n: [ :n: :mrph:PL.NONHUM ]
+# Prepositional & conjunction proclitics (bi-, li-, fi-, vi-, wo-, w-)
+pattern :n/adj/prn: [ {bi-|}:: ] | :n/adj/prn: [ :mrph:PREP.INSTR :n/adj/prn: ]
+pattern :n/adj/prn: [ {li-|}:: ] | :n/adj/prn: [ :mrph:PREP.DAT :n/adj/prn: ]
+pattern :n/adj/prn: [ {fi-|}:: ] | :n/adj/prn: [ :mrph:PREP.LOC :n/adj/prn: ]
+pattern :n/adj/prn: [ {vi-|}:: ] | :n/adj/prn: [ :mrph:PREP.LOC :n/adj/prn: ]
+pattern :n/adj/prn/v: [ {wo-|}:: ] | :n/adj/prn/v: [ :mrph:CONJ :n/adj/prn/v: ]
 
-# Singular Noun Classes (-do, -ngol, -nde, -ngal, -ngo, -ko, -kal, -dum, -oo, -ri, -dam)
-pattern :n: [ {|do}:: ] | :n: [ :n: :mrph:SG.HUM ]
-pattern :n: [ {|ngol}:: ] | :n: [ :n: :mrph:SG.CL ]
-pattern :n: [ {|nde}:: ] | :n: [ :n: :mrph:SG.CL ]
-pattern :n: [ {|ngal}:: ] | :n: [ :n: :mrph:SG.CL ]
-pattern :n: [ {|ngo}:: ] | :n: [ :n: :mrph:SG.CL ]
-pattern :n: [ {|ko}:: ] | :n: [ :n: :mrph:SG.CL ]
-pattern :n: [ {|kal}:: ] | :n: [ :n: :mrph:DIM.SG ]
-pattern :n: [ {|dum}:: ] | :n: [ :n: :mrph:NEUT ]
-pattern :n: [ {|oo}:: ] | :n: [ :n: :mrph:SG.DEM ]
-pattern :n: [ {|ri}:: ] | :n: [ :n: :mrph:SG.CL ]
-pattern :n: [ {|dam}:: ] | :n: [ :n: :mrph:MASS.LIQ ]
+# --- NOMINAL INFLECTION (Plurals, Feminine, Nisba) ---
+section nominal_inflection
+# Sound feminine plural (-aat, -at), sound masculine plural (-iin, -in)
+pattern :n/adj: [ {|aat}:: ] | :n/adj: [ :n/adj: :mrph:PL.F ]
+pattern :n/adj: [ {|āt}:: ] | :n/adj: [ :n/adj: :mrph:PL.F ]
+pattern :n/adj: [ {|iin}:: ] | :n/adj: [ :n/adj: :mrph:PL.M ]
+pattern :n/adj: [ {|īn}:: ] | :n/adj: [ :n/adj: :mrph:PL.M ]
+# Nisba / relational adjective & abstract noun (-iyya, -iya, -iyye, -yya, -iye)
+pattern :n/adj: [ {|iyya}:: ] | :n/adj: [ :n/adj: :mrph:NISBA ]
+pattern :n/adj: [ {|iyye}:: ] | :n/adj: [ :n/adj: :mrph:NISBA ]
+pattern :n/adj: [ {|iya}:: ] | :n/adj: [ :n/adj: :mrph:NISBA ]
+pattern :n/adj: [ {|iye}:: ] | :n/adj: [ :n/adj: :mrph:NISBA ]
+pattern :n/adj: [ {|yya}:: ] | :n/adj: [ :n/adj: :mrph:NISBA ]
+# Dual (-eyn, -ayn)
+pattern :n/adj: [ {|eyn}:: ] | :n/adj: [ :n/adj: :mrph:DU ]
+pattern :n/adj: [ {|ayn}:: ] | :n/adj: [ :n/adj: :mrph:DU ]
 
-# --- VERBAL INFLECTION (Aspect, Voice, & Tense Markers) ---
-section verb_inflection
+# --- PRONOMINAL ENCLITICS ---
+section pronominal_enclitics
+# Attached & hyphenated object/possessive enclitics (-he, -ḥe, -ha, -hum, -kum, -na, -ne, -i, -u)
+pattern :n/v/prep: [ {|hum}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.3PL ]
+pattern :n/v/prep: [ {|kum}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.2PL ]
+pattern :n/v/prep: [ {|ḥe}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.3FSG ]
+pattern :n/v/prep: [ {|he}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.3FSG ]
+pattern :n/v/prep: [ {|-he}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.3FSG ]
+pattern :n/v/prep: [ {|-ḥe}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.3FSG ]
+pattern :n/v/prep: [ {|-hum}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.3PL ]
+pattern :n/v/prep: [ {|-na}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.1PL ]
+pattern :n/v/prep: [ {|-i}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.1SG ]
+pattern :n/v/prep: [ {|-u}:: ] | :n/v/prep: [ :n/v/prep: :mrph:POSS.3MSG ]
 
-# Active Voice Suffixes
-pattern :v: [ {|ii}:: ] | :v: [ :v: :mrph:PFV.ACT ]
-pattern :v: [ {|aayi}:: ] | :v: [ :v: :mrph:PFV.NEG ]
-pattern :v: [ {|ay}:: ] | :v: [ :v: :mrph:IPFV.ACT ]
-pattern :v: [ {|ata}:: ] | :v: [ :v: :mrph:IPFV.NEG ]
-pattern :v: [ {|u}:: ] | :v: [ :v: :mrph:IMP ]
-pattern :v: [ {|an}:: ] | :v: [ :v: :mrph:FUT.ACT ]
-pattern :v: [ {|ee}:: ] | :v: [ :v: :mrph:SUBJ.PASS ]
+# --- VERBAL INFLECTION (Semitic Imperfective Prefixes & Perfective Suffixes) ---
+section verbal_inflection
+# Imperfective subject prefixes (yə-, tə-, nə-, yi-, ti-, ni-)
+pattern :v: [ {yə|}:: ] | :v: [ :mrph:IPFV.3MSG :v: ]
+pattern :v: [ {tə|}:: ] | :v: [ :mrph:IPFV.2SG.3FSG :v: ]
+pattern :v: [ {nə|}:: ] | :v: [ :mrph:IPFV.1PL :v: ]
+pattern :v: [ {yi|}:: ] | :v: [ :mrph:IPFV.3MSG :v: ]
+pattern :v: [ {ti|}:: ] | :v: [ :mrph:IPFV.2SG.3FSG :v: ]
+pattern :v: [ {ni|}:: ] | :v: [ :mrph:IPFV.1PL :v: ]
+# Perfective agreement suffixes (-et, -ət, -tu, -na)
+pattern :v: [ {|et}:: ] | :v: [ :v: :mrph:PFV.3FSG ]
+pattern :v: [ {|ət}:: ] | :v: [ :v: :mrph:PFV.3FSG ]
+pattern :v: [ {|tu}:: ] | :v: [ :v: :mrph:PFV.2PL ]
+pattern :v: [ {|na}:: ] | :v: [ :v: :mrph:PFV.1PL ]
 
-# Middle / Passive Voice Inflections
-pattern :v: [ {|iima}:: ] | :v: [ :v: :mrph:PFV.MID ]
-pattern :v: [ {|aama}:: ] | :v: [ :v: :mrph:PFV.PASS ]
-pattern :v: [ {|oto}:: ] | :v: [ :v: :mrph:IPFV.MID ]
-pattern :v: [ {|ate}:: ] | :v: [ :v: :mrph:IPFV.PASS ]
-pattern :v: [ {|ake}:: ] | :v: [ :v: :mrph:PFV.MID.ALT ]
-pattern :v: [ {|ete}:: ] | :v: [ :v: :mrph:IPFV.PASS.ALT ]
-
-# Relative & Subject Enclitic Verb Forms
-pattern :v: [ {|uu-mi}:: ] | :v: [ :v: :mrph:PFV.1SG ]
-pattern :v: [ {|ee-mi}:: ] | :v: [ :v: :mrph:IPFV.1SG ]
-pattern :v: [ {|o-daa}:: ] | :v: [ :v: :mrph:SUBJ.2SG ]
-pattern :v: [ {|u-don}:: ] | :v: [ :v: :mrph:PFV.2PL ]
-
-# --- VERBAL DERIVATION (Derivational Extensions) ---
-section verbal_derivation
-
-# Extension Extensions: Causative, Instrumental, Middle/Locative, Reversive, Distant
-pattern :v: [ {|in}:: ] | :v: [ :v: :mrph:CAUS ]
-pattern :v: [ {|ir}:: ] | :v: [ :v: :mrph:INST ]
-pattern :v: [ {|or}:: ] | :v: [ :v: :mrph:MID.LOC ]
-pattern :v: [ {|it}:: ] | :v: [ :v: :mrph:RETR ]
-pattern :v: [ {|oy}:: ] | :v: [ :v: :mrph:DIST ]
-pattern :v: [ {|id}:: ] | :v: [ :v: :mrph:ASSOC ]
-pattern :v: [ {|an}:: ] | :v: [ :v: :mrph:BEN ]
-pattern :v: [ {|iido}:: ] | :ptcp: [ :v: :mrph:PTCP.PFV ]
-pattern :v: [ {|oowo}:: ] | :ptcp: [ :v: :mrph:PTCP.IPFV ]
-
-# Complex & Stacked Extensions
-pattern :v: [ {|in|ir}:: ] | :v: [ :v: :mrph:CAUS :mrph:INST ]
-pattern :v: [ {|intin}:: ] | :v: [ :v: :mrph:CAUS.INTNS ]
-pattern :v: [ {|it|ir}:: ] | :v: [ :v: :mrph:RETR :mrph:INST ]
-pattern :v: [ {|id|or}:: ] | :v: [ :v: :mrph:ASSOC :mrph:MID.LOC ]
-pattern :v: [ {|or|iy}:: ] | :v: [ :v: :mrph:MID.LOC :mrph:DIST ]
-
-# --- NOMINAL DERIVATION (Agentive & Abstract Derivations) ---
-section nominal_derivation
-
-# Agentive & Abstract Suffixes
-pattern :n: [ {|oowo}:: ] | :n: [ :v: :mrph:AG.SG ]
-pattern :n: [ {|ooɓe}:: ] | :n: [ :v: :mrph:AG.PL ]
-pattern :n: [ {|aŋke}:: ] | :n: [ :n: :mrph:GENT ]
-pattern :n: [ {|anke}:: ] | :n: [ :n: :mrph:GENT.ALT ]
-pattern :n: [ {|ankooɓe}:: ] | :n: [ :n: :mrph:GENT.PL ]
-pattern :n: [ {|ankaagal}:: ] | :n: [ :n: :mrph:ABSTR ]
-pattern :n: [ {|aaku}:: ] | :n: [ :n: :mrph:ABSTR ]
-pattern :n: [ {|ere}:: ] | :n: [ :v: :mrph:NMLZ ]
-pattern :n: [ {|oore}:: ] | :n: [ :v: :mrph:NMLZ.ALT ]
-pattern :n: [ {|agol}:: ] | :n: [ :v: :mrph:INF ]
+# --- DERIVATIONAL PATTERNS (Form X st-, Participle mu-/mət-) ---
+section derivational_patterns
+pattern :v/n: [ {st|}:: ] | :v/n: [ :mrph:CAUS.REFL :v/n: ]
+pattern :n/adj/ptcp: [ {mu|}:: ] | :ptcp: [ :mrph:PTCP :v/n: ]
+pattern :n/adj/ptcp: [ {mət|}:: ] | :ptcp: [ :mrph:PASS.PTCP :v/n: ]
+pattern :n/adj: [ {|aan}:: ] | :adj: [ :v/n: :mrph:INTNS ]
 
 # --- REDUPLICATION ---
 section reduplication
-
 pattern :v: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :v: [ :v: :v: ]
 pattern :adj: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :adj: ]
-pattern :v: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :v: [ :v: :: :v: ]
 pattern :n: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :n: [ :n: :: :n: ]
 
-# --- POS COMPOSITION (Noun-Noun, Noun-Adj Compounding) ---
+# --- POS COMPOSITION (Construct State / Idafa Compounds) ---
 section pos_composition
-
-# Two-word composites
 pattern :n: [ :n: :n: ] | :n: [ :n: :n: ]
 pattern :n: [ :n: :adj: ] | :n: [ :n: :adj: ]
-pattern :n: [ :v: :n: ] | :n: [ :v: :n: ]
-pattern :n: [ :n: :v: ] | :n: [ :n: :v: ]
-
-# Three-word composites
+pattern :n: [ :n.prop: :n: ] | :n: [ :n.prop: :n: ]
+pattern :n: [ :n: :n.prop: ] | :n: [ :n: :n.prop: ]
 pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
-pattern :n: [ :n: :adj: :n: ] | :n: [ :n: :adj: :n: ]
 
-# --- NON-HASSANIYA FILTER ---
+# --- NON-HASSANIYA FILTER (STAGE 4 = EMPR) ---
 section nonhassaniya
-
-# Filter forms ending with non-Hassaniya orthographic sequences or invalid cluster characters
-pattern <re>.*[ƔƎʐʑʂʈɖɲ].*</re>:: | ::EMPR
+# Reject characters absent from Hassaniya Latin/academic orthographies (allows ʕ ḍ ḥ ṣ ṭ ẓ ɣ ɤ š ə ә ă ā ī ū)
+pattern <re>.*[ɓɗƴɲŋɔɛƔƎʐʑʂʈɖçœæ].*</re>:: | ::EMPR

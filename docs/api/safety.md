@@ -1,6 +1,7 @@
 # `beni.core.safety`
 
-Gates on promote, policy update, and Hub push.
+Gates on promote, policy update (SFT, GRPO, DPO, and APO), and Hub push. See
+[Safety](../safety.md) for each gate.
 
 ```python
 from beni.core.safety import SafetyGovernor, SafetySpec
@@ -30,9 +31,10 @@ assert d.allowed
         - allow_hub_push
         - record_snapshot
         - write_snapshot
+        - apply_pre_update
       show_root_heading: true
       heading_level: 2
-      show_if_no_docstring: false
+      show_if_no_docstring: true
 
 ::: beni.core.safety.governor.PromoteDecision
     options:
@@ -50,4 +52,4 @@ assert d.allowed
         - load
       show_root_heading: true
       heading_level: 2
-      show_if_no_docstring: false
+      show_if_no_docstring: true

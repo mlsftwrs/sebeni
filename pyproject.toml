@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sebeni"
-version = "0.1.2"
+version = "0.2.1"
 description = "Self-aware morphotactic pattern generation toolkit for extremely low-resource languages"
 readme = "README.md"
 license = { text = "MIT" }
@@ -34,8 +34,6 @@ dependencies = [
     "pytrie",
     "attrdict3",
     "regex",
-    "torchao>=0.16.0",
-    "bitsandbytes"
 ]
 
 [project.optional-dependencies]
@@ -48,6 +46,9 @@ train = [
     "accelerate",
     "vllm",
     "trackio",
+    # Quantised loading / optimisers: only training needs them (#12).
+    "torchao>=0.16.0",
+    "bitsandbytes",
 ]
 wandb = [
     "wandb",
@@ -84,7 +85,7 @@ gui = [
 
 [project.urls]
 Homepage = "https://seben.robotsmali.org"
-Documentation = "https://seben.robotsmali.org/docs"
+Documentation = "https://mlsftwrs.github.io/sebeni"
 Repository = "https://github.com/mlsftwrs/sebeni"
 "Hugging Face" = "https://huggingface.co/mlsftwrs"
 
@@ -108,6 +109,7 @@ beni = [
     "data/raw/*",
     "data/test.json",
     "data/exp.yaml",
+    "data/presets/*.yaml",
     "core/hub/templates/*",
 ]
 
@@ -118,6 +120,9 @@ beni = ["*.old", "*.backup", "*Zone.Identifier"]
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-v --strict-markers"
+markers = [
+    "slow: downloads models and trains (TinyStories-1M); run with SEBENI_RUN_SLOW=1",
+]
 
 [tool.ruff]
 target-version = "py310"

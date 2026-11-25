@@ -14,6 +14,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
+from beni.core import kveritas as kv
 from beni.core.language import resolve_scope
 from beni.core.srl.config import MasterConfig
 from beni.utils import config as cfg
@@ -97,15 +98,77 @@ def load_train_records(mc: MasterConfig) -> Dict[str, Any]:
     }
 
 
+def _resolve_source(mc: MasterConfig, source: Any) -> Any:
+    """Resolve a relative file path against the config file's directory when it exists there."""
+    items = source if isinstance(source, (list, tuple)) else [source]
+    base = getattr(mc, "_config_file_dir", None)
+    resolved = []
+    for item in items:
+        path = Path(str(item)).expanduser()
+        if any(ch in str(item) for ch in "*?["):
+            # Glob: prefer matches next to the config file when the cwd has none.
+            import glob as _glob
+
+            if not path.is_absolute() and not _glob.glob(str(path)) and base and _glob.glob(str(Path(base) / path)):
+                path = Path(base) / path
+            resolved.append(str(path))
+            continue
+        if not path.is_absolute() and not path.exists() and base and (Path(base) / path).exists():
+            path = Path(base) / path
+        resolved.append(str(path) if path.exists() else str(item))
+    return resolved if isinstance(source, (list, tuple)) else resolved[0]
+
+
+def _lang_text_json(path: str) -> Optional[Dict[str, str]]:
+    """Return the payload when ``path`` is a ``test.json``-style ``{lang: text}`` file."""
+    candidate = Path(path)
+    if candidate.suffix.lower() != ".json" or not candidate.is_file():
+        return None
+    try:
+        payload = json.loads(candidate.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    record_keys = {"text", "lang", "language", "reference", "tokens", "prompt"}
+    if (
+        isinstance(payload, dict)
+        and payload
+        and all(isinstance(v, str) for v in payload.values())
+        and not record_keys.intersection(str(k).lower() for k in payload)
+    ):
+        return payload
+    return None
+
+
 def load_eval_records(mc: MasterConfig) -> List[Dict[str, str]]:
-    """Held-out paragraphs from packaged ``test.json``, filtered to the run scope."""
-    from beni.data.datasets import SebeniDataLoader
+    """Held-out rows, filtered to the run scope.
+
+    Reads ``experiment.eval_source`` (a path, glob, list, or Hugging Face id,
+    like ``data.source``) when set, otherwise the packaged ``test.json``.
+    A ``.json`` file shaped like ``test.json`` (``{lang: text}``) is split into
+    paragraphs the same way. Relative paths and globs resolve against the
+    config file's directory when nothing matches from the current directory.
+    A Hugging Face id is read with ``data.hf_split`` (default ``train``).
+    """
+    from beni.core.language import Language
+    from beni.data.datasets import SebeniDataLoader, _split_paragraphs
 
     scope = _scope(mc)
     previous = mc.data.languages
     mc.data.languages = list(scope.languages)
     try:
-        return SebeniDataLoader(mc.data).load_sebeni(split="test")
+        loader = SebeniDataLoader(mc.data)
+        source = getattr(mc.experiment, "eval_source", None)
+        if not source:
+            return loader.load_sebeni(split="test")
+        source = _resolve_source(mc, source)
+        payload = _lang_text_json(source) if isinstance(source, str) else None
+        if payload is None:
+            return loader.load(source)
+        rows = []
+        for lang_key, blob in payload.items():
+            lang = Language.from_code(str(lang_key)).group_code
+            rows.extend({"text": para, "lang": lang} for para in _split_paragraphs(blob))
+        return rows
     finally:
         mc.data.languages = previous
 
@@ -208,6 +271,55 @@ def _active_trainer(mc: MasterConfig):
     return mc.trainer
 
 
+def default_weights_dir(mc: MasterConfig) -> Path:
+    """Where the active arm saved its policy: its ``output_dir``, else ``{working_dir}/models``."""
+    block = _active_trainer(mc)
+    out = getattr(block, "output_dir", None) or getattr(mc.trainer, "output_dir", None)
+    if out:
+        return Path(out)
+    return Path(mc.working_dir or cfg.get_workdir().root) / "models"
+
+
+def _has_weights(path: Path) -> bool:
+    return path.is_dir() and any((path / name).is_file() for name in ("adapter_config.json", "config.json"))
+
+
+def resolve_policy_weights(mc: MasterConfig, weights: Optional[str] = None) -> Optional[str]:
+    """Trained weights to load: ``weights`` when given, else the arm's output dir if it holds any."""
+    if weights:
+        return str(weights)
+    default = default_weights_dir(mc)
+    return str(default) if _has_weights(default) else None
+
+
+def load_policy(mc: MasterConfig, weights: Optional[str] = None, require: bool = False):
+    """Build the arm's trainer and load the trained policy for eval / generate / push.
+
+    ``weights`` is a directory or Hub repo id; by default the arm's output
+    directory. When no trained weights are found, ``require=True`` raises
+    ``FileNotFoundError``; otherwise the base model is loaded and
+    ``trainer.loaded_weights`` stays ``None``.
+    """
+    from beni.core.srl.unified import SRLTrainer
+
+    if mc.working_dir:
+        cfg.set_working_dir(mc.working_dir)
+    # Same language list as training, so the system prompt matches.
+    mc.data.languages = list(_scope(mc).languages)
+    target = resolve_policy_weights(mc, weights)
+    if target is None and require:
+        raise FileNotFoundError(
+            f"No trained weights in {default_weights_dir(mc)} (no adapter_config.json or config.json). "
+            "Train first or pass --weights."
+        )
+    trainer = SRLTrainer(mc)
+    if target is None:
+        trainer.load_models()
+    else:
+        trainer.load_aligned_weights(target)
+    return trainer
+
+
 def run_distill(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
     """SAMPG once per language, then freeze G and D."""
     from beni.core.safety.governor import SafetyGovernor
@@ -215,6 +327,7 @@ def run_distill(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None
 
     if mc.working_dir:
         cfg.set_working_dir(mc.working_dir)
+    kv.emit_phase("distill", mc)
     loaded = None
     if records is None:
         loaded = load_train_records(mc)
@@ -303,6 +416,9 @@ def run_arm(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None):
         raise ValueError("SFT is torch-only. Set trainer.framework: torch for algorithm: sft.")
     from beni.core.srl.unified import SRLTrainer
 
+    kv.emit_phase("train", mc)
+    kv.emit_seed(getattr(_active_trainer(mc), "seed", None), mc)
+
     trainer = SRLTrainer(mc)
     trainer.train(records)
     _write_manifest(
@@ -312,6 +428,99 @@ def run_arm(mc: MasterConfig, records: Optional[List[Dict[str, Any]]] = None):
         train_source=(loaded or {}).get("source"),
     )
     return trainer
+
+
+def _clear_empr_gloss(token) -> None:
+    """Remove any LLM-hallucinated EMPR gloss when DabaX did not classify the token as EMPR."""
+    def _scrub_morphemes(items):
+        for morph in items or []:
+            if str(getattr(morph, "gloss", "") or "").strip().upper() == "EMPR":
+                morph.gloss = ""
+            _scrub_morphemes(getattr(morph, "morphemes", None))
+
+    for analysis in getattr(token, "analyses", None) or []:
+        if str(getattr(analysis, "gloss", "") or "").strip().upper() == "EMPR":
+            analysis.gloss = ""
+        _scrub_morphemes(getattr(analysis, "morphemes", None))
+
+
+def _assign_daba_stage(token, daba_tokens) -> None:
+    """Apply DabaX-computed stage (and EMPR gloss if borrowing) onto ``token``."""
+    from beni.core import Analysis
+    from beni.core.compute.helpers import is_empr_token
+
+    if not daba_tokens:
+        token.stage = -1
+        _clear_empr_gloss(token)
+        return
+    if len(daba_tokens) == 1:
+        daba_tok = daba_tokens[0]
+        token.stage = daba_tok.stage
+        if is_empr_token(daba_tok):
+            if not is_empr_token(token):
+                token.analyses.append(Analysis(form=token.surface, ps=[], gloss="EMPR", morphemes=[]))
+        else:
+            _clear_empr_gloss(token)
+        return
+    stages = []
+    for dt in daba_tokens:
+        try:
+            st = int(dt.stage)
+        except (TypeError, ValueError):
+            st = 0
+        if st < 0:
+            token.stage = -1
+            _clear_empr_gloss(token)
+            return
+        stages.append(st)
+    token.stage = max(stages) if stages else -1
+    if any(is_empr_token(dt) for dt in daba_tokens):
+        if not is_empr_token(token):
+            token.analyses.append(Analysis(form=token.surface, ps=[], gloss="EMPR", morphemes=[]))
+    else:
+        _clear_empr_gloss(token)
+
+
+def _recompute_daba_stages(sent, dabax, lang: str):
+    """Discard any LLM-emitted token stage and compute Daba stages via ``dabax``."""
+    from beni.core.language import Language
+
+    group = Language.from_code(lang or "bam").group_code
+    sent.lang = group
+    sent.language = Language.from_code(group)
+    tokens = list(getattr(sent, "tokens", None) or [])
+    if not tokens:
+        return sent
+
+    for tok in tokens:
+        tok.stage = -1
+
+    surfaces = [str(getattr(tok, "surface", "") or "").strip() for tok in tokens]
+    if all(surfaces):
+        try:
+            parsed = dabax.loader(" ".join(surfaces)) or []
+        except Exception:
+            parsed = []
+        daba_tokens = [dt for s in parsed for dt in (getattr(s, "tokens", None) or [])]
+        if len(daba_tokens) == len(tokens) and all(
+            str(getattr(dt, "surface", "") or "").strip().lower() == surf.lower()
+            for dt, surf in zip(daba_tokens, surfaces)
+        ):
+            for tok, dt in zip(tokens, daba_tokens):
+                _assign_daba_stage(tok, [dt])
+            return sent
+
+    for tok, surf in zip(tokens, surfaces):
+        if not surf:
+            tok.stage = -1
+            continue
+        try:
+            parsed = dabax.loader(surf) or []
+        except Exception:
+            parsed = []
+        daba_tokens = [dt for s in parsed for dt in (getattr(s, "tokens", None) or [])]
+        _assign_daba_stage(tok, daba_tokens)
+    return sent
 
 
 def _finite_uwec(stages, pi_theta, pi_ref, *, beta: float, eps: float):
@@ -349,13 +558,22 @@ def run_eval(
     records: Optional[List[Dict[str, Any]]] = None,
     generate: Optional[Callable[[str, str], str]] = None,
     policy: Any = None,
+    weights: Optional[str] = None,
+    record: bool = True,
 ) -> Dict[str, Any]:
-    """Score held-out test text. MER, MCS, and UWEC pool by morpheme or token count."""
+    """Score held-out test text. MER, MCS, and UWEC pool by morpheme or token count.
+
+    ``record=False`` (in-training probes) only returns the report: no
+    eval.json, safety snapshot, manifest, or K-Veritas phase / claim lines.
+
+    ``generate(text, lang)`` decodes one row; without it, ``policy.analyze``
+    is used. ``weights`` records which trained weights were scored.
+    """
     from beni.core.compute.helpers import mer_edit_counts, mcs_match_counts
     from beni.core.compute.metrics import MorphologyScorer
     from beni.core.compute.uwec import array_module
     from beni.core.morphotactic.dabax import get_dabax
-    from beni.core.safety.governor import SafetyGovernor
+    from beni.core.safety.governor import SafetyGovernor, weights_fingerprint
 
     try:
         import jax.numpy as jnp  # type: ignore
@@ -368,6 +586,8 @@ def run_eval(
 
     if mc.working_dir:
         cfg.set_working_dir(mc.working_dir)
+    if record:
+        kv.emit_phase("eval", mc)
     if records is None:
         records = load_eval_records(mc)
     scope = _scope(mc)
@@ -381,7 +601,10 @@ def run_eval(
 
     scorer = MorphologyScorer()
     by_language = {}
-    cap = max(int(mc.experiment.max_eval_rows or 0), 0)
+    max_rows = mc.experiment.max_eval_rows
+    if max_rows is not None and int(max_rows) < 0:
+        raise ValueError(f"experiment.max_eval_rows must be null or >= 0, got {max_rows}")
+    cap = None if max_rows in (None, 0) else int(max_rows)
     scope_mer_ops = 0
     scope_mer_n = 0
     scope_mcs_hit = 0.0
@@ -392,7 +615,7 @@ def run_eval(
     if decode is None and policy is not None:
 
         def _from_policy(text: str, _lang: str) -> str:
-            return policy.generate(text)
+            return policy.analyze(text)
 
         decode = _from_policy
 
@@ -409,9 +632,8 @@ def run_eval(
             process=True,
             runtime_dir=cfg.get_workdir().runtime,
         )
-        # Fast evaluation: parse only the evaluated subset (or small sample for ref_phi) instead of 1800+ texts
-        eval_sample_size = cap if cap else min(20, len(texts))
-        sample_texts = texts[:eval_sample_size]
+        # Parse only the evaluated subset: all rows when max_eval_rows is null, else the first ``cap``.
+        sample_texts = texts if cap is None else texts[:cap]
         parsed_ref_cache = {}
         sentences = []
         for text in sample_texts:
@@ -430,40 +652,9 @@ def run_eval(
         uwec_sum = 0.0
         uwec_n = 0
         n_scored = 0
-        if decode is not None and cap:
-            for text in texts[:cap]:
-                try:
-                    completion = decode(text, group)
-                except Exception:
-                    continue
-                if not completion:
-                    continue
-                hyp_sentences = []
-                # Attempt structured JSON parsing first
-                clean = completion.strip()
-                if clean.startswith("```json"):
-                    clean = clean[7:]
-                if clean.startswith("```"):
-                    clean = clean[3:]
-                if clean.endswith("```"):
-                    clean = clean[:-3]
-                clean = clean.strip()
-                if clean.startswith("{") and clean.endswith("}"):
-                    try:
-                        import json as _json
-                        data = _json.loads(clean)
-                        if isinstance(data, dict) and "tokens" in data:
-                            from beni.core.compute.rewards import RewardManager
-                            sent = RewardManager.parse_json_to_sentence(data, text=text)
-                            if sent and sent.tokens:
-                                hyp_sentences = [sent]
-                    except Exception:
-                        pass
-                if not hyp_sentences:
-                    try:
-                        hyp_sentences = dabax.loader(completion) or []
-                    except Exception:
-                        hyp_sentences = []
+        n_skipped = 0
+        if decode is not None:
+            for text in sample_texts:
                 ref_sentences = parsed_ref_cache.get(text)
                 if ref_sentences is None:
                     try:
@@ -471,7 +662,32 @@ def run_eval(
                         parsed_ref_cache[text] = ref_sentences
                     except Exception:
                         ref_sentences = []
-                if not ref_sentences or not hyp_sentences:
+                ref_morphemes = _morphemes(ref_sentences[0]) if ref_sentences else []
+                if not ref_morphemes:
+                    # An empty reference has no defined MER; count it, skip decoding, keep it out of the pools.
+                    n_skipped += 1
+                    continue
+                try:
+                    completion = decode(text, group)
+                except Exception:
+                    continue
+                if not completion:
+                    continue
+                hyp_sentences = []
+                # Attempt structured JSON parsing first; discard any LLM-emitted stage
+                # and compute Daba stages via DabaX on the predicted token surfaces.
+                from beni.core.compute.rewards import RewardManager
+                data = RewardManager.extract_json(completion)
+                if isinstance(data, dict) and isinstance(data.get("tokens"), list):
+                    sent = RewardManager.parse_json_to_sentence(data, text=text)
+                    if sent and sent.tokens:
+                        hyp_sentences = [_recompute_daba_stages(sent, dabax, group)]
+                if not hyp_sentences:
+                    try:
+                        hyp_sentences = dabax.loader(completion) or []
+                    except Exception:
+                        hyp_sentences = []
+                if not hyp_sentences:
                     continue
                 all_hyp_sentences.extend(hyp_sentences)
                 ref_sent, hyp_sent = ref_sentences[0], hyp_sentences[0]
@@ -479,7 +695,7 @@ def run_eval(
                 ref_tokens = list(getattr(ref_sent, "tokens", None) or [])
                 hyp_stages = [token.stage for token in hyp_tokens]
                 ref_stages = [token.stage for token in ref_tokens]
-                ops, n_ref = mer_edit_counts(_morphemes(ref_sent), _morphemes(hyp_sent), xp=xp)
+                ops, n_ref = mer_edit_counts(ref_morphemes, _morphemes(hyp_sent), xp=xp)
                 mer_ops += int(ops)
                 mer_n += int(n_ref)
                 hits, n_tok = mcs_match_counts(hyp_stages, ref_stages, xp=xp)
@@ -524,6 +740,7 @@ def run_eval(
             "uwec": uwec_val,
             "n_sentences": len(sentences),
             "n_scored": n_scored,
+            "n_skipped": n_skipped,
             "n_morphemes": mer_n,
             "n_tokens": int(mcs_n) if mcs_n else uwec_n,
             "checkpoint_id": checkpoint_id,
@@ -543,26 +760,58 @@ def run_eval(
         "uwec": (scope_uwec_sum / scope_uwec_n) if scope_uwec_n else None,
         "n_morphemes": scope_mer_n,
         "n_tokens": int(scope_mcs_n) if scope_mcs_n else scope_uwec_n,
+        "n_scored": sum(int(row.get("n_scored") or 0) for row in by_language.values()),
+        "n_skipped": sum(int(row.get("n_skipped") or 0) for row in by_language.values()),
         "beta": scorer.beta,
         "eps": scorer.eps,
         "reference_model": ref_id,
+        "weights": weights,
+        "eval_source": str(mc.experiment.eval_source) if mc.experiment.eval_source else "packaged:test.json",
+        "max_eval_rows": cap,
         "tau": mc.distillation.tau,
     }
+    if not record:
+        return report
     out = cfg.get_workdir().exp / "eval.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    # The snapshot lives next to the weights it scores, which is where `sebeni push`
+    # checks. A base-model or Hub-only eval goes to exp/ so it can never clear
+    # trained weights for a push.
+    snapshot_dir = Path(weights) if weights and Path(weights).is_dir() else cfg.get_workdir().exp
+    training = {}
+    previous = snapshot_dir / SafetyGovernor.SNAPSHOT_NAME
+    if previous.is_file():
+        try:
+            prior = json.loads(previous.read_text(encoding="utf-8"))
+            training = {
+                key: prior.get(key)
+                for key in ("blocked_steps", "target_gate", "gates_fired", "u_indicator", "u_kl", "uncertainty")
+                if prior.get(key) is not None
+            }
+            training = prior.get("training") or training
+        except (OSError, ValueError):
+            training = {}
     gov = SafetyGovernor(mc.safety.to_spec(tau=mc.distillation.tau, kl_beta=mc.trainer.beta))
     gov.record_snapshot(
-        phi=report["phi"] or 0.0,
+        phi=report["phi"],
         tau=mc.distillation.tau,
         mer=report["mer"],
         mcs=report["mcs"],
         checkpoint_id=",".join(str(v.get("checkpoint_id") or "") for v in by_language.values()),
         algorithm=mc.algorithm,
         language=",".join(report["languages"]),
-        extra={"scope": scope.label, "by_language": by_language, "uwec": report["uwec"]},
+        extra={
+            "scope": scope.label,
+            "by_language": by_language,
+            "uwec": report["uwec"],
+            "weights": weights,
+            "weights_sha256": weights_fingerprint(snapshot_dir) if snapshot_dir != cfg.get_workdir().exp else None,
+            "training": training,
+        },
     )
-    gov.write_snapshot(cfg.get_workdir().models)
+    report["safety_snapshot"] = str(gov.write_snapshot(snapshot_dir))
+    kv.emit_claims(report, mc)
     _write_manifest(mc, stage="eval", eval=str(out), scope=scope.label)
     return report
 
@@ -575,16 +824,33 @@ def _macro(by_language: Dict[str, Dict[str, Any]], key: str) -> Optional[float]:
 
 
 def run_experiment(mc: MasterConfig) -> Dict[str, Any]:
-    """Distill, train one arm, then evaluate. The experiment train set is the packaged jsonl."""
-    mc.experiment.dataset = "packaged"
-    mc.data.source = None
+    """Distill, train one arm, then evaluate.
+
+    Trains on ``data.source`` when the config sets it, else on the packaged
+    ``dataset_300_samples.jsonl``. The train file and row count are printed.
+    """
+    if not mc.data.source:
+        mc.experiment.dataset = "packaged"
     loaded = load_train_records(mc)
+    source = loaded.get("source") or "packaged:dataset_300_samples.jsonl"
+    counts = loaded.get("counts") or {}
+    print(
+        f"[exp] train data: {source} ({len(loaded['records'])} rows; "
+        + ", ".join(f"{lang}={n}" for lang, n in sorted(counts.items()))
+        + ")",
+        flush=True,
+    )
     if not loaded["records"]:
-        raise RuntimeError("Experiment train split is empty (dataset_300_samples.jsonl).")
+        raise RuntimeError(f"Experiment train split is empty ({source}).")
     run_distill(mc, loaded["records"])
     trainer = run_arm(mc, loaded["records"])
 
     def _generate(text: str, _lang: str) -> str:
-        return trainer.generate(text)
+        return trainer.analyze(text)
 
-    return run_eval(mc, generate=_generate, policy=getattr(trainer, "plugin", trainer))
+    return run_eval(
+        mc,
+        generate=_generate,
+        policy=getattr(trainer, "plugin", trainer),
+        weights=str(default_weights_dir(mc)),
+    )

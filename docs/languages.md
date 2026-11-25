@@ -11,10 +11,10 @@ group in JSON `lang`.
 | Bozo | boz | **boz** | Family grouped |
 | Dogon | dtm | **dtm** | Toro So as emblem |
 | Fula / Fulani | ful | **ful** | Packaged baseline |
-| Hassaniya | mey, hsy | **mey** | Toolkit uses **mey** |
+| Hassaniya | mey | **mey** | `hsy` maps to `mey` only inside the experiment jsonl |
 | Kassonke (Xaasongaxango) | kao | **kao** | Packaged baseline |
 | Mamara | myk | **myk** | Packaged baseline |
-| Maninka | mku, mlq | **mku** | Packaged Daba files may live under `baselines/mlq/` |
+| Maninka | mku, mlq | **mku** | Packaged Daba files under `beni/data/baselines/mku/` |
 | Seynara / Senoufo | spp, seq | **spp** | Senufo group |
 | Songhay | ses | **ses** | Packaged baseline |
 | Soninke | snk | **snk** | Packaged baseline |
@@ -32,6 +32,20 @@ sebeni exp --preset single --lang bbo --algorithm grpo -w ./runs/bbo
 `bbo` is an outlier kept in the experiment file and excluded from MULTI13.
 Inside `dataset_300_samples.jsonl` only, `mlq` is read as Kassonke `kao`,
 `hsy` as `mey`, and `seq` as `spp`. `Language.from_code("mlq")` is still Maninka `mku`.
+Packaged `test.json` keys Maninka as `mlq`, which resolves to `mku`.
+
+## Scope labels
+
+`resolve_scope` labels every run; `eval.json` and the manifest carry the label.
+
+| Label | When |
+| --- | --- |
+| `MULTI13` | `multi13` / `all`, or exactly the 13 groups |
+| `SINGLE_LANG` | one group (also the fallback when no language is given: `bam`) |
+| `OUTLIER` | only `bbo` |
+| `PARTIAL` | any other subset |
+
+`bbo` is dropped from any mixed scope and recorded as dropped.
 
 ```yaml
 data:

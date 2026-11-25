@@ -1,4 +1,4 @@
-# Alias of configs/presets/multi13.yaml.
+# Alias of beni/data/presets/multi13.yaml.
 # `sebeni exp` trains on dataset_300_samples.jsonl and evaluates on test.json.
 
 preset: multi13
@@ -48,7 +48,7 @@ experiment:
   dataset: packaged
   freeze_resources: true
   scope: MULTI13
-  max_eval_rows: 1
+  max_eval_rows: null      # all held-out test.json rows per language
   kveritas: false
   kveritas_seal: false
 

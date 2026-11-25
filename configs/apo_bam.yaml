@@ -1,6 +1,6 @@
 # Anchored Preference Optimization (APO, https://huggingface.co/papers/2408.06266)
 # policy-update plugin (TRL DPO loss_type apo_zero / apo_down)
-# Docs: https://seben.robotsmali.org/docs/hyperparams/
+# Docs: https://mlsftwrs.github.io/sebeni/hyperparams/
 project_name: sebeni-bam-apo
 algorithm: apo
 # working_dir: ./runs/bam-apo-001

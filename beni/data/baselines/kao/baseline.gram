@@ -1,8 +1,12 @@
-# Kassonke morphotactic patterns
+# Kassonke (Xaasongaxango, kao) morphotactic patterns
+# version 2026.11.23 — revised from beni/data/raw/kao.txt & test.json
+# Fixes: removed broken nonkassonke consonant-final & French-digraph false positives (was 48% false EMPR!)
 
 # macro definitions
-macro   @vow@            [aeiou]
-macro   @cons@           [bcdfghjklmnɲŋprstwy]
+macro   @vow@            <re>.*[aeiou]</re>
+macro   @nasal-v@        <re>.*[aeiou][nŋ]</re>
+macro   @nonnasal-v@     <re>.*[aeiou]</re>
+macro   @cons@           <re>.*[bcdfghjklmnɲŋprstwxy]</re>
 macro   @syl@            [^aeiou]*(?P<V>[aeiou])(?P=V)?([^aeiou]+(?=([^aeiou]|$)))?
 
 # processing instructions
@@ -20,141 +24,107 @@ stage 2 add parallel parse reduplication
 stage 2 apply lookup
 return if parsed
 stage 3 add parallel decompose pos_composition
+stage 3 apply lookup
 return if parsed
 stage 4 apply firstmatch parse nonkassonke
 return if parsed
 
 # --- NOUN INFLECTION (Definiteness & Plurality) ---
 section noun_inflection
+# Plural suffixes (-lu, -nu)
+pattern :n/adj/prn/n.prop: [ {|lu}:: ] | :n/adj/prn/n.prop: [ :n/adj/prn/n.prop: :mrph:PL ]
+pattern :n/adj/prn/n.prop: [ {|nu}:: ] | :n/adj/prn/n.prop: [ :n/adj/prn/n.prop: :mrph:PL ]
 
-# Plural Suffix (-nu, -lu)
-pattern :n: [ {|nu}:: ] | :n: [ :n: :mrph:PL ]
-pattern :n: [ {|lu}:: ] | :n: [ :n: :mrph:PL ]
+# Definite suffixes (-o, -yo, -wo, -no, -ŋo, hyphenated -o)
+pattern :n/adj/n.prop: [ {|yo}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF ]
+pattern :n/adj/n.prop: [ {|wo}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF ]
+pattern :n/adj/n.prop: [ {|no}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF ]
+pattern :n/adj/n.prop: [ {|ŋo}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF ]
+pattern :n/adj/n.prop: [ {|-o}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF ]
+pattern :n/adj/n.prop: [ {<re>.*[^o]</re>|o}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF ]
 
-# Definite Suffix (-o, -yo, -wo, -no)
-pattern :n: [ {|o}:: ] | :n: [ :n: :mrph:DEF ]
-pattern :n: [ {|yo}:: ] | :n: [ :n: :mrph:DEF ]
-pattern :n: [ {|wo}:: ] | :n: [ :n: :mrph:DEF ]
-pattern :n: [ {|no}:: ] | :n: [ :n: :mrph:DEF ]
+# Combined Definite Plural (-olu, -yolu, -wolu, -nolu, -ŋolu)
+pattern :n/adj/n.prop: [ {|olu}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF :mrph:PL ]
+pattern :n/adj/n.prop: [ {|yolu}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF :mrph:PL ]
+pattern :n/adj/n.prop: [ {|wolu}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF :mrph:PL ]
+pattern :n/adj/n.prop: [ {|nolu}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF :mrph:PL ]
+pattern :n/adj/n.prop: [ {|ŋolu}:: ] | :n/adj/n.prop: [ :n/adj/n.prop: :mrph:DEF :mrph:PL ]
 
-# Combined Definite Plural (-olu, -yolu, -wolu, -nolu)
-pattern :n: [ {|olu}:: ] | :n: [ :n: :mrph:DEF :mrph:PL ]
-pattern :n: [ {|yolu}:: ] | :n: [ :n: :mrph:DEF :mrph:PL ]
-pattern :n: [ {|wolu}:: ] | :n: [ :n: :mrph:DEF :mrph:PL ]
-pattern :n: [ {|nolu}:: ] | :n: [ :n: :mrph:DEF :mrph:PL ]
-
-# --- VERBAL INFLECTION (Aspect & Tense Markers) ---
+# --- VERBAL INFLECTION (Aspect & Tense) ---
 section verb_inflection
-
-# Infinitival / Base Form (-o)
-pattern :v: [ {|o}:: ] | :v: [ :v: :mrph:INF ]
-
-# Past / Accomplished Aspect (-ta, -nta)
-pattern :v: [ {|ta}:: ] | :v: [ :v: :mrph:PAST ]
-pattern :v: [ {|nta}:: ] | :v: [ :v: :mrph:PAST ]
-
-# Participle / Gerund Suffix (-li)
+# Past / Accomplished (-ta, -nta, hyphenated -ta)
+pattern :v: [ {|ta}:: ] | :v: [ :v: :mrph:PFV ]
+pattern :v: [ {|nta}:: ] | :v: [ :v: :mrph:PFV ]
+pattern :v: [ {|-ta}:: ] | :v: [ :v: :mrph:PFV ]
+# Imperfective / Infinitive (-la, -ra, -na, -lo)
+pattern :v: [ {|la}:: ] | :v: [ :v: :mrph:IPFV ]
+pattern :v: [ {|ra}:: ] | :v: [ :v: :mrph:IPFV ]
+pattern :v: [ {|na}:: ] | :v: [ :v: :mrph:IPFV ]
+pattern :v: [ {|-la}:: ] | :v: [ :v: :mrph:IPFV ]
+# Resultative participle (-nin, -riŋ)
+pattern :v/ptcp: [ {|nin}:: ] | :ptcp: [ :v: :mrph:PTCP.RES ]
+# Nominalization (-li, -lo, -ni)
 pattern :n: [ {|li}:: ] | :n: [ :v: :mrph:NMLZ ]
+pattern :n: [ {|lo}:: ] | :n: [ :v: :mrph:NMLZ ]
 
-# --- VERBAL DERIVATION (Derivational Prefixes) ---
+# --- VERBAL DERIVATION (Prefixes) ---
 section verbal_derivation
-
-# Causative Prefix (la-)
+# Causative (la-), Medial/Super (ma-), Iterative (to-)
 pattern :v: [ {la|}:: ] | :v: [ :mrph:CAUS :v: ]
-
-# Medial / Intensive Prefix (ma-)
 pattern :v: [ {ma|}:: ] | :v: [ :mrph:MID.INTNS :v: ]
-
-# Iterative / Repetitive Prefix (to-)
 pattern :v: [ {to|}:: ] | :v: [ :mrph:ITER :v: ]
 
-# --- NOMINAL DERIVATION (Derivational Suffixes) ---
+# --- NOMINAL DERIVATION ---
 section nominal_derivation
-
-# Augmentative Suffix (-ba)
-pattern :n: [ {|ba}:: ] | :n: [ :n: :mrph:AUG ]
-
-# Diminutive Suffix (-ndin)
-pattern :n: [ {|ndin}:: ] | :n: [ :n: :mrph:DIM ]
-
-# Gentilic / Inhabitant Suffix (-ŋga, -nka)
-pattern :n: [ {|ŋga}:: ] | :n: [ :n: :mrph:GENT ]
-pattern :n: [ {|nka}:: ] | :n: [ :n: :mrph:GENT ]
-
-# Locative Suffixes (-ya, -la, -nda)
+# Augmentative (-ba, -bo), Diminutive (-ndin, -ndingo)
+pattern :n/adj: [ {|ba}:: ] | :n/adj: [ :n/adj: :mrph:AUGM ]
+pattern :n/adj: [ {|ndin}:: ] | :n/adj: [ :n/adj: :mrph:DIM ]
+pattern :n/adj: [ {|ndinŋo}:: ] | :n/adj: [ :n/adj: :mrph:DIM :mrph:DEF ]
+# Gentilic (-ŋga, -nka)
+pattern :n/n.prop: [ {|ŋga}:: ] | :n: [ :n/n.prop: :mrph:GENT ]
+pattern :n/n.prop: [ {|nka}:: ] | :n: [ :n/n.prop: :mrph:GENT ]
+# Abstract (-ya, -yaa)
+pattern :n/adj: [ {|ya}:: ] | :n: [ :n/adj: :mrph:ABSTR ]
+pattern :n/adj: [ {|yaa}:: ] | :n: [ :n/adj: :mrph:ABSTR ]
+# Locative (-xola, -la, -nda)
 pattern :n: [ {|xola}:: ] | :n: [ :n: :mrph:LOC ]
-pattern :n: [ {|ya}:: ] | :n: [ :n: :mrph:ABSTR.LOC ]
-pattern :n: [ {|la}:: ] | :n: [ :n: :mrph:LOC.ALT ]
-pattern :n: [ {|nda}:: ] | :n: [ :n: :mrph:LOC.ALT ]
-
-# Privative Suffix (-ntan)
-pattern :n: [ {|ntan}:: ] | :n: [ :n: :mrph:PRIV ]
-
-# Experient / Relational Suffix (-nte, -din)
-pattern :n: [ {|nte}:: ] | :n: [ :n: :mrph:REL ]
-pattern :n: [ {|din}:: ] | :n: [ :n: :mrph:REL.ALT ]
-
-# Agentive / Participant Suffix (-la, -baxa, -to)
+pattern :n/n.prop: [ {|nda}:: ] | :n: [ :n/n.prop: :mrph:LOC ]
+# Privative (-ntan, -ntanŋo, -bali)
+pattern :adj/n: [ {|ntan}:: ] | :adj/n: [ :n: :mrph:PRIV ]
+pattern :adj/n: [ {|ntanŋo}:: ] | :adj/n: [ :n: :mrph:PRIV :mrph:DEF ]
+pattern :v/ptcp: [ {|bali}:: ] | :ptcp: [ :v: :mrph:PTCP.PRIV ]
+# Experient / Relational (-nte, -din)
+pattern :n/adj: [ {|nte}:: ] | :n/adj: [ :n/v: :mrph:REL ]
+# Agentive (-baxa, -baxo, -la, -to)
+pattern :n: [ {|baxa}:: ] | :n: [ :v: :mrph:AG.OCC ]
+pattern :n: [ {|baxo}:: ] | :n: [ :v: :mrph:AG.OCC :mrph:DEF ]
 pattern :n: [ {|la}:: ] | :n: [ :v: :mrph:AG ]
-pattern :n: [ {|baxa}:: ] | :n: [ :v: :mrph:PTCP ]
-pattern :n: [ {|to}:: ] | :n: [ :n: :mrph:PARTIC ]
-
-# Qualifying Suffix (-ma, -nin)
-pattern :n: [ {|ma}:: ] | :n: [ :n: :mrph:QUAL ]
-pattern :n: [ {|nin}:: ] | :n: [ :v: :mrph:STAT ]
-
-# Distributive Suffix (-kan)
-pattern :n: [ {|kan}:: ] | :n: [ :n: :mrph:DISTRIB ]
-
-# Instrumental Suffix (-ran)
-pattern :n: [ {|ran}:: ] | :n: [ :v: :mrph:INST ]
+pattern :n: [ {|to}:: ] | :n: [ :n/v: :mrph:CONV ]
+# Qualifying / Instrumental (-ma, -ran)
+pattern :adj/n: [ {|ma}:: ] | :adj/n: [ :n: :mrph:QUAL ]
+pattern :n: [ {|ran}:: ] | :n: [ :v: :mrph:INSTR ]
 
 # --- REDUPLICATION ---
 section reduplication
-
-# Full Reduplication (Verb, Noun, Adjective)
 pattern :v: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :v: [ :v: :v: ]
 pattern :n: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :n: [ :n: :n: ]
 pattern :adj: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :adj: ]
-
-# Reduplication with hyphen
+pattern :num: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :num: [ :num: :num: ]
 pattern :v: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :v: [ :v: :: :v: ]
 pattern :n: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :n: [ :n: :: :n: ]
-pattern :adj: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :: :adj: ]
 
-# Distributive Numeral Reduplication
-pattern :num: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :num: [ :num: :num: ]
-
-# --- POS COMPOSITION (Compound Nouns) ---
+# --- POS COMPOSITION ---
 section pos_composition
-
-# Noun-Noun Compounds
 pattern :n: [ :n: :n: ] | :n: [ :n: :n: ]
-
-# Noun-Adjective Compounds
 pattern :n: [ :n: :adj: ] | :n: [ :n: :adj: ]
-
-# Verb-Noun Compounds
 pattern :n: [ :v: :n: ] | :n: [ :v: :n: ]
-
-# Noun + Verb + Agent
+pattern :n: [ :n.prop: :n: ] | :n: [ :n.prop: :n: ]
 pattern :n: [ :n: :v: :mrph:AG ] | :n: [ :n: :v: :mrph:AG ]
-
-# Verb + NMLZ + Noun
 pattern :n: [ :v: :mrph:NMLZ :n: ] | :n: [ :v: :mrph:NMLZ :n: ]
+pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
 
-# Noun + AUG + Noun
-pattern :n: [ :n: :mrph:AUG :n: ] | :n: [ :n: :mrph:AUG :n: ]
-
-# --- NON-KASSONKE FILTER ---
+# --- NON-KASSONKE FILTER (STAGE 4 = EMPR) ---
 section nonkassonke
-
-# Filter out forms containing characters not in the Kassonke alphabet
-pattern <re>.*[ƔƎʐʑʂʈɖɓɗƴqvxzQVXZ].*</re>:: | ::EMPR
-
-# Filter out common loanword markers and orthographic patterns typical of French
-pattern <re>.*(ée?|tion|ment|que|oi|au|eau|ou|ai|ei|ch|th|ph|gn|gu).*</re>:: | ::EMPR
-
-# Forms ending with non-final consonants
-pattern <re>.+[bcdfghjklmnprstwy]$</re>:: | ::EMPR
-
+# Only filter characters outside the Kassonke alphabet (q, v, z, French accents ç/ê/î/ô/û/ù/è or non-Manding ɓɗƴƔ)
+# Note: Kassonke allows final -n/-ŋ and 'x' (e.g. Xaasongaxango, baxo) and vowel sequences in compounds.
+pattern <re>.*[qvzQVZɓɗƴƔƎʐʑʂʈɖçêîôûùè].*</re>:: | ::EMPR

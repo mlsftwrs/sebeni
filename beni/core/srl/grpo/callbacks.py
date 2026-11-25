@@ -183,13 +183,10 @@ class TrackioMetricsCallback(TrainerCallback):
 
 
 def emit_kveritas_line(name: str, value: float, step: int = 0) -> None:
-    """Print standard K-Veritas protocol metric line."""
-    if value is not None:
-        try:
-            val = float(value)
-            print(f"KVERITAS_METRIC name={name} value={val:.6g} step={int(step)}", flush=True)
-        except (ValueError, TypeError):
-            pass
+    """Print one K-Veritas metric line: ``KV <name>=<value> step=<step>``."""
+    from beni.core.kveritas import emit_metric
+
+    emit_metric(name, value, step=step)
 
 
 class KVeritasCallback(TrainerCallback):
@@ -240,7 +237,7 @@ class KVeritasCallback(TrainerCallback):
                     text_val = ""
                     lang_val = ""
                     if isinstance(row, dict) or hasattr(row, "get"):
-                        text_val = row.get("text") or ""
+                        text_val = row.get("raw_text") or row.get("text") or ""
                         if not text_val:
                             p = row.get("prompt")
                             if isinstance(p, list):
@@ -250,13 +247,12 @@ class KVeritasCallback(TrainerCallback):
                                         break
                                 if not text_val and p and isinstance(p[-1], dict):
                                     text_val = p[-1].get("content", "")
-                            elif isinstance(p, str):
-                                text_val = p
                         lang_val = row.get("lang") or row.get("language") or ""
-                    eval_records.append({"text": text_val, "lang": lang_val})
+                    if text_val:
+                        eval_records.append({"text": text_val, "lang": lang_val})
 
                 if eval_records:
-                    report = run_eval(self.config, eval_records)
+                    report = run_eval(self.config, eval_records, record=False)
                     for metric_key in ["phi", "mer", "mcs", "uwec"]:
                         val = report.get(metric_key)
                         if val is not None:

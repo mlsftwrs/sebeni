@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional
 from beni.core.srl.config import trl_config_kwargs
 from beni.core.srl.plugin import AlignmentPlugin
 from beni.core.srl.grpo.callbacks import TrackioMetricsCallback
+from beni.core.kveritas import active as kv_active
 from beni.utils import config as cfg
 
 
@@ -21,13 +22,21 @@ class SebeniSft(AlignmentPlugin):
     """TRL SFTTrainer over DabaX completion labels."""
 
     name = "sft"
+    signal_source = "targets"
 
     def extract_labels(self, records: List[Dict[str, Any]]) -> List[Dict[str, str]]:
-        """Build SFT rows from frozen resources. Skips empty analyses."""
-        from beni.core.srl.config import SRLGrpoPrompt
+        """Build SFT rows from frozen resources. Skips empty analyses.
+
+        Each row is a ``prompt`` / ``completion`` pair from
+        :func:`beni.core.srl.prompting.build_policy_example_parts`: the same chat
+        prompt GRPO / DPO train on and ``analyze`` decodes with, so TRL computes
+        the loss on the answer only. Targets the SafetyGovernor would refuse
+        (invalid JSON, wrong or mixed language) are dropped (``gate_targets``).
+        """
+        from beni.core.srl.prompting import build_policy_example_parts
         from beni.data.datasets import build_dabax_reference
 
-        prompt = SRLGrpoPrompt(languages=self.config.languages()).prompt()
+        languages = self.config.languages()
         accepted: List[Dict[str, str]] = []
         invalid: List[Dict[str, str]] = []
         for row in records or []:
@@ -40,14 +49,25 @@ class SebeniSft(AlignmentPlugin):
             if not reference or not tokens:
                 invalid.append({"text": text, "lang": lang})
                 continue
-            completion = json.dumps(reference, ensure_ascii=False)
+            target = json.dumps(reference, ensure_ascii=False)
+            prompt, answer = build_policy_example_parts(text, target, self.tokenizer, languages)
             accepted.append(
                 {
-                    "text": f"{prompt}\n\nUser: {text}\nAssistant: {completion}",
+                    "prompt": prompt,
+                    "completion": answer,
+                    "text": prompt + answer,
+                    "raw_text": text,
                     "lang": lang,
-                    "completion": completion,
+                    "target": target,
                 }
             )
+        accepted = self.gate_targets(accepted, completion_key="target")
+        accepted = self.drop_overlength(
+            accepted,
+            prompt_of=lambda row: row["prompt"],
+            answers_of=lambda row: [row["completion"]],
+            max_length=getattr(self.config.sft, "max_length", None),
+        ) if accepted else accepted
         root = Path(self.config.working_dir or cfg.get_workdir().root)
         dataset_path = root / "data" / "sft" / "train.jsonl"
         dataset_path.parent.mkdir(parents=True, exist_ok=True)
@@ -60,6 +80,7 @@ class SebeniSft(AlignmentPlugin):
             "dataset_sha256": digest,
             "dataset": str(dataset_path),
             "invalid_sample": invalid[:8],
+            "governor": self.target_gate_report,
         }
         report_path = root / "exp" / "sft_label_report.json"
         report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -82,36 +103,27 @@ class SebeniSft(AlignmentPlugin):
         from trl import SFTConfig, SFTTrainer
 
         records = [data[i] for i in range(len(data))] if hasattr(data, "column_names") else list(data or [])
-        labeled = self.extract_labels(records)
-        dataset = Dataset.from_list([{"text": row["text"]} for row in labeled])
-        train_dataset = dataset
-        eval_dataset = None
-        eval_ratio = getattr(self.config.data, "eval_ratio", 0.0) or 0.0
-        max_eval = getattr(self.config.experiment, "max_eval_rows", None)
-        if (eval_ratio > 0.0 or (max_eval and max_eval > 0)) and hasattr(dataset, "train_test_split") and len(dataset) > 1:
-            n_samples = len(dataset)
-            if max_eval is not None and max_eval > 0:
-                target_test = min(int(max_eval), max(1, n_samples - 1))
-                if n_samples > 2 and target_test >= n_samples:
-                    target_test = max(1, n_samples // 2)
-                test_size = target_test
-            else:
-                test_size = eval_ratio
-
-            split = dataset.train_test_split(test_size=test_size, seed=self.config.sft.seed)
-            train_dataset = split["train"]
-            eval_dataset = split["test"]
-            if max_eval is not None and max_eval > 0 and len(eval_dataset) > max_eval:
-                if hasattr(eval_dataset, "select"):
-                    eval_dataset = eval_dataset.select(range(max_eval))
-                else:
-                    eval_dataset = eval_dataset[:max_eval]
-
         if self.model is None:
             self.load_models()
+        labeled = self.extract_labels(records)
+        dataset = Dataset.from_list(
+            [
+                {
+                    "prompt": row["prompt"],
+                    "completion": row["completion"],
+                    "raw_text": row.get("raw_text", ""),
+                    "lang": row.get("lang", ""),
+                }
+                for row in labeled
+            ]
+        )
+        train_dataset, eval_dataset = self.split_eval(dataset, seed=self.config.sft.seed)
 
         project_name = project_name or self.config.project_name
-        sft_dict = {**self.config.sft.to_dict(), "dataset_text_field": "text"}
+        sft_dict = self.config.sft.to_dict()
+        # Hub uploads go through the SafetyGovernor (push_after_train / sebeni push), never
+        # through HF Trainer's own checkpoint pushes, which would bypass the gate.
+        sft_dict["push_to_hub"] = False
         if eval_dataset is not None:
             if "eval_strategy" not in sft_dict or not sft_dict["eval_strategy"]:
                 sft_dict["eval_strategy"] = "steps"
@@ -127,7 +139,7 @@ class SebeniSft(AlignmentPlugin):
             )
         )
         callbacks = [TrackioMetricsCallback(reward_manager=self.reward_manager)]
-        if getattr(self.config.experiment, "kveritas", False):
+        if kv_active(self.config):
             from beni.core.srl.grpo.callbacks import KVeritasCallback
             callbacks.append(KVeritasCallback(reward_manager=self.reward_manager, config=self.config, eval_dataset=eval_dataset))
         if extra_callbacks:
@@ -145,19 +157,12 @@ class SebeniSft(AlignmentPlugin):
             trainer_kwargs["processing_class"] = self.tokenizer
         elif "tokenizer" in trainer_sig:
             trainer_kwargs["tokenizer"] = self.tokenizer
-        if "dataset_text_field" in trainer_sig:
-            trainer_kwargs["dataset_text_field"] = "text"
         self.trainer = SFTTrainer(**trainer_kwargs)
         self._wire_pre_update_hooks(self.trainer)
         self._init_trackio(project_name)
         print("Starting Sebeni SFT Training Loop...")
         result = self.trainer.train()
         self.save_model(self.config.sft.output_dir or self.config.trainer.output_dir)
-        if self.config.sft.push_to_hub:
-            self.push_to_hub(
-                repo_id=self.config.sft.hub_model_id,
-                token=self.config.sft.hub_token,
-                private=self.config.sft.hub_private_repo,
-            )
+        self.push_after_train(self.config.sft)
         self._finish_trackio()
         return result

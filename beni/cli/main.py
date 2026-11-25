@@ -4,18 +4,37 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import typer
+from typer.core import TyperGroup
 
 from beni.core.srl.config import MasterConfig
 from beni.utils import config as cfg
 
+class _RecordingGroup(TyperGroup):
+    """Keeps the exact invocation args, so a K-Veritas re-launch repeats them
+    whether the CLI came from ``sys.argv`` or ``app([...])`` / CliRunner."""
+
+    def parse_args(self, ctx, args):
+        ctx.meta["sebeni_argv"] = list(args)
+        return super().parse_args(ctx, args)
+
+
 app = typer.Typer(
+    cls=_RecordingGroup,
     add_completion=False,
     no_args_is_help=True,
     help="Sebeni — self-aware morphotactic generation for extremely low-resource languages.",
 )
+
+
+@app.callback()
+def _main() -> None:
+    """Sebeni — self-aware morphotactic generation for extremely low-resource languages."""
+    from beni.core.kveritas import restore_caller_cwd
+
+    restore_caller_cwd()
 
 
 def _load_config(
@@ -38,83 +57,177 @@ def _packaged_exp_yaml() -> Path:
 
 
 def emit_kveritas_metrics(report: Dict, step: int = 0) -> None:
-    """Print stdout lines K-Veritas already understands."""
-    phi = report.get("phi")
-    if phi is not None:
-        typer.echo(f"KVERITAS_METRIC name=phi value={float(phi):.6g} step={step}")
+    """Print the report's Φ / MER / MCS / UWEC (scope and per language) as ``KV`` metric lines."""
+    from beni.core import kveritas as kv
+
+    for key in kv.CLAIM_METRICS:
+        kv.emit_metric(key, report.get(key), step=step)
     for lang, row in (report.get("by_language") or {}).items():
-        val = (row or {}).get("phi")
-        if val is None:
-            continue
-        typer.echo(f"KVERITAS_METRIC name=phi_{lang} value={float(val):.6g} step={step}")
+        for key in kv.CLAIM_METRICS:
+            kv.emit_metric(f"{key}_{lang}", (row or {}).get(key), step=step)
 
 
-def maybe_kveritas_init(working_dir: Optional[Path] = None, disclosure: str = "open") -> None:
-    """Ensure K-Veritas session is initialized in working_dir or current directory."""
+def maybe_kveritas_init(
+    working_dir: Optional[Path] = None, disclosure: str = "open", local: bool = False
+) -> bool:
+    """Ensure a K-Veritas session exists in ``working_dir`` (or the cwd).
+
+    Returns False when ``kveritas init`` fails (e.g. the attestation server is
+    unreachable); True when a session exists or the binary is missing.
+    """
     import shutil
     import subprocess
 
     binary = shutil.which("kveritas")
     if not binary:
-        return
+        return True
     target_dir = Path(working_dir) if working_dir else Path.cwd()
-    if not (target_dir / ".kveritas").is_dir() and not (Path.cwd() / ".kveritas").is_dir():
-        typer.echo(f"[kveritas] Initializing session in {target_dir} with disclosure={disclosure}")
+    target_dir.mkdir(parents=True, exist_ok=True)
+    if not (target_dir / ".kveritas").is_dir():
+        mode = "local key" if local else "attestation server"
+        typer.echo(f"[kveritas] Initializing session in {target_dir} with disclosure={disclosure} ({mode})")
         cmd = [binary, "init"]
         if disclosure:
             cmd.extend(["--disclosure", disclosure])
+        if local:
+            cmd.append("--local")
         result = subprocess.run(cmd, cwd=str(target_dir), check=False)
         if result.returncode != 0:
             typer.echo(f"Warning: kveritas init exited {result.returncode}", err=True)
+            return False
+    return True
 
 
 def maybe_kveritas_seal(output: Path, working_dir: Optional[Path] = None, report: Optional[Dict] = None) -> None:
-    import json
+    """Seal an existing K-Veritas session into ``output``.
+
+    Never creates a run: a session without recorded runs is refused, because a
+    report must cover the experiment that actually ran (``sebeni exp`` / ``train``
+    / ``eval`` with K-Veritas enabled run themselves under ``kveritas run``).
+    """
     import shutil
     import subprocess
 
+    del report  # kept for API compatibility; claims come from the monitored run
     binary = shutil.which("kveritas")
     if not binary:
+        typer.echo("kveritas not on PATH; skip seal. See https://kveritas.org/docs", err=True)
+        return
+    target_dir = Path(working_dir) if working_dir else Path.cwd()
+    session_file = target_dir / ".kveritas" / "session.json"
+    runs = []
+    if session_file.is_file():
+        try:
+            runs = json.loads(session_file.read_text(encoding="utf-8")).get("runs") or []
+        except (OSError, ValueError):
+            runs = []
+    if not runs:
         typer.echo(
-            "kveritas not on PATH; skip seal. See https://kveritas.org/docs",
+            f"Error: no recorded K-Veritas run in {target_dir}; nothing to seal. "
+            "Run `sebeni exp` / `train` / `eval` with experiment.kveritas enabled first.",
             err=True,
         )
         return
-    target_dir = Path(working_dir) if working_dir else Path.cwd()
-    if not (target_dir / ".kveritas").is_dir() and not (Path.cwd() / ".kveritas").is_dir():
-        maybe_kveritas_init(target_dir)
-
-    seal_dir = target_dir if (target_dir / ".kveritas").is_dir() else Path.cwd()
-    session_file = seal_dir / ".kveritas" / "session.json"
-    if session_file.is_file():
-        try:
-            session_data = json.loads(session_file.read_text(encoding="utf-8"))
-            if not session_data.get("runs"):
-                # Anchor the run so kveritas seal has at least one recorded run
-                metric_lines = []
-                if report:
-                    phi = report.get("phi")
-                    if phi is not None:
-                        metric_lines.append(f"KVERITAS_METRIC name=phi value={float(phi):.6g} step=0")
-                    for lang, row in (report.get("by_language") or {}).items():
-                        val = (row or {}).get("phi")
-                        if val is not None:
-                            metric_lines.append(f"KVERITAS_METRIC name=phi_{lang} value={float(val):.6g} step=0")
-                cmd_str = "; ".join(f"echo '{line}'" for line in metric_lines) if metric_lines else "echo '[sebeni] Run recorded'"
-                subprocess.run([binary, "run", "--", "sh", "-c", cmd_str], cwd=str(seal_dir), check=False)
-        except Exception:
-            pass
-
     output.parent.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run(
-        [binary, "seal", "--output", str(output.resolve())],
-        cwd=str(seal_dir),
-        check=False,
-    )
+    result = subprocess.run([binary, "seal", "--output", str(output.resolve())], cwd=str(target_dir), check=False)
     if result.returncode != 0:
         typer.echo(f"kveritas seal exited {result.returncode}", err=True)
     else:
         typer.echo(f"K-Veritas report sealed: {output}")
+
+
+def _kveritas_files(mc: MasterConfig, config: Optional[Path], code: Optional[Path] = None) -> List[str]:
+    """Inputs hashed before and after the monitored run: code manifest, config, train data, held-out data."""
+    from beni.core import kveritas as kv
+
+    source = mc.data.source
+    eval_source = mc.experiment.eval_source
+    return kv.evidence_files(
+        [
+            code,
+            config,
+            source if isinstance(source, (list, tuple)) else [source],
+            eval_source if isinstance(eval_source, (list, tuple)) else [eval_source],
+            cfg.DATA_DIR / "test.json",
+            cfg.DATA_DIR / "raw" / "dataset_300_samples.jsonl",
+        ]
+    )
+
+
+def _maybe_reexec_under_kveritas(
+    mc: MasterConfig, config: Optional[Path], seal: bool, report_name: str = "report.pdf"
+) -> None:
+    """Re-run this command once as the monitored subprocess of ``kveritas run``.
+
+    No-op inside the monitored child, when K-Veritas is off, or when the
+    ``kveritas`` binary is missing (a warning is printed). Otherwise exits with
+    the monitored run's return code. ``seal`` writes ``{working_dir}/exp/report.pdf``
+    after the whole command finishes.
+    """
+    import shutil
+    import subprocess
+    import sys
+
+    from beni.core import kveritas as kv
+
+    if kv.under_kveritas() or not (mc.experiment.kveritas or seal):
+        return
+    import click
+
+    try:
+        argv = click.get_current_context().meta.get("sebeni_argv")
+    except RuntimeError:
+        argv = None
+    if argv is None:
+        argv = sys.argv[1:]
+    binary = shutil.which("kveritas")
+    if not binary:
+        typer.echo("Warning: kveritas not on PATH; running without K-Veritas.", err=True)
+        return
+    workdir = Path(mc.working_dir or cfg.get_workdir().root)
+    moved = kv.move_aside_sealed_session(workdir)
+    if moved is not None:
+        typer.echo(f"[kveritas] Previous session was sealed; moved it to {moved}")
+    if not maybe_kveritas_init(
+        workdir, disclosure=mc.experiment.kveritas_disclosure, local=mc.experiment.kveritas_local
+    ):
+        typer.echo(
+            "Error: could not start a K-Veritas session, so the run would not be recorded. "
+            "Set experiment.kveritas_local: true to sign with a local key, fix the attestation "
+            "server, or rerun with --no-kveritas.",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+    report = workdir / "exp" / report_name if seal else None
+    local_key = None
+    if report is not None:
+        report.parent.mkdir(parents=True, exist_ok=True)
+        if mc.experiment.kveritas_local:
+            # `kveritas run --seal` signs with keys/private.pem in the session dir; seal
+            # explicitly instead, with the configured key, after the monitored run.
+            local_key = Path(mc.experiment.kveritas_local_key or workdir / "keys" / "private.pem").expanduser()
+            if not local_key.is_absolute():
+                local_key = Path.cwd() / local_key
+            if not local_key.is_file():
+                typer.echo(
+                    f"Error: K-Veritas local mode needs a signing key at {local_key}. Create one with "
+                    f"`openssl genrsa -out {local_key} 3072` or set experiment.kveritas_local_key.",
+                    err=True,
+                )
+                raise typer.Exit(code=1)
+    code_file = kv.code_manifest(workdir / "exp" / "sebeni_code.json")
+    cmd = kv.kveritas_command(
+        binary, argv, seal=None if local_key else report, files=_kveritas_files(mc, config, code_file)
+    )
+    typer.echo(f"[kveritas] Monitored run: {' '.join(cmd)}")
+    code = kv.run_forwarding_signals(cmd, cwd=str(workdir), env=kv.child_env())
+    if code == 0 and local_key is not None:
+        code = subprocess.call(
+            [binary, "seal", "--local-key", str(local_key), "-o", str(report.resolve())], cwd=str(workdir)
+        )
+    if code == 0 and report is not None:
+        typer.echo(f"K-Veritas report sealed: {report}")
+    raise typer.Exit(code=code)
 
 
 def default_config_yaml(langs: List[str], working_dir: str) -> str:
@@ -126,7 +239,7 @@ def default_config_yaml(langs: List[str], working_dir: str) -> str:
     default = codes[0]
     langs_yaml = "[" + ", ".join(codes) + "]"
     slug = "multi13" if resolved.label == "MULTI13" else "-".join(codes)
-    return f"""# Sebeni MasterConfig — https://seben.robotsmali.org/docs
+    return f"""# Sebeni MasterConfig — https://mlsftwrs.github.io/sebeni
 # working_dir is relocatable: CLI -w and SEBENI_HOME / SEBENI_WORKING_DIR also apply.
 # Distillation runs once, then one arm (sft | grpo | dpo | apo) reads frozen G/D.
 # Tune trainer/model hyperparams below or via `sebeni train --lr ...`.
@@ -149,6 +262,7 @@ data:
   languages: {langs_yaml}
   source: null             # path, glob, list of paths, or Hugging Face dataset id
   scheme: completion       # completion | preference | online_group
+  eval_ratio: 0.1          # in-training hold-out fraction (data.eval_rows sets a row count instead)
 
 trainer:
   framework: torch         # torch | jax
@@ -182,7 +296,7 @@ trainer:
 distillation:
   enabled: true
   backend: algorithmic     # algorithmic | gguf | google | openai | groq | together
-  model: gemini-2.5-flash
+  model: {cfg.DEFAULT_DISTIL_MODEL}
   # vertex: true           # ADC / Vertex AI; omit to auto-select when ADC is present
   tau: 0.5
   hitl: false
@@ -194,7 +308,7 @@ experiment:
   dataset: packaged        # dataset_300_samples.jsonl; test.json stays eval-only
   freeze_resources: true
   scope: {resolved.label}
-  max_eval_rows: 1
+  max_eval_rows: null      # held-out test.json rows per language; null scores all of them
 
 reward:
   format_weight: 0.1
@@ -286,10 +400,21 @@ def train(
     ),
     use_cpu: Optional[bool] = typer.Option(None, "--use-cpu/--no-use-cpu"),
     kveritas: Optional[bool] = typer.Option(
-        None, "--kveritas/--no-kveritas", help="Stream step rewards and eval metrics via K-Veritas protocol."
+        None,
+        "--kveritas/--no-kveritas",
+        help="Run the whole command under `kveritas run` and stream KV metrics. Default: experiment.kveritas.",
+    ),
+    kveritas_seal: Optional[bool] = typer.Option(
+        None,
+        "--kveritas-seal/--no-kveritas-seal",
+        help="Run under `kveritas run --seal` and write {working_dir}/exp/report_train.pdf. "
+        "Default: experiment.kveritas_seal.",
     ),
     eval_ratio: Optional[float] = typer.Option(
         None, "--eval-ratio", help="Fraction of user dataset held out for evaluation (default: 0.1)."
+    ),
+    eval_rows: Optional[int] = typer.Option(
+        None, "--eval-rows", help="Rows of the train data held out for in-training eval. Overrides --eval-ratio."
     ),
     eval_steps: Optional[int] = typer.Option(
         None, "--eval-steps", help="Number of update steps between evaluations."
@@ -336,12 +461,18 @@ def train(
         hitl=hitl,
         kveritas=kveritas,
         eval_ratio=eval_ratio,
+        eval_rows=eval_rows,
         eval_steps=eval_steps,
         use_vllm=use_vllm,
         vllm_gpu_memory_utilization=vllm_gpu_memory_utilization,
     )
-    if mc.experiment.kveritas:
-        maybe_kveritas_init(mc.working_dir)
+    # Each command seals its own one-run session: K-Veritas refuses to seal a session
+    # whose later run rewrote JSON files an earlier run produced (eval rewrites
+    # exp/manifest.json and models/safety_snapshot.json).
+    seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    if kveritas is False and kveritas_seal is None:
+        seal = False  # --no-kveritas opts out completely
+    _maybe_reexec_under_kveritas(mc, config, seal=seal, report_name="report_train.pdf")
     from beni.core.pipeline import run_arm
 
     run_arm(mc)
@@ -367,42 +498,94 @@ def eval(
     config: Path = typer.Option(..., "-c", "--config"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
     lang: Optional[List[str]] = typer.Option(None, "--lang"),
+    weights: Optional[str] = typer.Option(
+        None,
+        "--weights",
+        help="Trained adapter/model directory or Hub repo id. Default: the arm's output dir ({working_dir}/models).",
+    ),
+    eval_file: Optional[str] = typer.Option(
+        None,
+        "--eval-file",
+        help="Held-out rows to score (path, glob, or HF dataset id). Overrides experiment.eval_source; "
+        "default is the packaged test.json.",
+    ),
+    kveritas: Optional[bool] = typer.Option(
+        None,
+        "--kveritas/--no-kveritas",
+        help="Run the eval under `kveritas run` and claim its metrics. Default: experiment.kveritas.",
+    ),
+    kveritas_seal: Optional[bool] = typer.Option(
+        None,
+        "--kveritas-seal/--no-kveritas-seal",
+        help="Run under `kveritas run --seal` and write {working_dir}/exp/report_eval.pdf. Default: experiment.kveritas_seal.",
+    ),
 ):
-    """Score held-out test.json per language; write ``{working_dir}/exp/eval.json``."""
+    """Score the trained policy on held-out rows per language; write ``{working_dir}/exp/eval.json``.
+
+    Loads the trained weights (``--weights``, default the arm's output dir,
+    ``{working_dir}/models``) and decodes greedily with the training prompt.
+    Without trained weights it scores the base model and says so.
+    """
     mc = _load_config(config, working_dir)
     mc.apply_cli_overrides(languages=lang)
+    if eval_file:
+        mc.experiment.eval_source = eval_file
+    if kveritas is not None:
+        mc.experiment.kveritas = kveritas
+    seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    if kveritas is False and kveritas_seal is None:
+        seal = False  # --no-kveritas opts out completely
+    _maybe_reexec_under_kveritas(mc, config, seal=seal, report_name="report_eval.pdf")
     from beni.core.pipeline import run_eval
-    from beni.core.srl.unified import SRLTrainer
 
-    trainer = None
-    try:
-        trainer = SRLTrainer(mc)
-        trainer.load_models()
-    except Exception:
-        trainer = None
-    generate = None
-    policy = None
-    if trainer is not None:
+    trainer = _load_policy(mc, weights, require=bool(weights))
 
-        def _generate(text: str, _lang: str) -> str:
-            return trainer.generate(text)
+    def _generate(text: str, _lang: str) -> str:
+        return trainer.analyze(text)
 
-        generate = _generate
-        policy = getattr(trainer, "plugin", trainer)
-    report = run_eval(mc, generate=generate, policy=policy)
+    report = run_eval(
+        mc,
+        generate=_generate,
+        policy=getattr(trainer, "plugin", trainer),
+        weights=trainer.loaded_weights,
+    )
     typer.echo(str(cfg.get_workdir().exp / "eval.json"))
     typer.echo(f"scope={report.get('scope')} phi={report.get('phi')}")
 
 
+def _load_policy(mc: MasterConfig, weights: Optional[str], require: bool):
+    """Load the trained policy for eval / push / generate, or exit with a clear error."""
+    from beni.core.pipeline import default_weights_dir, load_policy
+
+    try:
+        trainer = load_policy(mc, weights=weights, require=require)
+    except (OSError, RuntimeError) as exc:
+        typer.echo(f"Error: could not load the policy: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    if trainer.loaded_weights:
+        typer.echo(f"Loaded trained weights: {trainer.loaded_weights}")
+    else:
+        typer.echo(
+            f"Warning: no trained weights in {default_weights_dir(mc)}; using the base model "
+            f"{mc.model.model_name}. Pass --weights to choose a checkpoint.",
+            err=True,
+        )
+    return trainer
+
+
+PRESETS_DIR = Path(__file__).resolve().parents[1] / "data" / "presets"
+
+
+def available_presets() -> List[str]:
+    return sorted(p.stem for p in PRESETS_DIR.glob("*.yaml"))
+
+
 def _preset_yaml(name: str) -> Path:
+    """Packaged preset ``beni/data/presets/<name>.yaml`` (``all`` is ``multi13``)."""
     token = str(name or "multi13").strip().lower()
     if token in {"all", "multi13"}:
         token = "multi13"
-    root = Path(__file__).resolve().parents[2] / "configs" / "presets" / f"{token}.yaml"
-    if root.is_file():
-        return root
-    packaged = Path(__file__).resolve().parents[1] / "data" / "presets" / f"{token}.yaml"
-    return packaged if packaged.is_file() else root
+    return PRESETS_DIR / f"{token}.yaml"
 
 
 def _run_exp(
@@ -411,7 +594,16 @@ def _run_exp(
     preset: Optional[str] = None,
     algorithm: Optional[str] = None,
     lang: Optional[List[str]] = None,
+    kveritas: Optional[bool] = None,
+    kveritas_seal: Optional[bool] = None,
 ) -> None:
+    if preset and not _preset_yaml(preset).is_file():
+        typer.echo(
+            f"Unknown preset {preset!r}. Available: {', '.join(available_presets()) or 'none'} "
+            f"(in {PRESETS_DIR}).",
+            err=True,
+        )
+        raise typer.Exit(code=2)
     cfg_path = _preset_yaml(preset) if preset else (config or _preset_yaml("multi13"))
     if not Path(cfg_path).is_file():
         cfg_path = config or _packaged_exp_yaml()
@@ -423,22 +615,25 @@ def _run_exp(
         mc.algorithm = algorithm.strip().lower()
     if lang:
         mc.apply_cli_overrides(languages=lang)
-    mc.experiment.dataset = "packaged"
-    mc.data.source = None
-    if mc.experiment.kveritas or mc.experiment.kveritas_seal:
-        maybe_kveritas_init(mc.working_dir)
+    if preset:
+        mc.data.source = None  # presets train on the packaged experiment jsonl
+    if not mc.data.source:
+        mc.experiment.dataset = "packaged"
+    if kveritas is not None:
+        mc.experiment.kveritas = kveritas
+    seal = mc.experiment.kveritas_seal if kveritas_seal is None else kveritas_seal
+    if kveritas is False and kveritas_seal is None:
+        seal = False  # --no-kveritas opts out completely
+    _maybe_reexec_under_kveritas(mc, Path(cfg_path), seal=bool(seal))
     from beni.core.pipeline import run_experiment
 
     try:
         report = run_experiment(mc)
-    except RuntimeError as exc:
+    except (RuntimeError, ValueError) as exc:  # e.g. empty split, test.json as train source
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=1) from exc
+    del report  # Φ / MER / MCS / UWEC are claimed by run_eval (KV claim lines)
     typer.echo(str(cfg.get_workdir().exp / "eval.json"))
-    if mc.experiment.kveritas:
-        emit_kveritas_metrics(report)
-    if mc.experiment.kveritas_seal:
-        maybe_kveritas_seal(cfg.get_workdir().exp / "report.pdf", working_dir=mc.working_dir, report=report)
 
 
 @app.command("exp")
@@ -447,7 +642,8 @@ def exp(
         None,
         "-c",
         "--config",
-        help="YAML MasterConfig. Defaults to the MULTI13 preset. data.source is ignored.",
+        help="YAML MasterConfig. Defaults to the MULTI13 preset. Trains on data.source when set, "
+        "else on the packaged dataset_300_samples.jsonl.",
     ),
     preset: Optional[str] = typer.Option(
         None,
@@ -462,10 +658,21 @@ def exp(
         "--lang",
         help="Scope override. Required in spirit for --preset single (default bam in the preset).",
     ),
+    kveritas: Optional[bool] = typer.Option(
+        None, "--kveritas/--no-kveritas", help="Run under `kveritas run`. Default: experiment.kveritas."
+    ),
+    kveritas_seal: Optional[bool] = typer.Option(
+        None,
+        "--kveritas-seal/--no-kveritas-seal",
+        help="Seal {working_dir}/exp/report.pdf after the run. Default: experiment.kveritas_seal.",
+    ),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
 ):
-    """Distill, train one arm on the packaged experiment jsonl, then evaluate test.json."""
-    _run_exp(config, working_dir, preset=preset, algorithm=algorithm, lang=lang)
+    """Distill, train one arm (on data.source, else the packaged experiment jsonl), then evaluate."""
+    _run_exp(
+        config, working_dir, preset=preset, algorithm=algorithm, lang=lang,
+        kveritas=kveritas, kveritas_seal=kveritas_seal,
+    )
 
 
 @app.command("experiment")
@@ -474,15 +681,27 @@ def experiment(
         None,
         "-c",
         "--config",
-        help="YAML MasterConfig. Defaults to the MULTI13 preset. data.source is ignored.",
+        help="YAML MasterConfig. Defaults to the MULTI13 preset. Trains on data.source when set, "
+        "else on the packaged dataset_300_samples.jsonl.",
     ),
     preset: Optional[str] = typer.Option(None, "--preset", help="multi13 or single."),
     algorithm: Optional[str] = typer.Option(None, "--algorithm", help="sft | grpo | dpo | apo."),
     lang: Optional[List[str]] = typer.Option(None, "--lang"),
+    kveritas: Optional[bool] = typer.Option(
+        None, "--kveritas/--no-kveritas", help="Run under `kveritas run`. Default: experiment.kveritas."
+    ),
+    kveritas_seal: Optional[bool] = typer.Option(
+        None,
+        "--kveritas-seal/--no-kveritas-seal",
+        help="Seal {working_dir}/exp/report.pdf after the run. Default: experiment.kveritas_seal.",
+    ),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
 ):
     """Alias of ``sebeni exp``."""
-    _run_exp(config, working_dir, preset=preset, algorithm=algorithm, lang=lang)
+    _run_exp(
+        config, working_dir, preset=preset, algorithm=algorithm, lang=lang,
+        kveritas=kveritas, kveritas_seal=kveritas_seal,
+    )
 
 
 @app.command()
@@ -490,15 +709,41 @@ def push(
     config: Path = typer.Option(..., "-c", "--config"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
     repo_id: Optional[str] = typer.Option(None, "--repo-id"),
+    write_card: bool = typer.Option(
+        False, "--write-card", help="Re-render README.md from the eval safety snapshot before pushing."
+    ),
+    weights: Optional[str] = typer.Option(
+        None,
+        "--weights",
+        help="Trained adapter/model directory or Hub repo id. Default: the arm's output dir ({working_dir}/models).",
+    ),
 ):
-    """Push ``output_dir`` to the Hub (requires model card + safety snapshot)."""
-    mc = _load_config(config, working_dir)
-    from beni.core.srl.unified import SRLTrainer
+    """Push the trained policy to the Hub.
 
-    trainer = SRLTrainer(mc)
-    trainer.load_models()
-    rid = repo_id or mc.trainer.hub_model_id
-    trainer.push_to_hub(repo_id=rid, token=mc.trainer.hub_token, private=mc.trainer.hub_private_repo)
+    Requires trained weights, plus README.md and an eval safety_snapshot.json
+    next to them: run ``sebeni eval`` first. ``--write-card`` re-renders the
+    card from that snapshot. A LoRA run pushes the adapter.
+    """
+    mc = _load_config(config, working_dir)
+    trainer = _load_policy(mc, weights, require=True)
+    from beni.core.pipeline import _active_trainer
+
+    arm_cfg = _active_trainer(mc)
+    rid = repo_id or getattr(arm_cfg, "hub_model_id", None) or mc.trainer.hub_model_id
+    token = getattr(arm_cfg, "hub_token", None) or mc.trainer.hub_token
+    private = getattr(arm_cfg, "hub_private_repo", mc.trainer.hub_private_repo)
+    try:
+        trainer.push_to_hub(
+            repo_id=rid,
+            token=token,
+            private=private,
+            output_dir=trainer.weights_dir,
+            write_card=write_card,
+        )
+    except PermissionError as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"Pushed {trainer.weights_dir} to {rid}")
 
 
 @app.command()
@@ -506,17 +751,29 @@ def generate(
     config: Path = typer.Option(..., "-c", "--config"),
     prompt: str = typer.Option(..., "--prompt"),
     working_dir: Optional[Path] = typer.Option(None, "-w", "--working-dir"),
-    max_length: int = typer.Option(128, "--max-length"),
+    max_new_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-new-tokens",
+        "--max-length",
+        help="Decoding budget. Default: experiment.eval_max_new_tokens.",
+    ),
     lang: Optional[str] = typer.Option(None, "--lang", help="Expected JSON lang for R_lang (one row)."),
+    weights: Optional[str] = typer.Option(
+        None,
+        "--weights",
+        help="Trained adapter/model directory or Hub repo id. Default: the arm's output dir ({working_dir}/models).",
+    ),
 ):
-    """Generate from the saved policy, gated by SafetyGovernor (format / R_lang)."""
+    """Analyze one sentence with the trained policy, gated by SafetyGovernor (format / R_lang).
+
+    ``--prompt`` is the sentence; it is wrapped in the training prompt and
+    decoded greedily.
+    """
     mc = _load_config(config, working_dir)
-    from beni.core.srl.unified import SRLTrainer
     from beni.core.compute.rewards import RewardManager
 
-    trainer = SRLTrainer(mc)
-    trainer.load_models()
-    text = trainer.generate(prompt, max_length=max_length)
+    trainer = _load_policy(mc, weights, require=bool(weights))
+    text = trainer.analyze(prompt, max_new_tokens=max_new_tokens)
     rm = RewardManager(reward_config=mc.reward)
     fmt = rm.reward_format([text])
     expected = lang or (mc.languages()[0] if mc.languages() else "bam")
@@ -569,3 +826,7 @@ def wordfreq(
     summary = root / "wordfreq.json"
     summary.write_text(json.dumps(index, indent=2, ensure_ascii=False), encoding="utf-8")
     typer.echo(str(summary if reports else last_path))
+
+
+if __name__ == "__main__":
+    app()

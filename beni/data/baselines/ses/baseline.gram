@@ -1,8 +1,10 @@
-# Songhay (Koyra Chiini / SES) morphotactic patterns
-# macro definitions
-macro   @v@             <re>[aoeiu]</re>
-macro   @cons@          <re>[bcdfghjklmŋprstwy]</re>
-macro   @ses-cons@      [bcdfghjklmŋprstwy]
+# Songhay (Koyraboro Senni & Koyra Chiini, ses) morphotactic patterns
+# version 2026.11.23 — revised from beni/data/raw/ses.txt & test.json
+# Supports BOTH Koyraboro Senni (-di, -yo, -diyo, -yaŋ) and Koyra Chiini (-oo, -aa, -ey, -yan)
+
+# macro definitions (fixed: leading .*)
+macro   @v@             <re>.*[aoeiu]</re>
+macro   @cons@          <re>.*[bcdfghjklmnɲŋprstwyzšž]</re>
 macro   @syl@           [^aoeiu]*(?P<V>[aoeiu])(?P=V)?
 
 # processing instructions
@@ -14,8 +16,7 @@ stage 0 apply lookup
 return if parsed
 stage 1 add sequential parse n_v_derivation
 stage 1 add parallel parse n_derivation
-stage 1 add parallel parse v_vq_derivation
-stage 1 add parallel parse vq_derivation
+stage 1 add parallel parse v_derivation
 stage 1 add parallel parse num_derivation
 stage 1 apply lookup
 return if parsed
@@ -23,122 +24,89 @@ stage 2 add parallel parse reduplication
 stage 2 apply lookup
 return if parsed
 stage 3 add parallel decompose pos_composition
+stage 3 apply lookup
 return if parsed
 stage 4 apply firstmatch parse nonSES
 return if parsed
 
-#for sentence
+# --- INFLECTION (Definiteness & Plurality across KS and KC) ---
 section inflection
-# nominal inflection
-# Plural markers: -y (after vowel), -ey (after consonant)
-# e.g., alaaya -> alaayaney, booro -> borey, haya -> hayey, konda -> kondawey
-pattern :n/adj/prn/n.prop/num: [ {@v@|y}:: ] | :n/adj/prn/n.prop/num: [:n/adj/prn/n.prop/num: :mrph:PL]
-pattern :n/adj/prn/n.prop/num: [ {@cons@|ey}:: ] | :n/adj/prn/n.prop/num: [:n/adj/prn/n.prop/num: :mrph:PL]
+# Koyraboro Senni definite singular (-di), plural (-yo), definite plural (-diyo)
+pattern :n/adj/ptcp/n.prop: [ {|di}:: ] | :n/adj/ptcp/n.prop: [ :n/adj/ptcp/n.prop: :mrph:DEF.SG ]
+pattern :n/adj/ptcp/n.prop: [ {|yo}:: ] | :n/adj/ptcp/n.prop: [ :n/adj/ptcp/n.prop: :mrph:PL ]
+pattern :n/adj/ptcp/n.prop: [ {|diyo}:: ] | :n/adj/ptcp/n.prop: [ :n/adj/ptcp/n.prop: :mrph:DEF.PL ]
 
-# Definite article / Specificity: -oo / -aa
-# e.g., hugu -> hugoo, ašarya -> ašaryaa, ganda -> gandaa
-pattern :n: [ {|oo}:: ] | :n: [:n: :mrph:DEF]
-pattern :n: [ {|aa}:: ] | :n: [:n: :mrph:DEF]
+# Koyra Chiini definite singular (-oo, -aa) & plural (-ey, -wey, vowel+y)
+pattern :n/adj/ptcp/n.prop: [ {|oo}:: ] | :n/adj/ptcp/n.prop: [ :n/adj/ptcp/n.prop: :mrph:DEF.SG ]
+pattern :n/adj/ptcp/n.prop: [ {|aa}:: ] | :n/adj/ptcp/n.prop: [ :n/adj/ptcp/n.prop: :mrph:DEF.SG ]
+pattern :n/adj/ptcp/n.prop: [ {|ey}:: ] | :n/adj/ptcp/n.prop: [ :n/adj/ptcp/n.prop: :mrph:DEF.PL ]
+pattern :n/adj/ptcp/n.prop: [ {|wey}:: ] | :n/adj/ptcp/n.prop: [ :n/adj/ptcp/n.prop: :mrph:DEF.PL ]
+pattern :n/adj/ptcp/n.prop: [ {@v@|y}:: ] | :n/adj/ptcp/n.prop: [ :n/adj/ptcp/n.prop: :mrph:PL ]
 
-# derivative forms we need to consider even if we have them in dictionary
+# --- COMMON DERIVATION ---
 section common_derivation
-# -yan / -yaa / -yandey ABSTR / ADJ (e.g., borocinitaray, tenjeyanoo, fasalyanoo)
-pattern :n/adj/v: [ {|yan}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
-pattern :n/adj/v: [ {|yaa}:: ] | :n: [:n/adj/v: :mrph:ABSTR]
-pattern :n/adj/v: [ {|yandey}:: ] | :n: [:n/adj/v: :mrph:ABSTR :mrph:PL]
+# Nominalization / abstract (-yan, -yaŋ, -yanoo, -yaŋoo, -yaa, -taray)
+pattern :n/adj/v: [ {|yanoo}:: ] | :n: [ :n/adj/v: :mrph:NMLZ :mrph:DEF.SG ]
+pattern :n/adj/v: [ {|yan}:: ] | :n: [ :n/adj/v: :mrph:NMLZ ]
+pattern :n/adj/v: [ {|yaŋ}:: ] | :n: [ :n/adj/v: :mrph:NMLZ ]
+pattern :n/adj/v: [ {|yaa}:: ] | :n: [ :n/adj/v: :mrph:ABSTR ]
+pattern :n/adj/v: [ {|taray}:: ] | :n: [ :n/adj/v: :mrph:ABSTR ]
+pattern :n/adj/v: [ {|yandey}:: ] | :n: [ :n/adj/v: :mrph:ABSTR :mrph:PL ]
+# Resultative participle / adjective (-ante, -antaa, -antey)
+pattern :v/ptcp: [ {|ante}:: ] | :ptcp: [ :v: :mrph:PTCP.RES ]
+pattern :v/ptcp: [ {|antaa}:: ] | :ptcp: [ :v: :mrph:PTCP.RES :mrph:DEF.SG ]
+pattern :v/ptcp: [ {|antey}:: ] | :ptcp: [ :v: :mrph:PTCP.RES :mrph:PL ]
 
-# common nominal/verbal derivation (locatives/relational)
+# --- RELATIONAL CLITICS ---
 section n_v_derivation
-# Postpositions acting as relational/locative clitics
-# e.g., hugu ra (in the house), ganda do (to the country), boro se (for the person)
-pattern :n/n.prop: [ {|ra}:: ] | :n/n.prop: [:n/n.prop: :mrph:LOC]
-pattern :n/n.prop: [ {|do}:: ] | :n/n.prop: [:n/n.prop: :mrph:ALL]
-pattern :n/n.prop: [ {|se}:: ] | :n/n.prop: [:n/n.prop: :mrph:DAT]
-pattern :n/n.prop: [ {|ga}:: ] | :n/n.prop: [:n/n.prop: :mrph:ABL]
+# Postpositions when fused (-ra, -do, -se, -ga)
+pattern :n/n.prop: [ {|ra}:: ] | :n/n.prop: [ :n/n.prop: :mrph:LOC ]
+pattern :n/n.prop: [ {|do}:: ] | :n/n.prop: [ :n/n.prop: :mrph:ALL ]
 
-# nominal derivation
+# --- NOMINAL DERIVATION ---
 section n_derivation
-# -koy / -kaw AG (agent/occupation, e.g., goykoy, hantumkaw)
-pattern :n: [ {|koy}:: ] | :n: [ :v/n: :mrph:AG]
-pattern :n: [ {|kaw}:: ] | :n: [ :v/n: :mrph:AG]
-# -boobo AUGM
-pattern :n/adj: [ {|boobo}:: ] | :n/adj: [:n/adj: :mrph:AUGM]
-# -kayna DIM
-pattern :n/adj: [ {|kayna}:: ] | :n/adj: [:n/adj: :mrph:DIM]
+# Agentive (-koy, -kaw, -kaa, -key), Diminutive (-ize, -izey, -ije, -ijeyo, -izoo, -kayna), Augmentative (-beeri, -boobo)
+pattern :n: [ {|koy}:: ] | :n: [ :v/n: :mrph:AG ]
+pattern :n: [ {|kaw}:: ] | :n: [ :v/n: :mrph:AG ]
+pattern :n: [ {|kaa}:: ] | :n: [ :v/n: :mrph:AG ]
+pattern :n: [ {|-ize}:: ] | :n: [ :n: :mrph:DIM ]
+pattern :n: [ {|-izey}:: ] | :n: [ :n: :mrph:DIM :mrph:PL ]
+pattern :n: [ {|-izoo}:: ] | :n: [ :n: :mrph:DIM :mrph:DEF.SG ]
+pattern :n: [ {|-ije}:: ] | :n: [ :n: :mrph:DIM ]
+pattern :n: [ {|-ijeyo}:: ] | :n: [ :n: :mrph:DIM :mrph:PL ]
+pattern :n/adj: [ {|kayna}:: ] | :n/adj: [ :n/adj: :mrph:DIM ]
 
-# verbal/vq derivation
-section v_vq_derivation
-# -andi / -tandi CAUS (e.g., bayrandi, gaaranti, kayandi, tabatandi)
-pattern :v: [ {|andi}:: ] | :v: [ :v: :mrph:CAUS]
-pattern :v: [ {|tandi}:: ] | :v: [ :v: :mrph:CAUS]
-# -yan NMLZ (verbal noun, e.g., tenjeyanoo)
-pattern :n: [ {|yan}:: ] | :n: [ :v: :mrph:NMLZ]
+# --- VERBAL DERIVATION ---
+section v_derivation
+# Causative (-ndi, -andi, -tandi), Verbal noun (-ri)
+pattern :v: [ {|andi}:: ] | :v: [ :v: :mrph:CAUS ]
+pattern :v: [ {|tandi}:: ] | :v: [ :v: :mrph:CAUS ]
+pattern :v: [ {|ndi}:: ] | :v: [ :v: :mrph:CAUS ]
+pattern :n: [ {|ri}:: ] | :n: [ :v: :mrph:NMLZ ]
 
-# vq derivation
-section vq_derivation
-pattern :vq: [ {|ya}:: ] | :n/v: [ :vq: :mrph:DEQU]
-pattern :adj: [ {|man}:: ] | :adj: [ :vq: :mrph:ADJ]
-
-# numeral derivation
+# --- NUMERAL DERIVATION ---
 section num_derivation
-pattern :num: [ {|yandey}:: ] | :num: [ :num: :mrph:DISTR]
+pattern :num: [ {|yandey}:: ] | :num: [ :num: :mrph:DISTR ]
 
-## reduplication
+# --- REDUPLICATION ---
 section reduplication
 pattern :v: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :v: [ :v: :v: ]
 pattern :adj: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :adj: ]
 pattern :num: [ {<re>(?P<stem>.+)</re>|<re>(?P=stem)</re>}:: ] | :num: [ :num: :num: ]
 pattern :v: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :v: [ :v: :: :v: ]
-pattern :adj: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :adj: [ :adj: :: :adj: ]
-pattern :num: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :num: [ :num: :: :num: ]
+pattern :n: [ {<re>(?P<stem>.+)</re>|-|<re>(?P=stem)</re>}:: ] | :n: [ :n: :: :n: ]
 
-## composition
-# general part-of-speech composition patterns
+# --- POS COMPOSITION ---
 section pos_composition
-
-# two-words composites
-# n.prop + n = n   ex: Mali ganda
 pattern :n: [ :n.prop: :n: ] | :n: [ :n.prop: :n: ]
-# v/n + n = n   ex: goykoy, hantumkaw
 pattern :n: [ :n/v: :n: ] | :n: [ :n/v: :n: ]
-# n + v = n/v
 pattern :n/v: [ :n: :v: ] | :n/v: [ :n: :v: ]
-# n + adj/num = n
 pattern :n: [ :n: :adj/num: ] | :n: [ :n: :adj/num: ]
-# dtm + v = n
-pattern :n: [ :dtm: :v: ] | :n: [ :dtm: :v: ]
-# pp + n = n
 pattern :n: [ :pp: :n: ] | :n: [ :pp: :n: ]
-
-# three-words composites
-# n + adj/pp/num + n = n
 pattern :n: [ :n: :adj/pp/num: :n: ] | :n: [ :n: :adj/pp/num: :n: ]
-# dtm/n + v + n = n
-pattern :n: [ :dtm/n: :v: :n: ] | :n: [ :dtm/n: :v: :n: ]
-# n + pp + v = n/v
-pattern :n/v: [ :n: :pp: :v: ] | :n/v: [ :n: :pp: :v: ]
-# n+n+n = n
 pattern :n: [ :n: :n: :n: ] | :n: [ :n: :n: :n: ]
 
-# v+mrph+n  ex: bayrandi, gaaranti
-pattern :n: [ :v: andi:mrph: :n: ] | :n: [ :v: :mrph:CAUS :n: ]
-pattern :n: [ :v: tandi:mrph: :n: ] | :n: [ :v: :mrph:CAUS :n: ]
-
-# v+mrph+v
-pattern :v: [ :v: andi:mrph: :v: ] | :v: [ :v: :mrph:CAUS :v: ]
-
-# four-words composites
-# n + pp + n + n = n
-pattern :n: [ :n: :pp: :n: :n: ] | :n: [ :n: :pp: :n: :n: ]
-# n + pp + adj + n = n
-pattern :n: [ :n: :pp: :adj: :n: ] | :n: [ :n: :pp: :adj: :n: ]
-# n+v+v+n
-pattern :n: [ :n: :v: :v: :n: ] | :n: [ :n: :v: :v: :n: ]
-
-# orthographically unlikely to be songhay words
-# for NEW orthography, with no tones marked
+# --- NON-SONGHAY FILTER (STAGE 4 = EMPR) ---
 section nonSES
-# forms with symbols out of songhay alphabet
-pattern <re>.*[qxçäëïüâêîôûéùàøðþ].*</re>:: | ::EMPR
-# two different vowels in sequence (no diphthongs in standard Koyra Chiini)
-pattern <re>.*(?P<v>[aoeiu])(?!(?P=v))(?=[aoeiu]).*</re>:: | ::EMPR
+# Reject characters outside Songhay orthography (allows a-z excl q,v,x + ɲ, ŋ, š, ž, é)
+pattern <re>.*[qvxQVXɓɗƴɔɛçäëïöüâêîôûùàøðþ].*</re>:: | ::EMPR

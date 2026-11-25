@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import datetime
 import inspect
+import logging
 from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
 from typing import Optional, Iterable, Dict, Any, List, Union, Type
 
 from beni.utils import config as cfg
+
+logger = logging.getLogger("sebeni.config")
 
 
 def trl_config_kwargs(
@@ -60,17 +63,21 @@ def trl_config_kwargs(
     return out
 
 
-def _overlay_dataclass(instance, data: Dict[str, Any]):
-    """Apply a (possibly partial) dict onto an existing dataclass instance."""
+def _overlay_dataclass(instance, data: Dict[str, Any], prefix: str = ""):
+    """Apply a (possibly partial) dict onto an existing dataclass instance.
+
+    Unknown keys are ignored with a warning so a typo does not pass silently.
+    """
     if not data:
         return instance
     valid = {f.name for f in fields(instance)}
     for key, val in data.items():
         if key not in valid:
+            logger.warning("Ignoring unknown config key %s%s", prefix, key)
             continue
         current = getattr(instance, key)
         if is_dataclass(current) and isinstance(val, dict):
-            setattr(instance, key, _overlay_dataclass(current, val))
+            setattr(instance, key, _overlay_dataclass(current, val, prefix=f"{prefix}{key}."))
         else:
             setattr(instance, key, val)
     post = getattr(instance, "__post_init__", None)
@@ -143,7 +150,11 @@ class DataConfig:
     hf_streaming: bool = False
     hf_kwargs: Optional[Dict[str, Any]] = None
     clear_on_load: bool = False
+    # In-training hold-out carved from the train data. eval_rows (a row count) wins over eval_ratio.
     eval_ratio: float = 0.1
+    eval_rows: Optional[int] = None
+    normalize_homoglyphs: bool = True
+    filter_corpus_noise: bool = False
 
     def __post_init__(self) -> None:
         from beni.core.language import parse_lang_codes
@@ -432,7 +443,7 @@ class DistillationConfig:
     enabled: bool = True
     backend: str = "algorithmic"
     provider: Optional[str] = None  # deprecated alias for backend
-    model: str = "gemini-3.7-flash"
+    model: str = cfg.DEFAULT_DISTIL_MODEL
     working_dir: Optional[str] = None
     batch_size: int = 10
     auto_update_baselines: bool = True
@@ -549,12 +560,23 @@ class ExperimentConfig:
 
     kveritas: bool = False
     kveritas_seal: bool = False
+    # `kveritas init --disclosure`: redacted | names | open.
+    kveritas_disclosure: str = "open"
+    # `kveritas init --local`: sign with a local key, no attestation server.
+    kveritas_local: bool = False
+    # Local mode signs the report with this RSA private key (PEM). Default {working_dir}/keys/private.pem.
+    kveritas_local_key: Optional[str] = None
     freeze_resources: bool = True
     # ``packaged`` reads dataset_300_samples.jsonl. ``raw`` keeps raw/*.txt for non-experiment train.
     dataset: str = "raw"
     scope: Optional[str] = None
     preset: Optional[str] = None
-    max_eval_rows: int = 1
+    # Held-out test.json rows decoded per language by run_eval. None (or 0) scores every row.
+    max_eval_rows: Optional[int] = None
+    # Held-out rows for run_eval: path, glob, list, or HF dataset id (like data.source). None = packaged test.json.
+    eval_source: Optional[Any] = None
+    # Greedy decoding budget per held-out row (run_eval, sebeni eval / generate).
+    eval_max_new_tokens: int = 512
 
 
 @dataclass
@@ -569,6 +591,7 @@ class SafetyConfig:
     uncertainty_downweight: bool = True
     require_model_card: bool = True
     require_safety_snapshot: bool = True
+    require_eval_metrics: bool = True
     max_kl: Optional[float] = None
 
     def to_spec(self, tau: float = 0.5, kl_beta: float = 0.1):
@@ -586,6 +609,7 @@ class SafetyConfig:
             max_kl=self.max_kl,
             require_model_card=self.require_model_card,
             require_safety_snapshot=self.require_safety_snapshot,
+            require_eval_metrics=self.require_eval_metrics,
         )
 
 
@@ -609,8 +633,25 @@ class MasterConfig:
     experiment: ExperimentConfig = field(default_factory=ExperimentConfig)
     wordfreq: WordfreqConfig = field(default_factory=WordfreqConfig)
 
+    def __post_init__(self) -> None:
+        # The output_dir / runtime_dir defaults come from whichever working dir is
+        # active right now. Remember them so apply_workdir can tell a default
+        # (to be moved into the new working dir) from a path set in the YAML.
+        active = cfg.get_workdir()
+        self._auto_paths = {str(active.models), str(active.runtime)}
+
+    def _is_auto_path(self, value: Optional[str], leaf: str) -> bool:
+        defaults = {"", str(cfg.DEFAULT_WORKING_DIR / leaf)}
+        defaults |= {p for p in getattr(self, "_auto_paths", set()) if Path(p).name == leaf}
+        return value is None or str(value) in defaults
+
     def apply_workdir(self, cli_path: Optional[Union[str, Path]] = None) -> Path:
-        """Resolve and activate working_dir; rewrite default output/runtime paths."""
+        """Resolve and activate working_dir; rewrite default output/runtime paths.
+
+        A default ``output_dir`` / ``runtime_dir`` (not set in the YAML) follows
+        the resolved working dir, even when another working dir was active when
+        this config was built.
+        """
         config_file_dir = getattr(self, "_config_file_dir", None)
         wd = cfg.resolve_working_dir(
             cli_path=cli_path,
@@ -620,14 +661,12 @@ class MasterConfig:
         self.working_dir = str(wd.root)
         if not self.distillation.working_dir:
             self.distillation.working_dir = str(wd.root)
-        default_models = str(cfg.DEFAULT_WORKING_DIR / "models")
-        if self.trainer.output_dir in ("", default_models) or self.trainer.output_dir == str(cfg.DEFAULT_WORKING_DIR / "models"):
-            self.trainer.output_dir = str(wd.models)
-        if self.processor.runtime_dir in ("", str(cfg.DEFAULT_WORKING_DIR / "runtime")):
+        for block in (self.trainer, self.dpo, self.apo, self.sft):
+            if self._is_auto_path(block.output_dir, "models"):
+                block.output_dir = str(wd.models)
+        if self._is_auto_path(self.processor.runtime_dir, "runtime"):
             self.processor.runtime_dir = str(wd.runtime)
-        for sibling in (self.dpo, self.apo, self.sft):
-            if sibling.output_dir in ("", default_models, str(cfg.DEFAULT_WORKING_DIR / "models")):
-                sibling.output_dir = str(wd.models)
+        self._auto_paths = {str(wd.models), str(wd.runtime)}
         return wd.root
 
     def languages(self) -> List[str]:
@@ -673,6 +712,7 @@ class MasterConfig:
         hitl: Optional[bool] = None,
         kveritas: Optional[bool] = None,
         eval_ratio: Optional[float] = None,
+        eval_rows: Optional[int] = None,
         eval_steps: Optional[int] = None,
         use_vllm: Optional[bool] = None,
         vllm_gpu_memory_utilization: Optional[float] = None,
@@ -753,6 +793,8 @@ class MasterConfig:
             self.experiment.kveritas = kveritas
         if eval_ratio is not None:
             self.data.eval_ratio = eval_ratio
+        if eval_rows is not None:
+            self.data.eval_rows = eval_rows
         return self
 
     @classmethod
@@ -761,14 +803,25 @@ class MasterConfig:
         config = cls()
         if not data:
             return config
+        data = dict(data)
+        # Top-level shorthands written by presets and the matrix runner.
+        experiment = dict(data.get("experiment") or {})
+        for alias in ("preset", "scope"):
+            if alias in data:
+                experiment.setdefault(alias, data.pop(alias))
+        if experiment:
+            data["experiment"] = experiment
         top = {f.name for f in fields(config)}
+        for key in data:
+            if key not in top:
+                logger.warning("Ignoring unknown config key %s", key)
         for key in top:
             if key not in data:
                 continue
             val = data[key]
             current = getattr(config, key)
             if is_dataclass(current) and isinstance(val, dict):
-                setattr(config, key, _overlay_dataclass(current, val))
+                setattr(config, key, _overlay_dataclass(current, val, prefix=f"{key}."))
             else:
                 setattr(config, key, val)
         return config

@@ -1,7 +1,6 @@
-# Single-language preset. Pick the language with `--lang bam` (default bam).
-# `--lang bbo` is the outlier scope and is not part of MULTI13.
-preset: single
-project_name: sebeni-single
+# MULTI13 preset. Override the arm with `sebeni exp --preset multi13 --algorithm sft`.
+preset: multi13
+project_name: sebeni-multi13
 algorithm: grpo          # sft | grpo | dpo | apo
 
 model:
@@ -14,7 +13,7 @@ model:
 
 data:
   default_lang: bam
-  languages: [bam]
+  languages: [multi13]
   scheme: completion
 
 trainer:
@@ -46,16 +45,16 @@ distillation:
 experiment:
   dataset: packaged
   freeze_resources: true
-  scope: SINGLE_LANG
-  max_eval_rows: 1
+  scope: MULTI13
+  max_eval_rows: null      # all held-out test.json rows per language
   kveritas: false
   kveritas_seal: false
 
 reward:
-  format_weight: 0.1
-  morph_weight: 0.4
-  rule_weight: 0.4
-  lang_weight: 0.1
+  format_weight: 0.2
+  morph_weight: 0.3
+  rule_weight: 0.3
+  lang_weight: 0.2
 
 safety:
   enabled: true

@@ -7,6 +7,7 @@ from beni.core.srl import (
 )
 from beni.core.compute.rewards import RewardManager
 from beni.core.srl.grpo.grpo import SebeniGrpo
+from beni.utils import config as cfg
 
 TEST_MODELS = [
     "HuggingFaceTB/SmolLM2-135M",
@@ -339,7 +340,7 @@ class TestSebeniGrpoPipeline:
         mock_distiller_cls.assert_called_once_with(
             lang_code="bam",
             backend="google",
-            model="gemini-3.7-flash",
+            model=cfg.DEFAULT_DISTIL_MODEL,
             working_dir=None,
             vertex=None,
             base_url=None,
