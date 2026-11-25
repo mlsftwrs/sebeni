@@ -2,7 +2,7 @@ algorithm: apo
 data:
   default_lang: bam
   languages:
-  - multi13
+  - mali13
   scheme: completion
 distillation:
   backend: google
@@ -19,7 +19,7 @@ experiment:
   kveritas: true
   kveritas_seal: true
   max_eval_rows: null
-  scope: MULTI13
+  scope: MALI13
 model:
   load_in_4bit: true
   lora_alpha: 32
@@ -27,7 +27,7 @@ model:
   lora_r: 16
   model_name: google/gemma-3-270m
   use_peft: true
-preset: multi13
+preset: mali13
 project_name: matrix_gemma-3-270m_apo
 reward:
   format_weight: 0.2
@@ -36,7 +36,7 @@ reward:
   rule_weight: 0.3
 safety:
   enabled: true
-scope: MULTI13
+scope: MALI13
 trainer:
   beta: 0.1
   bf16: false

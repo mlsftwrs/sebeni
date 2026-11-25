@@ -7,12 +7,12 @@ intentionally omitted — it has no stable inspect signature and used to break
 the API pages.
 
 ```
-sebeni init     --lang multi13 -w ./runs/multi13
+sebeni init     --lang mali13 -w ./runs/mali13
 sebeni init     --lang bam -w ./runs/bam
-sebeni distill  -c ./runs/multi13/config.yaml
-sebeni train    -c ./runs/multi13/config.yaml --algorithm grpo --lr 1e-5
-sebeni eval     -c ./runs/multi13/config.yaml
-sebeni exp      --preset multi13 --algorithm sft -w ./runs/multi13-sft
+sebeni distill  -c ./runs/mali13/config.yaml
+sebeni train    -c ./runs/mali13/config.yaml --algorithm grpo --lr 1e-5
+sebeni eval     -c ./runs/mali13/config.yaml
+sebeni exp      --preset mali13 --algorithm sft -w ./runs/mali13-sft
 sebeni exp      --preset single --lang bbo --algorithm sft -w ./runs/bbo-sft
 sebeni wordfreq -c config.yaml
 sebeni push     -c config.yaml --repo-id mlsftwrs/sebeni-bam-grpo
@@ -20,10 +20,10 @@ sebeni generate -c config.yaml --prompt "Aw ka kɛnɛ wa?" --lang bam
 ```
 
 YAML overlays `MasterConfig` dataclasses (no second config system). Presets
-ship in the package: `beni/data/presets/multi13.yaml`,
+ship in the package: `beni/data/presets/mali13.yaml`,
 `beni/data/presets/single.yaml`; an unknown `--preset` exits 2 and lists them.
 Unknown config keys log a warning ("Ignoring unknown config key …").
-`configs/exp.yaml` is a separate MULTI13 config, not an alias: its reward
+`configs/exp.yaml` is a separate MALI13 config, not an alias: its reward
 weights are 0.1/0.4/0.4/0.1 (format/morph/rule/lang), the preset's are
 0.2/0.3/0.3/0.2. Full trainer / LoRA tables: [Hyperparameters](hyperparams.md).
 
@@ -31,18 +31,18 @@ weights are 0.1/0.4/0.4/0.1 (format/morph/rule/lang), the preset's are
 
 | Command | Purpose | Important flags |
 | --- | --- | --- |
-| `sebeni init` | Write `config.yaml` + workdir (`data/`, `models/`, `runs/`, `exp/`, `runtime/`) | `--lang` (default `multi13`), `-w` (default `./runs/sebeni-001`) |
+| `sebeni init` | Write `config.yaml` + workdir (`data/`, `models/`, `runs/`, `exp/`, `runtime/`) | `--lang` (default `mali13`), `-w` (default `./runs/sebeni-001`) |
 | `sebeni distill` | Upstream SAMPG once per language; freeze G and D | `-c`, `-w`, `--lang`, `--hitl/--no-hitl` |
 | `sebeni train` | One arm against frozen G and D (distills first if `data/resources/frozen.json` is missing) | `-c`, `--algorithm`, `-w`, `--lang`, `--lr`, `--max-steps`, `--eval-ratio`, `--eval-rows`, `--eval-steps`, `--use-vllm`, `--kveritas/--no-kveritas`, `--kveritas-seal`; full list in [Hyperparameters](hyperparams.md#train-flags) |
-| `sebeni exp` | Distill, one arm, held-out eval (`experiment` alias); trains on `data.source` from `-c`, else packaged `dataset_300_samples.jsonl` | `--preset multi13\|single`, `--algorithm`, `--lang`, `-c`, `-w`, `--kveritas/--no-kveritas`, `--kveritas-seal` |
+| `sebeni exp` | Distill, one arm, held-out eval (`experiment` alias); trains on `data.source` from `-c`, else packaged `dataset_300_samples.jsonl` | `--preset mali13\|single`, `--algorithm`, `--lang`, `-c`, `-w`, `--kveritas/--no-kveritas`, `--kveritas-seal` |
 | `sebeni eval` | Held-out Φ / MER / MCS / UWEC of the trained weights on packaged `test.json` (or `experiment.eval_source`) → `{working_dir}/exp/eval.json` | `-c`, `-w`, `--lang`, `--weights`, `--eval-file`, `--kveritas/--no-kveritas`, `--kveritas-seal` |
 | `sebeni wordfreq` | Surfaces / lemmas / morphemes / stages per language | `-c`, `-w`, `--lang` |
 | `sebeni generate` | Analyse one sentence with the trained weights; warn on `R_format` / `R_lang` | `-c`, `--prompt`, `--lang`, `--weights`, `--max-new-tokens` (alias `--max-length`; default `experiment.eval_max_new_tokens`, 512) |
 | `sebeni push` | Hub upload of the trained weights (default the arm's output dir); needs an eval snapshot for those weights | `-c`, `-w`, `--repo-id` (else active arm / `trainer.hub_model_id`), `--weights`, `--write-card` |
 
-`--lang multi13` or `--lang all` selects the 13 canonical group codes.
+`--lang mali13` or `--lang all` selects the 13 canonical group codes.
 `--lang bam` is one language. `--lang bam,mku` is a comma-separated list.
-`--lang bbo` is the outlier and is not mixed into MULTI13.
+`--lang bbo` is the outlier and is not mixed into MALI13.
 
 Setting `--epochs` without `--max-steps` sets `max_steps: -1` so Hugging Face
 runs by epoch count.
@@ -82,7 +82,7 @@ per language; the default `null` (or `0`) scores all of them.
 {
   "model": "Qwen/Qwen2.5-0.5B",
   "algorithm": "sft",
-  "scope": "MULTI13",
+  "scope": "MALI13",
   "languages": ["bam", "mku"],
   "phi": 0.63,
   "mer": 0.21,
@@ -95,7 +95,7 @@ per language; the default `null` (or `0`) scores all of them.
   "n_scored": 3,
   "n_skipped": 0,
   "reference_model": "Qwen/Qwen2.5-0.5B",
-  "weights": "./runs/multi13-sft/models",
+  "weights": "./runs/mali13-sft/models",
   "eval_source": "packaged:test.json",
   "max_eval_rows": null,
   "tau": 0.5,
@@ -112,7 +112,7 @@ per language; the default `null` (or `0`) scores all of them.
       "n_tokens": 600,
       "checkpoint_id": "baseline_v3",
       "language": "bam",
-      "scope": "MULTI13"
+      "scope": "MALI13"
     }
   }
 }

@@ -6,15 +6,15 @@ dictionary from the packaged experiment jsonl (or your `data.source`), train
 `experiment.eval_source`). Pick a preset and an algorithm.
 
 ```bash
-sebeni exp --preset multi13 --algorithm sft -w ./runs/multi13-sft
+sebeni exp --preset mali13 --algorithm sft -w ./runs/mali13-sft
 sebeni exp --preset single --lang bam --algorithm grpo -w ./runs/bam-grpo
 sebeni exp --preset single --lang bbo --algorithm sft -w ./runs/bbo-sft
 # alias: sebeni experiment
 ```
 
-If `-c` and `--preset` are omitted, Sebeni loads the MULTI13 preset
-(`beni/data/presets/multi13.yaml`). Presets ship in the package
-(`beni/data/presets/`: `multi13.yaml`, `single.yaml`); an unknown `--preset`
+If `-c` and `--preset` are omitted, Sebeni loads the MALI13 preset
+(`beni/data/presets/mali13.yaml`). Presets ship in the package
+(`beni/data/presets/`: `mali13.yaml`, `single.yaml`); an unknown `--preset`
 exits with code 2 and lists the available presets. `exp` always re-distills, even
 when `data/resources/frozen.json` exists.
 
@@ -27,7 +27,7 @@ kept only for `--lang bbo`.
 
 ```mermaid
 flowchart TD
-  preset["preset multi13 or single"] --> jsonl["dataset_300_samples.jsonl"]
+  preset["preset mali13 or single"] --> jsonl["dataset_300_samples.jsonl"]
   jsonl --> distill["Distill once and freeze G, D"]
   distill --> arm["One arm: sft, grpo, dpo, or apo"]
   arm --> ev["Eval beni/data/test.json"]
@@ -41,7 +41,7 @@ flowchart TD
 | Train | `data.source` from `-c`, else `beni/data/raw/dataset_300_samples.jsonl` | experiment remap (packaged file), then group code |
 | Eval | `experiment.eval_source`, else `beni/data/test.json` | object `{lang: text}`; paragraphs split; evaluation only |
 
-`bbo` rows stay in the jsonl and are excluded from MULTI13. A language with no packaged baseline uses Distiller scratch bootstrap. `raw/*.txt` remains available to `sebeni wordfreq` and to `sebeni train` when `experiment.dataset` is `raw`.
+`bbo` rows stay in the jsonl and are excluded from MALI13. A language with no packaged baseline uses Distiller scratch bootstrap. `raw/*.txt` remains available to `sebeni wordfreq` and to `sebeni train` when `experiment.dataset` is `raw`.
 
 Custom `data.source` applies to `sebeni exp` (with `-c`), `train`, and
 `distill`. Held-out rows come from `experiment.eval_source` (a path, glob,
@@ -61,10 +61,10 @@ has no morphemes are skipped and counted in `n_skipped` in `eval.json`.
 ## YAML knobs
 
 Without `-c`, `exp` reads
-[`beni/data/presets/multi13.yaml`](https://github.com/mlsftwrs/sebeni/blob/main/beni/data/presets/multi13.yaml)
+[`beni/data/presets/mali13.yaml`](https://github.com/mlsftwrs/sebeni/blob/main/beni/data/presets/mali13.yaml)
 (or `single.yaml` with `--preset single`). Copy one, edit it, and pass `-c`.
 [`configs/exp.yaml`](https://github.com/mlsftwrs/sebeni/blob/main/configs/exp.yaml)
-is a separate MULTI13 config with reward weights 0.1/0.4/0.4/0.1 (the preset
+is a separate MALI13 config with reward weights 0.1/0.4/0.4/0.1 (the preset
 uses 0.2/0.3/0.3/0.2). Knobs:
 
 - `model.model_name` (and LoRA / 4-bit)
@@ -106,7 +106,7 @@ Every arm reports the same held-out metrics. MER and UWEC are costs (lower is
 better). MCS is the fraction of tokens whose predicted stage matches the
 reference stage, paired by index (higher is better); training uses the same
 match fraction. Scope scores pool reference morphemes (MER) and tokens (MCS,
-UWEC), so a language with more units weighs more in MULTI13. Φ is a macro mean
+UWEC), so a language with more units weighs more in MALI13. Φ is a macro mean
 over languages. UWEC is evaluation-only.
 
 ## K-Veritas (optional)

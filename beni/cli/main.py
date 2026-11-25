@@ -238,7 +238,7 @@ def default_config_yaml(langs: List[str], working_dir: str) -> str:
     codes = resolved.languages
     default = codes[0]
     langs_yaml = "[" + ", ".join(codes) + "]"
-    slug = "multi13" if resolved.label == "MULTI13" else "-".join(codes)
+    slug = "mali13" if resolved.label == "MALI13" else "-".join(codes)
     return f"""# Sebeni MasterConfig — https://mlsftwrs.github.io/sebeni
 # working_dir is relocatable: CLI -w and SEBENI_HOME / SEBENI_WORKING_DIR also apply.
 # Distillation runs once, then one arm (sft | grpo | dpo | apo) reads frozen G/D.
@@ -326,9 +326,9 @@ safety:
 @app.command()
 def init(
     lang: List[str] = typer.Option(
-        ["multi13"],
+        ["mali13"],
         "--lang",
-        help="multi13, all, one group code, or a comma-separated list (bam,mku). bbo is the outlier scope.",
+        help="mali13, all, one group code, or a comma-separated list (bam,mku). bbo is the outlier scope.",
     ),
     working_dir: Path = typer.Option(
         Path("./runs/sebeni-001"),
@@ -364,7 +364,7 @@ def train(
     lang: Optional[List[str]] = typer.Option(
         None,
         "--lang",
-        help="Scope override: multi13, all, one code, or a comma-separated list.",
+        help="Scope override: mali13, all, one code, or a comma-separated list.",
     ),
     hitl: Optional[bool] = typer.Option(None, "--hitl/--no-hitl", help="HITL on initial distill."),
     lr: Optional[float] = typer.Option(None, "--lr", help="Optimizer learning rate."),
@@ -581,10 +581,10 @@ def available_presets() -> List[str]:
 
 
 def _preset_yaml(name: str) -> Path:
-    """Packaged preset ``beni/data/presets/<name>.yaml`` (``all`` is ``multi13``)."""
-    token = str(name or "multi13").strip().lower()
-    if token in {"all", "multi13"}:
-        token = "multi13"
+    """Packaged preset ``beni/data/presets/<name>.yaml`` (``all`` / ``multi13`` map to ``mali13``)."""
+    token = str(name or "mali13").strip().lower()
+    if token in {"all", "mali13", "multi13"}:
+        token = "mali13"
     return PRESETS_DIR / f"{token}.yaml"
 
 
@@ -604,7 +604,7 @@ def _run_exp(
             err=True,
         )
         raise typer.Exit(code=2)
-    cfg_path = _preset_yaml(preset) if preset else (config or _preset_yaml("multi13"))
+    cfg_path = _preset_yaml(preset) if preset else (config or _preset_yaml("mali13"))
     if not Path(cfg_path).is_file():
         cfg_path = config or _packaged_exp_yaml()
     if not Path(cfg_path).is_file():
@@ -642,13 +642,13 @@ def exp(
         None,
         "-c",
         "--config",
-        help="YAML MasterConfig. Defaults to the MULTI13 preset. Trains on data.source when set, "
+        help="YAML MasterConfig. Defaults to the MALI13 preset. Trains on data.source when set, "
         "else on the packaged dataset_300_samples.jsonl.",
     ),
     preset: Optional[str] = typer.Option(
         None,
         "--preset",
-        help="multi13 or single. Overrides -c when set.",
+        help="mali13 or single. Overrides -c when set.",
     ),
     algorithm: Optional[str] = typer.Option(
         None, "--algorithm", help="sft | grpo | dpo | apo."
@@ -681,10 +681,10 @@ def experiment(
         None,
         "-c",
         "--config",
-        help="YAML MasterConfig. Defaults to the MULTI13 preset. Trains on data.source when set, "
+        help="YAML MasterConfig. Defaults to the MALI13 preset. Trains on data.source when set, "
         "else on the packaged dataset_300_samples.jsonl.",
     ),
-    preset: Optional[str] = typer.Option(None, "--preset", help="multi13 or single."),
+    preset: Optional[str] = typer.Option(None, "--preset", help="mali13 or single."),
     algorithm: Optional[str] = typer.Option(None, "--algorithm", help="sft | grpo | dpo | apo."),
     lang: Optional[List[str]] = typer.Option(None, "--lang"),
     kveritas: Optional[bool] = typer.Option(

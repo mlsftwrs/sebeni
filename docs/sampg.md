@@ -72,7 +72,7 @@ R_{\mathrm{total}} = \omega_m R_{\mathrm{morph}} + \omega_r R_{\mathrm{rule}} + 
 \]
 
 Default weights: \(R_{morph}=0.4\), \(R_{rule}=0.4\), \(R_{format}=0.1\),
-\(R_{lang}=0.1\) (sum **1.0**). The MULTI13 preset uses 0.3 / 0.3 / 0.2 / 0.2.
+\(R_{lang}=0.1\) (sum **1.0**). The MALI13 preset uses 0.3 / 0.3 / 0.2 / 0.2.
 Sebeni requires JSON `lang` to match **that row**.
 
 - \(R_{morph}\): mean of MCS, clipped \(1-\)MER, and lemma overlap against the

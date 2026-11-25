@@ -92,8 +92,8 @@ def build_config(
 
     # Data & Scope
     cfg.setdefault("data", {})
-    if scope.upper() == "MULTI13":
-        cfg["data"]["languages"] = ["multi13"]
+    if scope.upper() in {"MALI13", "MULTI13"}:
+        cfg["data"]["languages"] = ["mali13"]
     else:
         cfg["data"]["languages"] = [scope.lower()]
         cfg["data"]["default_lang"] = scope.lower()
@@ -184,7 +184,7 @@ def run_experiment_cell(
 
     model_name = cfg_data["model"]["model_name"]
     algo = cfg_data["algorithm"]
-    scope = cfg_data.get("scope", "MULTI13")
+    scope = cfg_data.get("scope", "MALI13")
     seed = cfg_data.get("trainer", {}).get("seed", 42)
 
     result_row = {
@@ -334,8 +334,8 @@ def main() -> None:
     parser.add_argument(
         "--scope",
         type=str,
-        default="MULTI13",
-        help="Scope (default: MULTI13).",
+        default="MALI13",
+        help="Scope (default: MALI13).",
     )
     parser.add_argument(
         "--max-steps",
@@ -394,7 +394,7 @@ def main() -> None:
         "--base-config",
         type=Path,
         default=None,
-        help="Base MasterConfig for every cell (default: configs/matrix/base_multi13.yaml). "
+        help="Base MasterConfig for every cell (default: configs/matrix/base_mali13.yaml). "
         "Read only; never modified.",
     )
     parser.add_argument(
@@ -451,7 +451,7 @@ def main() -> None:
     os.environ["GOOGLE_LOCATION"] = args.location
 
     repo_root = Path(__file__).resolve().parent.parent
-    base_config_path = Path(args.base_config) if args.base_config else repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    base_config_path = Path(args.base_config) if args.base_config else repo_root / "configs" / "matrix" / "base_mali13.yaml"
     if not base_config_path.is_file():
         parser.error(f"--base-config not found: {base_config_path}")
     logger.info("Base config: %s", base_config_path)

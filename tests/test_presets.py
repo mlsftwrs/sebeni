@@ -6,11 +6,11 @@ from beni.cli.main import PRESETS_DIR, _preset_yaml, app, available_presets
 
 
 def test_presets_resolve_inside_the_package():
-    for name in ("single", "multi13", "all"):
+    for name in ("single", "mali13", "multi13", "all"):
         path = _preset_yaml(name)
         assert path.is_file() and path.parent == PRESETS_DIR
     assert PRESETS_DIR.parts[-3:] == ("beni", "data", "presets")
-    assert {"multi13", "single"} <= set(available_presets())
+    assert {"mali13", "single"} <= set(available_presets())
 
 
 def test_unknown_preset_exits_2(tmp_path):

@@ -70,4 +70,4 @@ ENV GOOGLE_CLOUD_LOCATION=global \
 
 # Entrypoint for run_matrix
 ENTRYPOINT ["python3", "scripts/run_matrix.py"]
-CMD ["--models", "SmolLM2-135M", "--algorithms", "grpo", "--max-steps", "2", "--scope", "MULTI13", "--distil-model", "gemini-3.7-flash", "--location", "global", "--vertex", "--output-dir", "experiments/matrix"]
+CMD ["--models", "SmolLM2-135M", "--algorithms", "grpo", "--max-steps", "2", "--scope", "MALI13", "--distil-model", "gemini-3.7-flash", "--location", "global", "--vertex", "--output-dir", "experiments/matrix"]

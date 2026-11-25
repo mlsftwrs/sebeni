@@ -130,7 +130,8 @@ def test_scope_alias_expands_in_system_prompt():
     from beni.core.language import resolve_scope
     from beni.core.srl.prompting import system_prompt
 
-    assert system_prompt(["multi13"]) == system_prompt(resolve_scope("multi13").languages)
+    assert system_prompt(["mali13"]) == system_prompt(resolve_scope("mali13").languages)
+    assert system_prompt(["multi13"]) == system_prompt(resolve_scope("mali13").languages)
 
 
 def test_sft_example_prefix_survives_template_injection():

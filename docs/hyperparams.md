@@ -235,7 +235,7 @@ See [Experiments](experiments.md).
 | `kveritas_local_key` | `null` | PEM path; default `{working_dir}/keys/private.pem` (`openssl genrsa -out <path> 3072`) |
 | `freeze_resources` | `true` | Reuse `data/resources/frozen.json` instead of re-distilling in `train` |
 | `dataset` | `raw` | Used only when `data.source` is unset: `raw` reads `beni/data/raw/*.txt`; `packaged` reads `dataset_300_samples.jsonl` (set by `exp` when `data.source` is unset) |
-| `scope` | `null` | Set from `--lang` (`MULTI13`, `SINGLE_LANG`, `OUTLIER`, `PARTIAL`) |
+| `scope` | `null` | Set from `--lang` (`MALI13`, `SINGLE_LANG`, `OUTLIER`, `PARTIAL`) |
 | `preset` | `null` | Informational |
 
 ## `distillation:`

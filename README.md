@@ -78,12 +78,12 @@ or `TOGETHER_API_KEY`. Hub push uses `HF_TOKEN` or `huggingface-cli login`.
 **Canonical experiment** (packaged jsonl, no data to write):
 
 ```bash
-sebeni exp --preset multi13 --algorithm sft -w ./runs/multi13-sft
+sebeni exp --preset mali13 --algorithm sft -w ./runs/mali13-sft
 sebeni exp --preset single --lang bam --algorithm grpo -w ./runs/bam-grpo
 ```
 
-If `-c` and `--preset` are omitted, Sebeni loads the MULTI13 preset
-(`beni/data/presets/multi13.yaml`, shipped in the package). `sebeni exp` trains
+If `-c` and `--preset` are omitted, Sebeni loads the MALI13 preset
+(`beni/data/presets/mali13.yaml`, shipped in the package). `sebeni exp` trains
 on `data.source` when the `-c` config sets it, otherwise on the packaged
 `beni/data/raw/dataset_300_samples.jsonl`; `--preset` always uses the packaged
 file. It evaluates `beni/data/test.json` unless `experiment.eval_source` is set.
@@ -102,8 +102,8 @@ sebeni wordfreq -c ./runs/manding-001/config.yaml
 ```
 
 `init` writes `config.yaml` plus `data/`, `models/`, `runs/`, `exp/`, `runtime/`
-(default `-w ./runs/sebeni-001`, default `--lang multi13`).
-`--lang multi13` (or `all`) is the 13 canonical groups. `--lang bam` is one
+(default `-w ./runs/sebeni-001`, default `--lang mali13`).
+`--lang mali13` (or `all`) is the 13 canonical groups. `--lang bam` is one
 language; `--lang bam,mku` is a list. Trainer / LoRA knobs are YAML keys under
 `model:` / `trainer:` (GRPO) / `sft:` / `dpo:` / `apo:` and CLI flags on
 `sebeni train`. Full tables:
@@ -114,9 +114,9 @@ split) holds out part of the training rows for in-training eval
 (`data.eval_ratio` / `data.eval_rows`). `experiment.max_eval_rows` only caps
 `sebeni eval`; its default `null` scores every held-out row per language.
 
-Presets: [`beni/data/presets/multi13.yaml`](beni/data/presets/multi13.yaml),
+Presets: [`beni/data/presets/mali13.yaml`](beni/data/presets/mali13.yaml),
 [`beni/data/presets/single.yaml`](beni/data/presets/single.yaml).
-[`configs/exp.yaml`](configs/exp.yaml) is a separate MULTI13 config (same as the
+[`configs/exp.yaml`](configs/exp.yaml) is a separate MALI13 config (same as the
 packaged `beni/data/exp.yaml`). It differs from the preset in reward weights:
 0.1/0.4/0.4/0.1 vs the preset's 0.2/0.3/0.3/0.2 (format/morph/rule/lang).
 
@@ -158,7 +158,7 @@ kept for `--lang bbo`. Completions use JSON `tokens`.
 3. **Evaluate.** Held-out packaged `test.json` (or `experiment.eval_source` /
    `sebeni eval --eval-file`) reports Φ, MER, MCS, and UWEC for
    model, algorithm, and scope. **MER and UWEC are costs to minimize; MCS is a
-   consistency score (match fraction), higher is better.** MULTI13 pools
+   consistency score (match fraction), higher is better.** MALI13 pools
    morphemes (MER) and tokens (MCS, UWEC); Φ is a macro mean over languages.
    UWEC is evaluation-only. `sebeni eval` decodes greedily with the trained
    weights (`--weights`, default `{working_dir}/models`) and the same prompt as
@@ -175,7 +175,7 @@ sebeni init      --lang bam --lang mku -w ./runs/manding-001
 sebeni distill   -c config.yaml
 sebeni train     -c config.yaml --algorithm grpo [--lr 1e-5] [--kveritas] [--eval-ratio 0.1] [--use-vllm]
 sebeni eval      -c config.yaml [--weights PATH|REPO] [--eval-file PATH]
-sebeni exp       --preset multi13 --algorithm sft -w ./runs/multi13-sft   # alias: sebeni experiment
+sebeni exp       --preset mali13 --algorithm sft -w ./runs/mali13-sft   # alias: sebeni experiment
 sebeni wordfreq  -c config.yaml
 sebeni generate  -c config.yaml --prompt "..." --lang bam [--max-new-tokens 512]
 sebeni push      -c config.yaml --repo-id mlsftwrs/<model> [--write-card]

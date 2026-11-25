@@ -80,15 +80,15 @@ flowchart LR
 ```
 
 ```bash
-sebeni init --lang multi13 -w ./runs/multi13
-sebeni distill -c ./runs/multi13/config.yaml
-sebeni train -c ./runs/multi13/config.yaml --algorithm grpo --lr 1e-5 --max-steps 20
-sebeni eval  -c ./runs/multi13/config.yaml
+sebeni init --lang mali13 -w ./runs/mali13
+sebeni distill -c ./runs/mali13/config.yaml
+sebeni train -c ./runs/mali13/config.yaml --algorithm grpo --lr 1e-5 --max-steps 20
+sebeni eval  -c ./runs/mali13/config.yaml
 sebeni exp --preset single --lang bam --algorithm sft -w ./runs/bam-sft
 ```
 
 `init` creates `config.yaml` plus `data/`, `models/`, `runs/`, `exp/`,
-`runtime/` (default `-w ./runs/sebeni-001`). `--lang multi13` is the default
+`runtime/` (default `-w ./runs/sebeni-001`). `--lang mali13` is the default
 scope. `--lang bam` is one language; `--lang bam,mku` is a list.
 
 !!! note

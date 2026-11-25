@@ -17,7 +17,7 @@ END_OF_TURN_MARKERS = ("<|im_end|>", "<|eot_id|>", "<end_of_turn>", "<|end|>", "
 
 
 def system_prompt(languages: Optional[Sequence[str]] = None) -> str:
-    """The SRL system prompt naming the run's languages (scope aliases such as ``multi13`` expanded)."""
+    """The SRL system prompt naming the run's languages (scope aliases such as ``mali13`` expanded)."""
     from beni.core.language import resolve_scope
     from beni.core.srl.config import SRLGrpoPrompt
 

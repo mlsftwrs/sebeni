@@ -7,9 +7,9 @@ Language codes: [Languages](languages.md). Zero-data-prep run:
 
 ## 1. Batteries-included multilingual (`sebeni exp`)
 
-Without `-c`, `sebeni exp` loads the packaged `beni/data/presets/multi13.yaml`.
+Without `-c`, `sebeni exp` loads the packaged `beni/data/presets/mali13.yaml`.
 To change the model, hyperparams, or `report_to`, copy a config
-(`beni/data/presets/multi13.yaml` or `configs/exp.yaml`), edit it, and pass
+(`beni/data/presets/mali13.yaml` or `configs/exp.yaml`), edit it, and pass
 `-c`. Runs on packaged train / test splits — no jsonl to prepare. If the `-c`
 config sets `data.source`, `sebeni exp` trains on that instead; it prints the
 train data it uses (`[exp] train data: …`).

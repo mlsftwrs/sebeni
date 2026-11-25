@@ -13,7 +13,7 @@ Browse from [mlsftwrs.github.io/sebeni/api/](https://mlsftwrs.github.io/sebeni/a
 | [Safety](safety.md) | `SafetySpec`, `SafetyGovernor`, `PromoteDecision`, `SafetySnapshot` |
 | [Compute](compute.md) | `MorphologyScorer`, `uwec`, `mer_micro`, `mer_edit_counts`, `mcs_match_counts`, `stage_to_phi`, `RewardManager` |
 | [CLI](cli.md) | `sebeni` commands + `default_config_yaml` |
-| [Language](language.md) | `Language`, `parse_lang_codes`, `resolve_scope`, `experiment_group_code`, `MULTI13` |
+| [Language](language.md) | `Language`, `parse_lang_codes`, `resolve_scope`, `experiment_group_code`, `MALI13` |
 | [Distiller / DabaX](morphotactic.md) | `Distiller`, `DabaX` |
 
 Import config **without** torch:

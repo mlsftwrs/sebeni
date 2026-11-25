@@ -9,7 +9,7 @@ from beni.utils import config as cfg
 
 
 # Mali's 13 national languages, as Sebeni group codes.
-MULTI13: List[str] = [
+MALI13: List[str] = [
     "bam",
     "bmq",
     "boz",
@@ -24,8 +24,11 @@ MULTI13: List[str] = [
     "snk",
     "taq",
 ]
+# Deprecated alias kept for imports written before the MULTI13 -> MALI13 rename.
+MULTI13 = MALI13
 OUTLIER_CODE = "bbo"
-SCOPE_PRESETS = {"multi13", "all"}
+# ``multi13`` is the pre-rename spelling, still accepted.
+SCOPE_PRESETS = {"mali13", "multi13", "all"}
 # Applied only when reading the experiment jsonl. Global ``mlq`` stays Maninka.
 EXPERIMENT_CODE_MAP = {"mlq": "kao", "hsy": "mey", "seq": "spp"}
 
@@ -47,8 +50,8 @@ def parse_lang_codes(value: Optional[Union[str, Iterable[str]]]) -> List[str]:
 class ScopeResolution:
     """Language scope for one run.
 
-    ``label`` is ``MULTI13``, ``SINGLE_LANG``, ``OUTLIER``, or ``PARTIAL``.
-    ``dropped`` lists codes removed so they are not mixed into MULTI13 (``bbo``).
+    ``label`` is ``MALI13``, ``SINGLE_LANG``, ``OUTLIER``, or ``PARTIAL``.
+    ``dropped`` lists codes removed so they are not mixed into MALI13 (``bbo``).
     """
 
     label: str
@@ -57,9 +60,9 @@ class ScopeResolution:
 
 
 def resolve_scope(value: Optional[Union[str, Iterable[str]]]) -> ScopeResolution:
-    """Expand ``multi13`` / ``all`` and separate the ``bbo`` outlier.
+    """Expand ``mali13`` / ``all`` and separate the ``bbo`` outlier.
 
-    One ``--lang`` value may be ``multi13``, ``all``, a single code, or a
+    One ``--lang`` value may be ``mali13``, ``all``, a single code, or a
     comma-separated list. Repeating the flag still works.
     """
     tokens = parse_lang_codes(value)
@@ -67,7 +70,7 @@ def resolve_scope(value: Optional[Union[str, Iterable[str]]]) -> ScopeResolution
         return ScopeResolution("SINGLE_LANG", ["bam"], [])
     if any(token in SCOPE_PRESETS for token in tokens):
         dropped = ["bbo"] if "bbo" in tokens else []
-        return ScopeResolution("MULTI13", list(MULTI13), dropped)
+        return ScopeResolution("MALI13", list(MALI13), dropped)
 
     ordered: List[str] = []
     seen = set()
@@ -89,9 +92,9 @@ def resolve_scope(value: Optional[Union[str, Iterable[str]]]) -> ScopeResolution
         label = "OUTLIER"
     elif len(ordered) == 1:
         label = "SINGLE_LANG"
-    elif ordered == list(MULTI13) or set(ordered) == set(MULTI13):
-        label = "MULTI13"
-        ordered = list(MULTI13)
+    elif ordered == list(MALI13) or set(ordered) == set(MALI13):
+        label = "MALI13"
+        ordered = list(MALI13)
     else:
         label = "PARTIAL"
     return ScopeResolution(label, ordered, dropped)

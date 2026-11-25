@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from beni.core.language import MULTI13
+from beni.core.language import MALI13
 from beni.utils import config as cfg
 
 _GLOSS_PENDING_MARKER = "gloss-pending"
@@ -50,10 +50,10 @@ def _iter_mdf_blocks(dict_path: Path) -> List[Dict[str, Any]]:
 def curation_summary(
     baselines_dir: Optional[Union[str, Path]] = None,
 ) -> Dict[str, Dict[str, int]]:
-    """Return total, curated, and gloss-pending ``\\lx`` counts per MULTI13 language."""
+    """Return total, curated, and gloss-pending ``\\lx`` counts per MALI13 language."""
     root = _baselines_root(baselines_dir)
     summary: Dict[str, Dict[str, int]] = {}
-    for lang in sorted(MULTI13):
+    for lang in sorted(MALI13):
         dict_path = root / lang / "baseline.dict"
         if not dict_path.is_file():
             continue

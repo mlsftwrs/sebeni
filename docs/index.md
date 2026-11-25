@@ -10,14 +10,14 @@
 ```
 $ whoami
 sebeni
-$ sebeni exp --preset multi13 --algorithm sft -w ./runs/multi13-sft
+$ sebeni exp --preset mali13 --algorithm sft -w ./runs/mali13-sft
 distill → train sft → eval MER / MCS / UWEC
 ```
 
 </div>
 
 <p>
-  <span class="typewriter" data-text="$ sebeni exp --preset multi13 --algorithm sft"></span>
+  <span class="typewriter" data-text="$ sebeni exp --preset mali13 --algorithm sft"></span>
 </p>
 
 Sebeni is a **morphotactic post-training toolkit** for extremely low-resource

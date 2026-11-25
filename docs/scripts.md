@@ -18,7 +18,7 @@ python scripts/run_matrix.py --models SmolLM2-135M --algorithms sft --max-steps 
 
 | File | What |
 | --- | --- |
-| `configs/matrix/base_multi13.yaml` | Default base MasterConfig for every cell (read only): MULTI13, 500 steps, bf16, vLLM on, Google distillation (`gemini-3.7-flash`, Vertex, `global`), `kveritas` + `kveritas_seal`, reward weights 0.2/0.3/0.3/0.2 |
+| `configs/matrix/base_mali13.yaml` | Default base MasterConfig for every cell (read only): MALI13, 500 steps, bf16, vLLM on, Google distillation (`gemini-3.7-flash`, Vertex, `global`), `kveritas` + `kveritas_seal`, reward weights 0.2/0.3/0.3/0.2 |
 | `configs/matrix/models.json` | The 12 candidate models (`id`, `slug`, `display_name`, `params`, `trust_remote_code`, `recommended_batch_size`) |
 
 Top-level `preset:` / `scope:` map onto `experiment.preset` /
@@ -42,14 +42,14 @@ gradient accumulation that divide `num_generations`.
 | --- | --- | --- |
 | `--models` | all 12 in `models.json` | Comma-separated slugs or HF ids |
 | `--algorithms` | `sft,grpo,dpo,apo` | Arms |
-| `--scope` | `MULTI13` | Scope |
+| `--scope` | `MALI13` | Scope |
 | `--max-steps` | `500` | Steps per cell |
 | `--load-in-4bit` / `--load-in-8bit` / `--no-quantization` | (YAML) | Mutually exclusive quantization |
 | `--distil-model` | `gemini-3.7-flash` | Distiller teacher |
 | `--backend` | `google` | `google`, `gemini`, or `algorithmic` |
 | `--vertex` | on | Vertex AI client (cannot be turned off from the CLI) |
 | `--location` | `global` | Also exported as `GOOGLE_CLOUD_LOCATION` / `GOOGLE_LOCATION` |
-| `--base-config` | `configs/matrix/base_multi13.yaml` | Base MasterConfig (read only) |
+| `--base-config` | `configs/matrix/base_mali13.yaml` | Base MasterConfig (read only) |
 | `--output-dir` | `experiments/matrix` | Outputs and reports |
 | `--max-eval-rows` | (YAML: `null` = all) | Paragraphs scored per language |
 | `--kveritas-disclosure` | `open` | K-Veritas disclosure mode |
@@ -78,7 +78,7 @@ Trackio logs, and tables, replacing any existing algorithm subdirectory.
 | `--eval-steps` | `max_steps // 10` | Eval interval |
 | `--max-completion-length` | `256` | Rollout length |
 | `--load-in-4bit` | off | 4-bit (recommended on L4) |
-| `--scope` / `--output-dir` | `MULTI13` / `experiments/matrix` | |
+| `--scope` / `--output-dir` | `MALI13` / `experiments/matrix` | |
 | `--skip-distillation` / `--distill` | skip | Train on the packaged data without Gemini distillation |
 | `--distil-model`, `--backend`, `--location`, `--vertex/--no-vertex` | `gemini-3.7-flash`, `google`, `global`, off | Distillation, when `--distill` |
 | `--kveritas-disclosure` | `open` | |
@@ -129,7 +129,7 @@ Hub without retraining.
 | `--models` | `SmolLM2-135M` | Or `all` |
 | `--algorithms` | `grpo,sft` | |
 | `--steps` | `100` | Step suffix used in repo names |
-| `--scope` | `MULTI13` | |
+| `--scope` | `MALI13` | |
 | `--output-dir` | `experiments/matrix` | Local runs root |
 | `--hf-org`, `--hf-token` | `mlsftwrs`, env | |
 | `--max-eval-rows` | `10` | Paragraphs per language |
@@ -181,8 +181,8 @@ most read `GOOGLE_CLOUD_REGION` (default `us-central1`).
 | `scripts/run_workbench_cli.py` | Python version: `--model` (`SmolLM2-135M`), `--algo` (`grpo`), `--steps` (`2`), `--eval-rows` (`5`), `--project`, `--location` (`global`), `--output-dir` (`experiments/matrix_workbench`) |
 
 Both workbench runners write their L4 settings (bf16 on, fp16 off, gradient
-checkpointing on, 4-bit on) to `<output-dir>/base_multi13.l4.yaml` and pass
-it as `--base-config`; `configs/matrix/base_multi13.yaml` is never modified.
+checkpointing on, 4-bit on) to `<output-dir>/base_mali13.l4.yaml` and pass
+it as `--base-config`; `configs/matrix/base_mali13.yaml` is never modified.
 
 The notebook
 [`cookbooks/experimentation_matrix.ipynb`](https://github.com/mlsftwrs/sebeni/blob/main/cookbooks/experimentation_matrix.ipynb)

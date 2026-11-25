@@ -1,4 +1,4 @@
-"""Integrity and DabaX regression tests for all 13 MULTI13 packaged baselines."""
+"""Integrity and DabaX regression tests for all 13 MALI13 packaged baselines."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from beni.core.language import MULTI13
+from beni.core.language import MALI13
 from beni.core.morphotactic.dabax import DabaX, empr_stages_for_lang
 
 BASELINES_DIR = Path("beni/data/baselines")
@@ -44,7 +44,7 @@ CANONICAL_PS = {
 }
 
 
-@pytest.mark.parametrize("lang", sorted(MULTI13))
+@pytest.mark.parametrize("lang", sorted(MALI13))
 def test_baseline_files_exist_and_no_stale_txt_duplicates(lang: str):
     bdir = BASELINES_DIR / lang
     assert (bdir / "baseline.gram").is_file(), f"Missing {lang}/baseline.gram"
@@ -53,7 +53,7 @@ def test_baseline_files_exist_and_no_stale_txt_duplicates(lang: str):
     assert not (bdir / "baseline.gram.txt").exists(), f"Stale duplicate {lang}/baseline.gram.txt"
 
 
-@pytest.mark.parametrize("lang", sorted(MULTI13))
+@pytest.mark.parametrize("lang", sorted(MALI13))
 def test_dictionary_mdf_hygiene_and_dictreader(lang: str):
     daba_formats = pytest.importorskip("daba.formats")
     dict_path = BASELINES_DIR / lang / "baseline.dict"
@@ -107,7 +107,7 @@ def test_dictionary_mdf_hygiene_and_dictreader(lang: str):
     assert len(dic) >= 500
 
 
-@pytest.mark.parametrize("lang", sorted(MULTI13))
+@pytest.mark.parametrize("lang", sorted(MALI13))
 def test_grammar_compiles_and_test_json_coverage(lang: str, tmp_path: Path):
     daba_newmorph = pytest.importorskip("daba.newmorph")
     expected_empr = frozenset({6}) if lang == "bam" else frozenset({4})

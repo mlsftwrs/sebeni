@@ -10,7 +10,7 @@ Public URL: [mlsftwrs.github.io/sebeni](https://mlsftwrs.github.io/sebeni).
 
 1. **Distill resources** — once per language, on the train split. If Φ is below τ, Distiller proposes a candidate grammar G and dictionary D and promotes them only when Φ′ improves. The result is frozen.
 2. **Train one arm** — SFT, GRPO, DPO, or APO reads that frozen checkpoint and starts from the base model. Arms do not promote new G or D.
-3. **Evaluate** — the trained weights are decoded greedily on held-out rows (packaged `test.json`, or `experiment.eval_source`) and scored for MER, MCS, and UWEC for model \(m\), algorithm \(\mathcal{A}\), and scope \(l\). MER and UWEC are costs to minimize; MCS is a stage-match fraction to maximize. MULTI13 pools morphemes (MER) and tokens (MCS, UWEC) across languages; top-level Φ is a macro mean over languages.
+3. **Evaluate** — the trained weights are decoded greedily on held-out rows (packaged `test.json`, or `experiment.eval_source`) and scored for MER, MCS, and UWEC for model \(m\), algorithm \(\mathcal{A}\), and scope \(l\). MER and UWEC are costs to minimize; MCS is a stage-match fraction to maximize. MALI13 pools morphemes (MER) and tokens (MCS, UWEC) across languages; top-level Φ is a macro mean over languages.
 
 ```mermaid
 flowchart TD
@@ -80,7 +80,7 @@ beni/
   core/hub/                model cards
   core/wordfreq/           surface / lemma / morpheme / stage counts
   data/baselines/{lang}/   packaged G, D (Maninka under mku/)
-  data/presets/            multi13.yaml, single.yaml (sebeni exp --preset)
+  data/presets/            mali13.yaml, single.yaml (sebeni exp --preset)
   data/raw/dataset_300_samples.jsonl   experiment train split
   data/test.json           packaged eval texts for sebeni exp
   utils/                   workdir, prompts, language metadata

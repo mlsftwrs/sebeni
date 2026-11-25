@@ -353,7 +353,7 @@ def test_build_config_local_key(tmp_path):
     base = tmp_path / "base.yaml"
     base.write_text(yaml.safe_dump({"model": {}, "trainer": {}, "distillation": {}, "experiment": {}}), encoding="utf-8")
     cfg = build_config(
-        base, {"id": "m", "slug": "m"}, "sft", "MULTI13", 1, "x", "global", False, "algorithmic",
+        base, {"id": "m", "slug": "m"}, "sft", "MALI13", 1, "x", "global", False, "algorithmic",
         tmp_path, kveritas_local_key=str(tmp_path / "k.pem"),
     )
     assert cfg["experiment"]["kveritas_local"] is True

@@ -24,12 +24,12 @@ Aliases such as `bm` → `bam` and `mlq` → `mku` are resolved by
 `Language.from_code`. Pass ISO or group to `--lang`.
 
 ```bash
-sebeni init --lang multi13 -w ./runs/mali-001
+sebeni init --lang mali13 -w ./runs/mali-001
 sebeni init --lang bam -w ./runs/bam
 sebeni exp --preset single --lang bbo --algorithm grpo -w ./runs/bbo
 ```
 
-`bbo` is an outlier kept in the experiment file and excluded from MULTI13.
+`bbo` is an outlier kept in the experiment file and excluded from MALI13.
 Inside `dataset_300_samples.jsonl` only, `mlq` is read as Kassonke `kao`,
 `hsy` as `mey`, and `seq` as `spp`. `Language.from_code("mlq")` is still Maninka `mku`.
 Packaged `test.json` keys Maninka as `mlq`, which resolves to `mku`.
@@ -40,7 +40,7 @@ Packaged `test.json` keys Maninka as `mlq`, which resolves to `mku`.
 
 | Label | When |
 | --- | --- |
-| `MULTI13` | `multi13` / `all`, or exactly the 13 groups |
+| `MALI13` | `mali13` / `all`, or exactly the 13 groups |
 | `SINGLE_LANG` | one group (also the fallback when no language is given: `bam`) |
 | `OUTLIER` | only `bbo` |
 | `PARTIAL` | any other subset |

@@ -64,17 +64,17 @@ def test_unknown_keys_warn_and_aliases_map(caplog):
     with caplog.at_level(logging.WARNING, logger="sebeni.config"):
         mc = MasterConfig.from_dict(
             {
-                "preset": "multi13",
-                "scope": "MULTI13",
+                "preset": "mali13",
+                "scope": "MALI13",
                 "bogus": 1,
                 "experiment": {"eval_file": "test.json"},
                 "data": {"eval_rows": 5},
             }
         )
-    assert mc.experiment.preset == "multi13"
-    assert mc.experiment.scope == "MULTI13"
+    assert mc.experiment.preset == "mali13"
+    assert mc.experiment.scope == "MALI13"
     assert mc.data.eval_rows == 5
     messages = " ".join(r.getMessage() for r in caplog.records)
     assert "bogus" in messages
     assert "experiment.eval_file" in messages
-    assert "preset" not in messages.replace("multi13", "")
+    assert "preset" not in messages.replace("mali13", "")

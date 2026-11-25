@@ -7,7 +7,7 @@ R_{\mathrm{total}} = \omega_m R_{\mathrm{morph}} + \omega_r R_{\mathrm{rule}} + 
 \]
 
 Dataclass and `sebeni init` defaults (YAML `reward:`): morph **0.4**, rule
-**0.4**, format **0.1**, lang **0.1**. The packaged preset `beni/data/presets/multi13.yaml`
+**0.4**, format **0.1**, lang **0.1**. The packaged preset `beni/data/presets/mali13.yaml`
 (what `sebeni exp` loads with no `-c`) overrides them to morph **0.3**, rule **0.3**,
 format **0.2**, lang **0.2**. Both sum to **1.0**. GRPO stays
 **outcome-level** on the completion; token stages are process signal. Daba
@@ -37,7 +37,7 @@ language's train-split Φ < τ (0.5).
 
 **MER** — morpheme edit rate \((S_m+D_m+I_m)/N_m\) from a Levenshtein
 traceback. \(N_m\) is the reference morpheme count. The reported value for a
-language or MULTI13 is one micro-average over every morpheme in that scope.
+language or MALI13 is one micro-average over every morpheme in that scope.
 Eval compares the **first** DabaX sentence of the reference parse with the
 first sentence of the hypothesis. A row whose reference has no morphemes is
 skipped (not decoded, kept out of the pools) and counted in `n_skipped`, so

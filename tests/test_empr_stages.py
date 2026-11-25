@@ -8,13 +8,13 @@ from beni.core import Analysis, Sentence, Token
 from beni.core.compute.helpers import is_empr_token, recognized_word, stage_to_phi
 from beni.core.compute.metrics import MorphologyScorer
 from beni.core.compute.rewards import RewardManager
-from beni.core.language import MULTI13
+from beni.core.language import MALI13
 from beni.core.morphotactic.dabax import DabaX, empr_stages_for_lang, parse_empr_stages
 
 
 def test_empr_stages_across_all_13_baselines():
     assert empr_stages_for_lang("bam") == frozenset({6})
-    for group in MULTI13:
+    for group in MALI13:
         if group == "bam":
             continue
         assert empr_stages_for_lang(group) == frozenset({4}), group

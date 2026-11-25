@@ -133,7 +133,7 @@ tags:
   - sebeni
   - {algo.lower()}
   - {model_entry['slug']}
-  - multi13
+  - mali13
   - low-resource-languages
   - morphotactics
   - training-data
@@ -593,8 +593,8 @@ def main() -> None:
     parser.add_argument(
         "--scope",
         type=str,
-        default="MULTI13",
-        help="Scope (default: MULTI13)",
+        default="MALI13",
+        help="Scope (default: MALI13)",
     )
     parser.add_argument(
         "--output-dir",
@@ -737,7 +737,7 @@ def main() -> None:
     os.environ["GOOGLE_CLOUD_LOCATION"] = args.location
     os.environ["GOOGLE_LOCATION"] = args.location
 
-    base_config_path = repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    base_config_path = repo_root / "configs" / "matrix" / "base_mali13.yaml"
     catalog_path = repo_root / "configs" / "matrix" / "models.json"
     catalog = load_model_catalog(catalog_path)
 

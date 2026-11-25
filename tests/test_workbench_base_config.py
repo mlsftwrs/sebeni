@@ -1,4 +1,4 @@
-"""Issue 19: the workbench runners never write configs/matrix/base_multi13.yaml."""
+"""Issue 19: the workbench runners never write configs/matrix/base_mali13.yaml."""
 
 import hashlib
 import sys
@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
-BASE = Path("configs/matrix/base_multi13.yaml")
+BASE = Path("configs/matrix/base_mali13.yaml")
 # The workbench runners are local (gitignored) helper scripts; test them only where present.
 needs_workbench = pytest.mark.skipif(
     not Path("scripts/run_workbench_cli.py").is_file(), reason="local workbench scripts not present"

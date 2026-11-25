@@ -52,7 +52,7 @@ Promoted files are versioned `baseline_vN` under
 
 ```bash
 sebeni distill -c config.yaml
-sebeni distill -c config.yaml --lang multi13 --hitl
+sebeni distill -c config.yaml --lang mali13 --hitl
 sebeni distill -c config.yaml --lang bam,mku --hitl
 ```
 
