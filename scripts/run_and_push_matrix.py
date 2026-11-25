@@ -71,7 +71,7 @@ def generate_repo_readme(
         "  - sebeni",
         "  - low-resource-languages",
         "  - morphotactic-alignment",
-        "  - multi13",
+        "  - mali13",
         "  - sft",
         "  - grpo",
         "  - dpo",
@@ -199,7 +199,7 @@ def main() -> None:
         "--hf-repo",
         type=str,
         required=True,
-        help="Target Hugging Face repository ID (e.g. 'organization/sebeni-multi13-smollm2' or 'username/repo')",
+        help="Target Hugging Face repository ID (e.g. 'organization/sebeni-mali13-smollm2' or 'username/repo')",
     )
     parser.add_argument(
         "--hf-token",
@@ -260,8 +260,8 @@ def main() -> None:
     parser.add_argument(
         "--scope",
         type=str,
-        default="MULTI13",
-        help="Scope for experiment (default: MULTI13)",
+        default="MALI13",
+        help="Scope for experiment (default: MALI13)",
     )
     parser.add_argument(
         "--output-dir",
@@ -412,7 +412,7 @@ def main() -> None:
     os.environ["GOOGLE_CLOUD_LOCATION"] = args.location
     os.environ["GOOGLE_LOCATION"] = args.location
 
-    base_config_path = repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    base_config_path = repo_root / "configs" / "matrix" / "base_mali13.yaml"
     catalog_path = repo_root / "configs" / "matrix" / "models.json"
     catalog = load_model_catalog(catalog_path)
 
@@ -430,7 +430,7 @@ def main() -> None:
     quantization = "4bit" if args.load_in_4bit else None
 
     logger.info("=" * 70)
-    logger.info("SEBENI MULTI13 ALIGNMENT MATRIX RUNNER")
+    logger.info("SEBENI MALI13 ALIGNMENT MATRIX RUNNER")
     logger.info("=" * 70)
     logger.info("Model: %s", [m["id"] for m in selected_models])
     logger.info("Algorithms (%d): %s", len(selected_algorithms), selected_algorithms)

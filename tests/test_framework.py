@@ -10,7 +10,7 @@ import pytest
 from beni.core import Analysis, Morpheme, Sentence, Token, sentence_to_completion_json
 from beni.core.compute.metrics import MorphologyScorer
 from beni.core.compute.rewards import RewardManager
-from beni.core.language import MULTI13, Language, experiment_group_code, resolve_scope
+from beni.core.language import MALI13, Language, experiment_group_code, resolve_scope
 from beni.core.safety.governor import SafetyGovernor, SafetySnapshot
 from beni.core.safety.spec import SafetySpec
 from beni.core.srl.algorithm1 import (
@@ -42,14 +42,19 @@ class TestLanguage:
         aliased = cfg.resolve_packaged_baseline_dir("mlq")
         assert aliased is not None
 
-    def test_multi13_and_outlier_scopes(self):
-        multi = resolve_scope("multi13")
-        assert multi.label == "MULTI13"
-        assert multi.languages == MULTI13
-        assert resolve_scope("all").languages == MULTI13
+    def test_mali13_and_outlier_scopes(self):
+        mali = resolve_scope("mali13")
+        assert mali.label == "MALI13"
+        assert mali.languages == MALI13
+        assert resolve_scope("all").languages == MALI13
         assert resolve_scope("bam,mku").languages == ["bam", "mku"]
         assert resolve_scope("bam").label == "SINGLE_LANG"
         assert resolve_scope("bbo").label == "OUTLIER"
+
+    def test_legacy_multi13_alias_resolves_to_mali13(self):
+        legacy = resolve_scope("multi13")
+        assert legacy.label == "MALI13"
+        assert legacy.languages == MALI13
         mixed = resolve_scope(["bam", "bbo"])
         assert mixed.languages == ["bam"]
         assert mixed.dropped == ["bbo"]
@@ -64,7 +69,7 @@ class TestLanguage:
 
 
 class TestExperimentSplit:
-    def test_bbo_dropped_from_multi13_and_test_json_refused(self, tmp_path):
+    def test_bbo_dropped_from_mali13_and_test_json_refused(self, tmp_path):
         import json
 
         from beni.data.datasets import assert_train_source, load_experiment_records
@@ -78,7 +83,7 @@ class TestExperimentSplit:
             {"text": "outlier", "lang": "bbo"},
         ]
         path.write_text("\n".join(json.dumps(row) for row in rows), encoding="utf-8")
-        loaded = load_experiment_records(["multi13"], path)
+        loaded = load_experiment_records(["mali13"], path)
         assert {row["lang"] for row in loaded["records"]} == {"kao", "mey", "spp", "bam"}
         assert loaded["dropped_bbo"] == 1
         heldout = tmp_path / "test.json"

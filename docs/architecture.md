@@ -10,7 +10,7 @@ Public URL: [https://seben.robotsmali.org/docs](https://seben.robotsmali.org/doc
 
 1. **Distill resources** — once per language, on the train split. If Φ is below τ, Distiller proposes a candidate grammar G and dictionary D and promotes them only when Φ′ improves. The result is frozen.
 2. **Train one arm** — SFT, GRPO, DPO, or APO reads that frozen checkpoint and starts from the base model. Arms do not promote new G or D.
-3. **Evaluate** — held-out `test.json` reports MER, MCS, and UWEC for model \(m\), algorithm \(\mathcal{A}\), and scope \(l\). All three are costs to minimize. MULTI13 pools morphemes (MER) and tokens (MCS, UWEC) across languages.
+3. **Evaluate** — held-out `test.json` reports MER, MCS, and UWEC for model \(m\), algorithm \(\mathcal{A}\), and scope \(l\). All three are costs to minimize. MALI13 pools morphemes (MER) and tokens (MCS, UWEC) across languages.
 
 ```mermaid
 flowchart TD

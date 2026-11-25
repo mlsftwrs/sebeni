@@ -1,5 +1,5 @@
 # Single-language preset. Pick the language with `--lang bam` (default bam).
-# `--lang bbo` is the outlier scope and is not part of MULTI13.
+# `--lang bbo` is the outlier scope and is not part of MALI13.
 preset: single
 project_name: sebeni-single
 algorithm: grpo          # sft | grpo | dpo | apo

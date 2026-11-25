@@ -66,11 +66,11 @@ or `TOGETHER_API_KEY`. Hub push uses `HF_TOKEN` or `huggingface-cli login`.
 **Canonical experiment** (packaged jsonl, no data to write):
 
 ```bash
-sebeni exp --preset multi13 --algorithm sft -w ./runs/multi13-sft
+sebeni exp --preset mali13 --algorithm sft -w ./runs/mali13-sft
 sebeni exp --preset single --lang bam --algorithm grpo -w ./runs/bam-grpo
 ```
 
-If `-c` and `--preset` are omitted, Sebeni loads the MULTI13 preset.
+If `-c` and `--preset` are omitted, Sebeni loads the MALI13 preset.
 `sebeni exp` trains on `beni/data/raw/dataset_300_samples.jsonl` and
 evaluates `beni/data/test.json`. Details:
 [Experiments](https://mlsftwrs.github.io/sebeni/experiments/).
@@ -88,14 +88,14 @@ sebeni wordfreq -c ./runs/manding-001/config.yaml
 ```
 
 `init` writes `config.yaml` plus `data/`, `models/`, `runs/`, `exp/`, `runtime/`.
-`--lang multi13` (or `all`) is the 13 canonical groups. `--lang bam` is one
+`--lang mali13` (or `all`) is the 13 canonical groups. `--lang bam` is one
 language. Trainer / LoRA knobs are YAML keys under `model:` / `trainer:` /
 `dpo:` / `apo:` and CLI flags on `sebeni train`. Full tables:
 [Hyperparameters](https://mlsftwrs.github.io/sebeni/hyperparams/).
 
-Presets: [`configs/presets/multi13.yaml`](configs/presets/multi13.yaml),
+Presets: [`configs/presets/mali13.yaml`](configs/presets/mali13.yaml),
 [`configs/presets/single.yaml`](configs/presets/single.yaml).
-`configs/exp.yaml` is an alias of the MULTI13 preset.
+`configs/exp.yaml` is an alias of the MALI13 preset.
 
 ## Dataset: text and language
 
@@ -130,7 +130,7 @@ kept for `--lang bbo`. Completions use JSON `tokens`.
 2. **Train one arm.** SFT, GRPO, DPO, or APO reads that checkpoint. Arms do not
    write a new grammar or dictionary.
 3. **Evaluate.** Held-out `test.json` reports MER, MCS, and UWEC for model,
-   algorithm, and scope. All three are costs to minimize. MULTI13 pools
+   algorithm, and scope. All three are costs to minimize. MALI13 pools
    morphemes (MER) and tokens (MCS, UWEC). UWEC is evaluation-only.
 
 One policy θ; `(G_ℓ, D_ℓ)` per language. τ defaults to **0.5**. Full narrative:
@@ -144,7 +144,7 @@ sebeni init      --lang bam --lang mku -w ./runs/manding-001
 sebeni distill   -c config.yaml
 sebeni train     -c config.yaml --algorithm grpo [--lr 1e-5] [--kveritas] [--eval-ratio 0.1]
 sebeni eval      -c config.yaml
-sebeni exp       --preset multi13 --algorithm sft -w ./runs/multi13-sft
+sebeni exp       --preset mali13 --algorithm sft -w ./runs/mali13-sft
 sebeni wordfreq  -c config.yaml
 sebeni generate  -c config.yaml --prompt "..." --lang bam
 sebeni push      -c config.yaml --repo-id mlsftwrs/<model>

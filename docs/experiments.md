@@ -5,13 +5,13 @@ dictionary from the packaged experiment jsonl, train **one** arm, then
 evaluate packaged `beni/data/test.json`. Pick a preset and an algorithm.
 
 ```bash
-sebeni exp --preset multi13 --algorithm sft -w ./runs/multi13-sft
+sebeni exp --preset mali13 --algorithm sft -w ./runs/mali13-sft
 sebeni exp --preset single --lang bam --algorithm grpo -w ./runs/bam-grpo
 sebeni exp --preset single --lang bbo --algorithm sft -w ./runs/bbo-sft
 # alias: sebeni experiment
 ```
 
-If `-c` and `--preset` are omitted, Sebeni loads the MULTI13 preset.
+If `-c` and `--preset` are omitted, Sebeni loads the MALI13 preset.
 `data.source` is **ignored**. The train file is
 `beni/data/raw/dataset_300_samples.jsonl`. Codes in that file are remapped
 before distillation: `mlq` → `kao`, `hsy` → `mey`, `seq` → `spp`. `bbo` is
@@ -19,7 +19,7 @@ kept only for `--lang bbo`.
 
 ```mermaid
 flowchart TD
-  preset["preset multi13 or single"] --> jsonl["dataset_300_samples.jsonl"]
+  preset["preset mali13 or single"] --> jsonl["dataset_300_samples.jsonl"]
   jsonl --> distill["Distill once and freeze G, D"]
   distill --> arm["One arm: sft, grpo, dpo, or apo"]
   arm --> ev["Eval beni/data/test.json"]
@@ -33,7 +33,7 @@ flowchart TD
 | Train | `beni/data/raw/dataset_300_samples.jsonl` | experiment remap, then group code |
 | Eval | `beni/data/test.json` | object `{lang: text}`; paragraphs split; evaluation only |
 
-`bbo` rows stay in the jsonl and are excluded from MULTI13. A language with no packaged baseline uses Distiller scratch bootstrap. `raw/*.txt` remains available to `sebeni wordfreq` and to `sebeni train` when `experiment.dataset` is `raw`.
+`bbo` rows stay in the jsonl and are excluded from MALI13. A language with no packaged baseline uses Distiller scratch bootstrap. `raw/*.txt` remains available to `sebeni wordfreq` and to `sebeni train` when `experiment.dataset` is `raw`.
 
 Custom `data.source` applies to `sebeni train` / `eval`. Wordfreq uses
 `wordfreq.raw_inputs` (with `data.source` as a compatibility fallback).
@@ -71,7 +71,7 @@ Trackio stays in `[train]`.
 
 Held-out MER, MCS, and UWEC are the same three costs for every arm. Scope
 scores pool reference morphemes (MER) and tokens (MCS, UWEC); a language with
-more units weighs more in MULTI13. Reported MCS is the mismatch rate.
+more units weighs more in MALI13. Reported MCS is the mismatch rate.
 Training still uses the match fraction. UWEC is evaluation-only.
 
 ## K-Veritas (optional)

@@ -146,8 +146,8 @@ def main():
     parser.add_argument(
         "--scope",
         type=str,
-        default="MULTI13",
-        help="Language scope (default: MULTI13)",
+        default="MALI13",
+        help="Language scope (default: MALI13)",
     )
     parser.add_argument(
         "--output-dir",
@@ -201,7 +201,7 @@ def main():
 
     catalog_path = repo_root / "configs" / "matrix" / "models.json"
     catalog = load_model_catalog(catalog_path)
-    base_config_path = repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    base_config_path = repo_root / "configs" / "matrix" / "base_mali13.yaml"
 
     selected_algos = [a.strip().lower() for a in args.algorithms.split(",") if a.strip()]
 

@@ -1,7 +1,7 @@
 [
   {
     "model": "HuggingFaceTB/SmolLM2-135M",
-    "scope": "MULTI13",
+    "scope": "MALI13",
     "method": "SFT",
     "mer": null,
     "mcs": null,

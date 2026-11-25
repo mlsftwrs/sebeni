@@ -18,7 +18,7 @@ borrowing EMPR / stage 6 → `empr` (default 0.5); unknown → 0. Trigger Distil
 if corpus/batch Φ < τ (0.5).
 
 **MER** — held-out morpheme edit rate \((S_m+D_m+I_m)/N_m\). \(N_m\) is the
-reference morpheme count. The reported value for a language or MULTI13 is one
+reference morpheme count. The reported value for a language or MALI13 is one
 micro-average over every morpheme in that scope. Lower is better.
 
 **MCS (reward)** — fraction of tokens whose predicted `stage` equals Daba's

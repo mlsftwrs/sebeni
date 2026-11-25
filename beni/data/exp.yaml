@@ -1,8 +1,8 @@
-# Alias of configs/presets/multi13.yaml.
+# Alias of configs/presets/mali13.yaml.
 # `sebeni exp` trains on dataset_300_samples.jsonl and evaluates on test.json.
 
-preset: multi13
-project_name: sebeni-multi13
+preset: mali13
+project_name: sebeni-mali13
 algorithm: grpo          # sft | grpo | dpo | apo
 
 model:
@@ -15,7 +15,7 @@ model:
 
 data:
   default_lang: bam
-  languages: [multi13]
+  languages: [mali13]
   scheme: completion
 
 trainer:
@@ -47,7 +47,7 @@ distillation:
 experiment:
   dataset: packaged
   freeze_resources: true
-  scope: MULTI13
+  scope: MALI13
   max_eval_rows: 1
   kveritas: false
   kveritas_seal: false

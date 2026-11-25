@@ -91,8 +91,8 @@ def build_config(
 
     # Data & Scope
     cfg.setdefault("data", {})
-    if scope.upper() == "MULTI13":
-        cfg["data"]["languages"] = ["multi13"]
+    if scope.upper() in {"MALI13", "MULTI13"}:
+        cfg["data"]["languages"] = ["mali13"]
     else:
         cfg["data"]["languages"] = [scope.lower()]
         cfg["data"]["default_lang"] = scope.lower()
@@ -180,7 +180,7 @@ def run_experiment_cell(
 
     model_name = cfg_data["model"]["model_name"]
     algo = cfg_data["algorithm"]
-    scope = cfg_data.get("scope", "MULTI13")
+    scope = cfg_data.get("scope", "MALI13")
     seed = cfg_data.get("trainer", {}).get("seed", 42)
 
     result_row = {
@@ -371,8 +371,8 @@ def main() -> None:
     parser.add_argument(
         "--scope",
         type=str,
-        default="MULTI13",
-        help="Scope (default: MULTI13).",
+        default="MALI13",
+        help="Scope (default: MALI13).",
     )
     parser.add_argument(
         "--max-steps",
@@ -475,7 +475,7 @@ def main() -> None:
     os.environ["GOOGLE_LOCATION"] = args.location
 
     repo_root = Path(__file__).resolve().parent.parent
-    base_config_path = repo_root / "configs" / "matrix" / "base_multi13.yaml"
+    base_config_path = repo_root / "configs" / "matrix" / "base_mali13.yaml"
     catalog_path = repo_root / "configs" / "matrix" / "models.json"
 
     catalog = load_model_catalog(catalog_path)
